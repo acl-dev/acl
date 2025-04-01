@@ -55,6 +55,8 @@ public:
 	int sendto(const void* data, size_t size,
 		const struct sockaddr* dest_addr, int addrlen, int flags = 0);
 
+	ssize_t send(const void* buf, size_t len, int flags);
+
 	/**
 	 * 如果采用写缓冲方式，则最后需要调用本函数刷写缓冲区
 	 * @return {bool} 返回 false 表示写失败，有可能是连接关闭

@@ -50,6 +50,18 @@ int ostream::sendto(const void* data, size_t len,
 #endif
 }
 
+ssize_t ostream::send(const void* buf, size_t len, int flags)
+{
+	acl_assert(stream_);
+	ACL_SOCKET fd = ACL_VSTREAM_SOCK(stream_);
+
+#if defined(_WIN32) || defined(_WIN64)
+	return ::send(fd, (char*) buf, (int) len, flags);
+#else
+	return ::send(fd, buf, len, flags);
+#endif
+}
+
 bool ostream::fflush()
 {
 	if (acl_vstream_fflush(stream_) == ACL_VSTREAM_EOF) {

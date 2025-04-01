@@ -6,6 +6,10 @@
 #include "acl_cpp/stream/socket_stream.hpp"
 #endif
 
+#if defined(__linux__) && defined(MSG_ZEROCOPY)
+#include <linux/errqueue.h>  // 定义了 sock_extended_err 结构
+#endif
+
 namespace acl {
 
 socket_stream::socket_stream()
@@ -485,6 +489,88 @@ bool socket_stream::get_tcp_non_blocking() const
 	}
 
 	return acl_is_blocking(sock) == 0;
+}
+
+bool socket_stream::set_zerocopy(bool yes)
+{
+#ifdef MSG_ZEROCOPY
+	ACL_SOCKET sock = sock_handle();
+	if (sock == ACL_SOCKET_INVALID) {
+		logger_error("invalid socket handle");
+		return false;
+	}
+
+	int on = yes ? 1 : 0;
+	if (setsockopt(sock, SOL_SOCKET, SO_ZEROCOPY, &on, sizeof(on)) != 0) {
+		logger_error("set SO_ZEROCOPY %s error %s",
+			on ? "on" : "off", last_serror());
+		return false;
+	}
+	return true;
+#else
+	(void) yes;
+	return false;
+#endif
+}
+
+bool socket_stream::wait_iocp(int ms) const
+{
+#ifdef MSG_ZEROCOPY
+	ACL_SOCKET fd = sock_handle();
+	if (fd == ACL_SOCKET_INVALID) {
+		logger_error("invalid socket handle");
+		return false;
+	}
+
+	struct pollfd pfd;
+	pfd.fd = fd;
+	pfd.events = POLLERR | POLLIN;
+
+	int ret = poll(&pfd, 1, ms);
+	if (ret < 0) {
+		return false;
+	}
+	if (ret == 0) {
+		acl_set_error(ACL_ETIMEDOUT);
+		return false;
+	}
+
+	char cmsgbuf[1024];
+	char payload[1];
+	struct msghdr msg;
+	struct iovec iov;
+	memset(&msg, 0, sizeof(msg));
+	iov.iov_base = payload;
+	iov.iov_len = sizeof(payload);
+	msg.msg_iov = &iov;
+	msg.msg_iovlen = 1;
+	msg.msg_control = cmsgbuf;
+	msg.msg_controllen = sizeof(cmsgbuf);
+
+	ssize_t n = ::recvmsg(fd, &msg, MSG_ERRQUEUE);
+	if (n < 0) {
+		return false;
+	}
+
+	struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
+	if (cmsg == NULL) {
+		return false;
+	}
+
+	if (cmsg->cmsg_level != SOL_IP || cmsg->cmsg_type != IP_RECVERR) {
+		return false;
+	}
+
+	struct sock_extended_err *serr = (struct sock_extended_err *)CMSG_DATA(cmsg);
+	if (serr && serr->ee_origin == SO_EE_ORIGIN_ZEROCOPY) {
+		return true;
+	} else {
+		return false;
+	}
+#else
+	(void) ms;
+	return false;
+#endif
 }
 
 } // namespace acl
