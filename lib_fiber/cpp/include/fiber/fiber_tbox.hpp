@@ -133,18 +133,27 @@ public:
 	T* pop(int ms = -1, bool* found = NULL) {
 		bool found_flag;
 
+		T* t = peek(found_flag);
+		if (found_flag) {
+			if (found) {
+				*found = found_flag;
+			}
+			return t;
+		}
+
+		if (lock_nonb_) {
+			while (!mutex_.trylock()) {}
+		} else if (!mutex_.lock()) { abort(); }
+
 		while (true) {
-			T* t = peek(found_flag);
+			t = peek(found_flag);
 			if (found_flag) {
+				if (!mutex_.unlock()) { abort(); }
 				if (found) {
 					*found = found_flag;
 				}
 				return t;
 			}
-
-			if (lock_nonb_) {
-				while (!mutex_.trylock()) {}
-			} else if (!mutex_.lock()) { abort(); }
 
 			// The calling order: wait should be called first
 			// before checking wait_ms.
@@ -163,8 +172,6 @@ public:
 				}
 				return NULL;
 			}
-
-			if (!mutex_.unlock()) { abort(); }
 		}
 	}
 
@@ -181,14 +188,29 @@ public:
 				if (max > 0 && n >= max) {
 					return n;
 				}
-				continue;
 			} else if (n > 0) {
 				return n;
 			}
+		}
 
-			if (lock_nonb_) {
-				while (!mutex_.trylock()) {}
-			} else if (!mutex_.lock()) { abort(); }
+		if (lock_nonb_) {
+			while (!mutex_.trylock()) {}
+		} else if (!mutex_.lock()) { abort(); }
+
+		while (true) {
+			T* t = peek(found_flag);
+			if (found_flag) {
+				out.push_back(t);
+				n++;
+				if (max > 0 && n >= max) {
+					if (!mutex_.unlock()) { abort(); }
+					return n;
+				}
+				continue;
+			} else if (n > 0) {
+				if (!mutex_.unlock()) { abort(); }
+				return n;
+			}
 
 			if (!cond_.wait(mutex_, ms) && ms >= 0) {
 				if (!mutex_.unlock()) { abort(); }
@@ -199,8 +221,6 @@ public:
 				if (!mutex_.unlock()) { abort(); }
 				return n;
 			}
-
-			if (!mutex_.unlock()) { abort(); }
 		}
 	}
 

@@ -144,14 +144,19 @@ public:
 	 * @override
 	 */
 	bool pop(T& t, int ms = -1) {
+		if (peek_obj(t)) {
+			return true;
+		}
+
+		if (lock_nonb_) {
+			while (!mutex_.trylock()) {}
+		} else if (!mutex_.lock()) { abort(); }
+
 		while (true) {
 			if (peek_obj(t)) {
+				if (!mutex_.unlock()) { abort(); }
 				return true;
 			}
-
-			if (lock_nonb_) {
-				while (!mutex_.trylock()) {}
-			} else if (!mutex_.lock()) { abort(); }
 
 			if (!cond_.wait(mutex_, ms) && ms >= 0) {
 				if (!mutex_.unlock()) { abort(); }
@@ -162,8 +167,6 @@ public:
 				if (!mutex_.unlock()) { abort(); }
 				return false;
 			}
-
-			if (!mutex_.unlock()) { abort(); }
 		}
 	}
 
@@ -179,14 +182,31 @@ public:
 				if (max > 0 && n >= max) {
 					return n;
 				}
-				continue;
 			} else if (n > 0) {
 				return n;
+			} else {
+				break;
 			}
+		}
 
-			if (lock_nonb_) {
-				while (!mutex_.trylock()) {}
-			} else if (!mutex_.lock()) { abort(); }
+		if (lock_nonb_) {
+			while (!mutex_.trylock()) {}
+		} else if (!mutex_.lock()) { abort(); }
+
+		while (true) {
+			T t;
+			if (peek_obj(t)) {
+				out.push_back(t);
+				n++;
+				if (max > 0 && n >= max) {
+					if (!mutex_.unlock()) { abort(); }
+					return n;
+				}
+				continue;
+			} else if (n > 0) {
+				if (!mutex_.unlock()) { abort(); }
+				return n;
+			}
 
 			if (!cond_.wait(mutex_, ms) && ms >= 0) {
 				if (!mutex_.unlock()) { abort(); }
@@ -197,8 +217,6 @@ public:
 				if (!mutex_.unlock()) { abort(); }
 				return n;
 			}
-
-			if (!mutex_.unlock()) { abort(); }
 		}
 	}
 
