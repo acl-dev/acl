@@ -48,7 +48,8 @@ namespace acl {
 template<typename T>
 class fiber_tbox2 : public box2<T> {
 public:
-	fiber_tbox2() : capacity_(10000) , off_curr_(0) , off_next_(0) {
+	fiber_tbox2(bool lock_nonb = true)
+	: capacity_(10000) , off_curr_(0) , off_next_(0), lock_nonb_(lock_nonb) {
 		box_ = new T[capacity_];
 	}
 
@@ -78,7 +79,9 @@ public:
 	 * @override
 	 */
 	bool push(T t, bool notify_first = true) {
-		if (! mutex_.lock()) { abort(); }
+		if (lock_nonb_) {
+			while (!qlock_.try_lock()) {}
+		} else if (!qlock_.lock()) { abort(); }
 
 		if (off_next_ == capacity_) {
 			if (off_curr_ >= 10000) {
@@ -116,12 +119,18 @@ public:
 		box_[off_next_++] = t;
 #endif
 
+		if (!qlock_.unlock()) { abort(); }
+
+		if (lock_nonb_) {
+			while (!mutex_.trylock()) {}
+		} else if (!mutex_.lock()) { abort(); }
+
 		if (notify_first) {
-			if (! cond_.notify()) { abort(); }
-			if (! mutex_.unlock()) { abort(); }
+			if (!cond_.notify()) { abort(); }
+			if (!mutex_.unlock()) { abort(); }
 		} else {
-			if (! mutex_.unlock()) { abort(); }
-			if (! cond_.notify()) { abort(); }
+			if (!mutex_.unlock()) { abort(); }
+			if (!cond_.notify()) { abort(); }
 		}
 		return true;
 	}
@@ -135,23 +144,26 @@ public:
 	 * @override
 	 */
 	bool pop(T& t, int ms = -1) {
-		if (! mutex_.lock()) { abort(); }
-
 		while (true) {
 			if (peek_obj(t)) {
-				if (! mutex_.unlock()) { abort(); }
 				return true;
 			}
 
+			if (lock_nonb_) {
+				while (!mutex_.trylock()) {}
+			} else if (!mutex_.lock()) { abort(); }
+
 			if (!cond_.wait(mutex_, ms) && ms >= 0) {
-				if (! mutex_.unlock()) { abort(); }
+				if (!mutex_.unlock()) { abort(); }
 				return false;
 			}
 
 			if (fiber::self_killed()) {
-				if (! mutex_.unlock()) { abort(); }
+				if (!mutex_.unlock()) { abort(); }
 				return false;
 			}
+
+			if (!mutex_.unlock()) { abort(); }
 		}
 	}
 
@@ -159,34 +171,34 @@ public:
 	size_t pop(std::vector<T>& out, size_t max, int ms) {
 		size_t n = 0;
 
-		if (! mutex_.lock()) { abort(); }
-
 		while (true) {
 			T t;
 			if (peek_obj(t)) {
 				out.push_back(t);
 				n++;
 				if (max > 0 && n >= max) {
-					if (! mutex_.unlock()) { abort(); }
 					return n;
 				}
 				continue;
-			}
-
-			if (n > 0) {
-				if (! mutex_.unlock()) { abort(); }
+			} else if (n > 0) {
 				return n;
 			}
 
-			if (! cond_.wait(mutex_, ms) && ms >= 0) {
-				if (! mutex_.unlock()) { abort(); }
+			if (lock_nonb_) {
+				while (!mutex_.trylock()) {}
+			} else if (!mutex_.lock()) { abort(); }
+
+			if (!cond_.wait(mutex_, ms) && ms >= 0) {
+				if (!mutex_.unlock()) { abort(); }
 				return n;
 			}
 
 			if (fiber::self_killed()) {
-				if (! mutex_.unlock()) { abort(); }
+				if (!mutex_.unlock()) { abort(); }
 				return n;
 			}
+
+			if (!mutex_.unlock()) { abort(); }
 		}
 	}
 
@@ -206,11 +218,11 @@ public:
 
 public:
 	void lock() {
-		if (! mutex_.lock()) { abort(); }
+		if (!qlock_.lock()) { abort(); }
 	}
 
 	void unlock() {
-		if (! mutex_.unlock()) { abort(); }
+		if (!qlock_.unlock()) { abort(); }
 	}
 
 private:
@@ -222,14 +234,21 @@ private:
 	size_t       capacity_;
 	size_t       off_curr_;
 	size_t       off_next_;
+	bool         lock_nonb_;
 	fiber_mutex  mutex_;
 	fiber_cond   cond_;
+	thread_mutex qlock_;
 
 	bool peek_obj(T& t) {
+		if (lock_nonb_) {
+			while (!qlock_.try_lock()) {}
+		} else if (qlock_.lock()) { abort(); }
+
 		if (off_curr_ == off_next_) {
 			if (off_curr_ > 0) {
 				off_curr_ = off_next_ = 0;
 			}
+			if (!qlock_.unlock()) { abort(); }
 			return false;
 		}
 
@@ -238,6 +257,7 @@ private:
 #else
 		t = box_[off_curr_++];
 #endif
+		if (!qlock_.unlock()) { abort(); }
 		return true;
 	}
 };

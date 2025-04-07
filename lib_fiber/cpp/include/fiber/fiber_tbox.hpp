@@ -46,8 +46,10 @@ public:
 	 * The constructor
 	 * @param free_obj {bool} Automatically check and release consumed
 	 *  dynamic objects when fiber_tbox is destroyed.
+	 * @param lock_nonb {bool} If use nonblocking lock mode.
 	 */
-	explicit fiber_tbox(bool free_obj = true) : size_(0), free_obj_(free_obj) {}
+	explicit fiber_tbox(bool free_obj = true, bool lock_nonb = true)
+	: size_(0), free_obj_(free_obj), lock_nonb_(lock_nonb)  {}
 
 	~fiber_tbox() {
 		clear(free_obj_);
@@ -85,17 +87,25 @@ public:
 	 * @override
 	 */
 	bool push(T* t, bool notify_first = true) {
-		if (! mutex_.lock()) { abort(); }
+		if (lock_nonb_) {
+			while (!qlock_.try_lock()) {}
+		} else if (!qlock_.lock()) { abort(); }
 
 		tbox_.push_back(t);
 		size_++;
 
+		if (!qlock_.unlock()) { abort(); }
+
+		if (lock_nonb_) {
+			while (!mutex_.trylock()) {}
+		} else if (!mutex_.lock()) { abort(); }
+
 		if (notify_first) {
-			if (! cond_.notify()) { abort(); }
-			if (! mutex_.unlock()) { abort(); }
+			if (!cond_.notify()) { abort(); }
+			if (!mutex_.unlock()) { abort(); }
 		} else {
-			if (! mutex_.unlock()) { abort(); }
-			if (! cond_.notify()) { abort(); }
+			if (!mutex_.unlock()) { abort(); }
+			if (!cond_.notify()) { abort(); }
 		}
 
 		return true;
@@ -123,22 +133,23 @@ public:
 	T* pop(int ms = -1, bool* found = NULL) {
 		bool found_flag;
 
-		if (! mutex_.lock()) { abort(); }
-
 		while (true) {
 			T* t = peek(found_flag);
 			if (found_flag) {
-				if (! mutex_.unlock()) { abort(); }
 				if (found) {
 					*found = found_flag;
 				}
 				return t;
 			}
 
+			if (lock_nonb_) {
+				while (!mutex_.trylock()) {}
+			} else if (!mutex_.lock()) { abort(); }
+
 			// The calling order: wait should be called first
 			// before checking wait_ms.
-			if (! cond_.wait(mutex_, ms) && ms >= 0) {
-				if (! mutex_.unlock()) { abort(); }
+			if (!cond_.wait(mutex_, ms) && ms >= 0) {
+				if (!mutex_.unlock()) { abort(); }
 				if (found) {
 					*found = false;
 				}
@@ -146,12 +157,14 @@ public:
 			}
 
 			if (fiber::self_killed()) {
-				if (! mutex_.unlock()) { abort(); }
+				if (!mutex_.unlock()) { abort(); }
 				if (found) {
 					*found = false;
 				}
 				return NULL;
 			}
+
+			if (!mutex_.unlock()) { abort(); }
 		}
 	}
 
@@ -159,8 +172,6 @@ public:
 	size_t pop(std::vector<T*>& out, size_t max, int ms) {
 		size_t n = 0;
 		bool found_flag;
-
-		if (! mutex_.lock()) { abort(); }
 
 		while (true) {
 			T* t = peek(found_flag);
@@ -171,22 +182,25 @@ public:
 					return n;
 				}
 				continue;
-			}
-
-			if (n > 0) {
-				if (! mutex_.unlock()) { abort(); }
+			} else if (n > 0) {
 				return n;
 			}
 
-			if (! cond_.wait(mutex_, ms) && ms >= 0) {
-				if (! mutex_.unlock()) { abort(); }
+			if (lock_nonb_) {
+				while (!mutex_.trylock()) {}
+			} else if (!mutex_.lock()) { abort(); }
+
+			if (!cond_.wait(mutex_, ms) && ms >= 0) {
+				if (!mutex_.unlock()) { abort(); }
 				return n;
 			}
 
 			if (fiber::self_killed()) {
-				if (! mutex_.unlock()) { abort(); }
+				if (!mutex_.unlock()) { abort(); }
 				return n;
 			}
+
+			if (!mutex_.unlock()) { abort(); }
 		}
 	}
 
@@ -209,13 +223,13 @@ public:
 
 public:
 	void lock() {
-		if (! mutex_.lock()) {
+		if (!qlock_.lock()) {
 			abort();
 		}
 	}
 
 	void unlock() {
-		if (! mutex_.unlock()) {
+		if (!qlock_.unlock()) {
 			abort();
 		}
 	}
@@ -228,19 +242,30 @@ private:
 	std::list<T*> tbox_;
 	size_t        size_;
 	bool          free_obj_;
+	bool          lock_nonb_;
 	fiber_mutex   mutex_;
 	fiber_cond    cond_;
+	thread_mutex  qlock_;
 
 	T* peek(bool& found_flag) {
+		if (lock_nonb_) {
+			while (!qlock_.try_lock()) {}
+		} else if (!qlock_.lock()) { abort(); }
+
 		typename std::list<T*>::iterator it = tbox_.begin();
 		if (it == tbox_.end()) {
+			if (!qlock_.unlock()) { abort(); }
+
 			found_flag = false;
 			return NULL;
 		}
-		found_flag = true;
 		size_--;
 		T* t = *it;
 		tbox_.erase(it);
+
+		if (!qlock_.unlock()) { abort(); }
+
+		found_flag = true;
 		return t;
 	}
 };
