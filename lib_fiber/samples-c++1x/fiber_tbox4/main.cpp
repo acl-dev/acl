@@ -6,7 +6,7 @@
 #include <memory>
 #include <atomic>
 
-static void consuming(acl::fiber_tbox<int>& box, int max) {
+static void consuming1(acl::fiber_tbox<int>& box, int max) {
 	int i = 0, cnt = 0;
 	for (i = 0; i < max; i++) {
 		int *n = box.pop();
@@ -33,11 +33,11 @@ static void test1(int max, bool read_in_fiber, bool send_in_fiber,
 	std::thread([box, wg, max, read_in_fiber] {
 		if (read_in_fiber) {
 			go[box, max] {
-				consuming(*box, max);
+				consuming1(*box, max);
 			};
 			acl::fiber::schedule();
 		} else {
-			consuming(*box, max);
+			consuming1(*box, max);
 		}
 
 		wg->done();
@@ -68,6 +68,69 @@ static void test1(int max, bool read_in_fiber, bool send_in_fiber,
 
 	acl::fiber::schedule();
 }
+
+//////////////////////////////////////////////////////////////////////////////
+
+static void consuming2(acl::fiber_tbox2<int>& box, int max) {
+	int i = 0, cnt = 0;
+	for (i = 0; i < max; i++) {
+		int n;
+		if (!box.pop(n)) {
+			printf("POP error\r\n");
+			break;
+		}
+		//printf(">>>pop one n: %d\n", i);
+		cnt++;
+	}
+
+	printf("The last n is %d, count is %d\r\n", i, cnt);
+}
+
+static void test2(int max, bool read_in_fiber, bool send_in_fiber,
+		bool blocking, bool notify_first) {
+	std::shared_ptr<acl::fiber_tbox2<int>> box(new acl::fiber_tbox2<int>(!blocking));
+
+	std::shared_ptr<acl::wait_group> wg(new acl::wait_group());
+
+	wg->add(1);
+	std::thread([box, wg, max, read_in_fiber] {
+		if (read_in_fiber) {
+			go[box, max] {
+				consuming2(*box, max);
+			};
+			acl::fiber::schedule();
+		} else {
+			consuming2(*box, max);
+		}
+
+		wg->done();
+	}).detach();
+
+	if (!send_in_fiber) {
+		int i;
+		for (i = 0; i < max; i++) {
+			box->push(i, notify_first);
+		}
+
+		printf("Push over, count=%d, max=%d\r\n", i, max);
+		wg->wait();
+		return;
+	}
+
+	go[box, wg, max, notify_first] {
+		int i;
+		for (i = 0; i < max; i++) {
+			box->push(i, notify_first);
+		}
+
+		printf("Push over, count=%d, max=%d\r\n", i, max);
+		wg->wait();
+	};
+
+	acl::fiber::schedule();
+}
+
+//////////////////////////////////////////////////////////////////////////////
 
 static void usage(const char *procname) {
 	printf("usage: %s -h[help]\r\n"
@@ -114,7 +177,12 @@ int main(int argc, char *argv[]) {
 	gettimeofday(&begin, nullptr);
 	test1(max, read_in_fiber, send_in_fiber, blocking, notify_first);
 	gettimeofday(&end, nullptr);
+	printf("fiber_tbox over now, max=%d, cost=%.2f\r\n", max, acl::stamp_sub(end, begin));
 
-	printf("All over now, max=%d, cost=%.2f\r\n", max, acl::stamp_sub(end, begin));
+	gettimeofday(&begin, nullptr);
+	test2(max, read_in_fiber, send_in_fiber, blocking, notify_first);
+	gettimeofday(&end, nullptr);
+	printf("fiber_tbox2 over now, max=%d, cost=%.2f\r\n", max, acl::stamp_sub(end, begin));
+
 	return 0;
 }

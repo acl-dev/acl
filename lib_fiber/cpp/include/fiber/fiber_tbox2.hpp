@@ -240,7 +240,7 @@ private:
 	bool peek_obj(T& t) {
 		if (lock_nonb_) {
 			while (!qlock_.try_lock()) {}
-		} else if (qlock_.lock()) { abort(); }
+		} else if (!qlock_.lock()) { abort(); }
 
 		if (off_curr_ == off_next_) {
 			if (off_curr_ > 0) {
@@ -264,7 +264,7 @@ private:
 
 		if (lock_nonb_) {
 			while (!qlock_.try_lock()) {}
-		} else if (qlock_.lock()) { abort(); }
+		} else if (!qlock_.lock()) { abort(); }
 
 		while (true) {
 			if (off_curr_ == off_next_) {
@@ -276,11 +276,9 @@ private:
 			}
 
 #if __cplusplus >= 201103L || defined(USE_CPP11)
-			T t = std::move(box_[off_curr_++]);
-			out.emplace_back(t);
+			out.push_back(std::move(box_[off_curr_++]));
 #else
-			T t = box_[off_curr_++];
-			out.push_back(t);
+			out.push_back(box_[off_curr_++]);
 #endif
 			n++;
 			if (max > 0 && n >= max) {
