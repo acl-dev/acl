@@ -177,20 +177,9 @@ public:
 
 	// @override
 	size_t pop(std::vector<T*>& out, size_t max, int ms) {
-		size_t n = 0;
-		bool found_flag;
-
-		while (true) {
-			T* t = peek(found_flag);
-			if (found_flag) {
-				out.push_back(t);
-				n++;
-				if (max > 0 && n >= max) {
-					return n;
-				}
-			} else if (n > 0) {
-				return n;
-			}
+		size_t n = peek(out, max);
+		if (n > 0) {
+			return n;
 		}
 
 		if (lock_nonb_) {
@@ -198,16 +187,8 @@ public:
 		} else if (!mutex_.lock()) { abort(); }
 
 		while (true) {
-			T* t = peek(found_flag);
-			if (found_flag) {
-				out.push_back(t);
-				n++;
-				if (max > 0 && n >= max) {
-					if (!mutex_.unlock()) { abort(); }
-					return n;
-				}
-				continue;
-			} else if (n > 0) {
+			n = peek(out, max);
+			if (n > 0) {
 				if (!mutex_.unlock()) { abort(); }
 				return n;
 			}
@@ -287,6 +268,35 @@ private:
 
 		found_flag = true;
 		return t;
+	}
+
+	size_t peek(std::vector<T*>& out, size_t max) {
+		size_t n = 0;
+
+		if (lock_nonb_) {
+			while (!qlock_.try_lock()) {}
+		} else if (!qlock_.lock()) { abort(); }
+
+		while (true) {
+			typename std::list<T*>::iterator it = tbox_.begin();
+			if (it == tbox_.end()) {
+				break;
+			}
+
+			T* t = *it;
+			tbox_.erase(it);
+			size_--;
+
+			out.push_back(t);
+			n++;
+
+			if (max > 0 && n >= max) {
+				break;
+			}
+		}
+
+		if (!qlock_.unlock()) { abort(); }
+		return n;
 	}
 };
 
