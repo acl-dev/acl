@@ -578,6 +578,7 @@ int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX *mutex)
 		unsigned id = acl_fiber_self();
 		long me = id == 0 ? -thread_self() : (long) id;
 		mutex->owner = me;
+		mutex->fiber = acl_fiber_running();
 	}
 	return ret;
 }
