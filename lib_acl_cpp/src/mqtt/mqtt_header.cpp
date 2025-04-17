@@ -72,9 +72,9 @@ mqtt_header::mqtt_header(const mqtt_header& header)
 	dlen_   = header.get_remaining_length();
 }
 
-mqtt_header::~mqtt_header(void) {}
+mqtt_header::~mqtt_header() {}
 
-void mqtt_header::reset(void) {
+void mqtt_header::reset() {
 	status_ = MQTT_STAT_HDR_TYPE;
 	finished_ = false;
 	type_   = MQTT_RESERVED_MIN;
@@ -171,7 +171,7 @@ bool mqtt_header::build_header(string& out) {
 	return true;
 }
 
-mqtt_qos_t mqtt_header::get_qos(void) const {
+mqtt_qos_t mqtt_header::get_qos() const {
 	switch ((hflags_ >> 1) & 0x03) {
 	case MQTT_QOS1:
 		return MQTT_QOS1;
@@ -183,11 +183,11 @@ mqtt_qos_t mqtt_header::get_qos(void) const {
 	}
 }
 
-bool mqtt_header::is_dup(void) const {
+bool mqtt_header::is_dup() const {
 	return (hflags_ & 0x08) ? true : false;
 }
 
-bool mqtt_header::is_remain(void) const {
+bool mqtt_header::is_remain() const {
 	return (hflags_ & 0x01) ? true : false;
 }
 
@@ -223,7 +223,7 @@ int mqtt_header::update_header_type(const char* data, int dlen) {
 	char ch = *data++;
 	dlen--;
 
-	char type = (ch &0xff) >> 4;
+	char type = (ch & 0xff) >> 4;
 	if (type <= MQTT_RESERVED_MIN || type >= MQTT_RESERVED_MAX) {
 		//logger_error("invalid type=%d", type);
 		return -1;

@@ -45,9 +45,10 @@ public:
 	/**
 	 * read mqtt data from mqtt connection and create the correspondingly
 	 * mqtt message object with the mqtt type from mqtt header.
+	 * @param max {size_t} Limit the max length of body data.
 	 * @return {mqtt_message*} return NULL if reading error or data invalid.
 	 */
-	mqtt_message* get_message();
+	mqtt_message* get_message(size_t max = 128000);
 
 public:
 	/**
