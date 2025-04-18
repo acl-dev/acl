@@ -45,6 +45,11 @@ fiber::~fiber()
 {
 }
 
+fiber::reset()
+{
+	f_ = NULL;
+}
+
 unsigned int fiber::get_id() const
 {
 	return f_ ? acl_fiber_id(f_) : 0;
@@ -233,7 +238,9 @@ void fiber::fiber_callback(ACL_FIBER *f, void *ctx)
 	fiber* me = (fiber *) ctx;
 	me->f_ = f;
 	me->run();
-	me->f_ = NULL;
+
+	// xxxx: don't set NULL here, or crash will happend. --- zsx, 2025.4.18.
+	// me->f_ = NULL;
 }
 
 bool fiber::kill(bool sync)
