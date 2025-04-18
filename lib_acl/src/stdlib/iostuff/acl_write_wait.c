@@ -43,13 +43,17 @@ int acl_write_wait_ms(ACL_SOCKET fd, int timeout)
 	const char *myname = "acl_write_wait";
 	struct pollfd fds;
 	int delay = timeout;
+#if 0
 	time_t begin, end;
+#endif
 
 	fds.events = POLLOUT;
 	fds.revents = 0;
 	fds.fd = fd;
 
+#if 0
 	begin = time(NULL);
+#endif
 
 	for (;;) {
 		switch (__sys_poll(&fds, 1, delay)) {
@@ -61,9 +65,11 @@ int acl_write_wait_ms(ACL_SOCKET fd, int timeout)
 			if (acl_last_error() == ACL_EINTR) {
 				continue;
 			}
+#if 0
 			acl_msg_error("%s(%d), %s: poll error(%s), fd: %d",
 				__FILE__, __LINE__, myname,
 				acl_last_serror(), (int) fd);
+#endif
 			return -1;
 		case 0:
 			if (timeout == 0) {
@@ -71,10 +77,12 @@ int acl_write_wait_ms(ACL_SOCKET fd, int timeout)
 			} else {
 				acl_set_error(ACL_ETIMEDOUT);
 			}
+#if 0
 			end = time(NULL);
 			acl_msg_error("%s(%d), %s: poll return 0, delay=%d, "
 				"fd=%d, cost=%ld", __FILE__, __LINE__,
 				myname, delay, fd, (long) ( end - begin));
+#endif
 			return -1;
 		default:
 			if (fds.revents & POLLNVAL) {
@@ -173,9 +181,12 @@ int acl_write_wait_ms(ACL_SOCKET fd, int timeout)
 			if (errnum == ACL_EINTR)
 				continue;
 #endif
+
+#if 0
 			acl_msg_error("%s, %s(%d): select error(%s), fd(%d)",
 				myname, __FILE__, __LINE__,
 				acl_last_serror(), (int) fd);
+#endif
 			return -1;
 		case 0:
 			if (timeout == 0) {

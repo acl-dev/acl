@@ -71,7 +71,7 @@ bool mqtt_client::send(mqtt_message& message) {
 	return true;
 }
 
-mqtt_message* mqtt_client::get_message() {
+mqtt_message* mqtt_client::get_message(size_t max) {
 	mqtt_header header(MQTT_RESERVED_MIN);
 
 	if (!read_header(header)) {
@@ -81,6 +81,10 @@ mqtt_message* mqtt_client::get_message() {
 			conn_->close();
 		}
 		//logger_error("get header error");
+		return NULL;
+	}
+
+	if (max > 0 && header.get_remaining_length() > max) {
 		return NULL;
 	}
 
