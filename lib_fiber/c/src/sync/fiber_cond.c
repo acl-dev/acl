@@ -144,7 +144,7 @@ static int fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 
 	WAITER_INC(ev);
 
-	// Hang the current fiber and will wakeup if the timer arrives or
+	// Hang the current fiber and will wake up if the timer arrives or
 	// be awakened by the other fiber or thread.
 	acl_fiber_switch();
 

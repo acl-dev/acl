@@ -11,7 +11,7 @@ struct SYNC_TIMER {
 	ACL_FIBER *fb;
 	MBOX *box;
 	int stop;
-	TIMER_CACHE *waiters;
+//	TIMER_CACHE *waiters;
 	long tid;
 };
 
@@ -23,7 +23,7 @@ static SYNC_TIMER *sync_timer_new(void)
 
 	pthread_mutex_init(&timer->lock, NULL);
 	timer->box = mbox_create(MBOX_T_MPSC);
-	timer->waiters = timer_cache_create();
+//	timer->waiters = timer_cache_create();
 	timer->tid = thread_self();
 
 	out = mbox_out(timer->box);
@@ -47,7 +47,7 @@ static void sync_timer_free(SYNC_TIMER *timer)
 {
 	pthread_mutex_destroy(&timer->lock);
 	mbox_free(timer->box, NULL);
-	timer_cache_free(timer->waiters);
+//	timer_cache_free(timer->waiters);
 	mem_free(timer);
 }
 
@@ -69,7 +69,7 @@ static void thread_init(void)
 
 static void wakeup_waiter(SYNC_TIMER *timer UNUSED, SYNC_OBJ *obj)
 {
-	// The fiber must has been awakened by the other fiber or thread.
+	// The fiber must have been awakened by the other fiber or thread.
 
 	if (obj->delay < 0) {
 		// No timer has been set if delay < 0,
@@ -117,9 +117,11 @@ static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
 		sync_obj_unrefer(obj);
 		mem_free(msg);
 
+/*
 		if (timer_cache_size(timer->waiters) == 0) {
 			delay = -1;
 		}
+*/
 	}
 }
 
@@ -160,16 +162,35 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 		// message with the temporary FILE_EVENT.
 
 		SYNC_MSG *msg = (SYNC_MSG*) mem_malloc(sizeof(SYNC_MSG));
+		socket_t out, out2 = INVALID_SOCKET;
+		FILE_EVENT *fe;
+
 		msg->obj = obj;
 		msg->action = SYNC_ACTION_WAKEUP;
-		socket_t out = mbox_out(timer->box);
-		FILE_EVENT *fe = fiber_file_cache_get(out);
+		sync_obj_refer(obj);
+
+		out = mbox_out(timer->box);
+
+		// Check if the out fd has been bound by the other fiber that
+		// it was yield when calling acl_fiber_write in mbox_send2,
+		// if so, we should duplicate another out fd to bind the new one.
+		fe = fiber_file_get(out);
+		if (fe) {
+			out2 = dup(out);
+			msg_warn("%s(%d): fe exists for out=%d, dup's out2=%d",
+				__FUNCTION__, __LINE__, (int) out, (int) out2);
+			fe = fiber_file_cache_get(out2);
+		} else {
+			fe = fiber_file_cache_get(out);
+		}
 
 		fe->mask |= EVENT_SYSIO;
-
-		sync_obj_refer(obj);
-		mbox_send(timer->box, msg);
+		mbox_send2(timer->box, out2 != INVALID_SOCKET ? out2 : out, msg);
 		fiber_file_cache_put(fe);
+
+		if (out2 != INVALID_SOCKET) {
+			acl_fiber_close(out2);
+		}
 	} else {
 		// If the current notifier is a fiber in the same thread with
 		// the one to be awakened, just wakeup it directly.

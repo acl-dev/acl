@@ -97,7 +97,9 @@ SYNC_WAITER *sync_waiter_get(void)
 
 void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 {
-	if (var_hook_sys_api) {
+	if (!var_hook_sys_api) {
+		mbox_send(waiter->box, fb);
+	} else {
 		// When using io_uring, we should call the system API of write
 		// to send data, because the fd is shared by multiple threads
 		// and which can't use io_uring directly, so we set the mask
@@ -123,6 +125,8 @@ void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 			assert(fe->mbox_wsem);
 		}
 
+		file_event_refer(fe);
+
 		// Reduce the sem number and maybe be suspended if sem is 0.
 		acl_fiber_sem_wait(fe->mbox_wsem);
 
@@ -136,7 +140,6 @@ void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 		if (acl_fiber_sem_post(fe->mbox_wsem) == 1) {
 			fiber_file_cache_put(fe);
 		}
-	} else {
-		mbox_send(waiter->box, fb);
+		file_event_unrefer(fe);
 	}
 }
