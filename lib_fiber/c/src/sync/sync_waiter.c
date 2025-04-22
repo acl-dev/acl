@@ -71,7 +71,7 @@ static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
 
 	while (!waiter->stop) {
 		int res;
-		ACL_FIBER *fb = mbox_read(waiter->box, delay, &res);
+		ACL_FIBER *fb = (ACL_FIBER*) mbox_read(waiter->box, delay, &res);
 		if (fb) {
 			assert(fb->status == FIBER_STATUS_SUSPEND);
 			FIBER_READY(fb);

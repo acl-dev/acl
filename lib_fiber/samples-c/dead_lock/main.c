@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 	locks = (ACL_FIBER_MUTEX**) malloc(nlocks * sizeof(ACL_FIBER_MUTEX*));
  
 	for (i = 0; i < nlocks; i++) {
-		locks[i] = acl_fiber_mutex_create(0);
+		locks[i] = acl_fiber_mutex_create(FIBER_MUTEX_F_CHECK_DEADLOCK);
 	}
 
 	for (i = 0; i < nfibers; i++) {

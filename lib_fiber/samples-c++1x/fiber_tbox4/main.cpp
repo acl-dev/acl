@@ -15,6 +15,14 @@ static void consuming1(acl::fiber_tbox<int>& box, int max) {
 			break;
 		}
 		//printf(">>>pop one n: %d\n", *n);
+#if 0
+		if (i > 0 && i % 10000 == 0) {
+			char buf[256];
+			snprintf(buf, sizeof(buf), "consuming1, i=%d", i);
+			acl::meter_time(__func__, __LINE__, buf);
+		}
+#endif
+
 		delete n;
 		cnt++;
 	}
@@ -142,7 +150,8 @@ static void usage(const char *procname) {
 }
 
 int main(int argc, char *argv[]) {
-	int ch, max = 1000;
+	int ch;
+	long long max = 1000;
 	bool read_in_fiber = false, send_in_fiber = false;
 	bool notify_first = false;
 
@@ -152,7 +161,7 @@ int main(int argc, char *argv[]) {
 			usage(argv[0]);
 			return 0;
 		case 'n':
-			max = atoi(optarg);
+			max = atoll(optarg);
 			break;
 		case 'C':
 			read_in_fiber = true;
@@ -173,14 +182,20 @@ int main(int argc, char *argv[]) {
 	gettimeofday(&begin, nullptr);
 	test1(max, read_in_fiber, send_in_fiber, notify_first);
 	gettimeofday(&end, nullptr);
-	printf("fiber_tbox over now, max=%d, cost=%.2f\r\n",
-		max, acl::stamp_sub(end, begin));
+	double tc = acl::stamp_sub(end, begin);
+	double speed = (max * 1000) / (tc > 0.0 ? tc : 0.00001);
+	printf("fiber_tbox over now, max=%lld, cost=%.2f, speed=%.2f\r\n",
+		max, tc, speed);
+
+	printf("\r\n");
 
 	gettimeofday(&begin, nullptr);
 	test2(max, read_in_fiber, send_in_fiber, notify_first);
 	gettimeofday(&end, nullptr);
-	printf("fiber_tbox2 over now, max=%d, cost=%.2f\r\n",
-		max, acl::stamp_sub(end, begin));
+	tc = acl::stamp_sub(end, begin);
+	speed = (max * 1000) / (tc > 0.0 ? tc : 0.00001);
+	printf("fiber_tbox2 over now, max=%lld, cost=%.2f, speed=%.2f\r\n",
+		max, tc, speed);
 
 	return 0;
 }

@@ -10,7 +10,8 @@ extern "C" {
 typedef struct ACL_FIBER_MUTEX ACL_FIBER_MUTEX;
 
 #define	FIBER_MUTEX_F_LOCK_TRY		(1 << 0)
-#define	FIBER_MUTEX_F_SWITCH_FIRST	(1 << 1)
+#define	FIBER_MUTEX_F_LOCK_ONCE		(1 << 1)
+#define	FIBER_MUTEX_F_CHECK_DEADLOCK	(1 << 2)
 
 FIBER_API ACL_FIBER_MUTEX *acl_fiber_mutex_create(unsigned flag);
 FIBER_API void acl_fiber_mutex_free(ACL_FIBER_MUTEX *mutex);
