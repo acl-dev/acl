@@ -130,6 +130,7 @@ struct FILE_EVENT {
 #define	STATUS_WRITEWAIT	(unsigned) (1 << 6)	// Wait for Writable
 #define	STATUS_CLOSING		(unsigned) (1 << 7)	// In closing status
 #define	STATUS_CLOSED		(unsigned) (1 << 8)	// In closed status
+#define STATUS_BUFFED		(unsigned) (1 << 9)
 
 #define	SET_CONNECTING(x)	((x)->status |= STATUS_CONNECTING)
 #define	SET_READABLE(x)		((x)->status |= STATUS_READABLE)

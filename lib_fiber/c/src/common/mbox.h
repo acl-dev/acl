@@ -27,6 +27,7 @@ void mbox_free(MBOX *mbox, void (*free_fn)(void*));
  * @return {int} 发送成功返回 0，否则返回 -1
  */
 int mbox_send(MBOX *mbox, void *msg);
+int mbox_send2(MBOX *mbox, socket_t out, void *msg);
 
 /**
  * 从消息队列中读取消息

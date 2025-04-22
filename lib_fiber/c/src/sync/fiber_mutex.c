@@ -373,20 +373,34 @@ void acl_fiber_mutex_stats_show(const ACL_FIBER_MUTEX_STATS *stats)
 
 /****************************************************************************/
 
+#if 1
+#define	LOCK(m) while(pthread_mutex_trylock(&(m)->lock) != 0) {}
+#else
+#define	LOCK(m) do { \
+	pthread_mutex_lock(&(m)->lock); \
+} while (0)
+#endif
+
+#define	UNLOCK(m) do { \
+	pthread_mutex_unlock(&(m)->lock); \
+} while (0)
+
+// Just for checking deadlock.
 static void thread_waiter_add(ACL_FIBER_MUTEX *mutex, unsigned long tid)
 {
 	THREAD_WAITER *waiter = (THREAD_WAITER*) mem_malloc(sizeof(THREAD_WAITER));
 	waiter->tid = tid;
-	pthread_mutex_lock(&mutex->lock);
+	LOCK(mutex);
 	array_append(mutex->waiting_threads, waiter);
-	pthread_mutex_unlock(&mutex->lock);
+	UNLOCK(mutex);
 }
 
+// Just for checking deadlock.
 static void thread_waiter_remove(ACL_FIBER_MUTEX *mutex, unsigned long tid)
 {
 	ITER iter;
 
-	pthread_mutex_lock(&mutex->lock);
+	LOCK(mutex);
 	foreach(iter, mutex->waiting_threads) {
 		THREAD_WAITER *waiter = (THREAD_WAITER*) iter.data;
 		if (waiter->tid == tid) {
@@ -395,7 +409,7 @@ static void thread_waiter_remove(ACL_FIBER_MUTEX *mutex, unsigned long tid)
 			break;
 		}
 	}
-	pthread_mutex_unlock(&mutex->lock);
+	UNLOCK(mutex);
 }
 
 static void free_locks_onexit(void)
@@ -427,6 +441,12 @@ ACL_FIBER_MUTEX *acl_fiber_mutex_create(unsigned flags)
 	mutex = (ACL_FIBER_MUTEX*) mem_calloc(1, sizeof(ACL_FIBER_MUTEX));
 	ring_init(&mutex->me);
 
+	if (flags & FIBER_MUTEX_F_LOCK_ONCE) {
+		flags &= ~FIBER_MUTEX_F_LOCK_TRY;
+	} else {
+		flags |= FIBER_MUTEX_F_LOCK_TRY;
+	}
+
 	mutex->flags  = flags;
 
 	mutex->waiters = array_create(5, ARRAY_F_UNORDER);
@@ -456,21 +476,23 @@ void acl_fiber_mutex_free(ACL_FIBER_MUTEX *mutex)
 
 static int fiber_mutex_lock_once(ACL_FIBER_MUTEX *mutex)
 {
-	int wakeup = 0, pos;
+	int pos;
 	EVENT *ev;
 	ACL_FIBER *fiber;
 
 	while (1) {
-		pthread_mutex_lock(&mutex->lock);
+		LOCK(mutex);
 		if (pthread_mutex_trylock(&mutex->thread_lock) == 0) {
-			pthread_mutex_unlock(&mutex->lock);
+			UNLOCK(mutex);
 			return 0;
 		}
 
 		// For the independent thread, only lock the thread mutex.
 		if (!var_hook_sys_api) {
-			pthread_mutex_unlock(&mutex->lock);
-			thread_waiter_add(mutex, thread_self());
+			UNLOCK(mutex);
+			if (mutex->flags & FIBER_MUTEX_F_CHECK_DEADLOCK) {
+				thread_waiter_add(mutex, thread_self());
+			}
 			return pthread_mutex_lock(&mutex->thread_lock);
 		}
 
@@ -481,11 +503,11 @@ static int fiber_mutex_lock_once(ACL_FIBER_MUTEX *mutex)
 
 		if (pthread_mutex_trylock(&mutex->thread_lock) == 0) {
 			array_delete(mutex->waiters, pos, NULL);
-			pthread_mutex_unlock(&mutex->lock);
+			UNLOCK(mutex);
 			return 0;
 		}
 
-		pthread_mutex_unlock(&mutex->lock);
+		UNLOCK(mutex);
 
 		fiber->wstatus |= FIBER_WAIT_MUTEX;
 
@@ -495,19 +517,14 @@ static int fiber_mutex_lock_once(ACL_FIBER_MUTEX *mutex)
 		WAITER_DEC(ev);
 
 		fiber->wstatus &= ~FIBER_WAIT_MUTEX;
-
-		if (++wakeup > 5) {
-			wakeup = 0;
-			acl_fiber_delay(100);
-		}
 	}
 }
 
 static int fiber_mutex_lock_try(ACL_FIBER_MUTEX *mutex)
 {
-	int wakeup = 0, pos;
+	int pos;
 	EVENT *ev;
-	ACL_FIBER *fiber = acl_fiber_running();
+	ACL_FIBER *fiber;
 
 	while (1) {
 		if (pthread_mutex_trylock(&mutex->thread_lock) == 0) {
@@ -516,22 +533,25 @@ static int fiber_mutex_lock_try(ACL_FIBER_MUTEX *mutex)
 
 		// For the independent thread, only lock the thread mutex.
 		if (!var_hook_sys_api) {
-			thread_waiter_add(mutex, thread_self());
+			if (mutex->flags & FIBER_MUTEX_F_CHECK_DEADLOCK) {
+				thread_waiter_add(mutex, thread_self());
+			}
 			return pthread_mutex_lock(&mutex->thread_lock);
 		}
 
+		fiber = acl_fiber_running();
 		fiber->sync = sync_waiter_get();
 
-		pthread_mutex_lock(&mutex->lock);
+		LOCK(mutex);
 		pos = array_append(mutex->waiters, fiber);
 
 		if (pthread_mutex_trylock(&mutex->thread_lock) == 0) {
 			array_delete(mutex->waiters, pos, NULL);
-			pthread_mutex_unlock(&mutex->lock);
+			UNLOCK(mutex);
 			return 0;
 		}
 
-		pthread_mutex_unlock(&mutex->lock);
+		UNLOCK(mutex);
 
 		fiber->wstatus |= FIBER_WAIT_MUTEX;
 
@@ -541,11 +561,6 @@ static int fiber_mutex_lock_try(ACL_FIBER_MUTEX *mutex)
 		WAITER_DEC(ev);
 
 		fiber->wstatus &= ~FIBER_WAIT_MUTEX;
-
-		if (++wakeup > 5) {
-			wakeup = 0;
-			acl_fiber_delay(100);
-		}
 	}
 }
 
@@ -553,16 +568,17 @@ int acl_fiber_mutex_lock(ACL_FIBER_MUTEX *mutex)
 {
 	int ret;
 
-	if (mutex->flags & FIBER_MUTEX_F_LOCK_TRY) {
-		ret = fiber_mutex_lock_try(mutex);
-	} else {
+	if (mutex->flags & FIBER_MUTEX_F_LOCK_ONCE) {
 		ret = fiber_mutex_lock_once(mutex);
+	} else {
+		ret = fiber_mutex_lock_try(mutex);
 	}
+
 	if (ret == 0) {
 		unsigned id = acl_fiber_self();  // 0 will return in no fiber mode.
 		long me = id == 0 ? -thread_self() : (long) id;
 		mutex->owner = me;
-		if (me < 0) {
+		if (me < 0 && (mutex->flags & FIBER_MUTEX_F_CHECK_DEADLOCK)) {
 			thread_waiter_remove(mutex, thread_self());
 		}
 
@@ -588,7 +604,7 @@ int acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *mutex)
 	ACL_FIBER *fiber;
 	int ret;
 
-	pthread_mutex_lock(&mutex->lock);
+	LOCK(mutex);
 	fiber = (ACL_FIBER*) array_pop_front(mutex->waiters);
 
 	// Just a sanity check!
@@ -605,7 +621,7 @@ int acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *mutex)
 
 	// Unlock the internal prive lock must behind the public thread_lock,
 	// or else the waiter maybe be skipped added in lock waiting process.
-	pthread_mutex_unlock(&mutex->lock);
+	UNLOCK(mutex);
 
 	if (ret != 0) {
 		return ret;

@@ -106,6 +106,11 @@ void mbox_free(MBOX *mbox, void (*free_fn)(void*))
 
 int mbox_send(MBOX *mbox, void *msg)
 {
+	return mbox_send2(mbox, mbox->out, msg);
+}
+
+int mbox_send2(MBOX *mbox, socket_t out, void *msg)
+{
 	int ret;
 	long long n = 1;
 	pthread_mutex_t *lock = mbox->lock;
@@ -134,9 +139,9 @@ int mbox_send(MBOX *mbox, void *msg)
 	mbox->nsend++;
 
 #if defined(_WIN32) || defined(_WIN64)
-	ret = (int) acl_fiber_send(mbox->out, (const char*) &n, (int) sizeof(n), 0);
+	ret = (int) acl_fiber_send(out, (const char*) &n, (int) sizeof(n), 0);
 #else
-	ret = (int) acl_fiber_write(mbox->out, &n, sizeof(n));
+	ret = (int) acl_fiber_write(out, &n, sizeof(n));
 #endif
 
 #if !defined(HAS_EVENTFD)
@@ -147,7 +152,7 @@ int mbox_send(MBOX *mbox, void *msg)
 
 	if (ret == -1) {
 		msg_error("%s(%d), %s: mbox write %d error %s", __FILE__,
-			__LINE__, __FUNCTION__, mbox->out, last_serror());
+			__LINE__, __FUNCTION__, (int) out, last_serror());
 		return -1;
 	}
 
