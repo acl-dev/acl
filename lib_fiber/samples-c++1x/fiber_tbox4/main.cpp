@@ -23,9 +23,9 @@ static void consuming1(acl::fiber_tbox<int>& box, int max) {
 }
 
 static void test1(int max, bool read_in_fiber, bool send_in_fiber,
-		bool blocking, bool notify_first) {
+		bool notify_first) {
 	std::shared_ptr<acl::fiber_tbox<int>> box(new
-		acl::fiber_tbox<int>(true, !blocking));
+		acl::fiber_tbox<int>(true));
 
 	std::shared_ptr<acl::wait_group> wg(new acl::wait_group());
 
@@ -87,8 +87,8 @@ static void consuming2(acl::fiber_tbox2<int>& box, int max) {
 }
 
 static void test2(int max, bool read_in_fiber, bool send_in_fiber,
-		bool blocking, bool notify_first) {
-	std::shared_ptr<acl::fiber_tbox2<int>> box(new acl::fiber_tbox2<int>(!blocking));
+		bool notify_first) {
+	std::shared_ptr<acl::fiber_tbox2<int>> box(new acl::fiber_tbox2<int>());
 
 	std::shared_ptr<acl::wait_group> wg(new acl::wait_group());
 
@@ -135,7 +135,6 @@ static void test2(int max, bool read_in_fiber, bool send_in_fiber,
 static void usage(const char *procname) {
 	printf("usage: %s -h[help]\r\n"
 		" -n max\r\n"
-		" -B [if use locker in blocking mode]\r\n"
 		" -C [if consumer in fiber]\r\n"
 		" -P [if producer in fiber]\r\n"
 		" -S [if notify first]\r\n",
@@ -145,9 +144,9 @@ static void usage(const char *procname) {
 int main(int argc, char *argv[]) {
 	int ch, max = 1000;
 	bool read_in_fiber = false, send_in_fiber = false;
-	bool blocking = false, notify_first = false;
+	bool notify_first = false;
 
-	while ((ch = getopt(argc, argv, "hn:CPBS")) > 0) {
+	while ((ch = getopt(argc, argv, "hn:CPS")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -161,9 +160,6 @@ int main(int argc, char *argv[]) {
 		case 'P':
 			send_in_fiber = true;
 			break;
-		case 'B':
-			blocking = true;
-			break;
 		case 'S':
 			notify_first = true;
 			break;
@@ -175,14 +171,16 @@ int main(int argc, char *argv[]) {
 
 	struct timeval begin, end;
 	gettimeofday(&begin, nullptr);
-	test1(max, read_in_fiber, send_in_fiber, blocking, notify_first);
+	test1(max, read_in_fiber, send_in_fiber, notify_first);
 	gettimeofday(&end, nullptr);
-	printf("fiber_tbox over now, max=%d, cost=%.2f\r\n", max, acl::stamp_sub(end, begin));
+	printf("fiber_tbox over now, max=%d, cost=%.2f\r\n",
+		max, acl::stamp_sub(end, begin));
 
 	gettimeofday(&begin, nullptr);
-	test2(max, read_in_fiber, send_in_fiber, blocking, notify_first);
+	test2(max, read_in_fiber, send_in_fiber, notify_first);
 	gettimeofday(&end, nullptr);
-	printf("fiber_tbox2 over now, max=%d, cost=%.2f\r\n", max, acl::stamp_sub(end, begin));
+	printf("fiber_tbox2 over now, max=%d, cost=%.2f\r\n",
+		max, acl::stamp_sub(end, begin));
 
 	return 0;
 }
