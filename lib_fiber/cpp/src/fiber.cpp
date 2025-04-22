@@ -45,7 +45,7 @@ fiber::~fiber()
 {
 }
 
-fiber::reset()
+void fiber::reset()
 {
 	f_ = NULL;
 }
