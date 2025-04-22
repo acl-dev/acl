@@ -161,40 +161,44 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 		// If the current notifier is a fiber of another thread, send
 		// message with the temporary FILE_EVENT.
 
+		socket_t out = mbox_out(timer->box);
+		FILE_EVENT *fe = fiber_file_get(out);
 		SYNC_MSG *msg = (SYNC_MSG*) mem_malloc(sizeof(SYNC_MSG));
-		socket_t out, out2 = INVALID_SOCKET;
-		FILE_EVENT *fe;
 
 		msg->obj = obj;
 		msg->action = SYNC_ACTION_WAKEUP;
 		sync_obj_refer(obj);
 
-		out = mbox_out(timer->box);
-
-		// Check if the out fd has been bound by the other fiber that
-		// it was yield when calling acl_fiber_write in mbox_send2,
-		// if so, we should duplicate another out fd to bind the new one.
-		fe = fiber_file_get(out);
-		if (fe) {
-			out2 = dup(out);
-			msg_warn("%s(%d): fe exists for out=%d, dup's out2=%d",
-				__FUNCTION__, __LINE__, (int) out, (int) out2);
-			fe = fiber_file_cache_get(out2);
-		} else {
+		// Check if the out fd has been bound by the other fiber and
+		// the fiber has suspended when calling acl_fiber_write in
+		// mbox_send, the current fiber must wait for the suspended
+		// fiber return and release the sem.
+		if (fe == NULL) {
 			fe = fiber_file_cache_get(out);
+			if (fe->mbox_wsem == NULL) {
+				fe->mbox_wsem = acl_fiber_sem_create(1);
+			}
+		} else if (fe->mbox_wsem == NULL) {
+			msg_fatal("%s(%d): fe's mbox_wsem NULL, out=%d",
+				 __FUNCTION__, __LINE__, (int) out);
 		}
+
+		file_event_refer(fe);
+
+		// Reduce the sem number and maybe be suspended if sem is 0,
+		// so only one fiber can mbox_send message at the same time.
+		acl_fiber_sem_wait(fe->mbox_wsem);
 
 		fe->mask |= EVENT_SYSIO;
-		mbox_send2(timer->box, out2 != INVALID_SOCKET ? out2 : out, msg);
-		fiber_file_cache_put(fe);
+		mbox_send(timer->box, msg);
 
-		if (out2 != INVALID_SOCKET) {
-			acl_fiber_close(out2);
+		if (acl_fiber_sem_post(fe->mbox_wsem) == 1) {
+			fiber_file_cache_put(fe);
 		}
+		file_event_unrefer(fe);
 	} else {
 		// If the current notifier is a fiber in the same thread with
 		// the one to be awakened, just wakeup it directly.
-
 		wakeup_waiter(timer, obj);
 	} 
 }
