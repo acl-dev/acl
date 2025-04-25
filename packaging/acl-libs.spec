@@ -2,7 +2,7 @@
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
-Version:        3.6.2
+Version:        3.6.3
 Release:        %{release_id}
 Group:          System/Libs
 License:        LGPL3.0,IBM
@@ -44,6 +44,15 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Fri Apr 25 2025 shuxin.zheng shuxin.zheng@qq.com 3.6.3-0-20250425.15
+- Feature: Add fiber pool module;
+- Feature: Support DMA IO;
+- Feature: Support Arm64ec for Windows;
+- Optimize: Optimize hooked epoll module in fiber mode;
+- Optimize: Optimize fiber sem;
+- Optimize: Optimize support c++11;
+- Bugfix: Fiexed bugs in fiber_mutex & fiber_cond.
 
 * Sat Nov 02 2024 shuxin.zheng shuxin.zheng@qq.com 3.6.2-0-20241102.10
 - Feature: Fiber supports io-ruing;
