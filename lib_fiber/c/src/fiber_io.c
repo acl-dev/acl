@@ -863,8 +863,16 @@ FILE_EVENT *fiber_file_cache_get(socket_t fd)
 
 void fiber_file_cache_put(FILE_EVENT *fe)
 {
-	fiber_file_del(fe, fe->fd);
-	fe->fd = INVALID_SOCKET;
+	// If the fe is being refered by more than one fibers, don't put it
+	// back to cache or free it, because the fe is still aliving now.
+	if (fe->refer > 1) {
+		return;
+	}
+
+	if (fe->fd != INVALID_SOCKET) {
+		fiber_file_del(fe, fe->fd);
+		fe->fd = INVALID_SOCKET;
+	}
 
 	if (array_size(__thread_fiber->cache) < __thread_fiber->cache_max) {
 		if (!(fe->status & STATUS_BUFFED)) {

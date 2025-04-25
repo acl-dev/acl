@@ -68,9 +68,10 @@ ACL_DBUF_POOL *acl_dbuf_pool_create2(size_t block_size, size_t align)
 	/* xxx: 为了尽量保证在调用 acl_mymalloc 分配内存时为内存页的整数倍，
 	 * 需要减去 sizeof(ACL_DBUF) 和 16 字节，其中 16 字节是 acl_mymalloc
 	 * 内部给每个内存块额外添加的控制头，在 acl_mymalloc 内部 16 字节为：
-	 * offsetof(MBLOCK, u.payload[0])
+	 * offsetof(MBLOCK, u.payload[0]), 另外16字节是给glibc malloc的,
+	 * 这样做的主要目的是使本次分配内存仅需分配一个页内存。
 	 */
-	size -= 16 + sizeof(ACL_DBUF);
+	size -= 32 + sizeof(ACL_DBUF) + sizeof(struct ACL_DBUF_POOL);
 
 #ifdef	USE_VALLOC
 	pool = (ACL_DBUF_POOL*) valloc(sizeof(struct ACL_DBUF_POOL)
