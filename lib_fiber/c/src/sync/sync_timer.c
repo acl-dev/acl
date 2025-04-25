@@ -179,8 +179,8 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 				fe->mbox_wsem = acl_fiber_sem_create(1);
 			}
 		} else if (fe->mbox_wsem == NULL) {
-			msg_fatal("%s(%d): fe's mbox_wsem NULL, out=%d",
-				 __FUNCTION__, __LINE__, (int) out);
+			msg_fatal("%s(%d): mbox_wsem NULL, out=%d, fd=%d, refer=%d",
+				__FUNCTION__, __LINE__, (int) out, fe->fd, fe->refer);
 		}
 
 		file_event_refer(fe);
@@ -190,11 +190,29 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 		acl_fiber_sem_wait(fe->mbox_wsem);
 
 		fe->mask |= EVENT_SYSIO;
+
+		// The fe maybe be used again in mbox_send->acl_fiber_write
+		// ->fiber_file_open->fiber_file_get.
 		mbox_send(timer->box, msg);
+
+#ifdef	DEBUG
+		FILE_EVENT *f = fiber_file_get(out);
+		if (f == NULL) {
+			msg_fatal("%s(%d): fiber_file_get NULL, fe=%p, out=%d",
+				__FUNCTION__, __LINE__, fe, out);
+		} else if (f->mbox_wsem == NULL) {
+			msg_fatal("%s(%d): mbox_wsem NULL, f=%p, fe=%p, out=%d",
+				__FUNCTION__, __LINE__, f, fe, out);
+		} else if (f != fe) {
+			msg_fatal("%s(%d): invalid f=%p, fe=%p, out=%d",
+				__FUNCTION__, __LINE__, f, fe, out);
+		}
+#endif
 
 		if (acl_fiber_sem_post(fe->mbox_wsem) == 1) {
 			fiber_file_cache_put(fe);
 		}
+
 		file_event_unrefer(fe);
 	} else {
 		// If the current notifier is a fiber in the same thread with
