@@ -1,9 +1,10 @@
 #pragma once
+#include "../acl_cpp_define.hpp"
 #include "noncopyable.hpp"
 
 namespace acl {
 
-class bitmap : public noncopyable {
+class ACL_CPP_API bitmap : public noncopyable {
 public:
 	/**
 	 * ¹¹Ôìº¯Êý

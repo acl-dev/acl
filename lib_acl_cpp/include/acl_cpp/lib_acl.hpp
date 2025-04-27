@@ -42,6 +42,8 @@
 #include "stdlib/diff_string.hpp"
 #include "stdlib/diff_manager.hpp"
 #include "stdlib/token_tree.hpp"
+//#include "stdlib/type.hpp"
+//#include "stdlib/class_counter.hpp"
 
 #include "serialize/gsoner.hpp"
 #include "serialize/gson_helper.ipp"
