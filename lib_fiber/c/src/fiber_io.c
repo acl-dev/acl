@@ -884,4 +884,19 @@ void fiber_file_cache_put(FILE_EVENT *fe)
 	}
 }
 
+void fiber_file_cache_refer(FILE_EVENT *fe)
+{
+	file_event_refer(fe);
+}
+
+void fiber_file_cache_unrefer(FILE_EVENT *fe)
+{
+	if (fe->refer == 1 && fe->fd != INVALID_SOCKET) {
+		fiber_file_del(fe, fe->fd);
+		fe->fd = INVALID_SOCKET;
+	}
+
+	file_event_unrefer(fe);
+}
+
 /****************************************************************************/

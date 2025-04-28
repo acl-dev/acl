@@ -164,6 +164,7 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 		socket_t out = mbox_out(timer->box);
 		FILE_EVENT *fe = fiber_file_get(out);
 		SYNC_MSG *msg = (SYNC_MSG*) mem_malloc(sizeof(SYNC_MSG));
+		int from_cache = 0, num;
 
 		msg->obj = obj;
 		msg->action = SYNC_ACTION_WAKEUP;
@@ -175,6 +176,7 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 		// fiber return and release the sem.
 		if (fe == NULL) {
 			fe = fiber_file_cache_get(out);
+			from_cache = 1;
 			if (fe->mbox_wsem == NULL) {
 				fe->mbox_wsem = acl_fiber_sem_create(1);
 			}
@@ -183,11 +185,15 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 				__FUNCTION__, __LINE__, (int) out, fe->fd, fe->refer);
 		}
 
-		file_event_refer(fe);
+		fiber_file_cache_refer(fe);
 
 		// Reduce the sem number and maybe be suspended if sem is 0,
 		// so only one fiber can mbox_send message at the same time.
-		acl_fiber_sem_wait(fe->mbox_wsem);
+		num = acl_fiber_sem_wait(fe->mbox_wsem);
+		if (num != 0) {
+			msg_fatal("%s(%d): invalid sem num=%d, fe=%p, %d, %d",
+				__FUNCTION__, __LINE__, num, fe, fe->fd, fe->refer);
+		}
 
 		fe->mask |= EVENT_SYSIO;
 
@@ -209,11 +215,17 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 		}
 #endif
 
-		if (acl_fiber_sem_post(fe->mbox_wsem) == 1) {
-			fiber_file_cache_put(fe);
+		if ((num = acl_fiber_sem_post(fe->mbox_wsem)) == 1) {
+			if (from_cache) {
+				fiber_file_cache_unrefer(fe);
+				fiber_file_cache_put(fe);
+			} else {
+				fiber_file_cache_unrefer(fe);
+			}
+		} else {
+			msg_fatal("%s(%d): invalid sem num=%d, fe=%p, %d, %d",
+				__FUNCTION__, __LINE__, num, fe, fe->fd, fe->refer);
 		}
-
-		file_event_unrefer(fe);
 	} else {
 		// If the current notifier is a fiber in the same thread with
 		// the one to be awakened, just wakeup it directly.
