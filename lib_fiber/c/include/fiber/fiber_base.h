@@ -39,6 +39,9 @@ FIBER_API void acl_fiber_set_shared_stack_size(size_t size);
  */
 FIBER_API size_t acl_fiber_get_shared_stack_size(void);
 
+FIBER_API void acl_fiber_set_max_cache(int max);
+FIBER_API int acl_fiber_get_max_cache(void);
+
 /**
  * Create and start one fiber
  * @param fn {void (*)(ACL_FIBER*, void*)} the callback of fiber running

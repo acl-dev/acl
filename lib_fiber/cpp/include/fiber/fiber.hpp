@@ -276,6 +276,9 @@ public:
 	 */
 	static size_t get_shared_stack_size();
 
+	static void set_max_cache(int max);
+	static int get_max_cache();
+
 	static void acl_io_hook();
 
 	static void acl_io_unlock();

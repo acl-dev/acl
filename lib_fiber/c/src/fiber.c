@@ -59,6 +59,17 @@ static size_t __shared_stack_size = 10240000;
 #endif
 
 static pthread_key_t __fiber_key;
+static int __max_cache = MAX_CACHE;
+
+void acl_fiber_set_max_cache(int max)
+{
+	__max_cache = max;
+}
+
+int acl_fiber_get_max_cache(void)
+{
+	return __max_cache;
+}
 
 int acl_fiber_scheduled(void)
 {
@@ -351,8 +362,8 @@ static void fiber_swap(ACL_FIBER *from, ACL_FIBER *to)
 		/* If the cached dead fibers reached the limit,
 		 * some will be freed
 		 */
-		if (n > MAX_CACHE) {
-			n -= MAX_CACHE;
+		if (n > __max_cache) {
+			n -= __max_cache;
 			fiber_kick(n);
 		}
 
