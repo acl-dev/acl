@@ -161,6 +161,16 @@ size_t fiber::get_shared_stack_size()
 	return acl_fiber_get_shared_stack_size();
 }
 
+void fiber::set_max_cache(int max)
+{
+	acl_fiber_set_max_cache(max);
+}
+
+int fiber::get_max_cache()
+{
+	return acl_fiber_get_max_cache();
+}
+
 ACL_FIBER *fiber::get_fiber() const
 {
 	return f_;

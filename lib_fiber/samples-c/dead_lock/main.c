@@ -78,17 +78,18 @@ static void fiber_check(ACL_FIBER *fb, void *ctx)
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -c fibers_count -n locks_count\r\n", procname);
+	printf("usage: %s -h [help] -c fibers_count -n locks_count -S [if using shared_stack]\r\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
-	int  i, ch, nlocks = 2, nfibers = 2;
+	int  i, ch, nlocks = 2, nfibers = 2, shared_stack = 0;
 	ACL_FIBER_MUTEX **locks;
 	MUTEX_CTX *ctx;
 	pthread_t  tid;
+	ACL_FIBER_ATTR attr;
 
-	while ((ch = getopt(argc, argv, "hc:n:")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:n:S")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -102,10 +103,16 @@ int main(int argc, char *argv[])
 				nlocks = 1;
 			}
 			break;
+		case 'S':
+			shared_stack = 1;
+			printf("Using shared_stack: yes!\r\n");
+			break;
 		default:
 			break;
 		}
 	}
+
+	acl_fiber_msg_stdout_enable(1);
 
 	locks = (ACL_FIBER_MUTEX**) malloc(nlocks * sizeof(ACL_FIBER_MUTEX*));
  
@@ -113,11 +120,15 @@ int main(int argc, char *argv[])
 		locks[i] = acl_fiber_mutex_create(FIBER_MUTEX_F_CHECK_DEADLOCK);
 	}
 
+	acl_fiber_attr_init(&attr);
+	acl_fiber_attr_setstacksize(&attr, 32000);
+	acl_fiber_attr_setsharestack(&attr, shared_stack);
+
 	for (i = 0; i < nfibers; i++) {
 		ctx = (MUTEX_CTX*) malloc(sizeof(MUTEX_CTX));
 		ctx->locks  = locks;
 		ctx->nlocks = nlocks;
-		acl_fiber_create(fiber_main, ctx, 32000);
+		acl_fiber_create2(&attr, fiber_main, ctx);
 	}
 
 	acl_fiber_create(fiber_check, NULL, 32000);

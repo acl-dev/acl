@@ -115,9 +115,12 @@ void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 		// wait for the previous fiber to return and release the sem.
 
 		FILE_EVENT *fe = fiber_file_get(out);
+		int from_cache = 0, num;
 
 		if (fe == NULL) {
 			fe = fiber_file_cache_get(out);
+			from_cache = 1;
+
 			// COW(Copy on write) to avoid unnecessary waste:
 			// alloc sem binding the fe if necessary.
 			if (fe->mbox_wsem == NULL) {
@@ -128,10 +131,14 @@ void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 				__FUNCTION__, __LINE__, (int) out, fe->fd, fe->refer);
 		}
 
-		file_event_refer(fe);
+		fiber_file_cache_refer(fe);
 
 		// Reduce the sem number and maybe be suspended if sem is 0.
-		acl_fiber_sem_wait(fe->mbox_wsem);
+		num = acl_fiber_sem_wait(fe->mbox_wsem);
+		if (num != 0) {
+			msg_fatal("%s(%d): invalid sem num=%d, fe=%p, %d, %d",
+				__FUNCTION__, __LINE__, num, fe, fe->fd, fe->refer);
+		}
 
 		fe->mask |= EVENT_SYSIO;
 
@@ -154,11 +161,18 @@ void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 #endif
 
 		// If no other fiber is suspended by the sem, then release it.
-		if (acl_fiber_sem_post(fe->mbox_wsem) == 1) {
-			fiber_file_cache_put(fe);
+		if ((num = acl_fiber_sem_post(fe->mbox_wsem)) == 1) {
+			if (from_cache) {
+				fiber_file_cache_unrefer(fe);
+				fiber_file_cache_put(fe);
+			} else {
+				fiber_file_cache_unrefer(fe);
+			}
+		} else {
+			msg_fatal("%s(%d): invalid sem num=%d, fe=%p, %d, %d",
+				__FUNCTION__, __LINE__, num, fe, fe->fd, fe->refer);
 		}
 
-		file_event_unrefer(fe);
 	} else {
 		// If the current notifier is a fiber in the same thread with
 		// the one to be awakened, just wakeup it directly.

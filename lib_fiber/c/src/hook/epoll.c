@@ -615,13 +615,13 @@ static void epoll_ctl_del(EVENT *ev, EPOLL_EVENT *ee, int fd)
 
 	if (epx->mask & EVENT_READ) {
 		assert(epx->fe);
-		event_del_read(ev, epx->fe, 0);
+		event_del_read(ev, epx->fe, 1);
 		CLR_READWAIT(epx->fe);
 	}
 
 	if (epx->mask & EVENT_WRITE) {
 		assert(epx->fe);
-		event_del_write(ev, epx->fe, 0);
+		event_del_write(ev, epx->fe, 1);
 		CLR_WRITEWAIT(epx->fe);
 	}
 
@@ -673,6 +673,7 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
 	} else {
 		msg_error("%s(%d), %s: invalid fd=%d",
 			__FILE__, __LINE__, __FUNCTION__, fd);
+		acl_fiber_stack_print(__FUNCTION__);
 		return -1;
 	}
 

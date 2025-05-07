@@ -39,6 +39,9 @@ FIBER_API void acl_fiber_set_shared_stack_size(size_t size);
  */
 FIBER_API size_t acl_fiber_get_shared_stack_size(void);
 
+FIBER_API void acl_fiber_set_max_cache(int max);
+FIBER_API int acl_fiber_get_max_cache(void);
+
 /**
  * Create and start one fiber
  * @param fn {void (*)(ACL_FIBER*, void*)} the callback of fiber running
@@ -66,6 +69,7 @@ typedef struct ACL_FIBER_STACK {
 
 FIBER_API ACL_FIBER_STACK *acl_fiber_stacktrace(const ACL_FIBER *fiber, size_t max);
 FIBER_API void acl_fiber_stackfree(ACL_FIBER_STACK *stack);
+FIBER_API void acl_fiber_stack_print(const char *tag);
 
 /**
  * Get the fibers count in deading status
@@ -268,6 +272,8 @@ FIBER_API void acl_fiber_schedule_with(int event_mode);
  * @param event_mode {int} the event type, defined as FIBER_EVENT_XXX
  */
 FIBER_API void acl_fiber_schedule_set_event(int event_mode);
+
+FIBER_API void acl_fiber_event_directly(int yes);
 
 /**
  * Check if the current thread is in fiber schedule status

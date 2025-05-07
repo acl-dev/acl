@@ -56,9 +56,28 @@ typedef struct FIBER_UNIX {
 	size_t dlen;
 } FIBER_UNIX;
 
+#include <execinfo.h>
+
+void acl_fiber_stack_print(const char *tag)
+{
+#define	STACK_SIZE	100
+	void *buffer[STACK_SIZE];
+	int nptrs = backtrace(buffer, STACK_SIZE), j;
+	char **frames = backtrace_symbols(buffer, nptrs);
+	if (frames == NULL) {
+		msg_error("%s(%d): backtrace_symbols null", __FUNCTION__, __LINE__);
+		return;
+	}
+
+	for (j = 0; j < nptrs; j++) {
+		msg_info("%s:  %s", tag ? tag : "none", frames[j]);
+	}
+
+	free(frames);
+}
+
 #ifdef	DEBUG_STACK
 #include <libunwind.h>
-
 ACL_FIBER_STACK *acl_fiber_stacktrace(const ACL_FIBER *fiber, size_t max)
 {
 	const FIBER_UNIX *fb = (const FIBER_UNIX*) fiber;
@@ -69,12 +88,14 @@ ACL_FIBER_STACK *acl_fiber_stacktrace(const ACL_FIBER *fiber, size_t max)
 	int  ret;
 
 	if (fb->context == NULL) {
+		msg_error("%s(%d): fb's context null", __FUNCTION__, __LINE__);
 		return NULL;
 	}
 
 	ret = unw_init_local(&cursor, (unw_context_t*) fb->context);
 	if (ret != 0) {
-		printf("unw_init_local error, ret=%d\r\n", ret);
+		msg_error("%s(%d): unw_init_local error=%s, ret=%d",
+			__FUNCTION__, __LINE__, strerror(errno), ret);
 		return NULL;
 	}
 
@@ -83,10 +104,13 @@ ACL_FIBER_STACK *acl_fiber_stacktrace(const ACL_FIBER *fiber, size_t max)
 	stack->count = 0;
 	stack->size  = max;
 
+	msg_info("%s(%d): stack's max size=%zd", __FUNCTION__, __LINE__, max);
+
 	while (unw_step(&cursor) > 0 && stack->count < stack->size) {
 		ret = unw_get_proc_name(&cursor, name, sizeof(name), &off);
 		if (ret != 0) {
-			printf("unw_get_proc_name error =%d\n", ret);
+			msg_error("%s(%d): unw_get_proc_name error=%s, ret=%d",
+				__FUNCTION__, __LINE__, strerror(errno), ret);
 		} else {
 			unw_get_reg(&cursor, UNW_REG_IP, &pc);
 			stack->frames[stack->count].func = mem_strdup(name);
@@ -96,12 +120,15 @@ ACL_FIBER_STACK *acl_fiber_stacktrace(const ACL_FIBER *fiber, size_t max)
 		}
 	}
 
+	msg_info("%s(%d): the fiber(%p)'s stack=%p", __FUNCTION__, __LINE__,
+		fiber, stack);
+
 	return stack;
 }
 #else
 ACL_FIBER_STACK *acl_fiber_stacktrace(const ACL_FIBER *fiber, size_t max)
 {
-	printf("%s(%d): Not supported, fiber-%d, max=%zd\r\n",
+	msg_error("%s(%d): Not supported, fiber-%d, max=%zd",
 		__FUNCTION__, __LINE__, acl_fiber_id(fiber), max);
 	return NULL;
 }
@@ -280,7 +307,7 @@ static void fiber_unix_start(unsigned int x, unsigned int y)
 
 	mem_free(ctx);
 
-#if	defined(USE_JMP)
+#if	defined(USE_JMP) && !defined(DEBUG_STACK)
 	/* When using setjmp/longjmp, the context just be used only once,
 	 * so we can free it here to save some memory.
 	 */
@@ -291,6 +318,11 @@ static void fiber_unix_start(unsigned int x, unsigned int y)
 #endif
 	fb->fiber.flag |= FIBER_F_STARTED;
 	fiber_start(&fb->fiber, fn, arg);
+
+	if (fb->context != NULL) {
+		stack_free(fb->context);
+		fb->context = NULL;
+	}
 }
 
 #endif // !USE_BOOST_JMP

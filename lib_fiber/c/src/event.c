@@ -43,6 +43,13 @@ void event_set(int event_mode)
 	}
 }
 
+static int __directly = 0;
+
+void acl_fiber_event_directly(int yes)
+{
+	__directly = yes;
+}
+
 EVENT *event_create(int size)
 {
 	EVENT *ev = NULL;
@@ -218,6 +225,9 @@ int event_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe)
 			fe->type = TYPE_BADFD;
 			msg_error("%s(%d): badfd=%d, fe=%p",
 				__FUNCTION__, __LINE__, fe->fd, fe);
+#ifdef	SYS_UNIX
+			acl_fiber_stack_print(__FUNCTION__);
+#endif
 			return -1;
 		default:
 			fe->type = TYPE_FILE;
@@ -415,7 +425,7 @@ void event_del_read(EVENT *ev, FILE_EVENT *fe, int directly)
 	}
 
 	if (fe->mask & EVENT_READ) {
-		if ((fe->mask & EVENT_DIRECT) || directly) {
+		if ((fe->mask & EVENT_DIRECT) || directly || __directly) {
 			ring_detach(&fe->me);
 			(void) ev->del_read(ev, fe);
 		} else if (fe->me.parent == &fe->me) {
@@ -436,7 +446,7 @@ void event_del_write(EVENT *ev, FILE_EVENT *fe, int directly)
 	}
 
 	if (fe->mask & EVENT_WRITE) {
-		if ((fe->mask & EVENT_DIRECT) || directly) {
+		if ((fe->mask & EVENT_DIRECT) || directly || __directly) {
 			ring_detach(&fe->me);
 			(void) ev->del_write(ev, fe);
 		} else if (fe->me.parent == &fe->me) {
