@@ -9,7 +9,9 @@
 
 namespace acl {
 
-class_counter::class_counter() {
+class_counter::class_counter(bool clean)
+: clean_(clean)
+{
 	lock_ = NEW thread_mutex;
 }
 
@@ -52,7 +54,9 @@ void class_counter::dec(const char *name) {
 
 	std::map<std::string, long long>::iterator it = names_.find(name);
 	if (it != names_.end()) {
-		it->second--;
+		if (--it->second == 0 && clean_) {
+			names_.erase(it);
+		}
 	} else {
 		logger_error("not find flag %s", name);
 	}
