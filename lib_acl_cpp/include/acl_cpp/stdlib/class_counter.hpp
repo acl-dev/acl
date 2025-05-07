@@ -27,7 +27,11 @@ class thread_mutex;
 
 class ACL_CPP_API class_counter : public singleton<class_counter> {
 public:
-	class_counter();
+	/**
+	 * 构造方法
+	 * @param clean {bool} 是否自动清除计数为 0 的计数对象.
+	 */
+	class_counter(bool clean = true);
 	~class_counter();
 
 	/**
@@ -60,6 +64,7 @@ public:
 private:
 	std::map<std::string, long long> names_;
 	thread_mutex* lock_;
+	bool clean_;
 };
 
 }  // namespace acl
