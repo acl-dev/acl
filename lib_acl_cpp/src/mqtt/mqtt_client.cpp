@@ -156,7 +156,7 @@ bool mqtt_client::read_message(const mqtt_header& header, mqtt_message& body) {
 
 		len -= n;
 
-		n = body.update(buf, (int) size);
+		n = body.update(buf, (int) n);
 		if (n == -1) {
 			logger_debug(DEBUG_MQTT, 1, "update body error");
 			return false;
