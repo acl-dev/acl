@@ -56,6 +56,15 @@ typedef struct FIBER_UNIX {
 	size_t dlen;
 } FIBER_UNIX;
 
+#if defined(ANDROID)
+
+void acl_fiber_stack_print(const char *tag)
+{
+	(void) arg;
+}
+
+#else
+
 #include <execinfo.h>
 
 void acl_fiber_stack_print(const char *tag)
@@ -75,6 +84,8 @@ void acl_fiber_stack_print(const char *tag)
 
 	free(frames);
 }
+
+#endif // ANDROID
 
 #ifdef	DEBUG_STACK
 #include <libunwind.h>
