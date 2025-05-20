@@ -60,7 +60,7 @@ typedef struct FIBER_UNIX {
 
 void acl_fiber_stack_print(const char *tag)
 {
-	(void) arg;
+	(void) tag;
 }
 
 #else
