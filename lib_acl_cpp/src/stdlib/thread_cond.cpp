@@ -41,8 +41,8 @@ bool thread_cond::notify_all()
 }
 
 #define	SEC_TO_NS	1000000000	// nanoseconds per second
-#define SEC_TO_MIS	1000000		// microseconds per second
-#define MIS_TO_NS	1000		// nanoseconds per microseconds
+#define SEC_TO_US	1000000		// microseconds per second
+#define US_TO_NS	1000		// nanoseconds per microseconds
 
 bool thread_cond::wait(long long microseconds /* = -1 */,
 	bool locked /* = false */)
@@ -89,11 +89,17 @@ bool thread_cond::timed_wait(long long microseconds, bool locked)
 {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
+
+	long long ns = (tv.tv_usec + microseconds % SEC_TO_US) * US_TO_NS;
+	// Sanity check.
+	if (ns < 0) {
+		ns = 0;
+	}
+
 	struct timespec ts;
-	ts.tv_sec   = (time_t) (tv.tv_sec + microseconds / SEC_TO_MIS);
-	long long n = (tv.tv_usec + microseconds % SEC_TO_MIS) * MIS_TO_NS;
-	ts.tv_nsec  = (long) n % SEC_TO_NS;
-	ts.tv_sec  += (long) n / SEC_TO_NS;
+	ts.tv_sec    = (long) (tv.tv_sec + microseconds / SEC_TO_US);
+	ts.tv_sec   += (long) (ns / SEC_TO_NS);
+	ts.tv_nsec   = (long) (ns % SEC_TO_NS);
 
 	bool locked_internal;
 	if (mutex_internal_ || !locked) {
