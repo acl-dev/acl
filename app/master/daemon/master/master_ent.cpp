@@ -808,6 +808,27 @@ static int service_env(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 		(void) acl_array_append(serv->children_env, nv);
 	}
 
+	value = get_str_ent(xcp, "master_envs", "-");
+	if (value && strcmp(value, "-") != 0) {
+		ACL_ARGV *tokens = acl_argv_split(value, ",; \t\r\n");
+		ACL_ITER iter;
+
+		acl_foreach(iter, tokens) {
+			char *token = (char*) iter.data;
+			char *name, *val;
+			if (acl_split_nameval2(token, &name, &val, '|')) {
+				continue;
+			}
+
+			nv = (ACL_MASTER_NV *) acl_mycalloc(1, sizeof(ACL_MASTER_NV));
+			nv->name  = acl_mystrdup(name);
+			nv->value = acl_mystrdup(val);
+			(void) acl_array_append(serv->children_env, nv);
+		}
+
+		acl_argv_free(tokens);
+	}
+
 	return 0;
 }
 

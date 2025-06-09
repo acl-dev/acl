@@ -98,6 +98,9 @@ int acl_master_refresh_service(ACL_MASTER_SERV *entry)
 	SWAP(char *, serv->notify_recipients, entry->notify_recipients);
 	SWAP(char *, serv->version, entry->version);
 	SWAP(ACL_ARGV *, serv->args, entry->args);
+	SWAP(ACL_ARRAY *, serv->children_env, entry->children_env);
+	SWAP(char *, serv->stdout_log, entry->stdout_log);
+	SWAP(char *, serv->stderr_log, entry->stderr_log);
 
 	acl_master_service_restart(serv);
 	acl_master_ent_free(entry);
