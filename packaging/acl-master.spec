@@ -87,7 +87,7 @@ fi
 %endif
 
 %changelog
-* Thu Jun 12 2025 shuxin.zheng@qq.com 3.5.5-2-20250612.21
+* Thu Jun 12 2025 shuxin.zheng@qq.com 3.5.5-3-20250612.21
 - acl_master: set ulimit -n from 204800 to 500000.
 
 * Mon Jun 09 2025 shuxin.zheng@qq.com 3.5.5-2-20250609.17
