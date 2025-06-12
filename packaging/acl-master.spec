@@ -1,4 +1,4 @@
-%define release_id 3
+%define release_id 4
 
 Summary: acl master framework
 Name:           acl-master
@@ -87,6 +87,9 @@ fi
 %endif
 
 %changelog
+* Thu Jun 12 2025 shuxin.zheng@qq.com 3.5.5-4-20250612.22
+- acl_master: set ulimit -n from 204800 to 500000.
+
 * Thu Jun 12 2025 shuxin.zheng@qq.com 3.5.5-3-20250612.21
 - acl_master: set ulimit -n from 204800 to 500000.
 

@@ -56,7 +56,7 @@ start() {
     [ -x $exec ] || exit 5
     echo -n $"Starting $prog: "
     ulimit -c 0
-    ulimit -n 204800
+    ulimit -n 500000
     trap '' 1
     #daemon --pidfile=${PID_FILE} 
     $exec -k -c $CONF_PATH -l $LOG_PATH &
