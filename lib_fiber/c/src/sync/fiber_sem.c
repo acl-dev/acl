@@ -97,50 +97,50 @@ int acl_fiber_sem_timed_wait(ACL_FIBER_SEM *sem, int milliseconds)
 		return -1;
 	}
 
-	ring_prepend(&sem->waiting, &curr->me2);
-
-	curr->wstatus |= FIBER_WAIT_SEM;
-
-	if (milliseconds > 0) {
-		fiber_timer_add(curr, (size_t) milliseconds);
-	}
-
 	// Make sure to start wakeup_timers in fiber_io.c by the following:
 	// fiber_io_event -> fiber_io_check -> fiber_io_loop -> wakeup_timers.
 	ev = fiber_io_event();
-	WAITER_INC(ev);  // Just for avoiding fiber_io_loop to exit
-	acl_fiber_switch();
-	WAITER_DEC(ev);
 
-	if (milliseconds > 0) {
-		fiber_timer_del(curr);
+	while (sem->num <= 0) {
+		ring_prepend(&sem->waiting, &curr->me2);
+		curr->wstatus |= FIBER_WAIT_SEM;
+
+		if (milliseconds > 0) {
+			fiber_timer_add(curr, (size_t) milliseconds);
+		}
+
+		WAITER_INC(ev);  // Just for avoiding fiber_io_loop to exit
+		acl_fiber_switch();
+		WAITER_DEC(ev);
+
+		if (milliseconds > 0) {
+			fiber_timer_del(curr);
+		}
+
+		curr->wstatus &= ~FIBER_WAIT_SEM;
+
+		/* If switch to me because other killed me, I should detach myself;
+		 * else if because other unlocks, I'll be detached twice, which is
+		 * harmless because RING can deal with it.
+		 */
+		ring_detach(&curr->me);
+		ring_detach(&curr->me2);
+
+		if (acl_fiber_canceled(curr)) {
+			acl_fiber_set_error(curr->errnum);
+			return -1;
+		}
+		if (curr->flag & FIBER_F_TIMER) {
+			// Clear FIBER_F_TIMER flag been set in wakeup_timers.
+			curr->flag &= ~FIBER_F_TIMER;
+
+			acl_fiber_set_errno(curr, FIBER_EAGAIN);
+			acl_fiber_set_error(FIBER_EAGAIN);
+			return -1;
+		}
 	}
 
-	curr->wstatus &= ~FIBER_WAIT_SEM;
-
-	/* If switch to me because other killed me, I should detach myself;
- 	 * else if because other unlock, I'll be detached twice which is
-	 * harmless because RING can deal with it.
-	 */
-	ring_detach(&curr->me);
-	ring_detach(&curr->me2);
-
-	if (acl_fiber_canceled(curr)) {
-		acl_fiber_set_error(curr->errnum);
-		return -1;
-	} else if (curr->flag & FIBER_F_TIMER) {
-		// Clear FIBER_F_TIMER flag been set in wakeup_timers.
-		curr->flag &= ~FIBER_F_TIMER;
-
-		acl_fiber_set_errno(curr, FIBER_EAGAIN);
-		acl_fiber_set_error(FIBER_EAGAIN);
-		return -1;
-	}
-
-	/* Needn't decrease the sem number, because the notifier has decreased
-	 * it for me.
-	 */
-	return sem->num;
+	return --sem->num;
 }
 
 int acl_fiber_sem_wait(ACL_FIBER_SEM *sem)
@@ -176,8 +176,8 @@ int acl_fiber_sem_post(ACL_FIBER_SEM *sem)
 	if (sem->tid == 0) {
 		sem->tid = thread_self();
 	}
-#if 0
-	else if (sem->tid != thread_self()) {
+#if 1
+	else if (sem->tid != (unsigned long) thread_self()) {
 		msg_error("%s(%d): current tid=%lu, sem tid=%lu",
 			__FUNCTION__, __LINE__, thread_self(), sem->tid);
 		return -1;
@@ -204,9 +204,7 @@ int acl_fiber_sem_post(ACL_FIBER_SEM *sem)
 	ring_detach(&ready->me2);
 	FIBER_READY(ready);
 
-	/* Help the fiber to be wakeup to decrease the sem number. */
-	num = sem->num--;
-
+	num = sem->num;
 	if (num >= sem->buf) {
 		acl_fiber_yield();
 	}

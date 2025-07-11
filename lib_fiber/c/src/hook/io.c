@@ -105,7 +105,7 @@ int WINAPI acl_fiber_close(socket_t fd)
 	ret = fiber_file_close(fe);
 
 	// If the return value more than 0, the fe has just been bound with
-	// the other fiber, we just return here and the fe will really be
+	// the other fiber, we just return here, and the fe will really be
 	// closed and freed by the last one binding the fe.
 	if (ret > 0) {
 		return 0;

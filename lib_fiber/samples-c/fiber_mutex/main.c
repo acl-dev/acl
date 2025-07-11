@@ -311,7 +311,7 @@ int main(int argc, char *argv[])
 			flags |= FIBER_MUTEX_F_LOCK_TRY;
 			break;
 		case 'S':
-			flags |= FIBER_MUTEX_F_SWITCH_FIRST;
+			//flags |= FIBER_MUTEX_F_SWITCH_FIRST;
 			break;
 		default:
 			break;
