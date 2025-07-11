@@ -105,7 +105,7 @@ void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 		// When using io_uring, we should call the system API of write
 		// to send data, because the fd is shared by multiple threads
 		// and which can't use io_uring directly, so we set the mask
-		// as EVENT_SYSIO to use system write API.
+		// as EVENT_SYSIO to use the system write API.
 
 		socket_t out = mbox_out(waiter->box);
 

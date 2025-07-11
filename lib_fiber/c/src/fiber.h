@@ -137,7 +137,7 @@ void fiber_io_clear(void);
 // event loop until it's ready for  reading or writing, and the current fiber
 // will be suspended; if the given fd in fe isn't a valid socket, the function
 // will return immediatly, users can check fe->type.
-// the return value is same as which is from event_add_read or event_add_write.
+// the return value is the same as which is from event_add_read or event_add_write.
 int fiber_wait_read(FILE_EVENT *fe);
 int fiber_wait_write(FILE_EVENT *fe);
 
