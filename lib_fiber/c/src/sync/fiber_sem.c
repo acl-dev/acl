@@ -138,10 +138,6 @@ int acl_fiber_sem_timed_wait(ACL_FIBER_SEM *sem, int milliseconds)
 			acl_fiber_set_error(FIBER_EAGAIN);
 			return -1;
 		}
-
-		if (sem->num  == 0) {
-			printf(">>>>>>>>>>>>>>>>>>>++++++++++wakeup and num is 0+++++++++++++++++++++\n");
-		}
 	}
 
 	return --sem->num;
