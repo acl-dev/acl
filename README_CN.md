@@ -1,6 +1,4 @@
 
-[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
-
 # acl -- One advanced C/C++ library for Unix/Windows.
 
 [English](README.md)
@@ -316,3 +314,8 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 - Gitee:    https://gitee.com/acl-dev/acl
 - 微 博：   http://weibo.com/zsxxsz
 - QQ 群:    705290654
+
+## 六、Thanks
+
+Thanks <a href=https://jb.gg/OpenSourceSupport target=_blank><img widith=100 height=50 src=res/logo/clion_icon.png /> </a>.
+[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
