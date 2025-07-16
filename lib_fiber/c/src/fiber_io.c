@@ -133,14 +133,13 @@ static void thread_init(void)
 		__main_fiber = __thread_fiber;
 		atexit(fiber_io_main_free);
 	} else if (pthread_setspecific(__fiber_key, __thread_fiber) != 0) {
-		printf("pthread_setspecific error!\r\n");
-		abort();
+		msg_fatal("pthread_setspecific error!\r\n");
 	}
 }
 
 static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
 
-// Notice: don't write log here to avoid recursive calling when user call
+// Notice: don't write log here to avoid recursive calling when user calls
 // acl_fiber_msg_register() to hook the log process.
 
 void fiber_io_check(void)
@@ -655,14 +654,12 @@ void fiber_file_set(FILE_EVENT *fe)
 	htable_enter(__thread_fiber->events, key, fe);
 #else
 	if (fe->fd <= INVALID_SOCKET || fe->fd >= (socket_t) var_maxfd) {
-		printf("%s(%d): invalid fd=%d\r\n", __FUNCTION__, __LINE__, fe->fd);
-		abort();
+		msg_fatal("%s(%d): invalid fd=%d", __FUNCTION__, __LINE__, fe->fd);
 	}
 
 	if (__thread_fiber->events[fe->fd] != NULL) {
-		printf("%s(%d): exist fd=%d, old=%p new=%p\r\n", __FUNCTION__,
+		msg_fatal("%s(%d): exist fd=%d, old=%p new=%p", __FUNCTION__,
 			__LINE__, fe->fd, __thread_fiber->events[fe->fd], fe);
-		abort();
 	}
 
 	__thread_fiber->events[fe->fd] = fe;
@@ -683,7 +680,7 @@ FILE_EVENT *fiber_file_open(socket_t fd)
 #endif
 	}
 
-	/* We can't set the fe's type here because it'll effect the DGRAM IO,
+	/* We can't set the fe's type here because it'll affect the DGRAM IO,
 	 * so, we'll set the fe's sock type in event.c.
 	 */
 	// Don't set fiber_r here, which will be set in fiber_wait_read()
@@ -760,7 +757,7 @@ void fiber_file_free(FILE_EVENT *fe)
 
 int fiber_file_close(FILE_EVENT *fe)
 {
-	ACL_FIBER *curr;
+	ACL_FIBER *curr = acl_fiber_running();
 	int n = 0;
 
 	assert(fe);
@@ -768,13 +765,9 @@ int fiber_file_close(FILE_EVENT *fe)
 
 	// At first, we should remove the IO event for the fd.
 	if (!IS_CLOSING(fe)) {
-		EVENT *event;
-
-		event = __thread_fiber->event;
+		EVENT *event = __thread_fiber->event;
 		event_close(event, fe);
 	}
-
-	curr = acl_fiber_running();
 
 	if (fe->fiber_r && fe->fiber_r != curr) {
 		n++;
@@ -866,6 +859,8 @@ void fiber_file_cache_put(FILE_EVENT *fe)
 	// If the fe is being referred by more than one fiber, don't put it
 	// back to cache or free it, because the fe is still living now.
 	if (fe->refer > 1) {
+		// If the other fiber is referring it, just unrefer it by me.
+		file_event_unrefer(fe);
 		return;
 	}
 

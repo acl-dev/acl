@@ -146,7 +146,7 @@ SYNC_TIMER *sync_timer_get(void)
 void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 {
 	if (!var_hook_sys_api) {
-		// If the current notifier is a thread, just send message.
+		// If the current notifier is a thread, just send a message.
 
 		SYNC_MSG *msg = (SYNC_MSG*) mem_malloc(sizeof(SYNC_MSG));
 		msg->obj = obj;
@@ -159,12 +159,12 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 		mbox_send(timer->box, msg);
 	} else if (thread_self() != timer->tid) {
 		// If the current notifier is a fiber of another thread, send
-		// message with the temporary FILE_EVENT.
+		// a message with the temporary FILE_EVENT.
 
 		socket_t out = mbox_out(timer->box);
 		FILE_EVENT *fe = fiber_file_get(out);
 		SYNC_MSG *msg = (SYNC_MSG*) mem_malloc(sizeof(SYNC_MSG));
-		int from_cache = 0, num;
+		int num;
 
 		msg->obj = obj;
 		msg->action = SYNC_ACTION_WAKEUP;
@@ -176,19 +176,18 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 		// fiber return and release the sem.
 		if (fe == NULL) {
 			fe = fiber_file_cache_get(out);
-			from_cache = 1;
 			if (fe->mbox_wsem == NULL) {
 				fe->mbox_wsem = acl_fiber_sem_create(1);
 			}
 		} else if (fe->mbox_wsem == NULL) {
 			msg_fatal("%s(%d): mbox_wsem NULL, out=%d, fd=%d, refer=%d",
 				__FUNCTION__, __LINE__, (int) out, fe->fd, fe->refer);
+		} else {
+			fiber_file_cache_refer(fe);
 		}
 
-		fiber_file_cache_refer(fe);
-
 		// Reduce the sem number and maybe be suspended if sem is 0,
-		// so only one fiber can mbox_send message at the same time.
+		// so only one fiber can mbox_send a message at the same time.
 		num = acl_fiber_sem_wait(fe->mbox_wsem);
 		if (num != 0) {
 			msg_fatal("%s(%d): invalid sem num=%d, fe=%p, %d, %d",
@@ -216,12 +215,7 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 #endif
 
 		if ((num = acl_fiber_sem_post(fe->mbox_wsem)) == 1) {
-			if (from_cache) {
-				fiber_file_cache_unrefer(fe);
-				fiber_file_cache_put(fe);
-			} else {
-				fiber_file_cache_unrefer(fe);
-			}
+			fiber_file_cache_put(fe);
 		} else {
 			msg_fatal("%s(%d): invalid sem num=%d, fe=%p, %d, %d",
 				__FUNCTION__, __LINE__, num, fe, fe->fd, fe->refer);
