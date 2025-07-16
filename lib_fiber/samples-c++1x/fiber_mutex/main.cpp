@@ -2,14 +2,45 @@
 #include <vector>
 #include <thread>
 #include <iostream>
+#include <getopt.h>
 
-int main() {
+static void usage(const char *proc) {
+	printf("usage: %s -h[help]\r\n"
+		"    -t threads_count[default: 2]\r\n"
+		"    -c fibers_count_per_thread[default: 10]\r\n"
+		"    -n loop_count_per_fiber[default: 100]\r\n"
+		"    -l locks_count[default: 2]\r\n", proc);
+}
+
+int main(int argc, char *argv[]) {
 	std::vector<std::thread*> threads;
 	std::vector<acl::fiber_mutex*> locks;
 	std::vector<long long*> cnts;
-	size_t number = 2;
+	int number = 2, nthreads = 2, nfibers = 10, count = 100;;
+	int ch;
 
-	for (size_t i = 0; i < number; i++) {
+	while ((ch = getopt(argc, argv, "ht:c:n:l:")) > 0) {
+		switch (ch) {
+		case 'h':
+		default:
+			usage(argv[0]);
+			return 0;
+		case 't':
+			nthreads = std::atoi(optarg);
+			break;
+		case 'c':
+			nfibers = std::atoi(optarg);
+			break;
+		case 'n':
+			count = std::atoi(optarg);
+			break;
+		case 'l':
+			number = std::atoi(optarg);
+			break;
+		}
+	}
+
+	for (int i = 0; i < number; i++) {
 		auto* lock = new acl::fiber_mutex;
 		locks.push_back(lock);
 		auto* cnt = new long long;
@@ -19,13 +50,13 @@ int main() {
 
 	acl::fiber::stdout_open(true);
 
-	for (size_t i = 0; i < 10; i++) {
+	for (int i = 0; i < nthreads; i++) {
 		auto* thr = new std::thread([&] {
-			for (size_t j = 0; j < 100; j++) {
+			for (int j = 0; j < nfibers; j++) {
 				go[&] {
 					acl::fiber::delay(5);
-					for (size_t m = 0; m < 100; m++) {
-						size_t k = m % number;
+					for (int m = 0; m < count; m++) {
+						int k = m % number;
 						locks[k]->lock();
 						*cnts[k] += 1;
 						acl::fiber::yield();
@@ -44,8 +75,8 @@ int main() {
 		delete it;
 	}
 
-	for (size_t i = 0; i < number; i++) {
-		printf("cnts[%zd]=%lld\r\n", i, *cnts[i]);
+	for (int i = 0; i < number; i++) {
+		printf("cnts[%d]=%lld\r\n", i, *cnts[i]);
 		delete cnts[i];
 		delete locks[i];
 	}

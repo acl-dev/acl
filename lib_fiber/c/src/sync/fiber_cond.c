@@ -293,7 +293,7 @@ int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
 	}
 
 	// Unrefer the waiter object, which will be really freed when its
-	// reference is zero. It's safely that the waiter object is used
+	// reference is zero. It's safe that the waiter object is used
 	// by multiple threads with using the reference way.
 	sync_obj_unrefer(obj);
 	return ret;

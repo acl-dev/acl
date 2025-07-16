@@ -102,7 +102,7 @@ void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 	if (!var_hook_sys_api) {
 		mbox_send(waiter->box, fb);
 	} else if (thread_self() != waiter->tid) {
-		// When using io_uring, we should call the system API of write
+		// When using io_uring, we should call the write system API
 		// to send data, because the fd is shared by multiple threads
 		// and which can't use io_uring directly, so we set the mask
 		// as EVENT_SYSIO to use the system write API.
@@ -115,11 +115,10 @@ void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 		// wait for the previous fiber to return and release the sem.
 
 		FILE_EVENT *fe = fiber_file_get(out);
-		int from_cache = 0, num;
+		int num;
 
 		if (fe == NULL) {
 			fe = fiber_file_cache_get(out);
-			from_cache = 1;
 
 			// COW(Copy on write) to avoid unnecessary waste:
 			// alloc sem binding the fe if necessary.
@@ -129,9 +128,9 @@ void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 		} else if (fe->mbox_wsem == NULL) {
 			msg_fatal("%s(%d): mbox_wsem NULL, out=%d, fd=%d, refer=%d",
 				__FUNCTION__, __LINE__, (int) out, fe->fd, fe->refer);
+		} else {
+			fiber_file_cache_refer(fe);
 		}
-
-		fiber_file_cache_refer(fe);
 
 		// Reduce the sem number and maybe be suspended if sem is 0.
 		num = acl_fiber_sem_wait(fe->mbox_wsem);
@@ -145,7 +144,6 @@ void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 		// The fe maybe be used again in mbox_send->acl_fiber_write
 		// ->fiber_file_open->fiber_file_get.
 		mbox_send(waiter->box, fb);
-
 #ifdef	DEBUG
 		FILE_EVENT *f = fiber_file_get(out);
 		if (f == NULL) {
@@ -162,17 +160,11 @@ void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 
 		// If no other fiber is suspended by the sem, then release it.
 		if ((num = acl_fiber_sem_post(fe->mbox_wsem)) == 1) {
-			if (from_cache) {
-				fiber_file_cache_unrefer(fe);
-				fiber_file_cache_put(fe);
-			} else {
-				fiber_file_cache_unrefer(fe);
-			}
+			fiber_file_cache_put(fe);
 		} else {
 			msg_fatal("%s(%d): invalid sem num=%d, fe=%p, %d, %d",
 				__FUNCTION__, __LINE__, num, fe, fe->fd, fe->refer);
 		}
-
 	} else {
 		// If the current notifier is a fiber in the same thread with
 		// the one to be awakened, just wakeup it directly.

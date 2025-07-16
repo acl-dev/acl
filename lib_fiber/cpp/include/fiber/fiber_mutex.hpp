@@ -34,12 +34,12 @@ public:
 	/**
 	 * Try to lock the mutex.
 	 * @return {bool} If lock successfully, return true, or return false
-	 *  if the mutex is locked by other coroutine.
+	 *  if the mutex is locked by the other coroutine.
 	 */
 	bool trylock();
 
 	/**
-	 * Unlock the mutex and wakeup the waiter.
+	 * Unlock the mutex and wake up the waiter.
 	 * @return {bool} If unlock successfully, return true, or return false.
 	 */
 	bool unlock();
@@ -54,7 +54,7 @@ public:
 	}
 
 	/**
-	 * Detect the deadlocks state.
+	 * Detect the deadlock state.
 	 * @param out {fiber_mutex_stats&} Save the checking result.
 	 * @return {bool} Returning true indicates the existence of a
 	 *  deadlock issue.
