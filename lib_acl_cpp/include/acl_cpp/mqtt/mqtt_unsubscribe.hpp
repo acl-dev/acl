@@ -31,6 +31,14 @@ public:
 	mqtt_unsubscribe& set_pkt_id(unsigned short id);
 
 	/**
+	 * get the messsage's id.
+	 * @return {unsigned short} should return the value that > 0 && <= 65535.
+	 */
+	unsigned short get_pkt_id() const {
+		return pkt_id_;
+	}
+
+	/**
 	 * set the message's topic.
 	 * @param topic {const char*}
 	 * @return {mqtt_unsubscribe&}
