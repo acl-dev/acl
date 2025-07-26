@@ -2,7 +2,7 @@
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
-Version:        3.6.3
+Version:        3.6.4
 Release:        %{release_id}
 Group:          System/Libs
 License:        LGPL3.0,IBM
@@ -44,6 +44,10 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Sat Jul 26 2025 shuxin.zheng shuxin.zheng@qq.com 3.6.4-0-20250726.12
+- Bugfix: Fixed bugs in fiber mutex module;
+- Feature: Add SSL for redis_client_pipeline.
 
 * Fri Apr 25 2025 shuxin.zheng shuxin.zheng@qq.com 3.6.3-0-20250425.15
 - Feature: Add fiber pool module;
