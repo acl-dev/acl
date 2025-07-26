@@ -179,8 +179,10 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 		logger_error("write connect response error");
 		delete peer;
 
+#ifndef	USE_REFER
 		local->unbind_sock();
 		delete local;
+#endif
 		return false;
 	}
 #endif

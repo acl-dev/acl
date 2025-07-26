@@ -12,6 +12,7 @@ namespace acl {
 
 class token_tree;
 class socket_stream;
+class sslbase_conf;
 class redis_client;
 
 typedef enum {
@@ -192,6 +193,7 @@ public:
 	void stop_thread();
 
 public:
+	redis_pipeline_channel& set_ssl_conf(sslbase_conf* ssl_conf);
 	redis_pipeline_channel& set_passwd(const char* passwd);
 	const char* get_addr() const {
 		return addr_.c_str();
@@ -229,13 +231,13 @@ private:
 class ACL_CPP_API redis_client_pipeline : public thread {
 public:
 	redis_client_pipeline(const char* addr, box_type_t type = BOX_TYPE_MBOX);
-	virtual ~redis_client_pipeline(void);
+	virtual ~redis_client_pipeline();
 
 	// Start the pipeline thread
-	void start_thread(void);
+	void start_thread();
 
 	// Stop the pipeline thread
-	void stop_thread(void);
+	void stop_thread();
 
 public:
 	// Called by redis_command in pipeline mode
@@ -246,9 +248,12 @@ public:
 
 	// Called by redis_command::get_pipeline_message, and can be overrided
 	// by child class. The box can be tbox, tbox_array, mbox, or fiber_tbox.
-	virtual box<redis_pipeline_message>* create_box(void);
+	virtual box<redis_pipeline_message>* create_box();
 
 public:
+	// Set the ssl conf for the connection with redis internal.
+	redis_client_pipeline& set_ssl_conf(sslbase_conf* ssl_conf);
+
 	// Set the password for connecting the redis server
 	redis_client_pipeline& set_password(const char* passwd);
 
@@ -265,17 +270,18 @@ public:
 	redis_client_pipeline& set_preconnect(bool yes);
 
 	// Get the max hash slot of redis
-	int get_max_slot(void) const {
+	int get_max_slot() const {
 		return max_slot_;
 	}
 
 protected:
 	// @override from acl::thread
-	void* run(void);
+	void* run();
 
 private:
 	string addr_;		// The default redis address
 	string passwd_;		// Password for connecting redis
+	sslbase_conf* ssl_conf_;// SSL will be used if not null
 	box_type_t box_type_;	// The type of box
 	int    max_slot_;	// The max hash slot for redis cluster
 	int    conn_timeout_;	// Timeout to connect redis
@@ -295,13 +301,13 @@ private:
 	void set_slot(int slot, const char* addr);
 
 	// Set all hash slots' addresses of all redises
-	void set_all_slot(void);
+	void set_all_slot();
 
 	// Start all pipeline channels threads
-	void start_channels(void);
+	void start_channels();
 
 	// Stop all pipeline channels threads
-	void stop_channels(void);
+	void stop_channels();
 
 	// Start one pipeline channel thread with the specified redis address
 	redis_pipeline_channel* start_channel(const char* addr);
@@ -326,7 +332,7 @@ private:
 
 /**
  * Sample:
- * void main_thread(void) {
+ * void main_thread() {
  *	acl::redis_client_pipeline pipeline("127.0.0.1:6379");
  *	pipeline.start_thread();
  *	// Start some threads

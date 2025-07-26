@@ -82,6 +82,7 @@ void mqtt_connect::set_will_qos(mqtt_qos_t qos) {
 		break;
 	default:
 		logger_error("invalid qos: %d", (int) qos);
+		break;
 	}
 }
 

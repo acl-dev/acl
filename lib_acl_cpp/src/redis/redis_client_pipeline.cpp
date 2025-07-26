@@ -27,6 +27,12 @@ redis_pipeline_channel::~redis_pipeline_channel()
 	delete box_;
 }
 
+redis_pipeline_channel &redis_pipeline_channel::set_ssl_conf(acl::sslbase_conf *ssl_conf)
+{
+	client_->set_ssl_conf(ssl_conf);
+	return *this;
+}
+
 redis_pipeline_channel& redis_pipeline_channel::set_passwd(const char *passwd)
 {
 	if (passwd && *passwd) {
@@ -362,6 +368,12 @@ redis_client_pipeline& redis_client_pipeline::set_retry(bool on)
 	return *this;
 }
 
+redis_client_pipeline& redis_client_pipeline::set_ssl_conf(acl::sslbase_conf *ssl_conf)
+{
+	ssl_conf_ = ssl_conf;
+	return *this;
+}
+
 redis_client_pipeline& redis_client_pipeline::set_password(const char* passwd)
 {
 	if (passwd && *passwd) {
@@ -642,9 +654,13 @@ redis_pipeline_channel* redis_client_pipeline::start_channel(const char *addr)
 {
 	redis_pipeline_channel* channel = NEW redis_pipeline_channel(
 		*this, addr, conn_timeout_, rw_timeout_, retry_);
+
+	channel->set_ssl_conf(ssl_conf_);
+
 	if (!passwd_.empty()) {
 		channel->set_passwd(passwd_);
 	}
+
 	if (channel->start_thread()) {
 		channels_->insert(addr, channel);
 		return channel;

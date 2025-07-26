@@ -24,8 +24,8 @@
         * [3. acl HTTP 模块是否支持服务器/客户端两种模式？](#3-acl-http-模块是否支持服务器客户端两种模式)
         * [4. acl HTTP 模块是否支持 websocket 通信协议？](#4-acl-http-模块是否支持-websocket-通信协议)
         * [5. acl HTTP 模块是否支持 session？](#5-acl-http-模块是否支持-session)
-        * [6. HttpServletRequest 为何读不到 json 或 xml 数据体？](#6-HttpServletRequest-为何读不到-json-或-xml-数据体)
-        * [7. http_request 因未设 Host 字段而出错的问题](#7-http_request-因未设-Host-字段而出错的问题)
+        * [6. HttpServletRequest 为何读不到 x-www-form-urlencoded, json 或 xml 数据体？](#6-httpservletrequest-为何读不到-x-www-form-urlencoded-json-或-xml-数据体)
+        * [7. http_request 因未设 Host 字段而出错的问题](#7-http_request-因未设-host-字段而出错的问题)
     * [（三）、Redis 模块](#三redis-模块)
         * [1. acl redis 库是否支持集群功能？](#1-acl-redis-库是否支持集群功能)
         * [2. acl redis 库是如何划分的？](#2-acl-redis-库是如何划分的)
@@ -43,7 +43,7 @@
         * [1. 有几种服务器编程模型？均有何特点？](#1-有几种服务器编程模型均有何特点)
         * [2. acl_master 的作用是什么？支持哪些平台？](#2-acl_master-的作用是什么支持哪些平台)
         * [3. 没有 acl_master 控制管理，服务子进程是否可以单独运行？](#3-没有-acl_master-控制管理服务子进程是否可以单独运行)
-        * [4. 手工模式下运行时遇到“idle timeout -- exiting, idle”怎么办？](#4-手工模式下运行时遇到idle-timeout----exiting-idle怎么办)
+        * [4. 手工模式下运行时遇到“idle timeout -- exiting, idle”怎么办？](#4-手工模式下运行时遇到-idle-timeout----exiting-idle-怎么办)
         * [5. acl_master 控制模式下，服务子进程如何预启动多个进程？](#5-acl_master-控制模式下服务子进程如何预启动多个进程)
         * [6. acl_master 控制模式下，如何只监听内网地址？](#6-acl_master-控制模式下如何只监听内网地址)
     * [（六）、数据库模块](#六数据库模块)
@@ -135,7 +135,7 @@ lib_acl_cpp 库是以动态加载方式加载 mysql 动态库的，所以在编�
 #### 5. acl HTTP 模块是否支持 session？
 支持。acl HTTP 模块当用在服务器编程时支持 session 存储，目前支持使用 memcached 或 redis 存储 session 数据。
  
-#### 6. HttpServletRequest 为何读不到 json 或 xml 数据体
+#### 6. HttpServletRequest 为何读不到 x-www-form-urlencoded json 或 xml 数据体
 当 HTTP 客户端请求的数据体为 json 或 xml 时，默认情况下从 acl::HttpServletRequest 对象中是读不到 json/xml 数据的，主要原因在于 HttpServletRequest 内置了自动读取并解析 json/xml/x-www-form-urlencoded 类型数据的功能，使用者只需直接获取解析后的对象即可，如针对 json 类数据体：
 
 ```c++
@@ -227,7 +227,7 @@ acl_master 为由以上各个服务器编写的服务进程的控制管理程序
 
 可以。在没有 acl_master 的情况下，由以上各个服务模型编写的服务程序可以通过手工方式启动。启动方式一般为：./xxxx alone xxxx.cf，这样服务程序便以 alone 模式启动运行，具体情况可以参考 main.cpp 里的启动方式；在 WINDOWS 平台下只能是以 alone 模式手工启动运行。
 
-#### 4. 手工模式下运行时遇到"idle timeout -- exiting, idle"怎么办？
+#### 4. 手工模式下运行时遇到 idle timeout -- exiting, idle 怎么办？
 因为 acl 的服务器编程模型均支持半驻留方式（即运行空闲一段时间或处理连接次数达到设定值后会自动退出，这样的好处是：可以定期通过进程退出释放可能存在的资源泄露，另一方面便于用户在开发时通过 valgrind 进行内存检查），如果让进程不退出，可以在 alone 模式下给服务程序传递启动配置文件，如启动方式为：./xxxx alone xxxx.cf（传递方式可以看 main.cpp 和相关头文件），不同的服务器模型分别采取下面不同的配置项：  
 
 __程池模型：__ 将配置项 single_use_limit 和 single_idle_limit 设为 0；  
