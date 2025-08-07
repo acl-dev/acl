@@ -16,8 +16,20 @@
 
 namespace acl {
 
-#define INT_LEN		11
-#define	LONG_LEN	21
+#define INT_LEN			11
+#define	LONG_LEN		21
+#define	REDIS_DBUF_NBLOCK	1
+
+static dbuf_pool *dbuf_alloc()
+{
+#ifdef ACL_DBUF_HOOK_NEW
+	return new (REDIS_DBUF_NBLOCK) dbuf_pool();
+#else
+	// 因为 gcc 编译器在启用 O3 优化时，有可能在地址赋值时会因使用 MOVDQA，
+	// 而该指令是按 16 字节对齐的
+	return new dbuf_pool(REDIS_DBUF_NBLOCK, 16);
+#endif
+}
 
 void redis_command::init()
 {
@@ -38,16 +50,7 @@ void redis_command::init()
 	result_         = NULL;
 	pipe_msg_       = NULL;
 	addr_[0]        = 0;
-
-#define	REDIS_DBUF_NBLOCK	1
-
-#ifdef ACL_DBUF_HOOK_NEW
-	dbuf_           = new (REDIS_DBUF_NBLOCK) dbuf_pool();
-#else
-	// 因为 gcc 编译器在启用 O3 优化时，有可能在地址赋值时会因使用 MOVDQA，
-	// 而该指令是按 16 字节对齐的
-	dbuf_           = new dbuf_pool(REDIS_DBUF_NBLOCK, 16);
-#endif
+	dbuf_           = dbuf_alloc();
 }
 
 redis_command::redis_command()
@@ -393,14 +396,18 @@ const redis_result* redis_command::run(size_t nchild /* = 0 */,
 {
 	if (pipeline_ != NULL) {
 		redis_pipeline_message& msg = get_pipeline_message();
-		msg.set_option(dbuf_, nchild, timeout);
+		msg.set_option(nchild, timeout);
+		msg.move(dbuf_);
+		dbuf_ = dbuf_alloc();
 		result_ = pipeline_->run(msg);
 
 		return result_;
-	} else if (cluster_ != NULL) {
+	}
+	if (cluster_ != NULL) {
 		result_ = cluster_->run(*this, nchild, timeout);
 		return result_;
-	} else if (conn_ == NULL) {
+	}
+	if (conn_ == NULL) {
 		logger_error("ERROR: cluster_ and conn_ are all NULL");
 		return NULL;
 	}
@@ -985,7 +992,8 @@ void redis_command::build_request(size_t argc, const char* argv[], const size_t 
 	if (pipeline_) {
 		redis_pipeline_message& msg = get_pipeline_message();
 		build_request1(argc, argv, lens);
-		msg.set_request(request_buf_);
+		msg.move(request_buf_);
+		request_buf_ = NULL;
 		msg.set_slot(slot_);
 	} else if (slice_req_) {
 		build_request2(argc, argv, lens);

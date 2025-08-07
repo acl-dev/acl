@@ -1,7 +1,8 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
-#include "noncopyable.hpp"
+//#include "noncopyable.hpp"
 #include <vector>
+#include "atomic.hpp"
 
 struct ACL_DBUF_POOL;
 
@@ -29,10 +30,10 @@ public:
 	dbuf_pool(size_t nblock = 2, size_t align = 8);
 
 	/**
-	 * 该类对象必须要动态创建，所以隐藏了析构函数，使用者需要调用 destroy
+	 * 该类对象需要动态创建，所以隐藏了析构函数，使用者需要调用 destroy
 	 * 函数来销毁动态对象
 	 */
-	void destroy();
+	void destroy() const;
 
 #ifdef ACL_DBUF_HOOK_NEW
 	/**

@@ -39,7 +39,7 @@ private:
 
 class ACL_CPP_API atomic_long : public atomic<long long> {
 public:
-	atomic_long(long long n = 0);
+	explicit atomic_long(long long n = 0);
 	atomic_long(const atomic_long& n);
 
 	~atomic_long() {}
@@ -101,6 +101,7 @@ private:
 	long long n_;
 };
 
+#if 0
 #include "thread.hpp"
 
 class atomic_long_test {
@@ -172,5 +173,6 @@ public:
 		thr3.wait();
 	}
 };
+#endif
 
 } // namespace acl

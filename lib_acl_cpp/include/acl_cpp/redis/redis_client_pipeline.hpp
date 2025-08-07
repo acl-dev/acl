@@ -49,7 +49,11 @@ public:
 	}
 
 	~redis_pipeline_message() {
+		delete req_;
 		delete box_;
+		if (dbuf_) {
+			dbuf_->destroy();
+		}
 	}
 
 public:
@@ -76,8 +80,7 @@ public:
 	// These thredd APIs are called in redis_command.cpp
 
 	// Called in redis_command::run().
-	void set_option(dbuf_pool* dbuf, size_t nchild, int* timeout) {
-		dbuf_    = dbuf;
+	void set_option(size_t nchild, int* timeout) {
 		nchild_  = nchild;
 		timeout_ = timeout ? *timeout : -1;
 		result_  = NULL;
@@ -85,8 +88,13 @@ public:
 		redirect_count_ = 0;
 	}
 
+	// Called in redis_command::run()
+	void move(dbuf_pool* dbuf) {
+		dbuf_ = dbuf;
+	}
+
 	// Called in redis_command::build_request().
-	void set_request(const string* req) {
+	void move(const string* req) {
 		req_  = req;
 	}
 
