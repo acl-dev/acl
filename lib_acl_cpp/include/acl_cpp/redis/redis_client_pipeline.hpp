@@ -26,7 +26,7 @@ typedef enum {
 class redis_pipeline_channel;
 
 /**
- * The message for transfering between redis command, redis client pipline
+ * The message for transferring between redis command, redis client pipline
  * and redis pipeline channel, which holds the redis command.
  */
 class redis_pipeline_message {
@@ -45,12 +45,14 @@ public:
 	, redirect_count_(0)
 	, channel_(NULL)
 	{
+		++refers_;
 	}
 
 	~redis_pipeline_message() {
 		delete box_;
 	}
 
+public:
 	void refer() {
 		++refers_;
 	}
@@ -211,13 +213,13 @@ private:
 	box<redis_pipeline_message>* box_;
 	std::vector<redis_pipeline_message*> msgs_;
 public:
-	void push(redis_pipeline_message* msg);
+	void push(redis_pipeline_message* msg) const;
 
 private:
 	bool handle_messages();
 	bool flush_all();
 	bool wait_results();
-	bool wait_one(socket_stream& conn, redis_pipeline_message& msg);
+	bool wait_one(socket_stream& conn, redis_pipeline_message& msg) const;
 	void all_failed();
 };
 
@@ -241,10 +243,10 @@ public:
 
 public:
 	// Called by redis_command in pipeline mode
-	const redis_result* run(redis_pipeline_message& msg);
+	const redis_result* run(redis_pipeline_message& msg) const;
 
 	// Called by redis_pipeline_channel
-	void push(redis_pipeline_message* msg);
+	void push(redis_pipeline_message* msg) const;
 
 	// Called by redis_command::get_pipeline_message, and can be overrided
 	// by child class. The box can be tbox, tbox_array, mbox, or fiber_tbox.

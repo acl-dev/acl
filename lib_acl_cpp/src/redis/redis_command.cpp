@@ -253,7 +253,7 @@ redis_pipeline_message& redis_command::get_pipeline_message()
 
 	box<redis_pipeline_message>* box = pipeline_->create_box();
 	pipe_msg_ = NEW redis_pipeline_message(redis_pipeline_t_cmd, box);
-	pipe_msg_->refer();
+	//pipe_msg_->refer();
 	return *pipe_msg_;
 }
 

@@ -54,12 +54,14 @@ bool redis_pipeline_channel::start_thread()
 void redis_pipeline_channel::stop_thread()
 {
 	//box<redis_pipeline_message>* box = new mbox<redis_pipeline_message>;
-	redis_pipeline_message message(redis_pipeline_t_stop, NULL);
-	push(&message);
+	redis_pipeline_message *message = NEW
+		redis_pipeline_message(redis_pipeline_t_stop, NULL);
+	push(message);
 	this->wait();
+	message->unrefer();
 }
 
-void redis_pipeline_channel::push(redis_pipeline_message* msg)
+void redis_pipeline_channel::push(redis_pipeline_message* msg) const
 {
 	box_->push(msg, false);
 }
@@ -124,7 +126,7 @@ void redis_pipeline_channel::all_failed()
 }
 
 bool redis_pipeline_channel::wait_one(socket_stream& conn,
-	redis_pipeline_message& msg)
+	redis_pipeline_message& msg) const
 {
 	dbuf_pool* dbuf = msg.get_dbuf();
 	assert(dbuf);
@@ -152,7 +154,8 @@ bool redis_pipeline_channel::wait_one(socket_stream& conn,
 		logger_warn("Unknown type=%d", (int) type);
 		msg.push(result);
 		return true;
-	} else if (type != REDIS_RESULT_ERROR) {
+	}
+	if (type != REDIS_RESULT_ERROR) {
 		msg.push(result);
 		return true;
 	}
@@ -175,7 +178,8 @@ bool redis_pipeline_channel::wait_one(socket_stream& conn,
 		} else {
 			msg.set_addr(addr);
 			msg.set_type(redis_pipeline_t_redirect);
-			// Transfer to pipeline processs again
+			// Transfer to the pipeline process again
+			msg.refer();
 			pipeline_.push(&msg);
 		}
 	} else if (EQ(ptr, "CLUSTERDOWN")) {
@@ -183,11 +187,11 @@ bool redis_pipeline_channel::wait_one(socket_stream& conn,
 		msg.push(result);
 
 		// And notify the pipeline thread the redis node down now,
-		// the message created here will be delete in pipeline thread.
-		redis_pipeline_message* m = new redis_pipeline_message(
+		// the message created here will be deleted in pipeline thread.
+		redis_pipeline_message* m = NEW redis_pipeline_message(
 				redis_pipeline_t_clusterdonw, NULL);
 		m->set_addr(this->get_addr());
-		// Transfer to pipeline processs again
+		// Transfer to the pipeline process again
 		pipeline_.push(m);
 		return false; // Return false to break the loop process.
 	} else {
@@ -217,7 +221,7 @@ bool redis_pipeline_channel::wait_results()
 		// one result. See acl_ypipe_flush(), if the consumer frees
 		// the mbox after acl_atomic_cas() but before acl_atomic_set(),
 		// the producer will crash.
-		(*it)->refer();
+		//(*it)->refer();
 
 		if (!wait_one(*conn, **it)) {
 			(*it)->unrefer();
@@ -235,7 +239,7 @@ bool redis_pipeline_channel::wait_results()
 
 	// Return NULL for the left failed results
 	for (; it != msgs_.end(); ++it) {
-		(*it)->refer();
+		//(*it)->refer();
 		(*it)->push(NULL);
 		(*it)->unrefer();
 	}
@@ -331,6 +335,7 @@ void* redis_pipeline_channel::run()
 
 redis_client_pipeline::redis_client_pipeline(const char* addr, box_type_t type)
 : addr_(addr)
+, ssl_conf_(NULL)
 , box_type_(type)
 , max_slot_(16384)
 , conn_timeout_(10)
@@ -402,18 +407,21 @@ void redis_client_pipeline::start_thread()
 void redis_client_pipeline::stop_thread()
 {
 	box<redis_pipeline_message>* box = new mbox<redis_pipeline_message>;
-	redis_pipeline_message message(redis_pipeline_t_stop, box);
-	push(&message);
+	redis_pipeline_message *message =
+		NEW redis_pipeline_message(redis_pipeline_t_stop, box);
+	push(message);
 	this->wait();  // Wait for the thread to exit
+	message->unrefer();
 }
 
-const redis_result* redis_client_pipeline::run(redis_pipeline_message& msg)
+const redis_result* redis_client_pipeline::run(redis_pipeline_message& msg) const
 {
+	msg.refer();
 	box_->push(&msg, false);
 	return msg.wait();
 }
 
-void redis_client_pipeline::push(redis_pipeline_message *msg)
+void redis_client_pipeline::push(redis_pipeline_message *msg) const
 {
 	box_->push(msg, false);
 }
@@ -445,7 +453,6 @@ void* redis_client_pipeline::run()
 		// return NULL;
 	}
 
-	redis_pipeline_channel* channel;
 	int  timeout = -1;
 	bool flag;
 
@@ -458,7 +465,7 @@ void* redis_client_pipeline::run()
 				break;
 			}
 
-			int slot = msg->get_slot();
+			const int slot = msg->get_slot();
 
 			// When coming from redis_pipeline_channel, the type
 			// will be redis_pipeline_t_redirect or
@@ -474,21 +481,23 @@ void* redis_client_pipeline::run()
 				logger_error("Redis cluster down");
 				cluster_down(*msg);
 				// The msg was created in channel thread.
-				delete msg;
+				msg->unrefer();
 				continue;
 			} else if (type == redis_pipeline_t_channel_closed) {
 				channel_closed(msg->get_channel());
 				// The msg was created in channel thread.
-				delete msg;
+				msg->unrefer();
 				continue;
 			}
 
-			channel = get_channel(slot);
+			redis_pipeline_channel *channel = get_channel(slot);
 			if (channel == NULL) {
 				logger_error("Channel null, slot=%d", slot);
 				msg->push(NULL);
+				msg->unrefer();
 				timeout = -1;
 			} else {
+				// Push the message to the channel's message queue
 				channel->push(msg);
 				timeout = 0;
 			}
@@ -530,7 +539,7 @@ void redis_client_pipeline::cluster_down(const redis_pipeline_message &msg)
 		}
 	}
 
-	// Reset the default addr which different from the the dead node
+	// Reset the default addr which different from the dead node
 	if (addr_ == addr) {
 		for (std::vector<char*>::const_iterator it = addrs_.begin();
 		     it != addrs_.end(); ++it) {
