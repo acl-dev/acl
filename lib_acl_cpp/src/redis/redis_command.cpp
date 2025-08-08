@@ -11,6 +11,7 @@
 #include "acl_cpp/redis/redis_command.hpp"
 #endif
 #include "redis_request.hpp"
+#include "acl_cpp/stdlib/class_counter.hpp"
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
@@ -51,6 +52,8 @@ void redis_command::init()
 	pipe_msg_       = NULL;
 	addr_[0]        = 0;
 	dbuf_           = dbuf_alloc();
+
+	COUNTER_INC(redis_comand);
 }
 
 redis_command::redis_command()
@@ -125,6 +128,7 @@ redis_command::~redis_command()
 	}
 
 	dbuf_->destroy();
+	COUNTER_DEC(redis_comand);
 }
 
 void redis_command::set_check_addr(bool on)

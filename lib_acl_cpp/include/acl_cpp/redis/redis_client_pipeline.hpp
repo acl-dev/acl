@@ -32,29 +32,9 @@ class redis_pipeline_channel;
 class redis_pipeline_message {
 public:
 	redis_pipeline_message(redis_pipeline_type_t type,
-		box<redis_pipeline_message>* box)
-	: type_(type)
-	, box_(box)
-	, timeout_(-1)
-	, nchild_(0)
-	, dbuf_(NULL)
-	, req_(NULL)
-	, slot_(-1)
-	, result_(NULL)
-	, addr_(NULL)
-	, redirect_count_(0)
-	, channel_(NULL)
-	{
-		++refers_;
-	}
+		box<redis_pipeline_message>* box);
 
-	~redis_pipeline_message() {
-		delete req_;
-		delete box_;
-		if (dbuf_) {
-			dbuf_->destroy();
-		}
-	}
+	~redis_pipeline_message();
 
 public:
 	void refer() {
@@ -65,6 +45,10 @@ public:
 		if (--refers_ == 0) {
 			delete this;
 		}
+	}
+
+	long long get_refer() const {
+		return refers_;
 	}
 
 	redis_pipeline_message& set_type(redis_pipeline_type_t type) {
@@ -80,23 +64,13 @@ public:
 	// These thredd APIs are called in redis_command.cpp
 
 	// Called in redis_command::run().
-	void set_option(size_t nchild, int* timeout) {
-		nchild_  = nchild;
-		timeout_ = timeout ? *timeout : -1;
-		result_  = NULL;
-		addr_    = NULL;
-		redirect_count_ = 0;
-	}
+	void set_option(size_t nchild, const int* timeout);
 
 	// Called in redis_command::run()
-	void move(dbuf_pool* dbuf) {
-		dbuf_ = dbuf;
-	}
+	void move(dbuf_pool* dbuf);
 
 	// Called in redis_command::build_request().
-	void move(const string* req) {
-		req_  = req;
-	}
+	void move(const string* req);
 
 	// Called in redis_command::build_request().
 	void set_slot(int slot) {
@@ -120,12 +94,7 @@ public:
 	}
 
 	// Called in redis_pipeline_channel::wait_one().
-	void set_addr(const char* addr) {
-		addr_ = addr;
-		if (addr) {
-			redirect_count_++;
-		}
-	}
+	void set_addr(const char* addr);
 
 	// Called in redis_pipeline_channel::wait_one().
 	size_t get_nchild() const {
@@ -147,15 +116,9 @@ public:
 	}
 
 public:
-	void push(const redis_result* result) {
-		result_ = result;
-		box_->push(this, false);
-	}
+	void push(const redis_result* result);
 
-	const redis_result* wait() {
-		box_->pop(-1, NULL);
-		return result_;
-	}
+	const redis_result* wait();
 
 	const char* get_addr() const {
 		return addr_;
@@ -174,12 +137,14 @@ private:
 	size_t        nchild_;
 	dbuf_pool*    dbuf_;
 	const string* req_;
-	int           slot_;
-
+	std::vector<dbuf_pool*>    dbufs_;
+	std::vector<const string*> reqs_;
 
 	const redis_result* result_;
-	const char*         addr_;
-	size_t              redirect_count_;
+
+	int         slot_;
+	const char* addr_;
+	size_t      redirect_count_;
 
 	// The msg will be freed when refers_ is 0.
 	atomic_long refers_;

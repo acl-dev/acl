@@ -17,6 +17,7 @@
 
 #include "acl_cpp/mqtt/mqtt_message.hpp"
 #endif
+#include "acl_cpp/stdlib/class_counter.hpp"
 
 namespace acl {
 
@@ -24,14 +25,19 @@ mqtt_message::mqtt_message(mqtt_type_t type)
 : header_(type)
 {
 	assert(type >= MQTT_RESERVED_MIN && type < MQTT_RESERVED_MAX);
+	COUNTER_INC(mqtt_message);
 }
 
 mqtt_message::mqtt_message(const mqtt_header& header)
 : header_(header)
 {
+	COUNTER_INC(mqtt_message);
 }
 
-mqtt_message::~mqtt_message(void) {}
+mqtt_message::~mqtt_message()
+{
+	COUNTER_DEC(mqtt_message);
+}
 
 void mqtt_message::pack_add(unsigned char ch, string& out) {
 	out.append(&ch, 1);

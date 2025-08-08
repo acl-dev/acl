@@ -7,9 +7,90 @@
 #include "acl_cpp/redis/redis_client_pipeline.hpp"
 #endif
 
+#include "acl_cpp/stdlib/class_counter.hpp"
+
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
 namespace acl {
+
+redis_pipeline_message::redis_pipeline_message(redis_pipeline_type_t type,
+	box<redis_pipeline_message>* box)
+: type_(type)
+, box_(box)
+, timeout_(-1)
+, nchild_(0)
+, dbuf_(NULL)
+, req_(NULL)
+, result_(NULL)
+, slot_(-1)
+, addr_(NULL)
+, redirect_count_(0)
+, channel_(NULL)
+{
+	++refers_;
+	COUNTER_INC(redis_pipeline_message);
+}
+
+redis_pipeline_message::~redis_pipeline_message() {
+	for (std::vector<const string*>::iterator it = reqs_.begin();
+		  it != reqs_.end(); ++it) {
+		delete *it;
+		COUNTER_DEC(pipeline_req);
+	}
+
+	for (std::vector<dbuf_pool*>::iterator it = dbufs_.begin();
+		  it != dbufs_.end(); ++it) {
+		(*it)->destroy();
+		COUNTER_DEC(pipeline_dbuf);
+	}
+	delete box_;
+	COUNTER_DEC(redis_pipeline_message);
+}
+
+void redis_pipeline_message::set_option(size_t nchild, const int* timeout) {
+	nchild_  = nchild;
+	timeout_ = timeout ? *timeout : -1;
+	result_  = NULL;
+	addr_    = NULL;
+	redirect_count_ = 0;
+}
+
+void redis_pipeline_message::move(const string* req) {
+	if (req) {
+		reqs_.push_back(req);
+		COUNTER_INC(pipeline_req);
+	}
+
+	req_ = req;
+}
+
+void redis_pipeline_message::move(dbuf_pool* dbuf) {
+	if (dbuf) {
+		dbufs_.push_back(dbuf);
+		COUNTER_INC(pipeline_dbuf);
+	}
+
+	dbuf_ = dbuf;
+}
+
+void redis_pipeline_message::set_addr(const char* addr) {
+	addr_ = addr;
+	if (addr) {
+		redirect_count_++;
+	}
+}
+
+void redis_pipeline_message::push(const redis_result* result) {
+	result_ = result;
+	box_->push(this, false);
+}
+
+const redis_result* redis_pipeline_message::wait() {
+	box_->pop(-1, NULL);
+	return result_;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 
 redis_pipeline_channel::redis_pipeline_channel(redis_client_pipeline& pipeline,
 	const char* addr, int conn_timeout, int rw_timeout, bool retry)
