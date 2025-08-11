@@ -118,7 +118,7 @@ public:
 public:
 	void push(const redis_result* result);
 
-	const redis_result* wait();
+	const redis_result* wait() const;
 
 	const char* get_addr() const {
 		return addr_;

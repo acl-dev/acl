@@ -2,7 +2,6 @@
 #include "../acl_cpp_define.hpp"
 //#include "noncopyable.hpp"
 #include <vector>
-#include "atomic.hpp"
 
 struct ACL_DBUF_POOL;
 

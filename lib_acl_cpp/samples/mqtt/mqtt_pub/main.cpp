@@ -4,8 +4,6 @@
 #include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
 
-static bool __payload_binary = false;
-
 static bool handle_connack(const acl::mqtt_message& message) {
 	const acl::mqtt_connack& connack = (const acl::mqtt_connack&) message;
 	printf("%s: connect code=%d\r\n", __FUNCTION__, connack.get_connack_code());
@@ -17,30 +15,18 @@ static bool handle_puback(acl::mqtt_client&, const acl::mqtt_message&) {
 	return true;
 }
 
-static bool test_publish(acl::mqtt_client& conn, unsigned short id, int length) {
+static int __count = 0;
+
+static bool test_publish(acl::mqtt_client& conn, const char* topic,
+		unsigned short id, const acl::string& payload) {
 	acl::mqtt_publish publish;
 
 	publish.get_header().set_qos(acl::MQTT_QOS1);
 	publish.set_pkt_id(id);
 
-	const char* topic = "test/topic";
 	publish.set_topic(topic);
 
-	acl::string payload;
-	payload.format("payload-%d:", id);
-
-	char ch;
-	if (__payload_binary) {
-		ch = 0;
-	} else {
-		ch = 'c';
-	}
-
-	for (; payload.size() < (size_t) length;) {
-		payload.append(&ch, 1);
-	}
-
-	publish.set_payload((unsigned) payload.size(), payload);
+	publish.set_payload((unsigned) payload.size(), payload.c_str());
 
 	if (!conn.send(publish)) {
 		printf("send publish error\r\n");
@@ -50,8 +36,8 @@ static bool test_publish(acl::mqtt_client& conn, unsigned short id, int length) 
 	ACL_VSTREAM* vs = conn.sock_stream()->get_vstream();
 	assert(vs);
 
-	printf("payload->size=%zd, total sent size=%lld\n",
-		payload.size(), vs->total_write_cnt);
+	printf("payload->size=%zd, total sent size=%lld, send count=%d\n",
+		payload.size(), vs->total_write_cnt, ++__count);
 
 	if (publish.get_header().get_qos() == acl::MQTT_QOS0) {
 		return true;
@@ -85,15 +71,17 @@ static bool test_publish(acl::mqtt_client& conn, unsigned short id, int length) 
 }
 
 static void usage(const char* procname) {
-	printf("usage: %s -h [help] -s addr -n max -c payload_length -B [if payload is binary data]\r\n", procname);
+	printf("usage: %s -h [help] -s addr -t topic -n max\r\n", procname);
 }
 
 int main(int argc, char* argv[]) {
 	char ch;
-	int  max = 1, length = 32;
+	int  max = 1;
 	acl::string addr("127.0.0.1|1883");
+	acl::string topic("test/topic");
+	acl::string payload = "{\"topic\":\"test1\",\"from\":\"test2\",\"to\":\"test2\",\"msg\":\"hello world\"}";
 
-	while ((ch = getopt(argc, argv, "hs:n:c:B")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:t:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -104,11 +92,8 @@ int main(int argc, char* argv[]) {
 		case 'n':
 			max = atoi(optarg);
 			break;
-		case 'c':
-			length = atoi(optarg);
-			break;
-		case 'B':
-			__payload_binary = true;
+		case 't':
+			topic = optarg;
 			break;
 		default:
 			break;
@@ -120,7 +105,7 @@ int main(int argc, char* argv[]) {
 	acl::mqtt_connect message;
 	message.set_cid("client-id-zsx-pub");
 	message.set_username("user-zsx");
-	//message.set_passwd("pass");
+	message.set_passwd("pass");
 #if 0
 	message.set_will_qos(acl::MQTT_QOS0);
 	message.set_will_topic("test/topic");
@@ -155,7 +140,7 @@ int main(int argc, char* argv[]) {
 
 	unsigned short id = 1;
 	for (int i = 1; i <= max; i++) {
-		if (!test_publish(conn, id++, length)) {
+		if (!test_publish(conn, topic, id++, payload)) {
 			break;
 		}
 		// id must be more than 0

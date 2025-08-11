@@ -85,7 +85,7 @@ void redis_pipeline_message::push(const redis_result* result) {
 	box_->push(this, false);
 }
 
-const redis_result* redis_pipeline_message::wait() {
+const redis_result* redis_pipeline_message::wait() const {
 	box_->pop(-1, NULL);
 	return result_;
 }
@@ -305,7 +305,7 @@ bool redis_pipeline_channel::wait_results()
 		//(*it)->refer();
 
 		if (!wait_one(*conn, **it)) {
-			(*it)->unrefer();
+			//(*it)->unrefer();
 			break;
 		}
 		(*it)->unrefer();
