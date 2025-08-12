@@ -357,7 +357,7 @@ public:
 protected:
 	const redis_result* run(size_t nchild = 0, int* timeout = NULL);
 
-	void clear_request();
+	void clear_request() const;
 	const redis_result** scan_keys(const char* cmd, const char* key,
 		int& cursor, size_t& size, const char* pattern,
 		const size_t* count);
@@ -434,7 +434,7 @@ protected:
 	int get_strings(std::vector<string>* result);
 	int get_strings(std::list<string>& result);
 	int get_strings(std::list<string>* result);
-	int get_strings(std::map<string, string>& result);
+	int get_strings(std::map<string, string>& out);
 	int get_strings(std::vector<string>& names,
 		std::vector<string>& values);
 	int get_strings(std::vector<const char*>& names,

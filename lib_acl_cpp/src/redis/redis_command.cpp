@@ -308,7 +308,7 @@ void redis_command::hash_slot(const char* key, size_t len)
 	}
 
 	unsigned short n = acl_hash_crc16(key, len);
-	slot_ = (int) (n % max_slot);
+	slot_ = n % max_slot;
 }
 
 const char* redis_command::get_client_addr() const
@@ -403,7 +403,7 @@ const redis_result* redis_command::run(size_t nchild /* = 0 */,
 		msg.set_option(nchild, timeout);
 		msg.move(dbuf_);
 		dbuf_ = dbuf_alloc();
-		result_ = pipeline_->run(msg);
+		result_ = pipeline_->exec(msg);
 
 		return result_;
 	}
@@ -814,7 +814,7 @@ int redis_command::get_strings(std::vector<string>& names,
 		values.push_back(value);
 	}
 
-	return (int) names.size();
+	return static_cast<int>(names.size());
 }
 
 int redis_command::get_strings(std::vector<const char*>& names,
@@ -853,7 +853,7 @@ int redis_command::get_strings(std::vector<const char*>& names,
 			continue;
 		}
 		len = rr->get_length() + 1;
-		nbuf = (char*) dbuf_->dbuf_alloc(len);
+		nbuf = static_cast<char *>(dbuf_->dbuf_alloc(len));
 		rr->argv_to_string(nbuf, len);
 		i++;
 
@@ -981,7 +981,7 @@ const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
 	return children;
 }
 
-void redis_command::clear_request()
+void redis_command::clear_request() const
 {
 	if (request_buf_) {
 		request_buf_->clear();
@@ -998,7 +998,7 @@ void redis_command::build_request(size_t argc, const char* argv[], const size_t 
 		build_request1(argc, argv, lens);
 		msg.move(request_buf_);
 		request_buf_ = NULL;
-		msg.set_slot(slot_);
+		msg.set_slot(static_cast<size_t>(slot_));
 	} else if (slice_req_) {
 		build_request2(argc, argv, lens);
 	} else {
