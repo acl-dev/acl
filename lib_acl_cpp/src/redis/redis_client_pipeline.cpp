@@ -23,7 +23,6 @@ redis_pipeline_message::redis_pipeline_message(redis_pipeline_type_t type,
 , req_(NULL)
 , result_(NULL)
 , slot_(-1)
-, addr_(NULL)
 , redirect_count_(0)
 , channel_(NULL)
 {
@@ -51,11 +50,17 @@ void redis_pipeline_message::set_option(size_t nchild, const int* timeout) {
 	nchild_  = nchild;
 	timeout_ = timeout ? *timeout : -1;
 	result_  = NULL;
-	addr_    = NULL;
 	redirect_count_ = 0;
+	addr_.clear();
 }
 
-void redis_pipeline_message::move(const string* req) {
+void redis_pipeline_message::set_slot(size_t slot)
+{
+	slot_ = slot;
+}
+
+void redis_pipeline_message::move(const string* req)
+{
 	if (req) {
 		reqs_.push_back(req);
 		COUNTER_INC(pipeline_req);
@@ -64,7 +69,8 @@ void redis_pipeline_message::move(const string* req) {
 	req_ = req;
 }
 
-void redis_pipeline_message::move(dbuf_pool* dbuf) {
+void redis_pipeline_message::move(dbuf_pool* dbuf)
+{
 	if (dbuf) {
 		dbufs_.push_back(dbuf);
 		COUNTER_INC(pipeline_dbuf);
@@ -73,19 +79,29 @@ void redis_pipeline_message::move(dbuf_pool* dbuf) {
 	dbuf_ = dbuf;
 }
 
-void redis_pipeline_message::set_addr(const char* addr) {
-	addr_ = addr;
+void redis_pipeline_message::set_addr(const char* addr)
+{
 	if (addr) {
+		addr_ = addr;
 		redirect_count_++;
 	}
 }
 
-void redis_pipeline_message::push(const redis_result* result) {
+void redis_pipeline_message::push(const redis_result* result)
+{
+	// One reference for the message itself, and the other one was added
+	// in redis_client_pipeline::exec().
+
+	assert(refers_ >= 2);
 	result_ = result;
 	box_->push(this, false);
+
+	// Just decrease the reference added in redis_client_pipeline::exec().
+	unrefer();
 }
 
-const redis_result* redis_pipeline_message::wait() const {
+const redis_result* redis_pipeline_message::wait() const
+{
 	box_->pop(-1, NULL);
 	return result_;
 }
@@ -108,7 +124,7 @@ redis_pipeline_channel::~redis_pipeline_channel()
 	delete box_;
 }
 
-redis_pipeline_channel &redis_pipeline_channel::set_ssl_conf(acl::sslbase_conf *ssl_conf)
+redis_pipeline_channel &redis_pipeline_channel::set_ssl_conf(sslbase_conf *ssl_conf)
 {
 	client_->set_ssl_conf(ssl_conf);
 	return *this;
@@ -124,7 +140,7 @@ redis_pipeline_channel& redis_pipeline_channel::set_passwd(const char *passwd)
 
 bool redis_pipeline_channel::start_thread()
 {
-	if (!((connect_client*) client_)->open()) {
+	if (!static_cast<connect_client *>(client_)->open()) {
 		logger_error("open %s error %s", addr_.c_str(), last_serror());
 		return false;
 	}
@@ -147,7 +163,7 @@ void redis_pipeline_channel::push(redis_pipeline_message* msg) const
 	box_->push(msg, false);
 }
 
-bool redis_pipeline_channel::flush_all()
+bool redis_pipeline_channel::flush_requests()
 {
 	if (msgs_.empty()) {
 		//logger("The messages are empty!");
@@ -157,7 +173,7 @@ bool redis_pipeline_channel::flush_all()
 	buf_.clear();
 
 	for (std::vector<redis_pipeline_message*>::iterator it = msgs_.begin();
-		it != msgs_.end(); ++it) {
+		  it != msgs_.end(); ++it) {
 		buf_.append((*it)->get_request());
 	}
 
@@ -172,7 +188,7 @@ bool redis_pipeline_channel::flush_all()
 	while (true) {
 		socket_stream* conn = client_->get_stream(false);
 		if (conn) {
-			if (conn->write(buf_) == (int) buf_.size()) {
+			if (conn->write(buf_) == static_cast<int>(buf_.size())) {
 				return true;
 			}
 
@@ -190,19 +206,11 @@ bool redis_pipeline_channel::flush_all()
 		client_->close();
 
 		// Reopen the new connection
-		if (!((connect_client*) client_)->open()) {
+		if (!static_cast<connect_client *>(client_)->open()) {
 			logger_error("Reopen connection failed!");
 			return false;
 		}
 		retried = true;
-	}
-}
-
-void redis_pipeline_channel::all_failed()
-{
-	std::vector<redis_pipeline_message*>::iterator it;
-	for (it = msgs_.begin(); it != msgs_.end(); ++it) {
-		(*it)->push(NULL);
 	}
 }
 
@@ -254,13 +262,13 @@ bool redis_pipeline_channel::wait_one(socket_stream& conn,
 			msg.push(result);
 		} if (msg.get_redirect_count() >= 5) {
 			logger_error("Redirect count(%d) exceed limit(5)",
-				(int) msg.get_redirect_count());
+				static_cast<int>(msg.get_redirect_count()));
 			msg.push(result);
 		} else {
 			msg.set_addr(addr);
 			msg.set_type(redis_pipeline_t_redirect);
-			// Transfer to the pipeline process again
-			msg.refer();
+
+			// Transfer the msg back to the pipeline thread again.
 			pipeline_.push(&msg);
 		}
 	} else if (EQ(ptr, "CLUSTERDOWN")) {
@@ -272,7 +280,7 @@ bool redis_pipeline_channel::wait_one(socket_stream& conn,
 		redis_pipeline_message* m = NEW redis_pipeline_message(
 				redis_pipeline_t_clusterdonw, NULL);
 		m->set_addr(this->get_addr());
-		// Transfer to the pipeline process again
+		// Transfer the cluster down msg to the pipeline thread.
 		pipeline_.push(m);
 		return false; // Return false to break the loop process.
 	} else {
@@ -296,19 +304,11 @@ bool redis_pipeline_channel::wait_results()
 
 	std::vector<redis_pipeline_message*>::iterator it;
 	for (it = msgs_.begin(); it != msgs_.end(); ++it) {
-		// Add the msg's reference to avoid it is freed in advance.
-		// The mbox is not safety in the tail return after push back
-		// if the consumer may free the msg at once after getting
-		// one result. See acl_ypipe_flush(), if the consumer frees
-		// the mbox after acl_atomic_cas() but before acl_atomic_set(),
-		// the producer will crash.
-		//(*it)->refer();
-
+		// The msg's reference has been increased in advance, so it's
+		// safe to operate the msg in wait_one.
 		if (!wait_one(*conn, **it)) {
-			//(*it)->unrefer();
 			break;
 		}
-		(*it)->unrefer();
 	}
 
 	// If we can't get the first result, the socket maybe be disconnected,
@@ -320,9 +320,7 @@ bool redis_pipeline_channel::wait_results()
 
 	// Return NULL for the left failed results
 	for (; it != msgs_.end(); ++it) {
-		//(*it)->refer();
 		(*it)->push(NULL);
-		(*it)->unrefer();
 	}
 
 	// We'll return true even some messages were failed, because we've
@@ -331,12 +329,20 @@ bool redis_pipeline_channel::wait_results()
 	return true;
 }
 
+void redis_pipeline_channel::all_failed()
+{
+	for (std::vector<redis_pipeline_message*>::iterator it = msgs_.begin();
+		  it != msgs_.end(); ++it) {
+		(*it)->push(NULL);
+	}
+}
+
 bool redis_pipeline_channel::handle_messages()
 {
 	bool retried = false;
 
 	while (true) {
-		if (!flush_all()) {
+		if (!flush_requests()) {
 			logger_error("All failed ...");
 			break;
 		}
@@ -355,7 +361,7 @@ bool redis_pipeline_channel::handle_messages()
 		retried = true;
 
 		client_->close();
-		if (!((connect_client*) client_)->open()) {
+		if (!static_cast<connect_client *>(client_)->open()) {
 			logger_error("Reopen failed");
 			break;
 		}
@@ -373,6 +379,7 @@ void* redis_pipeline_channel::run()
 	int timeout = -1;
 
 	while (!client_->eof()) {
+		// Get one message coming from redis_client_pipeline.
 		redis_pipeline_message* msg = box_->pop(timeout, &success);
 
 		if (msg != NULL) {
@@ -424,7 +431,7 @@ redis_client_pipeline::redis_client_pipeline(const char* addr, box_type_t type)
 , retry_(true)
 , preconn_(true)
 {
-	slot_addrs_ = (const char**) acl_mycalloc(max_slot_, sizeof(char*));
+	slot_addrs_ = static_cast<const char **>(acl_mycalloc(max_slot_, sizeof(char*)));
 	channels_   = NEW token_tree;
 	box_        = new mbox<redis_pipeline_message>;
 }
@@ -436,6 +443,14 @@ redis_client_pipeline::~redis_client_pipeline()
 		acl_myfree(*it);
 	}
 	acl_myfree(slot_addrs_);
+
+	const token_node *node = channels_->first_node();
+	while (node) {
+		redis_pipeline_channel *channel =
+			static_cast<redis_pipeline_channel*>(node->get_ctx());
+		delete channel;
+		node = channels_->next_node();
+	}
 	delete channels_;
 	delete box_;
 }
@@ -488,15 +503,25 @@ void redis_client_pipeline::start_thread()
 void redis_client_pipeline::stop_thread()
 {
 	box<redis_pipeline_message>* box = new mbox<redis_pipeline_message>;
-	redis_pipeline_message *message =
+	redis_pipeline_message *msg =
 		NEW redis_pipeline_message(redis_pipeline_t_stop, box);
-	push(message);
+	push(msg);
 	this->wait();  // Wait for the thread to exit
-	message->unrefer();
+	msg->unrefer();
 }
 
-const redis_result* redis_client_pipeline::run(redis_pipeline_message& msg) const
+const redis_result* redis_client_pipeline::exec(redis_pipeline_message& msg) const
 {
+	// The box in msg is not safety in the tail return after push back,
+	// because the consumer may free the box in msg at once after getting
+	// one result. See acl_ypipe_flush(), if the consumer frees
+	// the mbox after acl_atomic_cas() but before acl_atomic_set(),
+	// the producer will crash, so we should increase the msg's reference
+	// here to make sure the box in msg is not freed before the producer
+	// returns the result. And the msg's reference will be decreased
+	// in redis_pipeline_channel::wait_results() after the result is pushed
+	// to the channel's message queue.
+
 	msg.refer();
 	box_->push(&msg, false);
 	return msg.wait();
@@ -538,6 +563,9 @@ void* redis_client_pipeline::run()
 	bool flag;
 
 	while (true) {
+		// Get one message from the message queue, the timeout
+		// is -1 means waiting forever, and the flag indicates
+		// if one empty message has been got.
 		redis_pipeline_message* msg = box_->pop(timeout, &flag);
 		if (msg != NULL) {
 			redis_pipeline_type_t type = msg->get_type();
@@ -546,36 +574,39 @@ void* redis_client_pipeline::run()
 				break;
 			}
 
-			const int slot = msg->get_slot();
+			const size_t slot = msg->get_slot();
 
-			// When coming from redis_pipeline_channel, the type
-			// will be redis_pipeline_t_redirect or
-			// redis_pipeline_t_clusterdonw. So we should handle
-			// these two types carefully.
+			// When the message was coming from redis_pipeline_channel,
+			// the type should be redis_pipeline_t_clusterdonw,
+			// redis_pipeline_t_channel_closed or redis_pipeline_t_redirect.
+			// We should handle these three messages carefully.
 
-			if (type == redis_pipeline_t_redirect) {
-				// Reset to cmd type from redirect type which
-				// will be used in redis_pipeline_channel::run().
-				msg->set_type(redis_pipeline_t_cmd);
-				redirect(*msg, slot);
-			} else if (type == redis_pipeline_t_clusterdonw) {
+			 if (type == redis_pipeline_t_clusterdonw) {
 				logger_error("Redis cluster down");
 				cluster_down(*msg);
 				// The msg was created in channel thread.
 				msg->unrefer();
 				continue;
-			} else if (type == redis_pipeline_t_channel_closed) {
+			}
+
+			if (type == redis_pipeline_t_channel_closed) {
 				channel_closed(msg->get_channel());
 				// The msg was created in channel thread.
 				msg->unrefer();
 				continue;
 			}
 
-			redis_pipeline_channel *channel = get_channel(slot);
+			if (type == redis_pipeline_t_redirect) {
+				// Reset to cmd type from redirect type which
+				// will be used in redis_pipeline_channel::run().
+				msg->set_type(redis_pipeline_t_cmd);
+				redirect(*msg, slot);
+			}
+
+			const redis_pipeline_channel *channel = get_channel(slot);
 			if (channel == NULL) {
-				logger_error("Channel null, slot=%d", slot);
+				logger_error("Channel null, slot=%zd", slot);
 				msg->push(NULL);
-				msg->unrefer();
 				timeout = -1;
 			} else {
 				// Push the message to the channel's message queue
@@ -598,24 +629,13 @@ void* redis_client_pipeline::run()
 	return NULL;
 }
 
-void redis_client_pipeline::redirect(const redis_pipeline_message &msg, int slot)
-{
-	const char* addr = msg.get_addr();
-	if (addr) {
-		set_slot(slot, addr);
-	}
-}
-
 void redis_client_pipeline::cluster_down(const redis_pipeline_message &msg)
 {
-	const char* addr = msg.get_addr();
-	if (addr == NULL) {
-		return;
-	}
+	const std::string& addr = msg.get_addr();
 
 	// Clear all slots' addrs same as the dead node
-	for (int i = 0; i < max_slot_; i++) {
-		if (strcmp(slot_addrs_[i], addr) == 0) {
+	for (size_t i = 0; i < max_slot_; i++) {
+		if (addr == slot_addrs_[i]) {
 			slot_addrs_[i] = NULL;
 		}
 	}
@@ -624,40 +644,77 @@ void redis_client_pipeline::cluster_down(const redis_pipeline_message &msg)
 	if (addr_ == addr) {
 		for (std::vector<char*>::const_iterator it = addrs_.begin();
 		     it != addrs_.end(); ++it) {
-			if (strcmp(*it, addr) != 0) {
+			if (addr == *it) {
 				addr_ = *it;
 				break;
 			}
 		}
 
 		// Stop and remove the dead node
-		logger("Stop one channel thread, addr=%s", addr);
-		stop_channel(addr);
+		logger("Stop one channel thread, addr=%s", addr.c_str());
+		stop_channel(addr.c_str());
 	}
 }
 
-void redis_client_pipeline::set_slot(int slot, const char* addr)
+void redis_client_pipeline::channel_closed(redis_pipeline_channel* channel) const
 {
-	if (slot < 0 || slot >= max_slot_ || addr == NULL || *addr == 0) {
+	if (channel == NULL) {
+		logger_error("The channel null!");
 		return;
 	}
 
-	// 遍历缓存的所有地址，若该地址不存在则直接添加，然后使之与 slot 进行关联
+	const char* addr = channel->get_addr();
+	const token_node* node = channels_->find(addr);
+
+	if (node == NULL) {
+		channel->wait(); // Wait the thread to exit.
+		delete channel;
+		return;
+	}
+
+	redis_pipeline_channel* chan =
+		static_cast<redis_pipeline_channel*>(node->get_ctx());
+	if (chan == NULL || chan != channel) {
+		logger_warn("The channel=%p not mine=%p", channel, chan);
+	}
+
+	logger("The channel closed, addr=%s", addr);
+	channels_->remove(addr);
+	channel->wait();
+	delete channel;
+}
+
+void redis_client_pipeline::redirect(const redis_pipeline_message &msg, size_t slot)
+{
+	const std::string& addr = msg.get_addr();
+	set_slot(slot, addr.c_str());
+}
+
+void redis_client_pipeline::set_slot(size_t slot, const char* addr)
+{
+	if (slot >= max_slot_ || addr == NULL || *addr == 0) {
+		return;
+	}
+
+	// Traverse all cached addresses, add them directly if they do not exist,
+	// and then associate them with the slot.
 
 	std::vector<char*>::const_iterator cit = addrs_.begin();
 	for (; cit != addrs_.end(); ++cit) {
-		if (strcmp((*cit), addr) == 0) {
+		if (strcmp(*cit, addr) == 0) {
 			break;
 		}
 	}
 
-	// 将 slot 与地址进行关联映射
+	// Associate the slot with one address.
 	if (cit != addrs_.end()) {
 		slot_addrs_[slot] = *cit;
 	} else {
-		// 只所以采用动态分配方式，是因为在往数组中添加对象时，无论
-		// 数组如何做动态调整，该添加的动态内存地址都是固定的，所以
-		// slot_addrs_ 的下标地址也是相对不变的
+		// The reason for using dynamic allocation is that when adding
+		// objects to an array, regardless of how the array is
+		// dynamically adjusted, the dynamic memory address to be added
+		// is fixed. Therefore, the index address of slot_dedrs_
+		// is relatively unchanged.
 		char* buf = acl_mystrdup(addr);
 		addrs_.push_back(buf);
 		slot_addrs_[slot] = buf;
@@ -680,8 +737,8 @@ void redis_client_pipeline::set_all_slot()
 		return;
 	}
 
-	std::vector<redis_slot*>::const_iterator cit;
-	for (cit = slots->begin(); cit != slots->end(); ++cit) {
+	for (std::vector<redis_slot*>::const_iterator cit = slots->begin();
+		  cit != slots->end(); ++cit) {
 		const redis_slot* slot = *cit;
 		const char* ip = slot->get_ip();
 		int port = slot->get_port();
@@ -691,25 +748,25 @@ void redis_client_pipeline::set_all_slot()
 
 		size_t slot_min = slot->get_slot_min();
 		size_t slot_max = slot->get_slot_max();
-		if ((int) slot_max >= max_slot_ || slot_max < slot_min) {
+		if (slot_max >= max_slot_ || slot_max < slot_min) {
 			continue;
 		}
 
 		char buf[128];
 		safe_snprintf(buf, sizeof(buf), "%s:%d", ip, port);
-		for (int i = (int) slot_min; i <= (int) slot_max; i++) {
+		for (size_t i = slot_min; i <= slot_max; i++) {
 			set_slot(i, buf);
 		}
 	}
 }
 
-void redis_client_pipeline::stop_channels()
+void redis_client_pipeline::stop_channels() const
 {
 	const token_node* iter = channels_->first_node();
 	std::vector<redis_pipeline_channel*> channels;
 	while (iter) {
-		redis_pipeline_channel* channel = (redis_pipeline_channel*)
-			iter->get_ctx();
+		redis_pipeline_channel* channel =
+			static_cast<redis_pipeline_channel*>(iter->get_ctx());
 		// Notify and wait for the channel thread to exit
 		channel->stop_thread();
 		channels.push_back(channel);
@@ -718,8 +775,8 @@ void redis_client_pipeline::stop_channels()
 
 	// Delete all channels threads
 	for (std::vector<redis_pipeline_channel*>::iterator
-		     it = channels.begin(); it != channels.end(); ++it) {
-		channels_->remove(((*it)->get_addr()));
+		   it = channels.begin(); it != channels.end(); ++it) {
+		channels_->remove((*it)->get_addr());
 		delete *it;
 	}
 
@@ -730,13 +787,18 @@ void redis_client_pipeline::start_channels()
 {
 	for (std::vector<char*>::const_iterator cit = addrs_.begin();
 		cit != addrs_.end(); ++cit) {
-		(void) start_channel(*cit);
+		if (start_channel(*cit) == NULL) {
+			logger_error("start channel %s failed", *cit);
+		}
 	}
 
-	// 如果已经成功添加了集群节点，则说明为集群模式，按集群方式对待，
-	// 否则，按单点方式对待
+	// If the cluster node has been successfully added, it indicates that
+	// it is in cluster mode and should be treated as such. Otherwise,
+	// it should be treated as a single point.
 	if (channels_->first_node() == NULL) {
-		(void) start_channel(addr_);
+		if (start_channel(addr_) == NULL) {
+			logger_error("start channel %s failed", addr_.c_str());
+		}
 	}
 }
 
@@ -754,29 +816,28 @@ redis_pipeline_channel* redis_client_pipeline::start_channel(const char *addr)
 	if (channel->start_thread()) {
 		channels_->insert(addr, channel);
 		return channel;
-	} else {
-		delete channel;
-		return NULL;
 	}
+	delete channel;
+	return NULL;
 }
 
-void redis_client_pipeline::stop_channel(const char *addr)
+void redis_client_pipeline::stop_channel(const char *addr) const
 {
 	const token_node* node = channels_->find(addr);
 	if (node) {
-		redis_pipeline_channel* channel = (redis_pipeline_channel*)
-			node->get_ctx();
+		redis_pipeline_channel* channel =
+			static_cast<redis_pipeline_channel*>(node->get_ctx());
 		channels_->remove(addr);
 		channel->stop_thread();
 		delete channel;
 	}
 }
 
-redis_pipeline_channel* redis_client_pipeline::get_channel(int slot)
+redis_pipeline_channel* redis_client_pipeline::get_channel(size_t slot)
 {
 	const char* addr;
 	// First, get one addr of cluster mode when slot is valid
-	if (slot >= 0 && slot < (int) max_slot_) {
+	if (slot < max_slot_) {
 		addr = slot_addrs_[slot];
 		if (addr == NULL) {
 			addr = addr_.c_str();
@@ -789,37 +850,10 @@ redis_pipeline_channel* redis_client_pipeline::get_channel(int slot)
 
 	const token_node* node = channels_->find(addr);
 	if (node) {
-		return (redis_pipeline_channel*) node->get_ctx();
+		return static_cast<redis_pipeline_channel *>(node->get_ctx());
 	}
 
 	return start_channel(addr);
-}
-
-void redis_client_pipeline::channel_closed(redis_pipeline_channel* channel)
-{
-	if (channel == NULL) {
-		logger_error("The channel null!");
-		return;
-	}
-
-	const char* addr = channel->get_addr();
-	const token_node* node = channels_->find(addr);
-
-	if (node == NULL) {
-		channel->wait(); // Wait the thread to exit.
-		delete channel;
-		return;
-	}
-
-	redis_pipeline_channel* chan = (redis_pipeline_channel*) node->get_ctx();
-	if (chan == NULL || chan != channel) {
-		logger_warn("The channel=%p not mine=%p", channel, chan);
-	}
-
-	logger("The channel closed, addr=%s", addr);
-	channels_->remove(addr);
-	channel->wait();
-	delete channel;
 }
 
 } // namespace acl

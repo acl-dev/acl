@@ -36,7 +36,7 @@ public:
 
 	~redis_pipeline_message();
 
-public:
+//public:
 	void refer() {
 		++refers_;
 	}
@@ -60,7 +60,7 @@ public:
 		return type_;
 	}
 
-public:
+//public:
 	// These thredd APIs are called in redis_command.cpp
 
 	// Called in redis_command::run().
@@ -73,11 +73,9 @@ public:
 	void move(const string* req);
 
 	// Called in redis_command::build_request().
-	void set_slot(int slot) {
-		slot_ = slot;
-	}
+	void set_slot(size_t slot);
 
-public:
+//public:
 	// Called in redis_pipeline_channel::flush_all().
 	const string* get_request() const {
 		return req_;
@@ -89,7 +87,7 @@ public:
 	}
 
 	// Called in redis_client_pipeline::run().
-	int get_slot() const {
+	size_t get_slot() const {
 		return slot_;
 	}
 
@@ -106,7 +104,7 @@ public:
 		return timeout_ == -1 ? NULL : &timeout_;
 	}
 
-public:
+//public:
 	void set_channel(redis_pipeline_channel* channel) {
 		channel_ = channel;
 	}
@@ -115,12 +113,12 @@ public:
 		return channel_;
 	}
 
-public:
+//public:
 	void push(const redis_result* result);
 
 	const redis_result* wait() const;
 
-	const char* get_addr() const {
+	const std::string& get_addr() const {
 		return addr_;
 	}
 
@@ -142,8 +140,8 @@ private:
 
 	const redis_result* result_;
 
-	int         slot_;
-	const char* addr_;
+	size_t      slot_;
+	std::string addr_;
 	size_t      redirect_count_;
 
 	// The msg will be freed when refers_ is 0.
@@ -167,7 +165,7 @@ public:
 	bool start_thread();
 	void stop_thread();
 
-public:
+//public:
 	redis_pipeline_channel& set_ssl_conf(sslbase_conf* ssl_conf);
 	redis_pipeline_channel& set_passwd(const char* passwd);
 	const char* get_addr() const {
@@ -190,7 +188,7 @@ public:
 
 private:
 	bool handle_messages();
-	bool flush_all();
+	bool flush_requests();
 	bool wait_results();
 	bool wait_one(socket_stream& conn, redis_pipeline_message& msg) const;
 	void all_failed();
@@ -205,7 +203,7 @@ private:
  */
 class ACL_CPP_API redis_client_pipeline : public thread {
 public:
-	redis_client_pipeline(const char* addr, box_type_t type = BOX_TYPE_MBOX);
+	explicit redis_client_pipeline(const char* addr, box_type_t type = BOX_TYPE_MBOX);
 	virtual ~redis_client_pipeline();
 
 	// Start the pipeline thread
@@ -214,9 +212,9 @@ public:
 	// Stop the pipeline thread
 	void stop_thread();
 
-public:
+//public:
 	// Called by redis_command in pipeline mode
-	const redis_result* run(redis_pipeline_message& msg) const;
+	const redis_result* exec(redis_pipeline_message& msg) const;
 
 	// Called by redis_pipeline_channel
 	void push(redis_pipeline_message* msg) const;
@@ -225,7 +223,7 @@ public:
 	// by child class. The box can be tbox, tbox_array, mbox, or fiber_tbox.
 	virtual box<redis_pipeline_message>* create_box();
 
-public:
+//public:
 	// Set the ssl conf for the connection with redis internal.
 	redis_client_pipeline& set_ssl_conf(sslbase_conf* ssl_conf);
 
@@ -245,7 +243,7 @@ public:
 	redis_client_pipeline& set_preconnect(bool yes);
 
 	// Get the max hash slot of redis
-	int get_max_slot() const {
+	size_t get_max_slot() const {
 		return max_slot_;
 	}
 
@@ -258,7 +256,7 @@ private:
 	string passwd_;		// Password for connecting redis
 	sslbase_conf* ssl_conf_;// SSL will be used if not null
 	box_type_t box_type_;	// The type of box
-	int    max_slot_;	// The max hash slot for redis cluster
+	size_t   max_slot_;	// The max hash slot for redis cluster
 	int    conn_timeout_;	// Timeout to connect redis
 	int    rw_timeout_;	// IO timeout with redis
 	bool   retry_;		// If try again when disconnect from redis
@@ -273,7 +271,7 @@ private:
 	const char** slot_addrs_;	// Map hash slot with address
 
 	// Set the hash slot with the specified redis address
-	void set_slot(int slot, const char* addr);
+	void set_slot(size_t slot, const char* addr);
 
 	// Set all hash slots' addresses of all redises
 	void set_all_slot();
@@ -282,16 +280,16 @@ private:
 	void start_channels();
 
 	// Stop all pipeline channels threads
-	void stop_channels();
+	void stop_channels() const;
 
 	// Start one pipeline channel thread with the specified redis address
 	redis_pipeline_channel* start_channel(const char* addr);
 
 	// Get one pipeline channel thread with the specified hash slot
-	redis_pipeline_channel* get_channel(int slot);
+	redis_pipeline_channel* get_channel(size_t slot);
 
 	// Redirect one slot to another redis address
-	void redirect(const redis_pipeline_message& msg, int slot);
+	void redirect(const redis_pipeline_message& msg, size_t slot);
 
 	// When one redis node down, we should clear the node's hash slot map
 	// and stop the pipeline channel thread
@@ -299,10 +297,10 @@ private:
 
 	// Stop one pipeline channel thread with the specified redis address,
 	// delete the channel thread after the thread exited.
-	void stop_channel(const char* addr);
+	void stop_channel(const char* addr) const;
 
 	// Delete the channel when one channel closed message got.
-	void channel_closed(redis_pipeline_channel* channel);
+	void channel_closed(redis_pipeline_channel* channel) const;
 };
 
 /**
