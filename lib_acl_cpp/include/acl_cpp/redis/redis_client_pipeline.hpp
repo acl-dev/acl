@@ -182,7 +182,7 @@ private:
 	string buf_;
 	redis_client* client_;
 	box<redis_pipeline_message>* box_;
-	std::vector<redis_pipeline_message*> msgs_;
+	std::list<redis_pipeline_message*> msgs_;
 public:
 	void push(redis_pipeline_message* msg) const;
 
@@ -190,7 +190,9 @@ private:
 	bool handle_messages();
 	bool flush_requests();
 	bool wait_results();
-	bool wait_one(socket_stream& conn, redis_pipeline_message& msg) const;
+	const redis_result* get_result(socket_stream& conn,
+		redis_pipeline_message& msg) const;
+	bool handle_result(redis_pipeline_message* msg, const redis_result* result) const;
 	void all_failed();
 };
 
@@ -214,7 +216,7 @@ public:
 
 //public:
 	// Called by redis_command in pipeline mode
-	const redis_result* exec(redis_pipeline_message& msg) const;
+	const redis_result* exec(redis_pipeline_message* msg) const;
 
 	// Called by redis_pipeline_channel
 	void push(redis_pipeline_message* msg) const;

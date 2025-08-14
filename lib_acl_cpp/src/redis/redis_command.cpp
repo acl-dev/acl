@@ -250,18 +250,17 @@ bool redis_command::eof() const
 	return conn_ != NULL && conn_->eof();
 }
 
-redis_pipeline_message& redis_command::get_pipeline_message()
+redis_pipeline_message* redis_command::get_pipeline_message()
 {
 	if (pipe_msg_ != NULL) {
-		return *pipe_msg_;
+		return pipe_msg_;
 	}
 
 	assert(pipeline_);
 
 	box<redis_pipeline_message>* box = pipeline_->create_box();
 	pipe_msg_ = NEW redis_pipeline_message(redis_pipeline_t_cmd, box);
-	//pipe_msg_->refer();
-	return *pipe_msg_;
+	return pipe_msg_;
 }
 
 void redis_command::argv_space(size_t n)
@@ -399,11 +398,13 @@ const redis_result* redis_command::run(size_t nchild /* = 0 */,
 	int* timeout /* = NULL */)
 {
 	if (pipeline_ != NULL) {
-		redis_pipeline_message& msg = get_pipeline_message();
-		msg.set_option(nchild, timeout);
-		msg.move(dbuf_);
+		assert(pipe_msg_); // build_request() must have been called first.
+		pipe_msg_->set_option(nchild, timeout);
+		pipe_msg_->move(dbuf_);
 		dbuf_ = dbuf_alloc();
-		result_ = pipeline_->exec(msg);
+		result_ = pipeline_->exec(pipe_msg_);
+		pipe_msg_->unrefer();
+		pipe_msg_ = NULL;
 
 		return result_;
 	}
@@ -994,11 +995,11 @@ void redis_command::clear_request() const
 void redis_command::build_request(size_t argc, const char* argv[], const size_t lens[])
 {
 	if (pipeline_) {
-		redis_pipeline_message& msg = get_pipeline_message();
+		redis_pipeline_message* msg = get_pipeline_message();
 		build_request1(argc, argv, lens);
-		msg.move(request_buf_);
+		msg->move(request_buf_);
 		request_buf_ = NULL;
-		msg.set_slot(static_cast<size_t>(slot_));
+		msg->set_slot(static_cast<size_t>(slot_));
 	} else if (slice_req_) {
 		build_request2(argc, argv, lens);
 	} else {

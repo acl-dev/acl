@@ -491,8 +491,9 @@ public:
 		return slice_req_;
 	}
 
+private:
 	// get pipeline message bound with the current command
-	redis_pipeline_message& get_pipeline_message();
+	redis_pipeline_message* get_pipeline_message();
 
 protected:
 	/************************** request ********************************/
