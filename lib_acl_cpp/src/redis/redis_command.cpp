@@ -21,7 +21,7 @@ namespace acl {
 #define	LONG_LEN		21
 #define	REDIS_DBUF_NBLOCK	1
 
-static dbuf_pool *dbuf_alloc()
+dbuf_pool *redis_command::dbuf_create()
 {
 #ifdef ACL_DBUF_HOOK_NEW
 	return new (REDIS_DBUF_NBLOCK) dbuf_pool();
@@ -51,7 +51,7 @@ void redis_command::init()
 	result_         = NULL;
 	pipe_msg_       = NULL;
 	addr_[0]        = 0;
-	dbuf_           = dbuf_alloc();
+	dbuf_           = dbuf_create();
 
 	COUNTER_INC(redis_comand);
 }
@@ -400,12 +400,8 @@ const redis_result* redis_command::run(size_t nchild /* = 0 */,
 	if (pipeline_ != NULL) {
 		assert(pipe_msg_); // build_request() must have been called first.
 		pipe_msg_->set_option(nchild, timeout);
-		pipe_msg_->move(dbuf_);
-		dbuf_ = dbuf_alloc();
+		pipe_msg_->set(dbuf_);
 		result_ = pipeline_->exec(pipe_msg_);
-		pipe_msg_->unrefer();
-		pipe_msg_ = NULL;
-
 		return result_;
 	}
 	if (cluster_ != NULL) {
@@ -997,8 +993,7 @@ void redis_command::build_request(size_t argc, const char* argv[], const size_t 
 	if (pipeline_) {
 		redis_pipeline_message* msg = get_pipeline_message();
 		build_request1(argc, argv, lens);
-		msg->move(request_buf_);
-		request_buf_ = NULL;
+		msg->set(request_buf_);
 		msg->set_slot(static_cast<size_t>(slot_));
 	} else if (slice_req_) {
 		build_request2(argc, argv, lens);

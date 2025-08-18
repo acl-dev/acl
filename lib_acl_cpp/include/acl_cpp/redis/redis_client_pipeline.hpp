@@ -67,10 +67,10 @@ public:
 	void set_option(size_t nchild, const int* timeout);
 
 	// Called in redis_command::run()
-	void move(dbuf_pool* dbuf);
+	void set(dbuf_pool* dbuf);
 
 	// Called in redis_command::build_request().
-	void move(const string* req);
+	void set(const string* req);
 
 	// Called in redis_command::build_request().
 	void set_slot(size_t slot);
@@ -135,8 +135,6 @@ private:
 	size_t        nchild_;
 	dbuf_pool*    dbuf_;
 	const string* req_;
-	std::vector<dbuf_pool*>    dbufs_;
-	std::vector<const string*> reqs_;
 
 	const redis_result* result_;
 

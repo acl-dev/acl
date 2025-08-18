@@ -446,6 +446,7 @@ protected:
 
 private:
 	void init();
+	dbuf_pool *dbuf_create();
 
 public:
 	// compute hash slot of the given key and store it in the current

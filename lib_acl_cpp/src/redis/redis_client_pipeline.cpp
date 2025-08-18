@@ -31,17 +31,6 @@ redis_pipeline_message::redis_pipeline_message(redis_pipeline_type_t type,
 }
 
 redis_pipeline_message::~redis_pipeline_message() {
-	for (std::vector<const string*>::iterator it = reqs_.begin();
-		  it != reqs_.end(); ++it) {
-		delete *it;
-		COUNTER_DEC(pipeline_req);
-	}
-
-	for (std::vector<dbuf_pool*>::iterator it = dbufs_.begin();
-		  it != dbufs_.end(); ++it) {
-		(*it)->destroy();
-		COUNTER_DEC(pipeline_dbuf);
-	}
 	delete box_;
 	COUNTER_DEC(redis_pipeline_message);
 }
@@ -58,21 +47,11 @@ void redis_pipeline_message::set_slot(size_t slot) {
 	slot_ = slot;
 }
 
-void redis_pipeline_message::move(const string* req) {
-	if (req) {
-		reqs_.push_back(req);
-		COUNTER_INC(pipeline_req);
-	}
-
+void redis_pipeline_message::set(const string* req) {
 	req_ = req;
 }
 
-void redis_pipeline_message::move(dbuf_pool* dbuf) {
-	if (dbuf) {
-		dbufs_.push_back(dbuf);
-		COUNTER_INC(pipeline_dbuf);
-	}
-
+void redis_pipeline_message::set(dbuf_pool* dbuf) {
 	dbuf_ = dbuf;
 }
 
