@@ -83,7 +83,7 @@ public:
 		return will_msg_.empty() ? NULL : will_msg_.c_str();
 	}
 
-	bool has_session() const;
+	bool session_cleaned() const;
 
 private:
 	unsigned status_;

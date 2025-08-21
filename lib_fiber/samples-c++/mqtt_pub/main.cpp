@@ -3,6 +3,7 @@
 #include <getopt.h>
 #include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
+#include "fiber/libfiber.hpp"
 
 static bool handle_connack(const acl::mqtt_message& message) {
 	const acl::mqtt_connack& connack = (const acl::mqtt_connack&) message;
@@ -75,17 +76,24 @@ static bool test_publish(acl::mqtt_client& conn, const char* topic,
 	return true;
 }
 
-class mqtt_pub : public acl::thread {
+class mqtt_pub : public acl::fiber {
 public:
 	mqtt_pub(const char* addr, const char* topic, const char* payload,
 		int max, int uid)
 	: addr_(addr), topic_(topic), payload_(payload), max_(max), uid_(uid)
 	{}
 
-	~mqtt_pub() {}
 
 protected:
-	void* run() {
+	~mqtt_pub() {}
+
+	void run() {
+		doit();
+		delete this;
+	}
+
+private:
+	void doit() {
 		acl::mqtt_connect message;
 		acl::string cid;
 		cid.format("pub-%d", uid_);
@@ -102,24 +110,24 @@ protected:
 		acl::mqtt_client conn(addr_, 10, 0);
 		if (!conn.send(message)) {
 			printf("send message error\r\n");
-			return NULL;
+			return;
 		}
 		printf("send connect message ok\r\n");
 
 		acl::mqtt_message* res = conn.get_message();
 		if (res == NULL) {
 			printf("read CONNACK error\r\n");
-			return NULL;
+			return;
 		}
 		acl::mqtt_type_t type = res->get_header().get_type();
 		if (type != acl::MQTT_CONNACK) {
 			printf("invalid message type=%d\r\n", (int) type);
 			delete res;
-			return NULL;
+			return;
 		}
 		if (!handle_connack(*res)) {
 			delete res;
-			return NULL;
+			return;
 		}
 
 		delete res;
@@ -135,8 +143,6 @@ protected:
 				id = 1;
 			}
 		}
-
-		return NULL;
 	}
 
 private:
@@ -145,13 +151,13 @@ private:
 };
 
 static void usage(const char* procname) {
-	printf("usage: %s -h [help] -s addr -t topic -n max -c cocurrent -D [if in debug mode]\r\n", procname);
+	printf("usage: %s -h [help] -s addrs -t topic -n max -c cocurrent -D [if in debug mode]\r\n", procname);
 }
 
 int main(int argc, char* argv[]) {
 	char ch;
 	int  max = 1, cocurrent = 1;
-	acl::string addr("127.0.0.1|1883");
+	acl::string addresses("127.0.0.1|1883");
 	acl::string topic("test/topic");
 	acl::string payload = "{\"topic\":\"test1\",\"from\":\"test2\",\"to\":\"test2\",\"msg\":\"hello world\"}";
 
@@ -161,7 +167,7 @@ int main(int argc, char* argv[]) {
 			usage(argv[0]);
 			return 0;
 		case 's':
-			addr = optarg;
+			addresses = optarg;
 			break;
 		case 'n':
 			max = atoi(optarg);
@@ -182,18 +188,13 @@ int main(int argc, char* argv[]) {
 
 	acl::log::stdout_open(true);
 
-	std::vector<acl::thread*> threads;
-
+	std::vector<acl::string>& addrs = addresses.split2(",;");
 	for (int i = 0; i < cocurrent; i++) {
-		acl::thread* thr = new mqtt_pub(addr, topic, payload, max, i);
-		thr->start();
-		threads.push_back(thr);
+		acl::fiber* fb = new mqtt_pub(addrs[i%addrs.size()],
+			topic, payload, max, i);
+		fb->start();
 	}
 
-	for (std::vector<acl::thread*>::iterator it = threads.begin();
-		it != threads.end(); ++it) {
-		(*it)->wait();
-		delete *it;
-	}
+	acl::fiber::schedule();
 	return 0;
 }

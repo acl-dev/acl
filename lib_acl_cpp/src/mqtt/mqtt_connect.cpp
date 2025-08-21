@@ -102,7 +102,7 @@ void mqtt_connect::clean_session() {
 	conn_flags_ |= 0x02;
 }
 
-bool mqtt_connect::has_session() const {
+bool mqtt_connect::session_cleaned() const {
 	return conn_flags_ & 0x02 ? true : false;
 }
 

@@ -123,7 +123,7 @@ public:
 	 * @param cluster {redis_client_cluster*} redis 集群连接对象;
 	 *  the redis_cluster connection object which can connect to any
 	 *  redis-server and support connection pool
-	 *  when dynamicly creating connection pool to any redis-server, use
+	 *  when dynamically creating connection pool to any redis-server, use
 	 *  this param to limit the max number for each connection pool
 	 */
 	void set_cluster(redis_client_cluster* cluster);
@@ -173,7 +173,7 @@ public:
 	/**
 	 * 当返回值为 REDIS_RESULT_STATUS 类型时，本方法返回状态信息;
 	 * when result type is REDIS_RESULT_STATUS, the status info can be
-	 * get by this function
+	 * got by this function
 	 * @return {const char*} 返回 "" 表示出错;
 	 *  "" will be returned on error
 	 */
@@ -199,8 +199,8 @@ public:
 	 *  REDIS_RESULT_STATUS: 1
 	 *  REDIS_RESULT_INTEGER: 1
 	 *  REDIS_RESULT_STRING: > 0 时表示该字符串数据被切分成非连接内存块的个数;
-	 *       when the result type is REDIS_RESULT_STRING and the the
-	 *       string is too large, the string was be cut into many small
+	 *       when the result type is REDIS_RESULT_STRING and the
+	 *       string is too large, the string was being cut into many small
 	 *       chunks, the returned value is the chunks number
 	 *  REDIS_RESULT_ARRAY: children_->size()
 	 */
@@ -241,7 +241,7 @@ public:
 	/**
 	 * 判断当前所绑定的 redis 连接流对象(redis_client) 连接是否已经关闭；
 	 * 只有内部的 conn_ 流对象非空时调用此函数才有意义;
-	 * to judge if the redis connection was be closed, only redis_client
+	 * to judge if the redis connection was being closed, only redis_client
 	 * object be set internal
 	 * @return {bool}
 	 */
@@ -304,8 +304,8 @@ public:
 	 * just for response package, settint flag for receiving data
 	 * if split the large response data into multi little chunks
 	 * @param on {bool} 内部默认值为 false
-	 *  if true the response data will be splitted into multi little
-	 *  data, which is useful for large reponse data for avoiding
+	 *  if true the response data will be split into multi little
+	 *  data, which is useful for large response data for avoiding
 	 *  malloc large continuously memory from system.
 	 *  internal default is false
 	 */
@@ -357,7 +357,7 @@ public:
 protected:
 	const redis_result* run(size_t nchild = 0, int* timeout = NULL);
 
-	void clear_request();
+	void clear_request() const;
 	const redis_result** scan_keys(const char* cmd, const char* key,
 		int& cursor, size_t& size, const char* pattern,
 		const size_t* count);
@@ -425,7 +425,7 @@ protected:
 	bool check_status(const char* success = "OK");
 
 	int get_status(std::vector<bool>& out);
-	const char* get_status(void);
+	const char* get_status();
 
 	int get_string(string& buf);
 	int get_string(string* buf);
@@ -434,7 +434,7 @@ protected:
 	int get_strings(std::vector<string>* result);
 	int get_strings(std::list<string>& result);
 	int get_strings(std::list<string>* result);
-	int get_strings(std::map<string, string>& result);
+	int get_strings(std::map<string, string>& out);
 	int get_strings(std::vector<string>& names,
 		std::vector<string>& values);
 	int get_strings(std::vector<const char*>& names,
@@ -446,6 +446,7 @@ protected:
 
 private:
 	void init();
+	dbuf_pool *dbuf_create();
 
 public:
 	// compute hash slot of the given key and store it in the current
@@ -491,8 +492,9 @@ public:
 		return slice_req_;
 	}
 
+private:
 	// get pipeline message bound with the current command
-	redis_pipeline_message& get_pipeline_message(void);
+	redis_pipeline_message* get_pipeline_message();
 
 protected:
 	/************************** request ********************************/

@@ -71,3 +71,11 @@
 #define	DEBUG_MQTT			43
 #define	DEBUG_CPOLL			44
 #define ACL_CPP_DEBUG_MAX 		70
+
+#ifdef  DEBUG_OBJS
+# define COUNTER_INC(Name) ACL_COUNTER_INC(Name)
+# define COUNTER_DEC(Name) ACL_COUNTER_DEC(Name)
+#else
+# define COUNTER_INC(Name)
+# define COUNTER_DEC(Name)
+#endif

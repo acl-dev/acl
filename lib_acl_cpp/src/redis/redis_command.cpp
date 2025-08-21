@@ -11,13 +11,26 @@
 #include "acl_cpp/redis/redis_command.hpp"
 #endif
 #include "redis_request.hpp"
+#include "acl_cpp/stdlib/class_counter.hpp"
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
 namespace acl {
 
-#define INT_LEN		11
-#define	LONG_LEN	21
+#define INT_LEN			11
+#define	LONG_LEN		21
+#define	REDIS_DBUF_NBLOCK	1
+
+dbuf_pool *redis_command::dbuf_create()
+{
+#ifdef ACL_DBUF_HOOK_NEW
+	return new (REDIS_DBUF_NBLOCK) dbuf_pool();
+#else
+	// 因为 gcc 编译器在启用 O3 优化时，有可能在地址赋值时会因使用 MOVDQA，
+	// 而该指令是按 16 字节对齐的
+	return new dbuf_pool(REDIS_DBUF_NBLOCK, 16);
+#endif
+}
 
 void redis_command::init()
 {
@@ -38,16 +51,9 @@ void redis_command::init()
 	result_         = NULL;
 	pipe_msg_       = NULL;
 	addr_[0]        = 0;
+	dbuf_           = dbuf_create();
 
-#define	REDIS_DBUF_NBLOCK	1
-
-#ifdef ACL_DBUF_HOOK_NEW
-	dbuf_           = new (REDIS_DBUF_NBLOCK) dbuf_pool();
-#else
-	// 因为 gcc 编译器在启用 O3 优化时，有可能在地址赋值时会因使用 MOVDQA，
-	// 而该指令是按 16 字节对齐的
-	dbuf_           = new dbuf_pool(REDIS_DBUF_NBLOCK, 16);
-#endif
+	COUNTER_INC(redis_comand);
 }
 
 redis_command::redis_command()
@@ -122,6 +128,7 @@ redis_command::~redis_command()
 	}
 
 	dbuf_->destroy();
+	COUNTER_DEC(redis_comand);
 }
 
 void redis_command::set_check_addr(bool on)
@@ -243,18 +250,17 @@ bool redis_command::eof() const
 	return conn_ != NULL && conn_->eof();
 }
 
-redis_pipeline_message& redis_command::get_pipeline_message()
+redis_pipeline_message* redis_command::get_pipeline_message()
 {
 	if (pipe_msg_ != NULL) {
-		return *pipe_msg_;
+		return pipe_msg_;
 	}
 
 	assert(pipeline_);
 
 	box<redis_pipeline_message>* box = pipeline_->create_box();
 	pipe_msg_ = NEW redis_pipeline_message(redis_pipeline_t_cmd, box);
-	pipe_msg_->refer();
-	return *pipe_msg_;
+	return pipe_msg_;
 }
 
 void redis_command::argv_space(size_t n)
@@ -301,7 +307,7 @@ void redis_command::hash_slot(const char* key, size_t len)
 	}
 
 	unsigned short n = acl_hash_crc16(key, len);
-	slot_ = (int) (n % max_slot);
+	slot_ = n % max_slot;
 }
 
 const char* redis_command::get_client_addr() const
@@ -392,15 +398,17 @@ const redis_result* redis_command::run(size_t nchild /* = 0 */,
 	int* timeout /* = NULL */)
 {
 	if (pipeline_ != NULL) {
-		redis_pipeline_message& msg = get_pipeline_message();
-		msg.set_option(dbuf_, nchild, timeout);
-		result_ = pipeline_->run(msg);
-
+		assert(pipe_msg_); // build_request() must have been called first.
+		pipe_msg_->set_option(nchild, timeout);
+		pipe_msg_->set(dbuf_);
+		result_ = pipeline_->exec(pipe_msg_);
 		return result_;
-	} else if (cluster_ != NULL) {
+	}
+	if (cluster_ != NULL) {
 		result_ = cluster_->run(*this, nchild, timeout);
 		return result_;
-	} else if (conn_ == NULL) {
+	}
+	if (conn_ == NULL) {
 		logger_error("ERROR: cluster_ and conn_ are all NULL");
 		return NULL;
 	}
@@ -803,7 +811,7 @@ int redis_command::get_strings(std::vector<string>& names,
 		values.push_back(value);
 	}
 
-	return (int) names.size();
+	return static_cast<int>(names.size());
 }
 
 int redis_command::get_strings(std::vector<const char*>& names,
@@ -842,7 +850,7 @@ int redis_command::get_strings(std::vector<const char*>& names,
 			continue;
 		}
 		len = rr->get_length() + 1;
-		nbuf = (char*) dbuf_->dbuf_alloc(len);
+		nbuf = static_cast<char *>(dbuf_->dbuf_alloc(len));
 		rr->argv_to_string(nbuf, len);
 		i++;
 
@@ -970,7 +978,7 @@ const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
 	return children;
 }
 
-void redis_command::clear_request()
+void redis_command::clear_request() const
 {
 	if (request_buf_) {
 		request_buf_->clear();
@@ -983,10 +991,10 @@ void redis_command::clear_request()
 void redis_command::build_request(size_t argc, const char* argv[], const size_t lens[])
 {
 	if (pipeline_) {
-		redis_pipeline_message& msg = get_pipeline_message();
+		redis_pipeline_message* msg = get_pipeline_message();
 		build_request1(argc, argv, lens);
-		msg.set_request(request_buf_);
-		msg.set_slot(slot_);
+		msg->set(request_buf_);
+		msg->set_slot(static_cast<size_t>(slot_));
 	} else if (slice_req_) {
 		build_request2(argc, argv, lens);
 	} else {

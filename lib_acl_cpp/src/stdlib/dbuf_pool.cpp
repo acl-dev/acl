@@ -23,7 +23,7 @@ dbuf_pool::~dbuf_pool()
 #endif
 }
 
-void dbuf_pool::destroy()
+void dbuf_pool::destroy() const
 {
 	delete this;
 }

@@ -21,7 +21,7 @@ public:
 	virtual bool push(T* o, bool notify_first) = 0;
 
 	// Try to get one message with timed wait.
-	virtual T* pop(int wait_m, bool* bound) = 0;
+	virtual T* pop(int wait_m, bool* found) = 0;
 
 	// Try to get more messages with timed wait.
 	virtual size_t pop(std::vector<T*>& out, size_t max, int ms) = 0;

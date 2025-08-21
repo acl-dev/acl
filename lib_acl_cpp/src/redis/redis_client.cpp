@@ -32,7 +32,8 @@ redis_client::redis_client(const char* addr, int conn_timeout /* = 60 */,
 {
 	addr_ = acl_mystrdup(addr);
 	pass_ = NULL;
-	set_timeout(conn_timeout, rw_timeout);
+	this->conn_timeout_ = conn_timeout;
+	this->rw_timeout_   = rw_timeout;
 }
 
 redis_client::~redis_client()
@@ -87,8 +88,7 @@ socket_stream* redis_client::get_stream(bool auto_connect /* true */)
 	}
 }
 
-bool redis_client::check_connection(socket_stream& conn)
-{
+bool redis_client::check_connection(const socket_stream& conn) const {
 	char peer[64];
 	ACL_SOCKET fd = conn.sock_handle();
 

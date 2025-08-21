@@ -6,6 +6,8 @@
 #include "acl_cpp/stdlib/string.hpp"
 #endif
 
+#include "acl_cpp/stdlib/class_counter.hpp"
+
 #define ALLOC(n) acl_vstring_alloc((n))
 #define FREE(x) acl_vstring_free((x))
 #define STR(x)	acl_vstring_str((x))
@@ -41,6 +43,7 @@ void string::init(size_t len)
 	scan_ptr_          = NIL;
 	line_state_        = NIL;
 	line_state_offset_ = 0;
+	COUNTER_INC(string);
 }
 
 string::string()
@@ -124,6 +127,7 @@ string::~string()
 	if (line_state_) {
 		acl_line_state_free(line_state_);
 	}
+	COUNTER_DEC(string);
 }
 
 string& string::set_bin(bool bin)

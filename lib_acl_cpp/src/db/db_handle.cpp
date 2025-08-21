@@ -19,11 +19,11 @@ db_row::db_row(const std::vector<const char*>& names)
 {
 }
 
-db_row::~db_row(void)
+db_row::~db_row()
 {
 }
 
-void db_row::clear(void)
+void db_row::clear()
 {
 	values_.clear();
 }
@@ -208,20 +208,20 @@ void db_row::push_back(const char* value, size_t len)
 	lengths_.push_back(len);
 }
 
-size_t db_row::length(void) const
+size_t db_row::length() const
 {
 	return values_.size();
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-db_rows::db_rows(void)
+db_rows::db_rows()
 : result_tmp_(NULL)
 , result_free(NULL)
 {
 }
 
-db_rows::~db_rows(void)
+db_rows::~db_rows()
 {
 	std::vector<db_row*>::iterator it = rows_.begin();
 	for (; it != rows_.end(); ++it) {
@@ -269,7 +269,7 @@ const std::vector<const db_row*>& db_rows::get_rows(
 	return rows_tmp_;
 }
 
-const std::vector<db_row*>& db_rows::get_rows(void) const
+const std::vector<db_row*>& db_rows::get_rows() const
 {
 	return rows_;
 }
@@ -286,26 +286,26 @@ const db_row* db_rows::operator [](size_t idx) const
 	return row;
 }
 
-bool db_rows::empty(void) const
+bool db_rows::empty() const
 {
 	return rows_.empty();
 }
 
-size_t db_rows::length(void) const
+size_t db_rows::length() const
 {
 	return rows_.size();
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-db_handle::db_handle(void)
+db_handle::db_handle()
 : result_(NULL)
 , id_(NULL)
 {
 	time(&when_);
 }
 
-db_handle::~db_handle(void)
+db_handle::~db_handle()
 {
 	if (id_) {
 		acl_myfree(id_);
@@ -313,7 +313,7 @@ db_handle::~db_handle(void)
 	free_result();
 }
 
-bool db_handle::open(void)
+bool db_handle::open()
 {
 	// 调用虚方法的子类实现过程
 	return dbopen();
@@ -390,7 +390,7 @@ void db_handle::print_out(size_t max /* = 0 */) const
 }
 
 
-const db_rows* db_handle::get_result(void) const
+const db_rows* db_handle::get_result() const
 {
 	return result_;
 }
@@ -405,7 +405,7 @@ const std::vector<const db_row*>* db_handle::get_rows(
 	return &rows;
 }
 
-const std::vector<db_row*>* db_handle::get_rows(void) const
+const std::vector<db_row*>* db_handle::get_rows() const
 {
 	if (result_ == NULL) {
 		return NULL;
@@ -414,7 +414,7 @@ const std::vector<db_row*>* db_handle::get_rows(void) const
 	return &rows;
 }
 
-const db_row* db_handle::get_first_row(void) const
+const db_row* db_handle::get_first_row() const
 {
 	if (result_ == NULL) {
 		return NULL;
@@ -426,7 +426,7 @@ const db_row* db_handle::get_first_row(void) const
 	return first_row;
 }
 
-void db_handle::free_result(void)
+void db_handle::free_result()
 {
 	if (result_) {
 		delete result_;
@@ -445,7 +445,7 @@ const db_row* db_handle::operator [](size_t idx) const
 	return (*result_)[idx];
 }
 
-size_t db_handle::length(void) const
+size_t db_handle::length() const
 {
 	if (result_ == NULL) {
 		return 0;
@@ -454,7 +454,7 @@ size_t db_handle::length(void) const
 	}
 }
 
-bool db_handle::empty(void) const
+bool db_handle::empty() const
 {
 	return length() == 0 ? true : false;
 }
@@ -471,7 +471,7 @@ db_handle& db_handle::set_id(const char* id)
 	return *this;
 }
 
-db_handle& db_handle::set_when(time_t now)
+db_handle& db_handle::set_stamp(time_t now)
 {
 	when_ = now;
 	return *this;
@@ -486,7 +486,7 @@ void db_handle::set_loadpath(const char* path)
 	}
 }
 
-const char* db_handle::get_loadpath(void)
+const char* db_handle::get_loadpath()
 {
 	return __loadpath.empty() ? NULL : __loadpath.c_str();
 }

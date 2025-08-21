@@ -1052,7 +1052,7 @@ long long redis_commands::pattern_remove(const char* addr, const char* pattern,
 
 	acl::redis redis(&conn);
 
-	acl::atomic_long deleted = 0, error = 0, notfound = 0;
+	acl::atomic_long deleted, error, notfound;
 	int cursor = 0;
 
 	(void) cocurrent;

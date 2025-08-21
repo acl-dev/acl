@@ -20,7 +20,7 @@ public:
 	 * @param names {const std::vector<const char*>&} 数据库表中字段名列表
 	 */
 	db_row(const std::vector<const char*>& names);
-	~db_row(void);
+	~db_row();
 
 	/**
 	 * 取得数据表中的某个对应下标值的字段名
@@ -163,12 +163,12 @@ public:
 	 * 行记录中字段值的个数
 	 * @return {size_t}
 	 */
-	size_t length(void) const;
+	size_t length() const;
 
 	/**
 	 * 清除结果值（即 values_）
 	 */
-	void clear(void);
+	void clear();
 
 private:
 	// 数据表的字段名集合的引用
@@ -254,8 +254,8 @@ class query;
 class ACL_CPP_API db_handle : public connect_client
 {
 public:
-	db_handle(void);
-	virtual ~db_handle(void);
+	db_handle();
+	virtual ~db_handle();
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -277,8 +277,7 @@ public:
 	 * 获得上次数据库操作的出错错误号
 	 * @return {int}
 	 */
-	virtual int get_errno() const
-	{
+	virtual int get_errno() const {
 		return -1;
 	}
 
@@ -286,8 +285,7 @@ public:
 	 * 获得上次数据库操作的出错错描述
 	 * @return {const char*}
 	 */
-	virtual const char* get_error() const
-	{
+	virtual const char* get_error() const {
 		return "unkonwn error";
 	}
 
@@ -471,8 +469,7 @@ public:
 	 * 获得本实例的唯一 ID
 	 * @return {const char*} 为空时，表示未曾设置过唯一ID
 	 */
-	const char* get_id() const
-	{
+	const char* get_id() const {
 		return id_;
 	}
 
@@ -481,14 +478,13 @@ public:
 	 * @param now {time_t}
 	 * @return {db_handle&}
 	 */
-	db_handle& set_when(time_t now);
+	db_handle& set_stamp(time_t now);
 
 	/**
 	 * 获得该连接句柄上次被使用的时间
 	 * @return {time_t}
 	 */
-	time_t get_when() const
-	{
+	time_t get_stamp() const {
 		return when_;
 	}
 

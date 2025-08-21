@@ -8,7 +8,7 @@ class connect_pool;
 
 class ACL_CPP_API connect_client : public noncopyable {
 public:
-	connect_client(void)
+	connect_client()
 	: conn_timeout_(5)
 	, rw_timeout_(5)
 	, when_(0)
@@ -55,7 +55,7 @@ public:
 		return pool_;
 	}
 
-public:
+//public:
 	/**
 	 * 虚函数，该函数设置网络连接超时时间及网络 IO 超时时间，子类可以重载该虚函数，
 	 * 以便于设置内部的对象超时时间
