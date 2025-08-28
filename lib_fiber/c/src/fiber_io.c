@@ -247,6 +247,8 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 	TIMER_CACHE_NODE *timer;
 	long long now, last = 0, left;
 
+	assert(ev == __thread_fiber->event);
+
 	for (;;) {
 		while (acl_fiber_yield() > 0) {}
 
@@ -298,7 +300,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			break;
 		}
 
-		now = event_get_stamp(__thread_fiber->event);
+		now = event_get_stamp(ev);
 		if (now - last >= left) {
 			wakeup_timers(__thread_fiber->ev_timer, now);
 			last = now;
