@@ -12,7 +12,7 @@ extern "C" {
 #define ACL_VALID_LABEL_LEN	63	/* RFC 1035 */
 
 #define ACL_DONT_GRIPE		0
-#define ACL_DO_GRIPE		  1
+#define ACL_DO_GRIPE		1
 
 /**
  * Check if the specified name is a valid host name.

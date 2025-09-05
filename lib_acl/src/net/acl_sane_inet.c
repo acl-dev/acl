@@ -63,7 +63,7 @@ const char *acl_inet_ntop4(const unsigned char *src, char *dst, size_t size)
 	return (dst);
 }
 
-const char *acl_inet_ntoa(const struct in_addr in, char *buf, size_t size)
+const char *acl_inet_ntoa(struct in_addr in, char *buf, size_t size)
 {
 #if 0
 	unsigned char *src = (unsigned char *) &in.s_addr;
@@ -86,7 +86,7 @@ const char *acl_inet_ntoa(const struct in_addr in, char *buf, size_t size)
 }
 
 #ifdef AF_INET6
-const char *acl_inet6_ntoa(const struct in6_addr in6, char *buf, size_t size)
+const char *acl_inet6_ntoa(struct in6_addr in6, char *buf, size_t size)
 {
 	struct sockaddr_in6 sin6;
 
