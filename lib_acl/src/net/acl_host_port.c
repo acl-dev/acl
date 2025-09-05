@@ -140,7 +140,7 @@ struct addrinfo *acl_host_addrinfo2(const char *addr, int type, int family)
 	char  buf[260];  /* 253(max length of domain) + 1('|') + 5 (port) */
 	char *host = NULL, *port = NULL;
 
-	ACL_SAFE_STRNCPY(buf, addr, sizeof(buf));
+	ACL_SAFE_STRCPY(buf, addr);
 
 	if (host_port(buf, &host, &port) < 0) {
 		return NULL;
