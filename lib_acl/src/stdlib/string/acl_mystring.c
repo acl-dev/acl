@@ -412,17 +412,16 @@ int acl_safe_atoi(const char *s, int def) {
 
 long acl_safe_atol(const char *s, long def) {
 	char* end = NULL;
-	const long n = (int) strtol(s, &end, 10);
+	const long n = strtol(s, &end, 10);
 	if (end && *end != 0) {
 		return def;
 	}
 	return n;
 }
 
-
 long long acl_safe_atoll(const char *s, long long def) {
 	char* end = NULL;
-	const long long n = (int) strtol(s, &end, 10);
+	const long long n = strtoll(s, &end, 10);
 	if (end && *end != 0) {
 		return def;
 	}

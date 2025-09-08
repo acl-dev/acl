@@ -20,7 +20,7 @@ static void argv_extend(ACL_ARGV *argv)
 
 #define SPACE_LEFT(a) ((a)->len - (a)->argc - 1)
 
-static ACL_ARGV *split(const char *str, const char *sep)
+static ACL_ARGV *split2(const char *str, const char *sep)
 {
 #if 0
 	size_t len = strlen(str), i, start = 0;
@@ -94,15 +94,57 @@ static void test2(long long max, const char *str, const char *sep)
 	long long i;
 
 	for (i = 0; i < max; i++) {
-		ACL_ARGV *argv = split(str, sep);
+		ACL_ARGV *argv = split2(str, sep);
 		acl_argv_free(argv);
 	}
 }
 
-static void test3(const char *str, const char *sep)
+static ACL_ARGV *split3(char *str, const char *sep)
+{
+	char *ptr = str, *start = str;
+	ACL_ARGV *argv = acl_argv_alloc(5);
+
+	while (*ptr != 0) {
+		if (strchr(sep, (int) (*ptr)) != NULL) {
+			if (start < ptr) {
+				if (SPACE_LEFT(argv) <= 0) {
+					argv_extend(argv);
+				}
+				*ptr = 0;
+				argv->argv[argv->argc++] = start;
+			}
+			start = ptr + 1;
+		}
+		ptr++;
+	}
+
+	if (*start) {
+		if (SPACE_LEFT(argv) <= 0) {
+			argv_extend(argv);
+		}
+		argv->argv[argv->argc++] = start;
+	}
+
+	return argv;
+}
+
+static void test3(long long max, const char *str, const char *sep)
+{
+	long long i;
+
+	for (i = 0; i < max; i++) {
+		char *buf = strdup(str);
+		ACL_ARGV *argv = split3(buf, sep);
+		acl_myfree(argv->argv);
+		acl_myfree(argv);
+		free(buf);
+	}
+}
+
+static void test4(const char *str, const char *sep)
 {
 	ACL_ITER iter;
-	ACL_ARGV *argv = split(str, sep);
+	ACL_ARGV *argv = split2(str, sep);
 
 	acl_foreach(iter, argv) {
 		const char *ptr = (const char*) iter.data;
@@ -148,7 +190,7 @@ int main(int argc, char *argv[])
 
 	spent = stamp_sub(&end, &begin);
 	speed = (max * 1000) / (spent >= 1.0 ? spent : 1.0);
-	printf("loop=%lld, spent=%.2f ms, speed=%.2f\r\n", max, spent, speed);
+	printf("test1 bench: loop=%lld, spent=%.2f ms, speed=%.2f\r\n", max, spent, speed);
 
 	/*------------------------------------------------------------------*/
 
@@ -161,12 +203,29 @@ int main(int argc, char *argv[])
 
 	spent = stamp_sub(&end, &begin);
 	speed = (max * 1000) / (spent >= 1.0 ? spent : 1.0);
-	printf("loop=%lld, spent=%.2f ms, speed=%.2f\r\n", max, spent, speed);
-
-	test3(str, sep);
+	printf("test2 bench: loop=%lld, spent=%.2f ms, speed=%.2f\r\n", max, spent, speed);
 
 	printf("-------------------------------------------------------\r\n");
-	test3("hello world ,;?!\t\r\n", ",;?! \t\r\n");
+
+	printf("Enter any key to continue...");
+	getchar();
+
+	gettimeofday(&begin, NULL);
+	test3(max, str, sep);
+	gettimeofday(&end, NULL);
+
+	spent = stamp_sub(&end, &begin);
+	speed = (max * 1000) / (spent >= 1.0 ? spent : 1.0);
+	printf("test3 bench: loop=%lld, spent=%.2f ms, speed=%.2f\r\n", max, spent, speed);
+
+	printf("-------------------------------------------------------\r\n");
+
+	printf("Enter any key to continue...");
+	getchar();
+	test4(str, sep);
+
+	printf("-------------------------------------------------------\r\n");
+	test4("hello world ,;?!\t\r\n", ",;?! \t\r\n");
 
 	return 0;
 }

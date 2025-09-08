@@ -200,15 +200,17 @@ static int valid_ipv4_wildcard(const char *addr)
 
 int acl_valid_hostaddr(const char *addr, int gripe)
 {
+	int n;
+
 	/* Trivial cases first. */
-	if (*addr == 0) {
+	if (addr == NULL || *addr == 0) {
 		if (gripe) {
-			acl_msg_warn("%s: empty address", __FUNCTION__);
+			acl_msg_warn("%s: address null", __FUNCTION__);
 		}
 		return 0;
 	}
 
-#define VALID_PORT(x) (acl_alldig((x)) && acl_safe_atoi((x), -1) > 0)
+#define VALID_PORT(x) ((n = acl_safe_atoi((x), -1) >= 0) && n <= 65535)
 #define VALID_SEP(x)  ((x) == ACL_ADDR_SEP || (x) == ':')
 
 	/* port */

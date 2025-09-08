@@ -260,27 +260,51 @@ ACL_API int acl_dir_correct(const char *psrc_dir, char *pbuf, int sizeb);
  */
 ACL_API int acl_dir_getpath(const char *pathname, char *pbuf, int bsize);
 
-// 将字符串转换为整数，当转换失败时使用传入的值做为返回值，供调用者进行判断
+/**
+ * 将字符串转换为整数，当转换失败时使用传入的值做为返回值，供调用者进行判断，以下几个函数
+ * 内部使用 strtol/strtoll 提供了更为安全的字符串转整数的方法，当因输入的字符串非整数
+ * 格式而转换失败时，通过返回调用者设置的缺省值来表明转换失败
+ */
+/**
+ * 将数字字符串转为32位整数
+ * @param s {const char*} 字符串指针
+ * @param def {int} 转换失败时返回的值
+ * @return {int}
+ */
 ACL_API int acl_safe_atoi(const char *s, int def);
+
+/**
+ * 将数字字符串转为long型整数
+ * @param s {const char*} 字符串指针
+ * @param def {long} 转换失败时返回的值
+ * @return {long}
+ */
 ACL_API long acl_safe_atol(const char *s, long def);
+
+/**
+ * 将数字字符串转为64位整数
+ * @param s {const char*} 字符串指针
+ * @param def {long long} 转换失败时返回的值
+ * @return {long long}
+ */
 ACL_API long long acl_safe_atoll(const char *s, long long def);
 
 /**
- * 将数据字符串转换为64位有符号长整型
+ * 将数字字符串转换为64位有符号长整型
  * @param s {const char*} 字符串指针
  * @return {long long} 有符号长整型
  */
 ACL_API long long acl_atoll(const char *s);
 
 /**
- * 将数据字符串转换为64位无符号长整型
+ * 将数字字符串转换为64位无符号长整型
  * @param str {const char*} 字符串指针
  * @return {acl_uint64} 无符号长整型
  */
 ACL_API acl_uint64 acl_atoui64(const char *str);
 
 /**
-* 将数据字符串转换为64位符号长整型
+* 将数字字符串转换为64位符号长整型
 * @param str {const char*} 字符串指针
 * @return {acl_int64} 无符号长整型
 */

@@ -2075,7 +2075,7 @@ size_t split(const char* str, const char* sep, std::list<std::string>& out) {
 	size_t cnt = 0;
 	const char* ptr = str, *start = str;
 	while (*ptr) {
-		if (strchr(sep, (int) (*ptr)) != NULL) {
+		if (strchr(sep, *ptr) != NULL) {
 			if (start < ptr) {
 				size_t n = ptr - start;
 				std::string buf;
