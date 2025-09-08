@@ -141,7 +141,49 @@ static void test3(long long max, const char *str, const char *sep)
 	}
 }
 
-static void test4(const char *str, const char *sep)
+static ACL_ARGV *split4(char *str, const char *sep)
+{
+	size_t len = strlen(str), i, start = 0;
+	ACL_ARGV *argv = acl_argv_alloc(5);
+
+	for (i = 0; i < len; i++) {
+		if (strchr(sep, str[i]) != NULL) {
+			if (start < i) {
+				if (SPACE_LEFT(argv) <= 0) {
+					argv_extend(argv);
+				}
+				str[i] = 0;
+				argv->argv[argv->argc++] = str + start;
+			}
+			start = i + 1;
+		}
+	}
+
+	if (start < len) {
+		if (SPACE_LEFT(argv) <= 0) {
+			argv_extend(argv);
+		}
+
+		argv->argv[argv->argc++] = str + start;
+	}
+
+	return argv;
+}
+
+static void test4(long long max, const char *str, const char *sep)
+{
+	long long i;
+
+	for (i = 0; i < max; i++) {
+		char *buf = strdup(str);
+		ACL_ARGV *argv = split4(buf, sep);
+		acl_myfree(argv->argv);
+		acl_myfree(argv);
+		free(buf);
+	}
+}
+
+static void test5(const char *str, const char *sep)
 {
 	ACL_ITER iter;
 	ACL_ARGV *argv = split2(str, sep);
@@ -152,6 +194,72 @@ static void test4(const char *str, const char *sep)
 	}
 
 	acl_argv_free(argv);
+}
+
+static int argv_cmp(const ACL_ARGV *argv1, const ACL_ARGV *argv2)
+{
+	assert(argv1->argc == argv2->argc);
+	int i;
+
+	for (i = 0; i < argv1->argc; i++) {
+		if (strcmp(argv1->argv[i], argv2->argv[i]) != 0) {
+			printf("different, i=%d, %s, %s\r\n", i,
+				argv1->argv[i], argv2->argv[i]);
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
+static void test6(const char *str, const char *sep)
+{
+	ACL_ARGV *argv1 = acl_argv_split(str, sep);
+	ACL_ARGV *argv2 = split2(str, sep);
+
+	char *buf1 = strdup(str);
+	ACL_ARGV *argv3 = split3(buf1, sep);
+
+	char *buf2 = strdup(str);
+	ACL_ARGV *argv4 = split4(buf2, sep);
+
+	if (argv_cmp(argv1, argv2) == 0) {
+		printf("ok, argv1 == argv2\r\n");
+	} else {
+		printf("error, argv1 != argv2\r\n");
+		exit(1);
+	}
+
+
+	if (argv_cmp(argv2, argv3) == 0) {
+		printf("ok, argv2 == argv3\r\n");
+	} else {
+		printf("error, argv2 != argv3\r\n");
+		exit(1);
+	}
+
+	if (argv_cmp(argv3, argv4) == 0) {
+		printf("ok, argv3 == argv4\r\n");
+	} else {
+		printf("error, argv3 != argv4\r\n");
+		exit(1);
+	}
+
+	ACL_ITER iter;
+	acl_foreach(iter, argv3) {
+		printf("%s\r\n", (char*) iter.data);
+	}
+
+	acl_argv_free(argv1);
+	acl_argv_free(argv2);
+
+	acl_myfree(argv3->argv);
+	acl_myfree(argv3);
+	free(buf1);
+
+	acl_myfree(argv4->argv);
+	acl_myfree(argv4);
+	free(buf2);
 }
 
 static void usage(const char *procname)
@@ -222,10 +330,27 @@ int main(int argc, char *argv[])
 
 	printf("Enter any key to continue...");
 	getchar();
-	test4(str, sep);
+
+	gettimeofday(&begin, NULL);
+	test4(max, str, sep);
+	gettimeofday(&end, NULL);
+
+	spent = stamp_sub(&end, &begin);
+	speed = (max * 1000) / (spent >= 1.0 ? spent : 1.0);
+	printf("test4 bench: loop=%lld, spent=%.2f ms, speed=%.2f\r\n", max, spent, speed);
 
 	printf("-------------------------------------------------------\r\n");
-	test4("hello world ,;?!\t\r\n", ",;?! \t\r\n");
+
+	printf("Enter any key to continue...");
+	getchar();
+	test5(str, sep);
+
+	printf("-------------------------------------------------------\r\n");
+	test5("hello world ,;?!\t\r\n", ",;?! \t\r\n");
+
+	printf("-------------------------------------------------------\r\n");
+
+	test6(str, sep);
 
 	return 0;
 }
