@@ -19,6 +19,8 @@ static int test1(void) {
 		{ "192.168.0.1|65535",  4, 1, 1 },
 		{ "2001:db8::1|443",    6, 1, 1 },
 		{ "2001:db8:::1|80",   -6, 1, 0 }, // invalid IPv6
+		{ "*.*.*.1:80",        -4, 1, 1 },
+		{ "*.*.*.1|80",        -4, 1, 1 },
 		{ NULL,                 0, 0, 0 },
 	};
 	size_t i;
@@ -27,7 +29,7 @@ static int test1(void) {
 		if (acl_valid_hostaddr(addrs[i].addr, 1)) {
 			printf("Valid addr=%s\r\n", addrs[i].addr);
 		} else {
-			printf("Invalid addr=%s\r\n", addrs[i].addr);
+			printf("%d: Invalid addr=%s\r\n", __LINE__, addrs[i].addr);
 		}
 
 		printf("-----------------------------------------------\r\n");
@@ -39,28 +41,28 @@ static int test1(void) {
 		switch (addrs[i].type) {
 		case 4:
 			if (acl_valid_ipv4_hostaddr(addrs[i].addr, 1) == 0) {
-				printf("Check %s error\r\n", addrs[i].addr);
+				printf("%d: Check %s error\r\n", __LINE__, addrs[i].addr);
 				return -1;
 			}
 			printf("Check %s ok\r\n", addrs[i].addr);
 			break;
 		case 6:
 			if (acl_valid_ipv6_hostaddr(addrs[i].addr, 1) == 0) {
-				printf("Check %s error\r\n", addrs[i].addr);
+				printf("%d: Check %s error\r\n", __LINE__, addrs[i].addr);
 				return -1;
 			}
 			printf("Check %s ok\r\n", addrs[i].addr);
 			break;
 		case -4:
 			if (acl_valid_ipv4_hostaddr(addrs[i].addr, 1) == 1) {
-				printf("Check %s error\r\n", addrs[i].addr);
+				printf("%d: Check %s error\r\n", __LINE__, addrs[i].addr);
 				return -1;
 			}
 			printf("Check %s ok\r\n", addrs[i].addr);
 			break;
 		case -6:
 			if (acl_valid_ipv6_hostaddr(addrs[i].addr, 1) == 1) {
-				printf("Check %s error\r\n", addrs[i].addr);
+				printf("%d: Check %s error\r\n", __LINE__, addrs[i].addr);
 				return -1;
 			}
 			printf("Check %s ok\r\n", addrs[i].addr);
@@ -83,8 +85,8 @@ static int test1(void) {
 
 		if (acl_parse_hostaddr(addrs[i].addr, ip, sizeof(ip), &port)) {
 			if (addrs[i].ok == 0) {
-				printf("Parse error, addr=%s, ip=%s, port=%d\r\n",
-					addrs[i].addr, ip, port);
+				printf("%d: Parse error, addr=%s, ip=%s, port=%d\r\n",
+					__LINE__, addrs[i].addr, ip, port);
 				return -1;
 			}
 
@@ -92,8 +94,8 @@ static int test1(void) {
 				addrs[i].addr, ip, port);
 		} else {
 			if (addrs[i].ok == 1) {
-				printf("Parse error, addr=%s, ip=%s, port=%d\r\n",
-					addrs[i].addr, ip, port);
+				printf("%d: Parse error, addr=%s, ip=%s, port=%d\r\n",
+					__LINE__, addrs[i].addr, ip, port);
 				return -1;
 			}
 
@@ -114,13 +116,13 @@ static int test1(void) {
 		if (addrs[i].type == 4) {
 			if (acl_parse_ipv4_hostaddr(addrs[i].addr, ip, sizeof(ip), &port)) {
 				if (addrs[i].ok == 0) {
-					printf("Parse IPv4 error, addr=%s, ip=%s, port=%d\r\n",
-						addrs[i].addr, ip, port);
+					printf("%d: Parse IPv4 error, addr=%s, ip=%s, port=%d\r\n",
+						__LINE__, addrs[i].addr, ip, port);
 					return -1;
 				}
 			} else {
-				printf("Parse IPv4 error, addr=%s, ip=%s, port=%d\r\n",
-					addrs[i].addr, ip, port);
+				printf("%d: Parse IPv4 error, addr=%s, ip=%s, port=%d\r\n",
+					__LINE__, addrs[i].addr, ip, port);
 				return -1;
 			}
 
@@ -129,13 +131,13 @@ static int test1(void) {
 		} else if (addrs[i].type == 6) {
 			if (acl_parse_ipv6_hostaddr(addrs[i].addr, ip, sizeof(ip), &port)) {
 				if (addrs[i].ok == 0) {
-					printf("Parse IPv6 error, addr=%s, ip=%s, port=%d\r\n",
-						addrs[i].addr, ip, port);
+					printf("%d: Parse IPv6 error, addr=%s, ip=%s, port=%d\r\n",
+						__LINE__, addrs[i].addr, ip, port);
 					return -1;
 				}
 			} else {
-				printf("Parse IPv6 error, addr=%s, ip=%s, port=%d\r\n",
-					addrs[i].addr, ip, port);
+				printf("%d: Parse IPv6 error, addr=%s, ip=%s, port=%d\r\n",
+					__LINE__, addrs[i].addr, ip, port);
 				return -1;
 			}
 
@@ -155,5 +157,6 @@ int main(void) {
 	} else {
 		printf("\r\nTest failed\r\n");
 	}
+
 	return 0;
 }

@@ -133,15 +133,8 @@ static int valid_ipv4_field(const char *ptr)
 	if (*ptr == '*' && *(ptr + 1) == 0) {
 		return 1;
 	}
-	if (!acl_alldig(ptr)) {
-		return 0;
-	}
 	n = acl_safe_atoi(ptr, -1);
-	if (n < 0 || n > 255) {
-		return 0;
-	}
-
-	return 1;
+	return n >= 0 && n <= 255 ? 1 : 0;
 }
 
 static int valid_port(const char *ptr)
@@ -158,24 +151,24 @@ static int valid_port(const char *ptr)
 
 static int valid_ipv4_wildcard(const char *addr)
 {
-	ACL_ARGV *tokens = acl_argv_split(addr, ".");
+	ACL_ARGV_VIEW *tokens = acl_argv_view_split(addr, ".");
 	char     *ptr, *s4;
 	int       i;
 
-	if (tokens->argc != 4) {
-		acl_argv_free(tokens);
+	if (tokens->argv.argc != 4) {
+		acl_argv_view_free(tokens);
 		return 0;
 	}
 
 	for (i = 0; i < 3; i++) {
-		ptr = tokens->argv[i];
+		ptr = tokens->argv.argv[i];
 		if (!valid_ipv4_field(ptr)) {
-			acl_argv_free(tokens);
+			acl_argv_view_free(tokens);
 			return 0;
 		}
 	}
 
-	s4 = tokens->argv[3];
+	s4 = tokens->argv.argv[3];
 	ptr = strchr(s4, ACL_ADDR_SEP);
 	if (ptr == NULL) {
 		ptr = strchr(s4, ':');
@@ -185,7 +178,7 @@ static int valid_ipv4_wildcard(const char *addr)
 	}
 
 	if (!valid_ipv4_field(s4)) {
-		acl_argv_free(tokens);
+		acl_argv_view_free(tokens);
 		return 0;
 	}
 
@@ -194,7 +187,7 @@ static int valid_ipv4_wildcard(const char *addr)
 	} else {
 		i = 1;
 	}
-	acl_argv_free(tokens);
+	acl_argv_view_free(tokens);
 	return i;
 }
 
@@ -464,10 +457,20 @@ static int parse_hostaddr(const char *addr, char *ip, size_t size, int *port) {
 	}
 
 	ACL_SAFE_STRNCPY(ip, addr, size);
-	ptr = strrchr(ip, ACL_ADDR_SEP);
+	ptr = strchr(ip, ACL_ADDR_SEP);
 	if (ptr == NULL) {
-		return 1;
+		char *ch;
+		ptr = strchr(ip, ':');
+		if (ptr == NULL) {
+			return 1;
+		}
+
+		ch = strchr(ptr + 1, ':'); // If more than one ':', maybe IPv6.
+		if (ch != NULL) {
+			return 0;
+		}
 	}
+
 	if (ptr == ip) {
 		return 0;
 	}
@@ -499,6 +502,9 @@ int acl_parse_hostaddr(const char *addr, char *ip, size_t size, int *port)
 		*ptr = 0;
 	}
 
+#if 1
+	return acl_valid_hostaddr(addr, 0);
+#else
 	if (check_ipv6(ip, ip + strlen(ip)) == NULL) {
 		return 1;
 	}
@@ -519,6 +525,7 @@ int acl_parse_hostaddr(const char *addr, char *ip, size_t size, int *port)
 	}
 
 	return check_ipv4(ip, ptr) == NULL;
+#endif
 }
 
 int acl_parse_ipv4_hostaddr(const char *addr, char *ip, size_t size, int *port)

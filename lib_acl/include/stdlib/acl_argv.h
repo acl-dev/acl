@@ -213,6 +213,7 @@ ACL_API	ACL_ARGV *acl_argv_quote_split4(const char *str, const char *delim,
 	ACL_DBUF_POOL *dbuf);
 
 ///////////////////////////////////////////////////////////////////////////////
+// 更高效的字符串分割算法。
 
 typedef struct ACL_ARGV_VIEW ACL_ARGV_VIEW;
 
@@ -229,7 +230,20 @@ struct ACL_ARGV_VIEW {
 	void *(*iter_prev)(ACL_ITER*, const ACL_ARGV_VIEW*);
 };
 
+/**
+ * 使用分割字符串中的每一个字符做为分割符，对源字符串进行分割，返回的对象只读禁止修改.
+ * @param str {const char*} 源字符串
+ * @param delim {const char*} 用来对源字符串进行分割的字符串，该字符串中出现的每一个
+ *  字符都将做为分割符
+ * @return {ACL_ARGV_VIEW*} 分割后的对象（永远非NULL），返回对象只读不能修改，
+ *  可以使用 ACL_ITER 进行遍历.
+ */
 ACL_API ACL_ARGV_VIEW *acl_argv_view_split(const char *str, const char *delim);
+
+/**
+ *  释放分割对象
+ * @param view {ACL_ARGV_VIEW*} 由 acl_argv_view_split 创建的分割对象
+ */
 ACL_API void acl_argv_view_free(ACL_ARGV_VIEW *view);
 
 # ifdef	__cplusplus
