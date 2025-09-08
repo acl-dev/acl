@@ -1,8 +1,7 @@
 #include "lib_acl.h"
 #include "../stamp.h"
 
-static void test1(long long max, const char *str, const char *sep)
-{
+static void test1(long long max, const char *str, const char *sep) {
 	long long i;
 
 	for (i = 0; i < max; i++) {
@@ -11,8 +10,7 @@ static void test1(long long max, const char *str, const char *sep)
 	}
 }
 
-static void argv_extend(ACL_ARGV *argv)
-{
+static void argv_extend(ACL_ARGV *argv) {
 	argv->len = argv->len * 2;
 	argv->argv = (char**) acl_myrealloc((char*) argv->argv,
 		(argv->len + 1) * sizeof(char*));
@@ -20,8 +18,7 @@ static void argv_extend(ACL_ARGV *argv)
 
 #define SPACE_LEFT(a) ((a)->len - (a)->argc - 1)
 
-static ACL_ARGV *split2(const char *str, const char *sep)
-{
+static ACL_ARGV *split2(const char *str, const char *sep) {
 #if 0
 	size_t len = strlen(str), i, start = 0;
 	ACL_ARGV *argv = acl_argv_alloc(5);
@@ -89,8 +86,7 @@ static ACL_ARGV *split2(const char *str, const char *sep)
 	return argv;
 }
 
-static void test2(long long max, const char *str, const char *sep)
-{
+static void test2(long long max, const char *str, const char *sep) {
 	long long i;
 
 	for (i = 0; i < max; i++) {
@@ -99,8 +95,7 @@ static void test2(long long max, const char *str, const char *sep)
 	}
 }
 
-static ACL_ARGV *split3(char *str, const char *sep)
-{
+static ACL_ARGV *split3(char *str, const char *sep) {
 	char *ptr = str, *start = str;
 	ACL_ARGV *argv = acl_argv_alloc(5);
 
@@ -128,8 +123,7 @@ static ACL_ARGV *split3(char *str, const char *sep)
 	return argv;
 }
 
-static void test3(long long max, const char *str, const char *sep)
-{
+static void test3(long long max, const char *str, const char *sep) {
 	long long i;
 
 	for (i = 0; i < max; i++) {
@@ -141,8 +135,7 @@ static void test3(long long max, const char *str, const char *sep)
 	}
 }
 
-static ACL_ARGV *split4(char *str, const char *sep)
-{
+static ACL_ARGV *split4(char *str, const char *sep) {
 	size_t len = strlen(str), i, start = 0;
 	ACL_ARGV *argv = acl_argv_alloc(5);
 
@@ -170,8 +163,7 @@ static ACL_ARGV *split4(char *str, const char *sep)
 	return argv;
 }
 
-static void test4(long long max, const char *str, const char *sep)
-{
+static void test4(long long max, const char *str, const char *sep) {
 	long long i;
 
 	for (i = 0; i < max; i++) {
@@ -183,8 +175,16 @@ static void test4(long long max, const char *str, const char *sep)
 	}
 }
 
-static void test5(const char *str, const char *sep)
-{
+static void test5(long long max, const char *str, const char *sep) {
+	long long i;
+
+	for (i = 0; i < max; i++) {
+		ACL_ARGV_VIEW *view = acl_argv_view_split(str, sep);
+		acl_argv_view_free(view);
+	}
+}
+
+static void test6(const char *str, const char *sep) {
 	ACL_ITER iter;
 	ACL_ARGV *argv = split2(str, sep);
 
@@ -196,8 +196,7 @@ static void test5(const char *str, const char *sep)
 	acl_argv_free(argv);
 }
 
-static int argv_cmp(const ACL_ARGV *argv1, const ACL_ARGV *argv2)
-{
+static int argv_cmp(const ACL_ARGV *argv1, const ACL_ARGV *argv2) {
 	assert(argv1->argc == argv2->argc);
 	int i;
 
@@ -212,8 +211,7 @@ static int argv_cmp(const ACL_ARGV *argv1, const ACL_ARGV *argv2)
 	return 0;
 }
 
-static void test6(const char *str, const char *sep)
-{
+static void test7(const char *str, const char *sep) {
 	ACL_ARGV *argv1 = acl_argv_split(str, sep);
 	ACL_ARGV *argv2 = split2(str, sep);
 
@@ -222,6 +220,8 @@ static void test6(const char *str, const char *sep)
 
 	char *buf2 = strdup(str);
 	ACL_ARGV *argv4 = split4(buf2, sep);
+
+	ACL_ARGV_VIEW *view = acl_argv_view_split(str, sep);
 
 	if (argv_cmp(argv1, argv2) == 0) {
 		printf("ok, argv1 == argv2\r\n");
@@ -245,11 +245,21 @@ static void test6(const char *str, const char *sep)
 		exit(1);
 	}
 
-	ACL_ITER iter;
-	acl_foreach(iter, argv3) {
-		printf("%s\r\n", (char*) iter.data);
+	if (argv_cmp(argv4, &view->argv) == 0) {
+		printf("ok, argv4 == view\r\n");
+	} else {
+		printf("error, argv4 != view\r\n");
+		exit(1);
 	}
 
+	ACL_ITER iter;
+	acl_foreach(iter, argv3) {
+		printf("ARGV->%s\r\n", (char*) iter.data);
+	}
+
+	acl_foreach(iter, view) {
+		printf("View->%s\r\n", (char*) iter.data);
+	}
 	acl_argv_free(argv1);
 	acl_argv_free(argv2);
 
@@ -262,15 +272,13 @@ static void test6(const char *str, const char *sep)
 	free(buf2);
 }
 
-static void usage(const char *procname)
-{
+static void usage(const char *procname) {
 	printf("usage: %s -h [help]\r\n"
 		" -n max_loop[default: 10000]\r\n"
 		, procname);
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	struct timeval begin, end;
 	double spent, speed;
 	int ch;
@@ -343,14 +351,27 @@ int main(int argc, char *argv[])
 
 	printf("Enter any key to continue...");
 	getchar();
-	test5(str, sep);
+
+	gettimeofday(&begin, NULL);
+	test5(max, str, sep);
+	gettimeofday(&end, NULL);
+
+	spent = stamp_sub(&end, &begin);
+	speed = (max * 1000) / (spent >= 1.0 ? spent : 1.0);
+	printf("test5 bench: loop=%lld, spent=%.2f ms, speed=%.2f\r\n", max, spent, speed);
 
 	printf("-------------------------------------------------------\r\n");
-	test5("hello world ,;?!\t\r\n", ",;?! \t\r\n");
 
-	printf("-------------------------------------------------------\r\n");
-
+	printf("Enter any key to continue...");
+	getchar();
 	test6(str, sep);
+
+	printf("-------------------------------------------------------\r\n");
+
+	test7(str, sep);
+
+	printf("-------------------------------------------------------\r\n");
+	test7("hello world ,;?!\t\r\n", ",;?! \t\r\n");
 
 	return 0;
 }
