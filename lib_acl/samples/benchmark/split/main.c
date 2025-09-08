@@ -270,6 +270,8 @@ static void test7(const char *str, const char *sep) {
 	acl_myfree(argv4->argv);
 	acl_myfree(argv4);
 	free(buf2);
+
+	acl_argv_view_free(view);
 }
 
 static void usage(const char *procname) {

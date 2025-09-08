@@ -217,7 +217,7 @@ static void argv_extend(ARGV_VIEW *view) {
 
 ACL_ARGV_VIEW *acl_argv_view_split(const char *str, const char *delim) {
 	size_t len = strlen(str);
-	ARGV_VIEW *view = acl_mymalloc(sizeof(ARGV_VIEW) + len + 1);
+	ARGV_VIEW *view = (ARGV_VIEW*) acl_mymalloc(sizeof(ARGV_VIEW) + len + 1);
 	char *ptr = view->buf, *start = ptr;
 
 	memcpy(ptr, str, len);
