@@ -179,7 +179,7 @@ ACL_ARGV *acl_argv_quote_split4(const char *str, const char *delim,
 
 typedef struct ARGV_VIEW {
 	ACL_ARGV_VIEW view;
-	char *args[50];
+	char *args[20];
 	char  buf[1];
 } ARGV_VIEW;
 
