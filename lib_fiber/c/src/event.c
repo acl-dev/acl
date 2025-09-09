@@ -541,6 +541,8 @@ int event_process(EVENT *ev, int timeout)
 	// we can decrease the times of calling gettimeofday() API.
 	if (timeout != 0) {
 		(void) event_set_stamp(ev);
+	} else {
+		ev->timeout = -1;
 	}
 
 #ifdef HAS_POLL

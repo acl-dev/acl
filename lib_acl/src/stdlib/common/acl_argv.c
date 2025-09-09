@@ -24,8 +24,7 @@
 
 /* argv_extend - extend array */
 
-static void argv_extend(ACL_ARGV *argvp)
-{
+static void argv_extend(ACL_ARGV *argvp) {
 	argvp->len = argvp->len * 2;
 
 	if (argvp->dbuf) {
@@ -40,13 +39,11 @@ static void argv_extend(ACL_ARGV *argvp)
 	}
 }
 
-static void argv_push_back(struct ACL_ARGV *argvp, const char *s)
-{
+static void argv_push_back(ACL_ARGV *argvp, const char *s) {
 	acl_argv_add(argvp, s, 0);
 }
 
-static void argv_push_front(struct ACL_ARGV *argvp, const char *s)
-{
+static void argv_push_front(ACL_ARGV *argvp, const char *s) {
 	int   i;
 
 	/* Make sure that always argvp->argc < argvp->len. */
@@ -65,16 +62,14 @@ static void argv_push_front(struct ACL_ARGV *argvp, const char *s)
 	argvp->argc++;
 }
 
-static char *argv_pop_back(struct ACL_ARGV *argvp)
-{
+static char *argv_pop_back(ACL_ARGV *argvp) {
 	if (argvp->argc <= 0) {
 		return (NULL);
 	}
 	return argvp->argv[--argvp->argc];
 }
 
-static char *argv_pop_front(struct ACL_ARGV *argvp)
-{
+static char *argv_pop_front(ACL_ARGV *argvp) {
 	char *s;
 	int   i;
 
@@ -92,8 +87,7 @@ static char *argv_pop_front(struct ACL_ARGV *argvp)
 
 /* argv_iter_head - get the head of the array */
 
-static void *argv_iter_head(ACL_ITER *iter, struct ACL_ARGV *argv)
-{
+static void *argv_iter_head(ACL_ITER *iter, const ACL_ARGV *argv) {
 	iter->dlen = -1;
 	iter->key = NULL;
 	iter->klen = -1;
@@ -108,8 +102,7 @@ static void *argv_iter_head(ACL_ITER *iter, struct ACL_ARGV *argv)
 
 /* argv_iter_next - get the next of the array */
 
-static void *argv_iter_next(ACL_ITER *iter, struct ACL_ARGV *argv)
-{
+static void *argv_iter_next(ACL_ITER *iter, const ACL_ARGV *argv) {
 	iter->i++;
 	if (iter->i >= argv->argc) {
 		iter->data = iter->ptr = 0;
@@ -121,8 +114,7 @@ static void *argv_iter_next(ACL_ITER *iter, struct ACL_ARGV *argv)
  
 /* argv_iter_tail - get the tail of the array */
 
-static void *argv_iter_tail(ACL_ITER *iter, struct ACL_ARGV *argv)
-{
+static void *argv_iter_tail(ACL_ITER *iter, const ACL_ARGV *argv) {
 	iter->dlen = -1;
 	iter->key = NULL;
 	iter->klen = -1;
@@ -139,8 +131,7 @@ static void *argv_iter_tail(ACL_ITER *iter, struct ACL_ARGV *argv)
 
 /* argv_iter_prev - get the prev of the array */
 
-static void *argv_iter_prev(ACL_ITER *iter, struct ACL_ARGV *argv)
-{
+static void *argv_iter_prev(ACL_ITER *iter, const ACL_ARGV *argv) {
 	iter->i--;
 	if (iter->i < 0) {
 		iter->data = iter->ptr = 0;
@@ -152,9 +143,12 @@ static void *argv_iter_prev(ACL_ITER *iter, struct ACL_ARGV *argv)
 
 /* acl_argv_free - destroy string array */
 
-ACL_ARGV *acl_argv_free(ACL_ARGV *argvp)
-{
+void acl_argv_free(ACL_ARGV *argvp) {
 	char  **cpp;
+
+	if (argvp == NULL) {
+		return;
+	}
 
 	for (cpp = argvp->argv; cpp < argvp->argv + argvp->argc; cpp++) {
 		if (argvp->dbuf) {
@@ -170,18 +164,15 @@ ACL_ARGV *acl_argv_free(ACL_ARGV *argvp)
 		acl_myfree(argvp->argv);
 		acl_myfree(argvp);
 	}
-	return NULL;
 }
 
 /* acl_argv_alloc - initialize string array */
 
-ACL_ARGV *acl_argv_alloc(int size)
-{
+ACL_ARGV *acl_argv_alloc(int size) {
 	return acl_argv_alloc2(size, NULL);
 }
 
-ACL_ARGV *acl_argv_alloc2(int len, ACL_DBUF_POOL *dbuf)
-{
+ACL_ARGV *acl_argv_alloc2(int len, ACL_DBUF_POOL *dbuf) {
 	ACL_ARGV   *argvp;
 	int     sane_len;
 
@@ -221,10 +212,17 @@ ACL_ARGV *acl_argv_alloc2(int len, ACL_DBUF_POOL *dbuf)
 	return argvp;
 }
 
+void acl_argv_iter_init(ACL_ARGV *argvp) {
+	/* set the iterator callback */
+	argvp->iter_head = argv_iter_head;
+	argvp->iter_next = argv_iter_next;
+	argvp->iter_tail = argv_iter_tail;
+	argvp->iter_prev = argv_iter_prev;
+}
+
 /* acl_argv_add - add string to vector */
 
-void acl_argv_add(ACL_ARGV *argvp,...)
-{
+void acl_argv_add(ACL_ARGV *argvp,...) {
 	const char *arg;
 	va_list ap;
 
@@ -246,8 +244,7 @@ void acl_argv_add(ACL_ARGV *argvp,...)
 	argvp->argv[argvp->argc] = 0;
 }
 
-void acl_argv_addv(ACL_ARGV *argvp, va_list ap)
-{
+void acl_argv_addv(ACL_ARGV *argvp, va_list ap) {
 	const char *arg;
 
 	/* Make sure that always argvp->argc < argvp->len. */
@@ -268,9 +265,7 @@ void acl_argv_addv(ACL_ARGV *argvp, va_list ap)
 
 /* acl_argv_addn - add string to vector */
 
-void acl_argv_addn(ACL_ARGV *argvp,...)
-{
-	const char *myname = "acl_argv_addn";
+void acl_argv_addn(ACL_ARGV *argvp,...) {
 	const char *arg;
 	int     len;
 	va_list ap;
@@ -280,7 +275,7 @@ void acl_argv_addn(ACL_ARGV *argvp,...)
 	va_start(ap, argvp);
 	while ((arg = va_arg(ap, const char *)) != 0) {
 		if ((len = va_arg(ap, int)) < 0) {
-			acl_msg_panic("%s: bad string length %d", myname, len);
+			acl_msg_panic("%s: bad string length %d", __FUNCTION__, len);
 		}
 		if (SPACE_LEFT(argvp) <= 0) {
 			argv_extend(argvp);
@@ -296,9 +291,7 @@ void acl_argv_addn(ACL_ARGV *argvp,...)
 	argvp->argv[argvp->argc] = 0;
 }
 
-void acl_argv_addnv(ACL_ARGV *argvp, va_list ap)
-{
-	const char *myname = "acl_argv_addnv";
+void acl_argv_addnv(ACL_ARGV *argvp, va_list ap) {
 	const char *arg;
 	int     len;
 
@@ -306,7 +299,7 @@ void acl_argv_addnv(ACL_ARGV *argvp, va_list ap)
 
 	while ((arg = va_arg(ap, const char *)) != 0) {
 		if ((len = va_arg(ap, int)) < 0) {
-			acl_msg_panic("%s: bad string length %d", myname, len);
+			acl_msg_panic("%s: bad string length %d", __FUNCTION__, len);
 		}
 		if (SPACE_LEFT(argvp) <= 0) {
 			argv_extend(argvp);
@@ -321,8 +314,7 @@ void acl_argv_addnv(ACL_ARGV *argvp, va_list ap)
 	argvp->argv[argvp->argc] = 0;
 }
 
-int acl_argv_set(ACL_ARGV *argvp, int idx, const char *value)
-{
+int acl_argv_set(const ACL_ARGV *argvp, int idx, const char *value) {
 	if (idx < 0 || idx >= argvp->argc) {
 		return -1;
 	}
@@ -342,14 +334,12 @@ int acl_argv_set(ACL_ARGV *argvp, int idx, const char *value)
 
 /* acl_argv_terminate - terminate string array */
 
-void acl_argv_terminate(ACL_ARGV *argvp)
-{
+void acl_argv_terminate(const ACL_ARGV *argvp) {
 	/* Trust that argvp->argc < argvp->len. */
 	argvp->argv[argvp->argc] = 0;
 }
 
-char *acl_argv_index(ACL_ARGV *argvp, int idx)
-{
+char *acl_argv_index(const ACL_ARGV *argvp, int idx) {
 	if (argvp == NULL || idx < 0 || idx > argvp->argc - 1) {
 		return(NULL);
 	}
@@ -357,8 +347,7 @@ char *acl_argv_index(ACL_ARGV *argvp, int idx)
 	return argvp->argv[idx];
 }
 
-int acl_argv_size(ACL_ARGV *argvp)
-{
+int acl_argv_size(const ACL_ARGV *argvp) {
 	if (argvp == NULL) {
 		return -1;
 	}

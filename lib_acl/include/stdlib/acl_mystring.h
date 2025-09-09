@@ -11,18 +11,27 @@ extern "C" {
 
 /**
  * 功能: 安全的字符串拷贝宏函数, 可以保证最后一个字节为  "\0"
- * @param _obj {char*} 目的内存区指针
+ * @param _dst {char*} 目的内存区指针
  * @param _src {const char*} 源字符串指针
  * @param _size {int} 目的内存区的空间大小
  */
 #ifndef ACL_SAFE_STRNCPY
-#define ACL_SAFE_STRNCPY(_obj, _src, _size) do {                \
-    if (_size > 0) {                                            \
-        size_t _n = strlen(_src);                               \
-        _n = _n > (size_t ) _size - 1? (size_t) _size - 1 : _n; \
-        memcpy(_obj, _src, _n);                                 \
-        _obj[_n] = 0;                                           \
-    }                                                           \
+#define ACL_SAFE_STRNCPY(_dst, _src, _size) do {                              \
+    if ((_size) > 0) {                                                        \
+        size_t _n = strlen((_src));                                           \
+        _n = _n > (size_t ) (_size) - 1? (size_t) (_size) - 1 : _n;           \
+        memcpy(_dst, _src, _n);                                               \
+        (_dst)[_n] = 0;                                                       \
+    }                                                                         \
+} while (0)
+#endif
+
+#ifndef ACL_SAFE_STRCPY
+#define ACL_SAFE_STRCPY(_dst, _src) do {                                      \
+	size_t _n = strlen((_src));                                           \
+	_n = _n > sizeof((_dst)) - 1 ? sizeof((_dst)) -1 : _n;                \
+	memcpy((_dst), (_src), _n);                                           \
+	(_dst)[_n] = '\0';                                                    \
 } while (0)
 #endif
 
@@ -252,21 +261,50 @@ ACL_API int acl_dir_correct(const char *psrc_dir, char *pbuf, int sizeb);
 ACL_API int acl_dir_getpath(const char *pathname, char *pbuf, int bsize);
 
 /**
- * 将数据字符串转换为64位有符号长整型
+ * 将字符串转换为整数，当转换失败时使用传入的值做为返回值，供调用者进行判断，以下几个函数
+ * 内部使用 strtol/strtoll 提供了更为安全的字符串转整数的方法，当因输入的字符串非整数
+ * 格式而转换失败时，通过返回调用者设置的缺省值来表明转换失败
+ */
+/**
+ * 将数字字符串转为32位整数
+ * @param s {const char*} 字符串指针
+ * @param def {int} 转换失败时返回的值
+ * @return {int}
+ */
+ACL_API int acl_safe_atoi(const char *s, int def);
+
+/**
+ * 将数字字符串转为long型整数
+ * @param s {const char*} 字符串指针
+ * @param def {long} 转换失败时返回的值
+ * @return {long}
+ */
+ACL_API long acl_safe_atol(const char *s, long def);
+
+/**
+ * 将数字字符串转为64位整数
+ * @param s {const char*} 字符串指针
+ * @param def {long long} 转换失败时返回的值
+ * @return {long long}
+ */
+ACL_API long long acl_safe_atoll(const char *s, long long def);
+
+/**
+ * 将数字字符串转换为64位有符号长整型
  * @param s {const char*} 字符串指针
  * @return {long long} 有符号长整型
  */
 ACL_API long long acl_atoll(const char *s);
 
 /**
- * 将数据字符串转换为64位无符号长整型
+ * 将数字字符串转换为64位无符号长整型
  * @param str {const char*} 字符串指针
  * @return {acl_uint64} 无符号长整型
  */
 ACL_API acl_uint64 acl_atoui64(const char *str);
 
 /**
-* 将数据字符串转换为64位符号长整型
+* 将数字字符串转换为64位符号长整型
 * @param str {const char*} 字符串指针
 * @return {acl_int64} 无符号长整型
 */

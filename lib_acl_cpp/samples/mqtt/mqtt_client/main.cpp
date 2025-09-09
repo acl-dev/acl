@@ -6,6 +6,7 @@
 
 static bool __show_messsage = false;
 static bool __show_binary   = false;
+static size_t __count       = 0;
 static std::vector<acl::string> __topics;
 
 static bool handle_connack(acl::mqtt_client& conn,
@@ -74,9 +75,15 @@ static bool handle_publish(acl::mqtt_client& conn,
 	ACL_VSTREAM* vs = conn.sock_stream()->get_vstream();
 	assert(vs);
 
-	printf("topic: %s, qos: %d, pkt_id: %d, payload len: %zd, total read=%lld\r\n",
-		publish.get_topic(), (int) publish.get_header().get_qos(),
-		publish.get_pkt_id(), payload.size(), vs->total_read_cnt);
+	char buf[128];
+	acl::rfc822 rfc;
+	rfc.mkdate_cst(time(NULL), buf, sizeof(buf));
+
+	printf("%s: topic: %s, qos: %d, pkt_id: %d, count=%zd, payload len: %zd,"
+		" total read=%lld\r\n", buf, publish.get_topic(),
+		(int) publish.get_header().get_qos(), publish.get_pkt_id(),
+		++__count, payload.size(), vs->total_read_cnt);
+	fflush(stdout);
 
 	if (publish.get_header().get_qos() == acl::MQTT_QOS0) {
 		return true;
@@ -138,14 +145,19 @@ static void usage(const char* procname) {
 		" -s addr\r\n"
 		" -D [if display messages]\r\n"
 		" -B [if display as binary data format]\r\n"
+		" -c cid [default: client-id-test]\r\n"
+		" -u username [default: test-user]\r\n"
+		" -p password [default: passwd]\r\n"
+		" topic list\r\n"
 		, procname);
 }
 
 int main(int argc, char* argv[]) {
 	char ch;
 	acl::string addr("127.0.0.1|1883");
+	acl::string cid("client-id-test"), user("test-user"), pass("passwd");
 
-	while ((ch = getopt(argc, argv, "hs:DB")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:DBc:u:p:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -158,6 +170,15 @@ int main(int argc, char* argv[]) {
 			break;
 		case 'B':
 			__show_binary = true;
+			break;
+		case 'c':
+			cid = optarg;
+			break;
+		case 'u':
+			user = optarg;
+			break;
+		case 'p':
+			pass = optarg;
 			break;
 		default:
 			break;
@@ -177,9 +198,9 @@ int main(int argc, char* argv[]) {
 	}
 
 	acl::mqtt_connect message;
-	message.set_cid("client-id-test-xxx");
-	message.set_username("user-zsx");
-	//message.set_passwd("pass");
+	message.set_cid(cid);
+	message.set_username(user);
+	message.set_passwd(pass);
 #if 0
 	message.set_will_qos(acl::MQTT_QOS0);
 	message.set_will_topic("test/topic");

@@ -341,8 +341,8 @@ redis_result* redis_client::get_object(socket_stream& conn, dbuf_pool* dbuf)
 {
 	char ch;
 	if (!conn.read(ch)) {
-		logger_warn("read char error: %s, server: %s, fd: %u",
-			last_serror(), conn.get_peer(true),
+		logger_warn("read char error: %s, timeo=%d, server: %s, fd: %u",
+			last_serror(), conn.get_rw_timeout(), conn.get_peer(true),
 			(unsigned) conn.sock_handle());
 		return NULL;
 	}

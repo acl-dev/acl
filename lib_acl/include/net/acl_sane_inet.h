@@ -73,10 +73,10 @@ ACL_API const char *acl_inet_ntop4(const unsigned char *src, char *dst, size_t s
  * @param size {size_t} dst 的空间大小
  * @return {const char*} NULL: error; !NULL: ok
  */
-ACL_API const char *acl_inet_ntoa(const struct in_addr in, char *dst, size_t size);
+ACL_API const char *acl_inet_ntoa(struct in_addr in, char *dst, size_t size);
 
 #ifdef AF_INET6
-ACL_API const char *acl_inet6_ntoa(const struct in6_addr in6, char *buf, size_t size);
+ACL_API const char *acl_inet6_ntoa(struct in6_addr in6, char *buf, size_t size);
 #endif
 
 /**

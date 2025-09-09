@@ -346,16 +346,11 @@ bool socket_stream::set_local(const char* addr)
 const char* socket_stream::get_ip(const char* addr, std::string& out)
 {
 	char buf[256];
-	safe_snprintf(buf, sizeof(buf), "%s", addr);
-	char* ptr = strchr(buf, ':');
-	if ((ptr = strrchr(buf, ACL_ADDR_SEP)) || (ptr = strrchr(buf, ':'))) {
-		*ptr = 0;
+	if (acl_parse_hostaddr(addr, buf, sizeof(buf), NULL)) {
+		out = buf;
+		return out.c_str();
 	}
-	if (buf[0] == 0) {
-		return "";
-	}
-	out = buf;
-	return out.c_str();
+	return "";
 }
 
 bool socket_stream::alive(double* tc1 /* NULL */, double* tc2 /* NULL */) const

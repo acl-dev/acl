@@ -119,13 +119,11 @@ const char* aio_stream::get_local(bool full /* = false */) const
 const char* aio_stream::get_ip(const char* addr, std::string& out)
 {
 	char buf[256];
-	safe_snprintf(buf, sizeof(buf), "%s", addr);
-	char* ptr = strchr(buf, ':');
-	if (ptr) {
-		*ptr = 0;
+	if (acl_parse_hostaddr(addr, buf, sizeof(buf), NULL)) {
+		out = buf;
+		return out.c_str();
 	}
-	out = buf;
-	return out.c_str();
+	return "";
 }
 
 aio_handle& aio_stream::get_handle() const

@@ -20,17 +20,17 @@ static int __count = 0;
 static bool __debug = false;
 
 static bool test_publish(acl::mqtt_client& conn, const char* topic,
-		unsigned short id, const acl::string& payload) {
-	acl::mqtt_publish publish;
+	  unsigned short id, const acl::string& payload, acl::mqtt_qos_t qos) {
+	acl::mqtt_publish pub;
 
-	publish.get_header().set_qos(acl::MQTT_QOS1);
-	publish.set_pkt_id(id);
+	pub.get_header().set_qos(qos);
+	pub.set_pkt_id(id);
 
-	publish.set_topic(topic);
+	pub.set_topic(topic);
 
-	publish.set_payload((unsigned) payload.size(), payload.c_str());
+	pub.set_payload((unsigned) payload.size(), payload.c_str());
 
-	if (!conn.send(publish)) {
+	if (!conn.send(pub)) {
 		printf("send publish error\r\n");
 		return false;
 	}
@@ -43,7 +43,7 @@ static bool test_publish(acl::mqtt_client& conn, const char* topic,
 			payload.size(), vs->total_write_cnt, ++__count);
 	}
 
-	if (publish.get_header().get_qos() == acl::MQTT_QOS0) {
+	if (pub.get_header().get_qos() == acl::MQTT_QOS0) {
 		return true;
 	}
 
@@ -79,8 +79,13 @@ static bool test_publish(acl::mqtt_client& conn, const char* topic,
 class mqtt_pub : public acl::fiber {
 public:
 	mqtt_pub(const char* addr, const char* topic, const char* payload,
-		int max, int uid)
-	: addr_(addr), topic_(topic), payload_(payload), max_(max), uid_(uid)
+		int max, int uid, acl::mqtt_qos_t qos)
+	: addr_(addr)
+	, topic_(topic)
+	, payload_(payload)
+	, max_(max)
+	, uid_(uid)
+	, qos_(qos)
 	{}
 
 
@@ -134,7 +139,7 @@ private:
 
 		unsigned short id = 1;
 		for (int i = 1; i <= max_; i++) {
-			if (!test_publish(conn, topic_, id++, payload_)) {
+			if (!test_publish(conn, topic_, id++, payload_, qos_)) {
 				break;
 			}
 
@@ -148,6 +153,7 @@ private:
 private:
 	acl::string addr_, topic_, payload_;
 	int max_, uid_;
+	acl::mqtt_qos_t qos_;
 };
 
 static void usage(const char* procname) {
@@ -160,8 +166,9 @@ int main(int argc, char* argv[]) {
 	acl::string addresses("127.0.0.1|1883");
 	acl::string topic("test/topic");
 	acl::string payload = "{\"topic\":\"test1\",\"from\":\"test2\",\"to\":\"test2\",\"msg\":\"hello world\"}";
+	acl::mqtt_qos_t qos = acl::MQTT_QOS0;
 
-	while ((ch = getopt(argc, argv, "hs:n:t:c:D")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:t:c:q:D")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -181,6 +188,13 @@ int main(int argc, char* argv[]) {
 		case 'D':
 			__debug = true;
 			break;
+		case 'q':
+			if (strcasecmp(optarg, "qos1") == 0) {
+				qos = acl::MQTT_QOS1;
+			} else if (strcasecmp(optarg, "qos2") == 0) {
+				qos = acl::MQTT_QOS2;
+			}
+			break;
 		default:
 			break;
 		}
@@ -191,7 +205,7 @@ int main(int argc, char* argv[]) {
 	std::vector<acl::string>& addrs = addresses.split2(",;");
 	for (int i = 0; i < cocurrent; i++) {
 		acl::fiber* fb = new mqtt_pub(addrs[i%addrs.size()],
-			topic, payload, max, i);
+			topic, payload, max, i, qos);
 		fb->start();
 	}
 

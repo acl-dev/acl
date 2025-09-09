@@ -26,7 +26,7 @@ char *acl_lowercase(char *s)
 	}
 
 	while (*cp) {
-		*cp = tolower(*cp);
+		*cp = (char) tolower(*cp);
 		cp++;
 	}
 
@@ -42,7 +42,7 @@ char *acl_lowercase2(char *s, size_t n)
 	}
 
 	while (*cp && n > 0) {
-		*cp = tolower(*cp);
+		*cp = (char) tolower(*cp);
 		cp++;
 		n--;
 	}
@@ -59,7 +59,7 @@ char *acl_lowercase3(const char *s, char *buf, size_t size)
 	}
 
 	while (size > 1 && *s) {
-		*cp++ = tolower(*s++);
+		*cp++ = (char) tolower(*s++);
 		size--;
 	}
 	*cp = 0;
@@ -76,7 +76,7 @@ char *acl_uppercase(char *s)
 	}
 
 	while (*cp) {
-		*cp = toupper(*cp);
+		*cp = (char) toupper(*cp);
 		cp++;
 	}
 
@@ -92,7 +92,7 @@ char *acl_uppercase2(char *s, size_t n)
 	}
 
 	while (*cp && n > 0) {
-		*cp = toupper(*cp);
+		*cp = (char) toupper(*cp);
 		cp++;
 		n--;
 	}
@@ -109,7 +109,7 @@ char *acl_uppercase3(const char *s, char *buf, size_t size)
 	}
 
 	while (size > 1 && *s) {
-		*cp++ = toupper(*s++);
+		*cp++ = (char) toupper(*s++);
 		size--;
 	}
 
@@ -203,7 +203,7 @@ char *acl_strtrim(char *str)
 	while (*ptr) {
 		if (*ptr == ' ' || *ptr == '\t') {
 			memmove(ptr, ptr + 1, len--);
-		} else if (((*ptr) &0xff) == 0xa1
+		} else if (((*ptr) & 0xff) == 0xa1
 			&& ((*(ptr + 1)) & 0xff) == 0xa1) {
 
 			/* 对于全角的空格为: '　', 即 0xa10xa1 */
@@ -374,11 +374,12 @@ int acl_dir_getpath(const char *pathname, char *pbuf, int bsize)
 	}
 	ptr = strrchr(pbuf, PATH_SEP_C);
 	if (ptr != NULL) {
-		*ptr = 0;
-	}
-	if (ptr == pbuf) { /* such as "/tmp.txt", I'll left "/" */
-		if (bsize >= 2) {
-			*(ptr + 1) = 0;
+		if (ptr == pbuf) { /* such as "/tmp.txt", only use "/" */
+			if (bsize >= 2) {
+				*(ptr + 1) = 0;
+			}
+		} else {
+			*ptr = 0;
 		}
 	}
 
@@ -398,6 +399,33 @@ size_t acl_strnlen(const char * s, size_t count)
                 /* nothing */;
 	}
         return sc - s;
+}
+
+int acl_safe_atoi(const char *s, int def) {
+	char* end = NULL;
+	const int n = (int) strtol(s, &end, 10);
+	if (end && *end != 0) {
+		return def;
+	}
+	return n;
+}
+
+long acl_safe_atol(const char *s, long def) {
+	char* end = NULL;
+	const long n = strtol(s, &end, 10);
+	if (end && *end != 0) {
+		return def;
+	}
+	return n;
+}
+
+long long acl_safe_atoll(const char *s, long long def) {
+	char* end = NULL;
+	const long long n = strtoll(s, &end, 10);
+	if (end && *end != 0) {
+		return def;
+	}
+	return n;
 }
 
 long long acl_atoll(const char *s)
@@ -536,7 +564,7 @@ static void x64toa(acl_uint64 val, char *buf, size_t size,
 	} while (val > 0);
 
 	/* We now have the digit of the number in the buffer, but in reverse
-	   order.  Thus we reverse them now. */
+	   order.  Thus, we reverse them now. */
 
 	*p-- = '\0';            /* terminate string; p points to last digit */
 

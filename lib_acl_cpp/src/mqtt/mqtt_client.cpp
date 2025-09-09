@@ -32,8 +32,7 @@ bool mqtt_client::open() {
 	}
 
 	if (!conn_->open(addr_.c_str(), conn_timeout_, rw_timeout_)) {
-		logger_error("connect redis %s error: %s",
-			addr_.c_str(), last_serror());
+		logger_error("connect %s error: %s", addr_.c_str(), last_serror());
 		return false;
 	}
 

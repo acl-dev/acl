@@ -101,7 +101,7 @@ static bool set_sockopt_timeo(ACL_SOCKET fd, int opt, int timeout)
 
 bool stream::set_rw_timeout(int n, bool use_sockopt /* false */)
 {
-	if (!stream_ || n <= 0) {
+	if (!stream_) {
 		return false;
 	}
 
