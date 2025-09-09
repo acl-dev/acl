@@ -306,7 +306,7 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 ### 3.7、acl 使用 FAQ 参考 [FAQ.md](FAQ.md)
 
 ## 四、使用许可
-- LGPL-v3 license (see [LICENSE.txt](LICENSE.txt) in the acl project)
+- LGPL-v2.1 license (see [LICENSE.txt](LICENSE.txt) in the acl project)
 
 ## 五、参考
 - WEB 站点: https://blog.csdn.net/zsxxsz

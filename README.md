@@ -430,7 +430,7 @@ There are many small demos showing how to use acl library easily in [Demos](http
 If you have some questions when using Acl, please see [FAQ.md](FAQ.md).
 
 ## 5.4. License
-- LGPL-v3 license (see [LICENSE.txt](LICENSE.txt) in the acl project)
+- LGPL-v2.1 license (see [LICENSE.txt](LICENSE.txt) in the acl project)
 
 ## 5.5. Reference
 - Web site: https://acl-dev.cn/
