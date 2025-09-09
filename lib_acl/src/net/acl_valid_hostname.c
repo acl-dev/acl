@@ -22,8 +22,7 @@
 
 /* acl_valid_hostname - screen out bad hostnames */
 
-static const char *check_hostname(const char *name)
-{
+static const char *check_hostname(const char *name) {
 	const char *cp;
 	int     label_length = 0;
 	int     non_numeric = 0;
@@ -81,8 +80,7 @@ static const char *check_hostname(const char *name)
 	return NULL;
 }
 
-int acl_valid_hostname(const char *name, int gripe)
-{
+int acl_valid_hostname(const char *name, int gripe) {
 	const char *err = check_hostname(name);
 	if (err == NULL) {
 		return 1;
@@ -94,8 +92,7 @@ int acl_valid_hostname(const char *name, int gripe)
 	return 0;
 }
 
-int acl_valid_unix(const char *addr)
-{
+int acl_valid_unix(const char *addr) {
 	size_t nslash = 0, nchars = 0;
 	char lastch = 0;
 
@@ -126,8 +123,7 @@ int acl_valid_unix(const char *addr)
 
 /* acl_valid_hostaddr - verify numerical address syntax */
 
-static int valid_ipv4_field(const char *ptr)
-{
+static int valid_ipv4_field(const char *ptr) {
 	int n;
 
 	if (*ptr == '*' && *(ptr + 1) == 0) {
@@ -137,8 +133,7 @@ static int valid_ipv4_field(const char *ptr)
 	return n >= 0 && n <= 255 ? 1 : 0;
 }
 
-static int valid_port(const char *ptr)
-{
+static int valid_port(const char *ptr) {
 	int n;
 
 	if (!acl_alldig(ptr)) {
@@ -149,8 +144,7 @@ static int valid_port(const char *ptr)
 	return n >= 0 && n <= 65535;
 }
 
-static int valid_ipv4_wildcard(const char *addr)
-{
+static int valid_ipv4_wildcard(const char *addr) {
 	ACL_ARGV_VIEW *tokens = acl_argv_view_split(addr, ".");
 	char     *ptr, *s4;
 	int       i;
@@ -191,8 +185,11 @@ static int valid_ipv4_wildcard(const char *addr)
 	return i;
 }
 
-int acl_valid_hostaddr(const char *addr, int gripe)
-{
+int acl_valid_hostaddr(const char *addr, int gripe) {
+	return acl_check_hostaddr(addr, gripe) == ACL_HOSTADDR_TYPE_NONE ? 0 : 1;
+}
+
+int acl_check_hostaddr(const char *addr, int gripe) {
 	int n;
 
 	/* Trivial cases first. */
@@ -200,7 +197,7 @@ int acl_valid_hostaddr(const char *addr, int gripe)
 		if (gripe) {
 			acl_msg_warn("%s: address null", __FUNCTION__);
 		}
-		return 0;
+		return ACL_HOSTADDR_TYPE_NONE;
 	}
 
 #define VALID_PORT(x) ((n = acl_safe_atoi((x), -1) >= 0) && n <= 65535)
@@ -208,30 +205,40 @@ int acl_valid_hostaddr(const char *addr, int gripe)
 
 	/* port */
 	if (VALID_PORT(addr)) {
-		return 1;
+		return ACL_HOSTADDR_TYPE_WILDCARD;
 	}
 
-	/* |port, :port */
+	/* '|port', ':port' */
 	if (VALID_SEP(*addr) && VALID_PORT(addr + 1)) {
-		return 1;
+		return ACL_HOSTADDR_TYPE_WILDCARD;
 	}
 
-	/* *|port, *:port */
+	/* '*|port', '*:port' */
 	if (*addr == '*' && VALID_SEP(*(addr + 1)) && VALID_PORT(addr + 2)) {
-		return 1;
+		return ACL_HOSTADDR_TYPE_WILDCARD;
 	}
 
+	/* '*.*.*.1|port' */
 	if (valid_ipv4_wildcard(addr)) {
-		return 1;
+		return ACL_HOSTADDR_TYPE_WILDCARD;
 	}
 
 	if (*addr == '[') {
-		return acl_valid_ipv6_hostaddr(addr, gripe);
+		if (acl_valid_ipv6_hostaddr(addr, gripe)) {
+			return ACL_HOSTADDR_TYPE_IPV6;
+		}
+		return ACL_HOSTADDR_TYPE_NONE;
 	}
 
 	/* Protocol-dependent processing next. */
-	return acl_valid_ipv4_hostaddr(addr, gripe)
-		|| acl_valid_ipv6_hostaddr(addr, gripe);
+	if (acl_valid_ipv4_hostaddr(addr, gripe)) {
+		return ACL_HOSTADDR_TYPE_IPV4;
+	}
+
+	if (acl_valid_ipv6_hostaddr(addr, gripe)) {
+		return ACL_HOSTADDR_TYPE_IPV6;
+	}
+	return ACL_HOSTADDR_TYPE_NONE;
 }
 
 /* acl_valid_ipv4_hostaddr - test dotted quad string for correctness */
@@ -312,8 +319,7 @@ int acl_valid_ipv4_hostaddr(const char *addr, int gripe) {
 
 /* acl_valid_ipv6_hostaddr - validate IPv6 address syntax */
 
-static const char *check_ipv6(const char *cp, const char *end)
-{
+static const char *check_ipv6(const char *cp, const char *end) {
 	int  null_field = 0, field = 0, len = 0;
 
 	/*
@@ -337,7 +343,7 @@ static const char *check_ipv6(const char *cp, const char *end)
 				return "malformed format";
 			}
 			/* NOT: acl_valid_hostaddr(). Avoid recursion. */
-			return check_ipv4((const char *) cp - len, end);
+			return check_ipv4(cp - len, end);
 		case ':':
 		/* advance by exactly 1 character position or terminate. */
 			if (field == 0 && len == 0 && ACL_ISALNUM(cp[1])) {
@@ -450,7 +456,7 @@ static int parse_hostaddr(const char *addr, char *ip, size_t size, int *port) {
 		}
 
 		*ptr++ = 0;
-		if (port && *ptr++ == ':' && *ptr != 0) {
+		if (port && (*ptr == ':' || *ptr == '|') && *++ptr != 0) {
 			*port = acl_safe_atoi(ptr, -1);
 		}
 		return 1;
@@ -482,8 +488,7 @@ static int parse_hostaddr(const char *addr, char *ip, size_t size, int *port) {
 	return 1;
 }
 
-int acl_parse_hostaddr(const char *addr, char *ip, size_t size, int *port)
-{
+int acl_parse_hostaddr(const char *addr, char *ip, size_t size, int *port) {
 	char *ptr;
 
 	if (port) {
@@ -528,8 +533,7 @@ int acl_parse_hostaddr(const char *addr, char *ip, size_t size, int *port)
 #endif
 }
 
-int acl_parse_ipv4_hostaddr(const char *addr, char *ip, size_t size, int *port)
-{
+int acl_parse_ipv4_hostaddr(const char *addr, char *ip, size_t size, int *port) {
 	char *ptr;
 
 	if (port) {
@@ -556,12 +560,14 @@ int acl_parse_ipv4_hostaddr(const char *addr, char *ip, size_t size, int *port)
 	*ptr = 0;
 	if (port && *(ptr + 1)!= 0) {
 		*port = acl_safe_atoi(ptr + 1, -1);
+		if (*port < 0 || *port > 65535) {
+			return 0;
+		}
 	}
 	return check_ipv4(ip, ip + strlen(ip)) == NULL;
 }
 
-int acl_parse_ipv6_hostaddr(const char *addr, char *ip, size_t size, int *port)
-{
+int acl_parse_ipv6_hostaddr(const char *addr, char *ip, size_t size, int *port) {
 	char *ptr;
 
 	if (port) {

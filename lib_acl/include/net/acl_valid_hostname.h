@@ -31,6 +31,21 @@ ACL_API int acl_valid_hostname(const char *name, int gripe);
 ACL_API int acl_valid_hostaddr(const char *addr, int gripe);
 
 /**
+ * Check if the specified address if a valid IPv4 or IPv6 address.
+ * @param addr {const char*} the specified address.
+ * @param gripe {int} if log the warning info if name is invalid.
+ * @return {int} return 0 if not a valid address, else if
+ *  1: wildcard address format, such as |port, *|port, or *.*.*.*|port
+ *  2: IPv4 address format, ipv4:port, ipv4|port
+ *  3: IPv6 address format, [ipv6]:port, ipv6|port
+ */
+ACL_API int acl_check_hostaddr(const char *addr, int gripe);
+#define ACL_HOSTADDR_TYPE_NONE		0
+#define ACL_HOSTADDR_TYPE_WILDCARD	1
+#define ACL_HOSTADDR_TYPE_IPV4		2
+#define ACL_HOSTADDR_TYPE_IPV6		3
+
+/**
  * Check if the specified address if a valid IPv4 address.
  * @param addr {const char*} the specified address.
  * @param gripe {int} if log the warning info if name is invalid.

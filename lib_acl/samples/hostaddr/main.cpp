@@ -8,6 +8,7 @@ static int test1(void) {
 		int ok;
 	} addrs[] = {
 		{ "127.0.0.1:80",       4, 1, 1 },
+		{ "127.0.0.1|80",       4, 1, 1 },
 		{ "192.168.0.1:65535",  4, 1, 1 },
 		{ "[2001:db8::1]:443",  6, 1, 1 },
 		{ "[::1]:22",           6, 1, 1 },
@@ -16,6 +17,8 @@ static int test1(void) {
 		{ "[2001:db8:::1]:80", -6, 1, 0 }, // invalid IPv6
 		{ "192.168.0.1",        4, 0, 1 }, // missing port
 		{ "[::1]",              6, 0, 1 }, // missing port
+		{ "[::1]:80",           6, 1, 1 },
+		{ "[::1]|80",           6, 1, 1 },
 		{ "192.168.0.1|65535",  4, 1, 1 },
 		{ "2001:db8::1|443",    6, 1, 1 },
 		{ "2001:db8:::1|80",   -6, 1, 0 }, // invalid IPv6
@@ -90,8 +93,14 @@ static int test1(void) {
 				return -1;
 			}
 
-			printf("Parse ok, addr=%s, ip=%s, port=%d\r\n",
-				addrs[i].addr, ip, port);
+			if (!addrs[i].has_port || port >= 0) {
+				printf("Parse ok, addr=%s, ip=%s, port=%d\r\n",
+					addrs[i].addr, ip, port);
+			} else {
+				printf("%d: Parse error, addr=%s, ip=%s, port=%d\r\n",
+					__LINE__, addrs[i].addr, ip, port);
+				return -1;
+			}
 		} else {
 			if (addrs[i].ok == 1) {
 				printf("%d: Parse error, addr=%s, ip=%s, port=%d\r\n",
