@@ -121,6 +121,8 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
+	//////////////////////////////////////////////////////////////////////
+
 	struct timeval begin, end;
 
 	//////////////////////////////////////////////////////////////////////
@@ -171,6 +173,12 @@ int main(int argc, char* argv[]) {
 
 	tc = util::stamp_sub(&end, &begin);
 	printf("Test5 time cost: %.2f ms\r\n", tc);
+
+	//////////////////////////////////////////////////////////////////////
+
+	acl::string buf;
+	const std::vector<acl::string>& tokens = buf.split2(";");
+	printf("tokens' size: %zd\r\n", tokens.size());
 
 	return 0;
 }
