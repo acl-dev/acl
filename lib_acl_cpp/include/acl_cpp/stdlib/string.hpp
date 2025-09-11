@@ -949,8 +949,11 @@ public:
 	 * 将当前对象存储的字符串进行分割
 	 * @param sep {const char*} 进行分割时的分割符集合，该字符串中的每一个字符都
 	 *  做为分割符，注：内部不是用整个字符串进行分割的
-	 * @param quoted {bool} 当为 true 时，则对于由单/双引号引起来的
-	 *  字符串内容，不做分割，但此时要求 sep 中不得存在单/双号
+	 * @param quoted {bool} 当为 true 时，则源串中由单/双引号引起来的字符串内容，
+	 *  不做分割，但此时要求分割串 sep 中不得存在单/双号，如源串为:
+	 *  "abc*|\"cd*ef\"|\'gh|ijk\'|lmn"，分割串为 "*|"，当 quoted 为 true 时
+	 *  分割后结果为："abc", "cd*ef", "gh|ijk", "lmn"，当 quoted 为 false 时
+	 *  分割后结果为："abc", "cd", "ef", "gh", ijk", "lmn"
 	 * @return {std::list<string>&} 返回 list 格式的分割结果，返回的结果
 	 *  不需要释放，其引用了当前对象的一个内部指针
 	 */

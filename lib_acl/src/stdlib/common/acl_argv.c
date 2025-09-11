@@ -87,7 +87,7 @@ static char *argv_pop_front(ACL_ARGV *argvp) {
 
 /* argv_iter_head - get the head of the array */
 
-static void *argv_iter_head(ACL_ITER *iter, const ACL_ARGV *argv) {
+void *acl_argv_iter_head(ACL_ITER *iter, const ACL_ARGV *argv) {
 	iter->dlen = -1;
 	iter->key = NULL;
 	iter->klen = -1;
@@ -102,7 +102,7 @@ static void *argv_iter_head(ACL_ITER *iter, const ACL_ARGV *argv) {
 
 /* argv_iter_next - get the next of the array */
 
-static void *argv_iter_next(ACL_ITER *iter, const ACL_ARGV *argv) {
+void *acl_argv_iter_next(ACL_ITER *iter, const ACL_ARGV *argv) {
 	iter->i++;
 	if (iter->i >= argv->argc) {
 		iter->data = iter->ptr = 0;
@@ -114,7 +114,7 @@ static void *argv_iter_next(ACL_ITER *iter, const ACL_ARGV *argv) {
  
 /* argv_iter_tail - get the tail of the array */
 
-static void *argv_iter_tail(ACL_ITER *iter, const ACL_ARGV *argv) {
+void *acl_argv_iter_tail(ACL_ITER *iter, const ACL_ARGV *argv) {
 	iter->dlen = -1;
 	iter->key = NULL;
 	iter->klen = -1;
@@ -131,7 +131,7 @@ static void *argv_iter_tail(ACL_ITER *iter, const ACL_ARGV *argv) {
 
 /* argv_iter_prev - get the prev of the array */
 
-static void *argv_iter_prev(ACL_ITER *iter, const ACL_ARGV *argv) {
+void *acl_argv_iter_prev(ACL_ITER *iter, const ACL_ARGV *argv) {
 	iter->i--;
 	if (iter->i < 0) {
 		iter->data = iter->ptr = 0;
@@ -204,20 +204,20 @@ ACL_ARGV *acl_argv_alloc2(int len, ACL_DBUF_POOL *dbuf) {
 	argvp->pop_front = argv_pop_front;
 
 	/* set the iterator callback */
-	argvp->iter_head = argv_iter_head;
-	argvp->iter_next = argv_iter_next;
-	argvp->iter_tail = argv_iter_tail;
-	argvp->iter_prev = argv_iter_prev;
+	argvp->iter_head = acl_argv_iter_head;
+	argvp->iter_next = acl_argv_iter_next;
+	argvp->iter_tail = acl_argv_iter_tail;
+	argvp->iter_prev = acl_argv_iter_prev;
 
 	return argvp;
 }
 
 void acl_argv_iter_init(ACL_ARGV *argvp) {
 	/* set the iterator callback */
-	argvp->iter_head = argv_iter_head;
-	argvp->iter_next = argv_iter_next;
-	argvp->iter_tail = argv_iter_tail;
-	argvp->iter_prev = argv_iter_prev;
+	argvp->iter_head = acl_argv_iter_head;
+	argvp->iter_next = acl_argv_iter_next;
+	argvp->iter_tail = acl_argv_iter_tail;
+	argvp->iter_prev = acl_argv_iter_prev;
 }
 
 /* acl_argv_add - add string to vector */
