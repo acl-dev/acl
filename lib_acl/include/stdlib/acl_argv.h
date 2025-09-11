@@ -62,6 +62,11 @@ ACL_API ACL_ARGV *acl_argv_alloc2(int size, ACL_DBUF_POOL *dbuf);
  */
 ACL_API void acl_argv_iter_init(ACL_ARGV *argvp);
 
+ACL_API void *acl_argv_iter_head(ACL_ITER *iter, const ACL_ARGV *argv);
+ACL_API void *acl_argv_iter_next(ACL_ITER *iter, const ACL_ARGV *argv);
+ACL_API void *acl_argv_iter_tail(ACL_ITER *iter, const ACL_ARGV *argv);
+ACL_API void *acl_argv_iter_prev(ACL_ITER *iter, const ACL_ARGV *argv);
+
 /**
  * 向字符串动态数组中添加一至多个字符串，最后一个NULL字符串表示结束
  * @param argvp {ACL_ARGV*} 字符串动态数组指针

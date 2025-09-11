@@ -1279,10 +1279,10 @@ string string::right(size_t n)
 	return string(STR(vbf_) + n, nLeft);
 }
 
-std::list<acl::string>& string::split(const char* sep, bool quoted /* = false */)
+std::list<string>& string::split(const char* sep, bool quoted /* = false */)
 {
 	if (list_tmp_ == NIL) {
-		list_tmp_ = NEW std::list<acl::string>;
+		list_tmp_ = NEW std::list<string>;
 	} else {
 		list_tmp_->clear();
 	}
@@ -1292,27 +1292,29 @@ std::list<acl::string>& string::split(const char* sep, bool quoted /* = false */
 	}
 
 	ACL_ITER it;
-	ACL_ARGV *argv;
 
 	if (quoted) {
-		argv = acl_argv_quote_split(STR(vbf_), sep);
-	} else {
-		argv = acl_argv_split(STR(vbf_), sep);
+		ACL_ARGV *argv = acl_argv_quote_split(STR(vbf_), sep);
+		acl_foreach(it, argv) {
+			char* ptr = (char*) it.data;
+			list_tmp_->push_back(ptr);
+		}
+		return *list_tmp_;
 	}
 
-	acl_foreach(it, argv) {
+	ACL_ARGV_VIEW *view = acl_argv_view_split(STR(vbf_), sep);
+	acl_foreach(it, view) {
 		char* ptr = (char*) it.data;
 		list_tmp_->push_back(ptr);
 	}
-
-	acl_argv_free(argv);
+	acl_argv_view_free(view);
 	return *list_tmp_;
 }
 
-std::vector<acl::string>& string::split2(const char* sep, bool quoted /* = false */)
+std::vector<string>& string::split2(const char* sep, bool quoted /* = false */)
 {
 	if (vector_tmp_ == NIL) {
-		vector_tmp_ = NEW std::vector<acl::string>;
+		vector_tmp_ = NEW std::vector<string>;
 	} else {
 		vector_tmp_->clear();
 	}
@@ -1322,20 +1324,22 @@ std::vector<acl::string>& string::split2(const char* sep, bool quoted /* = false
 	}
 
 	ACL_ITER it;
-	ACL_ARGV *argv;
 
 	if (quoted) {
-		argv = acl_argv_quote_split(STR(vbf_), sep);
-	} else {
-		argv = acl_argv_split(STR(vbf_), sep);
+		ACL_ARGV *argv = acl_argv_quote_split(STR(vbf_), sep);
+		acl_foreach(it, argv) {
+			char* ptr = (char*) it.data;
+			vector_tmp_->push_back(ptr);
+		}
+		return *vector_tmp_;
 	}
 
-	acl_foreach(it, argv) {
+	ACL_ARGV_VIEW *view = acl_argv_view_split(STR(vbf_), sep);
+	acl_foreach(it, view) {
 		char* ptr = (char*) it.data;
 		vector_tmp_->push_back(ptr);
 	}
-
-	acl_argv_free(argv);
+	acl_argv_view_free(view);
 	return *vector_tmp_;
 }
 

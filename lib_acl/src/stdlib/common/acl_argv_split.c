@@ -179,28 +179,28 @@ ACL_ARGV *acl_argv_quote_split4(const char *str, const char *delim,
 
 typedef struct ARGV_VIEW {
 	ACL_ARGV_VIEW view;
-	char *args[50];
+	char *args[10];
 	char  buf[1];
 } ARGV_VIEW;
 
 static void *argv_view_iter_head(ACL_ITER *iter, const ACL_ARGV_VIEW *view) {
-	return view->argv.iter_head(iter, &view->argv);
+	return acl_argv_iter_head(iter, &view->argv);
 }
 
 static void *argv_view_iter_next(ACL_ITER *iter, const ACL_ARGV_VIEW *view) {
-	return view->argv.iter_next(iter, &view->argv);
+	return acl_argv_iter_next(iter, &view->argv);
 }
 
 static void *argv_view_iter_tail(ACL_ITER *iter, const ACL_ARGV_VIEW *view) {
-	return view->argv.iter_tail(iter, &view->argv);
+	return acl_argv_iter_tail(iter, &view->argv);
 }
 
 static void *argv_view_iter_prev(ACL_ITER *iter, const ACL_ARGV_VIEW *view) {
-	return view->argv.iter_prev(iter, &view->argv);
+	return acl_argv_iter_prev(iter, &view->argv);
 }
 
 static void argv_extend(ARGV_VIEW *view) {
-	view->view.argv.len = view->view.argv.len * 10;
+	view->view.argv.len = view->view.argv.len * 2;
 	if (view->view.argv.argv == view->args) {
 		view->view.argv.argv = (char **)
 			acl_mymalloc(view->view.argv.len * sizeof(char *));
@@ -228,8 +228,16 @@ ACL_ARGV_VIEW *acl_argv_view_split(const char *str, const char *delim) {
 	view->view.argv.len  = sizeof(view->args) / sizeof(view->args[0]);
 	view->view.argv.argv = view->args;
 
+#if 0
+	size_t i;
+	for (i = 0; i < sizeof(view->args) / sizeof(view->args[0]); i++) {
+		view->args[i] = NULL;
+	}
+#else
+	memset(view->args, 0, sizeof(char*) * sizeof(view->args) / sizeof(view->args[0]));
+#endif
+
 	/* set the iterator callback */
-	acl_argv_iter_init(&view->view.argv);
 	view->view.iter_head = argv_view_iter_head;
 	view->view.iter_next = argv_view_iter_next;
 	view->view.iter_tail = argv_view_iter_tail;

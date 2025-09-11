@@ -1,0 +1,90 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.4.0"
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    namespace "com.qiyi.acl"
+    compileSdk 30
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_STL=c++_shared",
+                          "-DHAS_ATOMIC=YES",
+                          "-DCMAKE_BUILD_TYPE=RELEASE",
+                          "-DCMAKE_CXX_FLAGS_RELEASE=-O3",
+                          "-DCMAKE_C_FLAGS_RELEASE=-O3",
+                          "-DACL_CLIENT_ONLY=YES",
+                          "-DHAS_MBEDTLS=YES",
+                          "-DACL_BUILD_SHARED=YES"
+                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86'
+
+                targets 'acl_static', 'protocol_static', 'acl_cpp_static',
+                        'fiber_static', 'fiber_cpp_static',
+                        'acl_shared', 'protocol_shared', 'acl_cpp_shared',
+                        'fiber_shared', 'fiber_cpp_shared'
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+            jniDebuggable true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "../../CMakeLists.txt"
+            //version "3.22.1"
+        }
+    }
+
+    ndkVersion "28.2.13676358"
+
+    packagingOptions {
+        exclude 'lib/arm64-v8a/libgnustl_shared.so'
+        exclude 'lib/armeabi-v7a/libgnustl_shared.so'
+        exclude 'lib/armeabi/libgnustl_shared.so'
+        exclude 'lib/x86/libgnustl_shared.so'
+        exclude 'lib/arm64-v8a/libc++_shared.so'
+        exclude 'lib/armeabi-v7a/libc++_shared.so'
+        exclude 'lib/armeabi/libc++_shared.so'
+        exclude 'lib/x86/libc++_shared.so'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2') {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+}
+
