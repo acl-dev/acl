@@ -375,5 +375,15 @@ int main(int argc, char *argv[]) {
 	printf("-------------------------------------------------------\r\n");
 	test7("hello world ,;?!\t\r\n", ",;?! \t\r\n");
 
+	printf("-------------------------------------------------------\r\n");
+
+	ACL_ARGV_VIEW *view = acl_argv_view_split("", ";");
+	ACL_ITER iter;
+	printf("argc=%d\r\n", view->argv.argc);
+
+	acl_foreach(iter, view) {
+		printf(">>size: %d, i: %d, %s\n", iter.size, iter.i, (const char*) iter.data);
+	}
+	acl_argv_view_free(view);
 	return 0;
 }
