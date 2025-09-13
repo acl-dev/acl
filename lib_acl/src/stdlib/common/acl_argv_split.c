@@ -228,15 +228,6 @@ ACL_ARGV_VIEW *acl_argv_view_split(const char *str, const char *delim) {
 	view->view.argv.len  = sizeof(view->args) / sizeof(view->args[0]);
 	view->view.argv.argv = view->args;
 
-#if 0
-	size_t i;
-	for (i = 0; i < sizeof(view->args) / sizeof(view->args[0]); i++) {
-		view->args[i] = NULL;
-	}
-#else
-	memset(view->args, 0, sizeof(char*) * sizeof(view->args) / sizeof(view->args[0]));
-#endif
-
 	/* set the iterator callback */
 	view->view.iter_head = argv_view_iter_head;
 	view->view.iter_next = argv_view_iter_next;
