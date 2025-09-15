@@ -74,11 +74,10 @@ static int bind_local(ACL_SOCKET sock, int family, const struct addrinfo *res0)
 static ACL_SOCKET connect_one(const struct addrinfo *peer,
 	const struct addr_res *local, int blocking, int timeout, unsigned *flags)
 {
-	ACL_SOCKET  sock;
 	int         on;
 	struct addrinfo *local0 = local->local_res0;
-
-	sock = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol);
+	ACL_SOCKET sock = socket(peer->ai_family, peer->ai_socktype,
+				peer->ai_protocol);
 
 	if (sock == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s(%d): create socket error: %s",
@@ -95,8 +94,7 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 	*/
 
 	on = 1;
-	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
-		  (const void *) &on, sizeof(on)) < 0) {
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
 		if (flags) {
 			*flags |= ACL_CONNECT_F_REUSE_ADDR_ERR;
 		}
@@ -171,10 +169,10 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 #else
 	if (acl_sane_connect(sock, peer->ai_addr, peer->ai_addrlen) < 0) {
 #endif
-		int  err, errnum;
+		int  err;
 		socklen_t len;
+		int errnum = acl_last_error();
 
-		errnum = acl_last_error();
 		len = sizeof(err);
 		if (getsockopt(sock, SOL_SOCKET, SO_ERROR,
 			(char *) &err, &len) < 0) {
@@ -197,7 +195,8 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 			acl_set_error(err);
 #endif
 			return ACL_SOCKET_INVALID;
-		} else if (err != 0) {
+		}
+		if (err != 0) {
 			errnum = err;
 			acl_set_error(err);
 		}
@@ -239,6 +238,13 @@ static struct addrinfo *try_numeric_addr(int family, const char *name,
 	const char *service, struct addrinfo *ai_buf, ACL_SOCKADDR *in_buf)
 {
 	size_t addrlen;
+	int port = acl_safe_atoi(service, -1);
+
+	if (port <= 0 || port > 65535) {
+		acl_msg_warn("%s(%d), %s: port=%s invalid",
+			__FILE__, __LINE__, __FUNCTION__, service);
+		return NULL;
+	}
 
 	if (family != PF_INET && family != PF_INET6) {
 		if (acl_valid_ipv6_hostaddr(name, 0)) {
@@ -258,9 +264,9 @@ static struct addrinfo *try_numeric_addr(int family, const char *name,
 	}
 
 	if (family == PF_INET) {
-		in_buf->in.sin_port   = htons(atoi(service));
+		in_buf->in.sin_port   = htons(port);
 	} else {
-		in_buf->in6.sin6_port = htons(atoi(service));
+		in_buf->in6.sin6_port = htons(port);
 	}
 
 	ai_buf->ai_flags    = AI_NUMERICHOST;
@@ -274,7 +280,7 @@ static struct addrinfo *try_numeric_addr(int family, const char *name,
 
 static struct addrinfo *resolve_addr(const char *name, const char *service)
 {
-	struct addrinfo hints, *res0;
+	struct addrinfo hints, *res0 = NULL;
 	int err;
 
 	memset(&hints, 0, sizeof(hints));
@@ -319,19 +325,37 @@ static int parse_addr(const char *addr, struct addr_res *res)
 	/* @local_ip or #local_interface */
 
 	if ((local = strchr(res->buf, '@')) != NULL) {
+		*local = 0;
 		if (*++local == 0) {
 			local = NULL;
 		}
 	}
 
 	if (local == NULL && (ptr = strchr(res->buf, '#')) != NULL) {
+		*ptr = 0;
 		if (*++ptr != 0) {
 			res->iface = ptr;
 		}
 	}
 
 	if (acl_valid_ipv6_hostaddr(peer, 0)) {
-		ptr = strrchr(peer, ACL_ADDR_SEP);
+		if (*peer == '[') {
+			char *p1;
+			++peer;
+			p1 = strchr(peer, ']');
+			if (p1 == NULL) {
+				acl_msg_error("%s, %s(%d): no ']' in addr(%s)",
+					__FILE__, __FUNCTION__, __LINE__, addr);
+				return -1;
+			}
+			*p1++ = 0;
+			ptr = strchr(p1, ':');
+			if (ptr == NULL) {
+				ptr = strchr(p1, ACL_ADDR_SEP);
+			}
+		} else {
+			ptr = strrchr(peer, ACL_ADDR_SEP);
+		}
 		res->peer_family = PF_INET6;
 	} else if (acl_valid_ipv4_hostaddr(peer, 0)) {
 		ptr = strrchr(peer, ACL_ADDR_SEP);
@@ -339,7 +363,7 @@ static int parse_addr(const char *addr, struct addr_res *res)
 			ptr = strrchr(peer, ':');
 		}
 		res->peer_family = PF_INET;
-	} else if (!(ptr = strrchr(res->buf, ACL_ADDR_SEP))) {
+	} else if ((ptr = strrchr(res->buf, ACL_ADDR_SEP)) == NULL) {
 		ptr = strrchr(res->buf, ':');
 	}
 
@@ -352,7 +376,7 @@ static int parse_addr(const char *addr, struct addr_res *res)
 	*ptr++ = 0;
 	res->peer_port = ptr;
 
-	if (atoi(res->peer_port) <= 0) {
+	if (acl_safe_atoi(res->peer_port, -1) <= 0) {
 		acl_msg_error("%s, %s(%d): invalid port(%s)",
 			__FILE__, __FUNCTION__, __LINE__, res->peer_port);
 		return -1;

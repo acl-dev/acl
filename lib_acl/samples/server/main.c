@@ -19,15 +19,19 @@ static void thread_run(void *arg)
 	char  buf[8192];
 	int   ret;
 
+	while (1) {
+		ret = acl_vstream_read(client, buf, sizeof(buf));
+		if (ret == ACL_VSTREAM_EOF) {
+			break;
+		}
 
-	ret = acl_vstream_read(client, buf, sizeof(buf));
-	if (ret == ACL_VSTREAM_EOF) {
-		acl_vstream_close(client);
-		return;
+		buf[ret] = 0;
+		if (acl_vstream_write(client, buf, ret) <= 0) {
+			break;
+		}
 	}
 
-	buf[ret] = 0;
-	(void) acl_vstream_write(client, buf, ret);
+	printf("Close peer client fd=%d\r\n", ACL_VSTREAM_SOCK(client));
 	acl_vstream_close(client);
 }
 	
@@ -52,7 +56,7 @@ static void run(const char *addr)
 			acl_msg_error("accept error(%s)", acl_last_serror());
 			break;
 		}
-		printf("accept one client\r\n");
+		printf("accept one client fd=%d\r\n", ACL_VSTREAM_SOCK(client));
 		acl_pthread_pool_add(pool, thread_run, client);
 	}
 

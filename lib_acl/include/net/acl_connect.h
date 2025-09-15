@@ -95,7 +95,7 @@ ACL_API ACL_SOCKET acl_inet_connect2(const char *addr, int blocking,
  * 远程连接网络服务器地址
  * @param addr {const char*} 远程服务器的监听地址，如：192.168.0.1|80，
  *  当本机有多个网卡地址且想通过某个指定网卡连接服务器时的地址格式：
- *  remote_ip|remote_port@local_ip 或 remote_ip|remote_port#local_ipinterface，
+ *  remote_ip|remote_port@local_ip 或 remote_ip|remote_port#local_interface，
  *  如：
  *    211.150.111.12|80@192.168.1.1
  *    211.150.111.12|80#interface
