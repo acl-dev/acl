@@ -21,19 +21,19 @@
 
 #endif
 
-int acl_timed_connect(ACL_SOCKET sock, const struct sockaddr *sa,
+int acl_timed_connect(ACL_SOCKET fd, const struct sockaddr *sa,
 	socklen_t len, int timeout)
 {
-	return acl_timed_connect_ms(sock, sa, len, timeout * 1000);
+	return acl_timed_connect_ms(fd, sa, len, timeout * 1000);
 }
 
-int acl_timed_connect_ms(ACL_SOCKET sock, const struct sockaddr *sa,
+int acl_timed_connect_ms(ACL_SOCKET fd, const struct sockaddr *sa,
 	 socklen_t len, int timeout)
 {
-	return acl_timed_connect_ms2(sock, sa, len, timeout, NULL);
+	return acl_timed_connect_ms2(fd, sa, len, timeout, NULL);
 }
 
-int acl_timed_connect_ms2(ACL_SOCKET sock, const struct sockaddr *sa,
+int acl_timed_connect_ms2(ACL_SOCKET fd, const struct sockaddr *sa,
 	socklen_t len, int timeout, unsigned *flags)
 {
 	int   err;
@@ -49,7 +49,7 @@ int acl_timed_connect_ms2(ACL_SOCKET sock, const struct sockaddr *sa,
 	/*
 	 * Start the connection, and handle all possible results.
 	 */
-	if (acl_sane_connect(sock, sa, len) == 0) {
+	if (acl_sane_connect(fd, sa, len) == 0) {
 		return 0;
 	}
 
@@ -79,7 +79,7 @@ int acl_timed_connect_ms2(ACL_SOCKET sock, const struct sockaddr *sa,
 	 * A connection is in progress. Wait for a limited amount of time for
 	 * something to happen. If nothing happens, report an error.
 	 */
-	if (timeout >= 0 && acl_write_wait_ms(sock, timeout) < 0) {
+	if (timeout >= 0 && acl_write_wait_ms(fd, timeout) < 0) {
 		if (flags) {
 			*flags |= ACL_CONNECT_F_WAIT_ERR;
 		}
@@ -91,7 +91,7 @@ int acl_timed_connect_ms2(ACL_SOCKET sock, const struct sockaddr *sa,
 	 * return the error, instead of returning it via the parameter list.
 	 */
 	len = sizeof(err);
-	if (getsockopt(sock, SOL_SOCKET, SO_ERROR, (char *) &err, &len) < 0) {
+	if (getsockopt(fd, SOL_SOCKET, SO_ERROR, (char *) &err, &len) < 0) {
 #ifdef  SUNOS5
 	/*
 	 * Solaris 2.4's socket emulation doesn't allow you
@@ -112,7 +112,6 @@ int acl_timed_connect_ms2(ACL_SOCKET sock, const struct sockaddr *sa,
 	if (err != 0) {
 		acl_set_error(err);
 		return -1;
-	} else {
-		return 0;
 	}
+	return 0;
 }
