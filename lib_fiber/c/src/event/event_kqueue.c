@@ -178,6 +178,9 @@ static int kqueue_wait(EVENT *ev, int timeout)
 	n = __sys_kevent(ek->kqfd, ek->changes, ek->nchanges, ek->events,
 		ek->nevents, &ts);
 	ek->nchanges = 0;
+	// Resetting the wait timeout before triggering any callback is safe
+	// and will not affect subsequent operations on the timeout value.
+	ev->timeout = -1;
 
 	if (n == -1) {
 		if (acl_fiber_last_error() == FIBER_EINTR) {

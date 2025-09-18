@@ -155,6 +155,15 @@ static int test1(void) {
 		}
 	}
 
+	printf("\r\n================================================\r\n\r\n");
+
+	const char *domain = "www.google.com";
+	int ret = acl_valid_hostname(domain, 1);
+	if (ret == 0) {
+		printf("%d: invalid hostname=%s\r\n", __LINE__, domain);
+		return -1;
+	}
+
 	return 0;
 }
 

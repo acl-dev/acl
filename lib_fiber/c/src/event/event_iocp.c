@@ -564,6 +564,8 @@ static void iocp_wait_more(EVENT_IOCP *ei, int timeout) {
 
 	if (GetQueuedCompletionStatusEx(ei->h_iocp, entries, MAX_ENTRIES,
 			&ready, timeout, FALSE)) {
+		ei->event.timeout = -1;
+
 		for (i = 0; i < ready; i++) {
 			LPOVERLAPPED_ENTRY entry = &entries[i];
 			IOCP_EVENT* ev = (IOCP_EVENT *) entry->lpOverlapped;
@@ -574,6 +576,7 @@ static void iocp_wait_more(EVENT_IOCP *ei, int timeout) {
 		}
 	} else {
 		int err = acl_fiber_last_error();
+		ei->event.timeout = -1;
 
 		if (err != WAIT_TIMEOUT) {
 			msg_error("%s(%d):GetQueuedCompletionStatusEx error=%d, %s",
