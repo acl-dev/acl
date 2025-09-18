@@ -60,8 +60,7 @@ static int poll_add_read(EVENT_POLL *ep, FILE_EVENT *fe)
 
 static int poll_add_write(EVENT_POLL *ep, FILE_EVENT *fe)
 {
-	struct pollfd *pfd = (fe->id >= 0 && fe->id < ep->count)
-		? &ep->pfds[fe->id] : NULL;
+	struct pollfd *pfd;
 
 	if (fe->id == -1) {
 		assert(ep->count < ep->size);
@@ -156,6 +155,10 @@ static int poll_wait(EVENT *ev, int timeout)
 	}
 #endif
 	n = (*sys_poll)(ep->pfds, ep->count, timeout);
+	// Resetting the wait timeout before triggering any callback is safe
+	// and will not affect subsequent operations on the timeout value.
+	ev->timeout = -1;
+
 #ifdef SYS_WIN
 	if (n == SOCKET_ERROR) {
 #else

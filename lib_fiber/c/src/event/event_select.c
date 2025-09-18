@@ -157,7 +157,12 @@ static int select_event_wait(EVENT *ev, int timeout)
 			}
 		}
 	}
+
 	n = (*sys_select)(es->maxfd + 1, &rset, &wset, &xset, tp);
+	// Resetting the wait timeout before triggering any callback is safe
+	// and will not affect subsequent operations on the timeout value.
+	ev->timeout = -1;
+
 #endif
 	if (n < 0) {
 		if (acl_fiber_last_error() == FIBER_EINTR) {

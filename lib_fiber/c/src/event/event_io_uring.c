@@ -551,6 +551,10 @@ AGAIN:
 		ret = io_uring_wait_cqes(&ep->ring, &cqe, 1, tp, NULL);
 	}
 
+	// Resetting the wait timeout before triggering any callback is safe
+	// and will not affect subsequent operations on the timeout value.
+	ep->event.timeout = -1;
+
 	if (ret < 0) {
 		if (ret == -ETIME) {
 			return 0;

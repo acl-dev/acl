@@ -206,6 +206,8 @@ static int wmsg_wait(EVENT *ev, int timeout)
 	UINT_PTR id = SetTimer(NULL, 0, timeout, NULL);
 	BOOL res = GetMessage(&msg, NULL, 0, 0);
 
+	ev->timeout = -1;
+
 	KillTimer(NULL, id);
 	if (!res) {
 		return 0;

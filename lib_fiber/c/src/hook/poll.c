@@ -319,7 +319,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
 	long long now;
 	EVENT *ev;
-	int old_timeout, nready;
+	int /* old_timeout, */ nready;
 	ACL_FIBER *curr;
 
 #ifdef SHARE_STACK
@@ -345,10 +345,10 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 
 	curr        = acl_fiber_running();
 	ev          = fiber_io_event();
-	old_timeout = ev->timeout;
+	//old_timeout = ev->timeout;
 
 #ifdef SHARE_STACK
-	// In shared stack mode, the fds input must be save to the dynamic
+	// In shared stack mode, the fds input must be saved to the dynamic
 	// memory to avoid memory collision accessed by different fibers.
 	if (curr->oflag & ACL_FIBER_ATTR_SHARE_STACK) {
 		pfds    = pollfds_clone(fds, nfds);
@@ -389,7 +389,9 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 			timer_cache_remove(ev->poll_timer, pe->expire, &pe->me);
 		}
 
-		ev->timeout = old_timeout;
+		// Don't restore the event's waiting timeout here again, it has
+		// been reset to -1 after event waiting wakeup. -- 2025.9.18
+		// ev->timeout = old_timeout;
 
 		if (acl_fiber_killed(pe->fiber)) {
 			acl_fiber_set_error(pe->fiber->errnum);
@@ -399,9 +401,10 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 			break;
 		}
 
-		if (timer_cache_size(ev->poll_timer) == 0) {
-			ev->timeout = -1;
-		}
+		// Don't reset the event's waiting timeout here again. 2025.9.18
+		//if (timer_cache_size(ev->poll_timer) == 0) {
+		//	ev->timeout = -1;
+		//}
 
 		if (pe->nready != 0 || timeout == 0) {
 			break;

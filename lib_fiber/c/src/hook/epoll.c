@@ -43,8 +43,8 @@ struct EPOLL {
 	size_t      nfds;
 
 	// Store all EPOLL_EVENT, every fiber should use its own EPOLL_EVENT,
-	// Because in some case, one thread maybe have many fibers but it maybe
-	// use only one epoll fd to handle IO events, see acl_read_epoll_wait()
+	// Because in some case, one thread maybe have many fibers, it maybe
+	// uses only one epoll fd to handle IO events, see acl_read_epoll_wait()
 	// in lib_acl/src/stdlib/iostuff/acl_read_wait.c.
 	HTABLE      *ep_events;
 };
@@ -711,7 +711,7 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 	EVENT *ev;
 	EPOLL_EVENT *ee;
 	long long now;
-	int old_timeout;
+	//int old_timeout;
 
 	if (sys_epoll_wait == NULL) {
 		hook_once();
@@ -742,7 +742,7 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 	ee->proc      = epoll_callback;
 	ee->nready    = 0;
 
-	old_timeout = ev->timeout;
+	//old_timeout = ev->timeout;
 	event_epoll_set(ev, ee, timeout);
 
 	while (1) {
@@ -760,7 +760,9 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 			timer_cache_remove(ev->epoll_timer, ee->expire, &ee->me);
 		}
 
-		ev->timeout = old_timeout;
+		// Don't restore the event's waiting timeout here again, it has
+		// been reset to -1 after event waiting wakeup. -- 2025.9.18
+		// ev->timeout = old_timeout;
 
 		if (acl_fiber_killed(ee->fiber)) {
 			acl_fiber_set_error(ee->fiber->errnum);
@@ -773,9 +775,10 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 			break;
 		}
 
-		if (timer_cache_size(ev->epoll_timer) == 0) {
-			ev->timeout = -1;
-		}
+		// Don't reset the event's waiting timeout here again. 2025.9.18
+		//if (timer_cache_size(ev->epoll_timer) == 0) {
+		//	ev->timeout = -1;
+		//}
 
 		if (ee->nready != 0 || timeout == 0) {
 			break;

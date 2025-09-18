@@ -82,7 +82,7 @@ static struct pollfd *pfds_create(int *nfds, fd_set *readfds,
 	return fds;
 }
 #else
-static struct pollfd *pfds_create(int *nfds, fd_set *readfds,
+static struct pollfd *pfds_create(const int *nfds, fd_set *readfds,
 	fd_set *writefds, fd_set *exceptfds fiber_unused)
 {
 	int fd;
