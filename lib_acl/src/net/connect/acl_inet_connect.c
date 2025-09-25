@@ -94,7 +94,7 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 	*/
 
 	on = 1;
-	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char*) &on, sizeof(on)) < 0) {
 		if (flags) {
 			*flags |= ACL_CONNECT_F_REUSE_ADDR_ERR;
 		}

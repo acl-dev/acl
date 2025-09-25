@@ -7,11 +7,11 @@
 #define	ACL_COUNTER_INIT(thread_safe)                                         \
 	acl::class_counter::get_instance().init(thread_safe)
 
-// æŸä¸ªå­—ç¬¦æ ‡è®°å¢åŠ ä¸€æ¬¡, flagName ä¸ºè‡ªå·±å®šä¹‰çš„å”¯ä¸€å­—ç¬¦å¯¹è±¡
+// Ä³¸ö×Ö·û±ê¼ÇÔö¼ÓÒ»´Î, flagName Îª×Ô¼º¶¨ÒåµÄÎ¨Ò»×Ö·û¶ÔÏó
 #define ACL_COUNTER_INC(flagName)                                             \
 	acl::class_counter::get_instance().inc(#flagName)
 
-// æŸä¸ªå­—ç¬¦æ ‡è®°å‡å°‘ä¸€æ¬¡
+// Ä³¸ö×Ö·û±ê¼Ç¼õÉÙÒ»´Î
 #define ACL_COUNTER_DEC(flagName)                                             \
 	acl::class_counter::get_instance().dec(#flagName)
 
@@ -28,36 +28,36 @@ class thread_mutex;
 class ACL_CPP_API class_counter : public singleton<class_counter> {
 public:
 	/**
-	 * æ„é€ æ–¹æ³•
-	 * @param clean {bool} æ˜¯å¦è‡ªåŠ¨æ¸…é™¤è®¡æ•°ä¸º 0 çš„è®¡æ•°å¯¹è±¡.
+	 * ¹¹Ôì·½·¨
+	 * @param clean {bool} ÊÇ·ñ×Ô¶¯Çå³ı¼ÆÊıÎª 0 µÄ¼ÆÊı¶ÔÏó.
 	 */
 	class_counter(bool clean = true);
 	~class_counter();
 
 	/**
-	 * å¯ä»¥åœ¨è¿›ç¨‹åˆå§‹åŒ–æ—¶è°ƒç”¨æœ¬æ–¹æ³•(éå¿…é¡»)è¿›è¡Œåˆå§‹åŒ–,æŒ‡å®šå†…éƒ¨æ˜¯å¦éœ€è¦åŠ é”,
-	 * å¦‚æœä¸è°ƒç”¨æœ¬æ–¹æ³•,å†…éƒ¨è‡ªåŠ¨åŠ çº¿ç¨‹é”.
+	 * ¿ÉÒÔÔÚ½ø³Ì³õÊ¼»¯Ê±µ÷ÓÃ±¾·½·¨(·Ç±ØĞë)½øĞĞ³õÊ¼»¯,Ö¸¶¨ÄÚ²¿ÊÇ·ñĞèÒª¼ÓËø,
+	 * Èç¹û²»µ÷ÓÃ±¾·½·¨,ÄÚ²¿×Ô¶¯¼ÓÏß³ÌËø.
 	 */
 	void init(bool thread_safe = true);
 
 	/**
-	 * @brief å°†nameå¯¹åº”çš„è®¡æ•°åŠ 1,å½“æ²¡æœ‰nameæ—¶è®¾ç½®ä¸º1
+	 * @brief ½«name¶ÔÓ¦µÄ¼ÆÊı¼Ó1,µ±Ã»ÓĞnameÊ±ÉèÖÃÎª1
 	 */
 	void inc(const char *name);
 
 	/**
-	 * @brief å°†nameå¯¹åº”çš„è®¡æ•°å‡1,å½“æ²¡æœ‰nameæ—¶å°†è¾“å‡ºé”™è¯¯æ—¥å¿—
+	 * @brief ½«name¶ÔÓ¦µÄ¼ÆÊı¼õ1,µ±Ã»ÓĞnameÊ±½«Êä³ö´íÎóÈÕÖ¾
 	 */
 	void dec(const char *name);
 
 	/**
-	 * @brief è·å–nameå¯¹è±¡çš„ç»Ÿè®¡ä¸ªæ•°
+	 * @brief »ñÈ¡name¶ÔÏóµÄÍ³¼Æ¸öÊı
 	 */
 	long long count(const char *name);
 
 	/**
-	 * @brief è¾“å‡ºè®¡æ•°ç»Ÿè®¡
-	 * @param flag è°ƒç”¨è€…æ ‡è®°
+	 * @brief Êä³ö¼ÆÊıÍ³¼Æ
+	 * @param flag µ÷ÓÃÕß±ê¼Ç
 	 */
 	void print(const char *flag = NULL);
 

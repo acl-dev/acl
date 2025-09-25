@@ -292,7 +292,7 @@ void redis_command::hash_slot(const char* key, size_t len)
 	if (cluster_ != NULL) {
 		max_slot = cluster_->get_max_slot();
 	} else if (pipeline_ != NULL) {
-		max_slot = pipeline_->get_max_slot();
+		max_slot = (int) pipeline_->get_max_slot();
 	} else {
 		return;
 	}
