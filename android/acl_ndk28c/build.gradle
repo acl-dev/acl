@@ -23,7 +23,7 @@ android {
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_STL=c++_shared",
-                          "-DHAS_ATOMIC=YES",
+//                          "-DHAS_ATOMIC=YES",
                           "-DCMAKE_BUILD_TYPE=RELEASE",
                           "-DCMAKE_CXX_FLAGS_RELEASE=-O3",
                           "-DCMAKE_C_FLAGS_RELEASE=-O3",
