@@ -287,6 +287,7 @@ EVENT *event_kqueue_create(int size)
 	ek->event.flag   = EVENT_F_KQUEUE;
 #else
 	ek->event.flag   = EVENT_F_KQUEUE | EVENT_F_USE_ONCE;
+	//ek->event.flag  |= EVENT_F_KEEPREAD;
 #endif
 
 	ek->event.event_fflush = (int (*)(EVENT*)) kqueue_fflush;

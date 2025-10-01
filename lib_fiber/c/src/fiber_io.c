@@ -448,7 +448,9 @@ size_t acl_fiber_sleep(size_t seconds)
 static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	CLR_READWAIT(fe);
-	event_del_read(ev, fe, 0);
+	if (!(fe->type & TYPE_KEEPREAD)) {
+		event_del_read(ev, fe, 0);
+	}
 
 	/* If the reader fiber has been set in ready status when the
 	 * other fiber killed the reader fiber, the reader fiber should

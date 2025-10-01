@@ -131,6 +131,7 @@ struct FILE_EVENT {
 #define	STATUS_CLOSING		(unsigned) (1 << 7)	// In closing status
 #define	STATUS_CLOSED		(unsigned) (1 << 8)	// In closed status
 #define STATUS_BUFFED		(unsigned) (1 << 9)
+#define STATUS_READING		(unsigned) (1 << 10)	// In reading status.
 
 #define	SET_CONNECTING(x)	((x)->status |= STATUS_CONNECTING)
 #define	SET_READABLE(x)		((x)->status |= STATUS_READABLE)
@@ -141,6 +142,7 @@ struct FILE_EVENT {
 #define	SET_WRITEWAIT(x)	((x)->status |= STATUS_WRITEWAIT)
 #define	SET_CLOSING(x)		((x)->status |= STATUS_CLOSING)
 #define	SET_CLOSED(x)		((x)->status |= STATUS_CLOSED)
+#define SET_READING(x)		((x)->status |= STATUS_READING)
 
 #define	CLR_CONNECTING(x)	((x)->status &= ~STATUS_CONNECTING)
 #define	CLR_READABLE(x)		((x)->status &= ~STATUS_READABLE)
@@ -151,6 +153,7 @@ struct FILE_EVENT {
 #define	CLR_WRITEWAIT(x)	((x)->status &= ~STATUS_WRITEWAIT)
 #define	CLR_CLOSING(x)		((x)->status &= ~STATUS_CLOSING)
 #define	CLR_CLOSED(x)		((x)->status &= ~STATUS_CLOSED)
+#define CLR_READING(x)		((x)->status &= ~STATUS_READING)
 
 #define	IS_CONNECTING(x)	((x)->status & STATUS_CONNECTING)
 #define	IS_READABLE(x)		((x)->status & STATUS_READABLE)
@@ -161,6 +164,7 @@ struct FILE_EVENT {
 #define	IS_WRITEWAIT(x)		((x)->status & STATUS_WRITEWAIT)
 #define	IS_CLOSING(x)		((x)->status & STATUS_CLOSING)
 #define	IS_CLOSED(x)		((x)->status & STATUS_CLOSED)
+#define IS_READING(x)		((x)->status & STATUS_READING)
 
 	unsigned type;
 #define	TYPE_NONE		(unsigned) (0)
@@ -169,6 +173,7 @@ struct FILE_EVENT {
 #define	TYPE_BADFD		(unsigned) (1 << 2)
 #define	TYPE_EVENTABLE		(unsigned) (1 << 3)
 #define	TYPE_INTERNAL		(unsigned) (1 << 4)
+#define TYPE_KEEPREAD		(unsigned) (1 << 5)
 
 	unsigned oper;
 #define	EVENT_ADD_READ		(unsigned) (1 << 0)
@@ -398,6 +403,7 @@ struct EVENT {
 #define	EVENT_F_SELECT		(1 << 4)
 #define	EVENT_F_EPOLL		(1 << 5)
 #define	EVENT_F_KQUEUE		(1 << 6)
+#define EVENT_F_KEEPREAD	(1 << 7)
 
 #define	EVENT_IS_IOCP(x)	((x)->flag & EVENT_F_IOCP)
 #define	EVENT_IS_IO_URING(x)	((x)->flag & EVENT_F_IO_URING)

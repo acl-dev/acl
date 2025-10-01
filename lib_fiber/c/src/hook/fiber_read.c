@@ -186,14 +186,19 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
     int err;                                                                 \
     if (IS_READABLE((_fe))) {                                                \
         CLR_READABLE((_fe));                                                 \
-    } else if (fiber_wait_read((_fe)) < 0) {                                 \
+    } else if (!IS_READING((_fe)) && fiber_wait_read((_fe)) < 0) {           \
         return -1;                                                           \
     }                                                                        \
     if ((_fn) == NULL) {                                                     \
         hook_once();                                                         \
     }                                                                        \
     ret = (*_fn)((_fe)->fd, ##_args);                                        \
-    if (ret >= 0) {                                                          \
+    if (ret > 0) {                                                           \
+        if (((_fe)->type & TYPE_KEEPREAD) != 0) {                            \
+            SET_READING((_fe));                                              \
+        }                                                                    \
+        return ret;                                                          \
+    } else if (ret == 0) {                                                   \
         return ret;                                                          \
     }                                                                        \
     err = acl_fiber_last_error();                                            \
@@ -204,6 +209,7 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
         }                                                                    \
         return -1;                                                           \
     }                                                                        \
+    CLR_READING((_fe));                                                      \
 } while (1)
 
 #endif

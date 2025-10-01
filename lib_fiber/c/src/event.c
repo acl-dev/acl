@@ -219,6 +219,9 @@ int event_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe)
 		switch (errno) {
 		case ESPIPE:
 			fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
+			if ((ev->flag & EVENT_F_KEEPREAD) != 0) {
+				fe->type |= TYPE_KEEPREAD;
+			}
 			acl_fiber_set_error(0);
 			return 1;
 		case EBADF:
@@ -258,6 +261,9 @@ int event_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe)
 		}
 
 		fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
+		if ((ev->flag & EVENT_F_KEEPREAD) != 0) {
+			fe->type |= TYPE_KEEPREAD;
+		}
 		acl_fiber_set_error(0);
 		return 1;
 #else
@@ -316,7 +322,7 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		}
 	}
 
-	// If the fd's type has been checked and it isn't a valid socket,
+	// If the fd's type has been checked, and it isn't a valid socket,
 	// return immediately.
 	if (!(fe->type & TYPE_EVENTABLE)) {
 		if (fe->type & TYPE_FILE) {
@@ -364,7 +370,6 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		} else {
 			fe->oper |= EVENT_ADD_READ;
 		}
-
 	}
 
 	return 1;
