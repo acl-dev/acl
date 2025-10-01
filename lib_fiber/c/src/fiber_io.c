@@ -448,7 +448,7 @@ size_t acl_fiber_sleep(size_t seconds)
 static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	CLR_READWAIT(fe);
-	if (!(fe->type & TYPE_KEEPREAD)) {
+	if ((fe->type & TYPE_KEEPREAD) == 0) {
 		event_del_read(ev, fe, 0);
 	}
 
