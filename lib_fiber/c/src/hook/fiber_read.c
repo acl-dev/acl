@@ -222,6 +222,11 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 
 #ifdef SYS_UNIX
 
+static ssize_t try_read(FILE_EVENT *fe, void *buf, size_t count)
+{
+	FIBER_READ(sys_read, fe, buf, count);
+}
+
 ssize_t fiber_read(FILE_EVENT *fe,  void *buf, size_t count)
 {
 	CLR_POLLING(fe);
@@ -258,7 +263,11 @@ ssize_t fiber_read(FILE_EVENT *fe,  void *buf, size_t count)
 	}
 #endif
 
-	FIBER_READ(sys_read, fe, buf, count);
+	ssize_t ret = try_read(fe, buf, count);
+	if (ret > 0 && ret < (ssize_t) count && IS_READING(fe)) {
+		CLR_READING(fe);
+	}
+	return ret;
 }
 
 ssize_t fiber_readv(FILE_EVENT *fe, const struct iovec *iov, int iovcnt)
@@ -357,6 +366,15 @@ ssize_t fiber_recvmmsg(FILE_EVENT *fe, struct mmsghdr *msgvec,
 
 #endif  // SYS_UNIX
 
+static ssize_t try_recv(FILE_EVENT *fe, void *buf, size_t len, int flags)
+{
+#ifdef SYS_WIN
+	FIBER_READ(sys_recv, fe, buf, (int) len, flags);
+#else
+	FIBER_READ(sys_recv, fe, buf, len, flags);
+#endif
+}
+
 ssize_t fiber_recv(FILE_EVENT *fe, void *buf, size_t len, int flags)
 {
 	CLR_POLLING(fe);
@@ -398,10 +416,20 @@ ssize_t fiber_recv(FILE_EVENT *fe, void *buf, size_t len, int flags)
 	}
 #endif
 
+	ssize_t ret = try_recv(fe, buf, len, flags);
+	if (ret > 0 && ret < (ssize_t) len && IS_READING(fe)) {
+		CLR_READING(fe);
+	}
+	return ret;
+}
+
+static ssize_t try_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
+	int flags, struct sockaddr *src_addr, socklen_t *addrlen)
+{
 #ifdef SYS_WIN
-	FIBER_READ(sys_recv, fe, buf, (int) len, flags);
+	FIBER_READ(sys_recvfrom, fe, buf, (int) len, flags, src_addr, addrlen);
 #else
-	FIBER_READ(sys_recv, fe, buf, len, flags);
+	FIBER_READ(sys_recvfrom, fe, buf, len, flags, src_addr, addrlen);
 #endif
 }
 
@@ -445,9 +473,9 @@ ssize_t fiber_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
 	}
 #endif
 
-#ifdef SYS_WIN
-	FIBER_READ(sys_recvfrom, fe, buf, (int) len, flags, src_addr, addrlen);
-#else
-	FIBER_READ(sys_recvfrom, fe, buf, len, flags, src_addr, addrlen);
-#endif
+	ssize_t ret = try_recvfrom(fe, buf, len, flags, src_addr, addrlen);
+	if (ret > 0 && ret < (ssize_t) len && IS_READING(fe)) {
+		CLR_READING(fe);
+	}
+	return ret;
 }

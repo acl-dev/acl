@@ -89,10 +89,8 @@ static int epoll_add_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
 
 	ee.events |= EPOLLIN;
 	if ((ep->event.flag & EVENT_F_KEEPREAD) != 0) {
-		printf(">>>>keep read EPOLLET\n");
 		ee.events |= EPOLLET;
 	}
-	else printf(">>>no keep read\n");
 
 	if (fe->mask & EVENT_WRITE) {
 		ee.events |= EPOLLOUT;
@@ -371,7 +369,7 @@ EVENT *event_epoll_create(int size)
 #else
 	ep->event.flag   = EVENT_F_EPOLL | EVENT_F_USE_ONCE;
 #endif
-	//ep->event.flag  |= EVENT_F_KEEPREAD;
+	ep->event.flag  |= EVENT_F_KEEPREAD;
 
 	ep->event.event_wait = epoll_event_wait;
 	ep->event.checkfd    = (event_oper *) epoll_checkfd;
