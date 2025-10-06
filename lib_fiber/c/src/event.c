@@ -219,8 +219,11 @@ int event_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe)
 		switch (errno) {
 		case ESPIPE:
 			fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
-			if ((ev->flag & EVENT_F_KEEPREAD) != 0) {
-				fe->type |= TYPE_KEEPREAD;
+			if ((ev->flag & EVENT_F_KEEPIO) != 0) {
+				fe->type |= TYPE_KEEPIO;
+			}
+			if ((ev->flag & EVENT_F_ONESHOT) != 0) {
+				fe->type |= TYPE_ONESHOT;
 			}
 			acl_fiber_set_error(0);
 			return 1;
@@ -261,8 +264,11 @@ int event_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe)
 		}
 
 		fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
-		if ((ev->flag & EVENT_F_KEEPREAD) != 0) {
-			fe->type |= TYPE_KEEPREAD;
+		if ((ev->flag & EVENT_F_KEEPIO) != 0) {
+			fe->type |= TYPE_KEEPIO;
+		}
+		if ((ev->flag & EVENT_F_ONESHOT) != 0) {
+			fe->type |= TYPE_ONESHOT;
 		}
 		acl_fiber_set_error(0);
 		return 1;
@@ -357,7 +363,7 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		fe->oper &= ~EVENT_DEL_READ;
 	}
 
-	if (!(fe->mask & EVENT_READ)) {
+	if (!(fe->mask & EVENT_READ) || (fe->type & TYPE_ONESHOT) != 0) {
 		if (fe->mask & EVENT_DIRECT) {
 			if (ev->add_read(ev, fe) < 0) {
 				return -1;

@@ -194,7 +194,7 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
     }                                                                        \
     ret = (*_fn)((_fe)->fd, ##_args);                                        \
     if (ret > 0) {                                                           \
-        if (((_fe)->type & TYPE_KEEPREAD) != 0) {                            \
+        if (((_fe)->type & TYPE_KEEPIO) != 0) {                              \
             SET_READING((_fe));                                              \
         }                                                                    \
         return ret;                                                          \

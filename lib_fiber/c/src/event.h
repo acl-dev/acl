@@ -173,7 +173,8 @@ struct FILE_EVENT {
 #define	TYPE_BADFD		(unsigned) (1 << 2)
 #define	TYPE_EVENTABLE		(unsigned) (1 << 3)
 #define	TYPE_INTERNAL		(unsigned) (1 << 4)
-#define TYPE_KEEPREAD		(unsigned) (1 << 5)
+#define	TYPE_KEEPIO		(unsigned) (1 << 5)
+#define	TYPE_ONESHOT		(unsigned) (1 << 6)
 
 	unsigned oper;
 #define	EVENT_ADD_READ		(unsigned) (1 << 0)
@@ -403,7 +404,8 @@ struct EVENT {
 #define	EVENT_F_SELECT		(1 << 4)
 #define	EVENT_F_EPOLL		(1 << 5)
 #define	EVENT_F_KQUEUE		(1 << 6)
-#define EVENT_F_KEEPREAD	(1 << 7)
+#define	EVENT_F_KEEPIO		(1 << 7)
+#define	EVENT_F_ONESHOT		(1 << 8)
 
 #define	EVENT_IS_IOCP(x)	((x)->flag & EVENT_F_IOCP)
 #define	EVENT_IS_IO_URING(x)	((x)->flag & EVENT_F_IO_URING)
