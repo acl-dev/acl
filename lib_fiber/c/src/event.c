@@ -44,10 +44,22 @@ void event_set(int event_mode)
 }
 
 static int __directly = 0;
+static int __keepio   = 0;
+static int __oneshot  = 0;
 
 void acl_fiber_event_directly(int yes)
 {
 	__directly = yes;
+}
+
+void acl_fiber_event_keepio(int yes)
+{
+	__keepio = yes;
+}
+
+void acl_fiber_event_oneshot(int yes)
+{
+	__oneshot = yes;
 }
 
 EVENT *event_create(int size)
@@ -97,6 +109,14 @@ EVENT *event_create(int size)
 	}
 
 	assert(ev);
+
+	if (__keepio) {
+		ev->flag |= EVENT_F_KEEPIO;
+	}
+	if (__oneshot) {
+		ev->flag |= EVENT_F_ONESHOT;
+	}
+
 	ring_init(&ev->events);
 	ev->timeout = -1;
 	ev->setsize = size;

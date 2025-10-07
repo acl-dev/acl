@@ -308,6 +308,10 @@ public:
 	 */
 	static void share_epoll(bool yes);
 
+	static void set_event_directly(bool yes);
+	static void set_event_keepio(bool yes);
+	static void set_event_oneshot(bool yes);
+
 public:
 	/**
 	 * Return the corresponding C language coroutine object of

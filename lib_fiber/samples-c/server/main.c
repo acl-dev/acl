@@ -15,7 +15,7 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 	ACL_VSTREAM *cstream = (ACL_VSTREAM *) ctx;
 	char  buf[8192];
 	int   ret, count = 0;
-    time_t stamp = time(NULL);
+	time_t stamp = time(NULL);
 
 	if (!__setsockopt_timeout) {
 		cstream->rw_timeout = __rw_timeout;

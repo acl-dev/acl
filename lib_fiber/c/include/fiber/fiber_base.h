@@ -273,7 +273,15 @@ FIBER_API void acl_fiber_schedule_with(int event_mode);
  */
 FIBER_API void acl_fiber_schedule_set_event(int event_mode);
 
+/**
+ * Set the event handling in directly mode without event operation caching.
+ * @param yes {int} set in directly event mode if yes isn't 0. The default
+ *  mode is in caching event mode.
+ */
 FIBER_API void acl_fiber_event_directly(int yes);
+
+FIBER_API void acl_fiber_event_keepio(int yes);
+FIBER_API void acl_fiber_event_oneshot(int yes);
 
 /**
  * Check if the current thread is in fiber schedule status

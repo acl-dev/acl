@@ -282,6 +282,9 @@ static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
 		" -e event_mode [kernel|select|poll|io_uring]\r\n"
+		" -D [if using directly event mode, default: 0]\r\n"
+		" -K [if using keep IO event mode, default: 0]\r\n"
+		" -O [if using epoll oneshot mode, default: 0]\r\n"
 		" -s server_ip\r\n"
 		" -p server_port\r\n"
 		" -t connt_timeout\r\n"
@@ -313,6 +316,7 @@ static void test_time(void)
 int main(int argc, char *argv[])
 {
 	int   ch, event_mode = FIBER_EVENT_KERNEL;
+	int   directly = 0, keepio = 0, oneshot = 0;
        
 	acl_lib_init();
 	acl_msg_stdout_enable(1);
@@ -323,7 +327,7 @@ int main(int argc, char *argv[])
 
 	snprintf(__server_ip, sizeof(__server_ip), "%s", "127.0.0.1");
 
-	while ((ch = getopt(argc, argv, "hc:n:s:p:t:r:w:Sd:z:e:m:Z")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:n:s:p:t:r:w:Sd:z:e:m:ZDKO")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -376,12 +380,25 @@ int main(int argc, char *argv[])
 		case 'Z':
 			__stack_share = 1;
 			break;
+		case 'D':
+			directly = 1;
+			break;
+		case 'K':
+			keepio = 1;
+			break;
+		case 'O':
+			oneshot = 1;
+			break;
 		default:
 			break;
 		}
 	}
 
 	acl_fiber_msg_stdout_enable(1);
+	acl_fiber_event_directly(directly);
+	acl_fiber_event_keepio(keepio);
+	acl_fiber_event_oneshot(oneshot);
+
 	gettimeofday(&__begin, NULL);
 
 	acl_fiber_create(fiber_main, NULL, 327680);

@@ -388,9 +388,6 @@ EVENT *event_epoll_create(int size)
 #else
 	ep->event.flag   = EVENT_F_EPOLL | EVENT_F_USE_ONCE;
 #endif
-	//ep->event.flag  |= EVENT_F_KEEPIO;
-	//ep->event.flag  |= EVENT_F_ONESHOT;
-
 	ep->event.event_wait = epoll_event_wait;
 	ep->event.checkfd    = (event_oper *) epoll_checkfd;
 	ep->event.add_read   = (event_oper *) epoll_add_read;
