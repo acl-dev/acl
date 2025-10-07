@@ -413,7 +413,7 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		fe->oper &= ~EVENT_DEL_WRITE;
 	}
 
-	if (!(fe->mask & EVENT_WRITE)) {
+	if (!(fe->mask & EVENT_WRITE) || (fe->type & TYPE_ONESHOT) != 0) {
 		if (fe->mask & EVENT_DIRECT) {
 			if (ev->add_write(ev, fe) < 0) {
 				return -1;
