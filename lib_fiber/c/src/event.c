@@ -44,10 +44,22 @@ void event_set(int event_mode)
 }
 
 static int __directly = 0;
+static int __keepio   = 0;
+static int __oneshot  = 0;
 
 void acl_fiber_event_directly(int yes)
 {
 	__directly = yes;
+}
+
+void acl_fiber_event_keepio(int yes)
+{
+	__keepio = yes;
+}
+
+void acl_fiber_event_oneshot(int yes)
+{
+	__oneshot = yes;
 }
 
 EVENT *event_create(int size)
@@ -97,6 +109,14 @@ EVENT *event_create(int size)
 	}
 
 	assert(ev);
+
+	if (__keepio) {
+		ev->flag |= EVENT_F_KEEPIO;
+	}
+	if (__oneshot) {
+		ev->flag |= EVENT_F_ONESHOT;
+	}
+
 	ring_init(&ev->events);
 	ev->timeout = -1;
 	ev->setsize = size;
@@ -219,6 +239,12 @@ int event_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe)
 		switch (errno) {
 		case ESPIPE:
 			fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
+			if ((ev->flag & EVENT_F_KEEPIO) != 0) {
+				fe->type |= TYPE_KEEPIO;
+			}
+			if ((ev->flag & EVENT_F_ONESHOT) != 0) {
+				fe->type |= TYPE_ONESHOT;
+			}
 			acl_fiber_set_error(0);
 			return 1;
 		case EBADF:
@@ -258,6 +284,12 @@ int event_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe)
 		}
 
 		fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
+		if ((ev->flag & EVENT_F_KEEPIO) != 0) {
+			fe->type |= TYPE_KEEPIO;
+		}
+		if ((ev->flag & EVENT_F_ONESHOT) != 0) {
+			fe->type |= TYPE_ONESHOT;
+		}
 		acl_fiber_set_error(0);
 		return 1;
 #else
@@ -316,7 +348,7 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		}
 	}
 
-	// If the fd's type has been checked and it isn't a valid socket,
+	// If the fd's type has been checked, and it isn't a valid socket,
 	// return immediately.
 	if (!(fe->type & TYPE_EVENTABLE)) {
 		if (fe->type & TYPE_FILE) {
@@ -351,7 +383,7 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		fe->oper &= ~EVENT_DEL_READ;
 	}
 
-	if (!(fe->mask & EVENT_READ)) {
+	if (!(fe->mask & EVENT_READ) || (fe->type & TYPE_ONESHOT) != 0) {
 		if (fe->mask & EVENT_DIRECT) {
 			if (ev->add_read(ev, fe) < 0) {
 				return -1;
@@ -364,7 +396,6 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		} else {
 			fe->oper |= EVENT_ADD_READ;
 		}
-
 	}
 
 	return 1;
@@ -402,7 +433,7 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		fe->oper &= ~EVENT_DEL_WRITE;
 	}
 
-	if (!(fe->mask & EVENT_WRITE)) {
+	if (!(fe->mask & EVENT_WRITE) || (fe->type & TYPE_ONESHOT) != 0) {
 		if (fe->mask & EVENT_DIRECT) {
 			if (ev->add_write(ev, fe) < 0) {
 				return -1;

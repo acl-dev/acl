@@ -78,18 +78,27 @@ static int epoll_add_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
 	struct epoll_event ee;
 	int op, n;
 
-	if ((fe->mask & EVENT_READ)) {
-		return 0;
-	}
+	//if ((fe->mask & EVENT_READ)) {
+	//	return 0;
+	//}
 
-	ee.events   = 0;
+	ee.events   = EPOLLIN;
 	ee.data.u32 = 0;
 	ee.data.u64 = 0;
 	ee.data.ptr = fe;
 
-	ee.events |= EPOLLIN;
+	if ((fe->type & TYPE_KEEPIO) != 0) {
+		ee.events |= EPOLLET;
+	}
+	if ((fe->type & TYPE_ONESHOT) != 0) {
+		ee.events |= EPOLLONESHOT;
+	}
+
 	if (fe->mask & EVENT_WRITE) {
 		ee.events |= EPOLLOUT;
+		op = EPOLL_CTL_MOD;
+		n  = 0;
+	} else if (fe->mask & EVENT_READ) {
 		op = EPOLL_CTL_MOD;
 		n  = 0;
 	} else {
@@ -115,15 +124,23 @@ static int epoll_add_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
 	struct epoll_event ee;
 	int op, n;
 
-	ee.events   = 0;
+	ee.events   = EPOLLOUT;
 	ee.data.u32 = 0;
 	ee.data.u64 = 0;
 	ee.data.ptr = fe;
 
-	ee.events |= EPOLLOUT;
+	if ((fe->type & TYPE_KEEPIO) != 0) {
+		ee.events |= EPOLLET;
+	}
+	if ((fe->type & TYPE_ONESHOT) != 0) {
+		ee.events |= EPOLLONESHOT;
+	}
 
 	if (fe->mask & EVENT_READ) {
 		ee.events |= EPOLLIN;
+		op = EPOLL_CTL_MOD;
+		n  = 0;
+	} else if (fe->mask & EVENT_WRITE) {
 		op = EPOLL_CTL_MOD;
 		n  = 0;
 	} else {
@@ -156,6 +173,12 @@ static int epoll_del_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
 
 	if (fe->mask & EVENT_WRITE) {
 		ee.events = EPOLLOUT;
+		if ((fe->type & TYPE_KEEPIO) != 0) {
+			ee.events |= EPOLLET;
+		}
+		if ((fe->type & TYPE_ONESHOT) != 0) {
+			ee.events |= EPOLLONESHOT;
+		}
 		op = EPOLL_CTL_MOD;
 		n  = 0;
 	} else {
@@ -188,6 +211,12 @@ static int epoll_del_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
 
 	if (fe->mask & EVENT_READ) {
 		ee.events = EPOLLIN;
+		if ((fe->type & TYPE_KEEPIO) != 0) {
+			ee.events |= EPOLLET;
+		}
+		if ((fe->type & TYPE_ONESHOT) != 0) {
+			ee.events |= EPOLLONESHOT;
+		}
 		op = EPOLL_CTL_MOD;
 		n  = 0;
 	} else {
@@ -359,7 +388,6 @@ EVENT *event_epoll_create(int size)
 #else
 	ep->event.flag   = EVENT_F_EPOLL | EVENT_F_USE_ONCE;
 #endif
-
 	ep->event.event_wait = epoll_event_wait;
 	ep->event.checkfd    = (event_oper *) epoll_checkfd;
 	ep->event.add_read   = (event_oper *) epoll_add_read;

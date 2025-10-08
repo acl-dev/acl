@@ -209,7 +209,8 @@ void fiber::acl_io_unlock()
 
 #include "winapi_hook.hpp"
 
-bool fiber::winapi_hook() {
+bool fiber::winapi_hook()
+{
 	return ::winapi_hook();
 }
 
@@ -220,6 +221,21 @@ void fiber::share_epoll(bool yes)
 #else
 	(void) yes;
 #endif
+}
+
+void fiber::set_event_directly(bool yes)
+{
+	acl_fiber_event_directly(yes ? 1 : 0);
+}
+
+void fiber::set_event_keepio(bool yes)
+{
+	acl_fiber_event_keepio(yes ? 1 : 0);
+}
+
+void fiber::set_event_oneshot(bool yes)
+{
+	acl_fiber_event_oneshot(yes ? 1 : 0);
 }
 
 void fiber::run()

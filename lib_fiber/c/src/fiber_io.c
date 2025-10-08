@@ -448,7 +448,10 @@ size_t acl_fiber_sleep(size_t seconds)
 static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	CLR_READWAIT(fe);
-	event_del_read(ev, fe, 0);
+
+	if ((fe->type & TYPE_KEEPIO) == 0) {
+		event_del_read(ev, fe, 0);
+	}
 
 	/* If the reader fiber has been set in ready status when the
 	 * other fiber killed the reader fiber, the reader fiber should
@@ -541,7 +544,10 @@ int fiber_wait_read(FILE_EVENT *fe)
 static void write_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	CLR_WRITEWAIT(fe);
-	event_del_write(ev, fe, 0);
+
+	if (IS_CONNECTING(fe) || (fe->type & TYPE_KEEPIO) == 0) {
+		event_del_write(ev, fe, 0);
+	}
 
 	/* If the writer fiber has been set in ready status when the
 	 * other fiber killed the writer fiber, the writer fiber should

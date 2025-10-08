@@ -293,6 +293,9 @@ static void usage(const char *procname)
 		" -w write_timeout\r\n"
 		" -q listen_queue\r\n"
 		" -z stack_size\r\n"
+		" -D [if using directly event mode, default: 0]\r\n"
+		" -K [if using event keep IO mode, default: 0]\r\n"
+		" -O [if using epoll event oneshot mode, default: 0]\r\n"
 		" -Z [if use shared stack]\r\n"
 		" -T [if use setsockopt to set IO timeout]\r\n"
 		" -S [if using single IO, default: no]\r\n", procname);
@@ -303,11 +306,12 @@ int main(int argc, char *argv[])
 	int   ch, event_mode = FIBER_EVENT_KERNEL;
 	ACL_FIBER_ATTR fiber_attr;
 	int   stack_size = 320000;
+	int   directly = 0, keepio = 0, oneshot = 0;
 
 	acl_fiber_attr_init(&fiber_attr);
 	snprintf(__listen_ip, sizeof(__listen_ip), "%s", "127.0.0.1");
 
-	while ((ch = getopt(argc, argv, "hs:p:r:w:q:Sz:Ze:T")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:p:r:w:q:Sz:Ze:TDKO")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -340,6 +344,15 @@ int main(int argc, char *argv[])
 		case 'T':
 			__use_sockopt = 1;
 			break;
+		case 'D':
+			directly = 1;
+			break;
+		case 'K':
+			keepio = 1;
+			break;
+		case 'O':
+			oneshot = 1;
+			break;
 		case 'e':
 			if (strcasecmp(optarg, "select") == 0) {
 				event_mode = FIBER_EVENT_SELECT;
@@ -360,6 +373,9 @@ int main(int argc, char *argv[])
 	acl_lib_init();
 	acl_msg_stdout_enable(1);
 	acl_fiber_msg_stdout_enable(1);
+	acl_fiber_event_directly(directly);
+	acl_fiber_event_keepio(keepio);
+	acl_fiber_event_oneshot(oneshot);
 
 #ifdef	SCHEDULE_AUTO
 	acl_fiber_schedule_init(1);

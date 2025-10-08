@@ -186,14 +186,19 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
     int err;                                                                 \
     if (IS_READABLE((_fe))) {                                                \
         CLR_READABLE((_fe));                                                 \
-    } else if (fiber_wait_read((_fe)) < 0) {                                 \
+    } else if (!IS_READING((_fe)) && fiber_wait_read((_fe)) < 0) {           \
         return -1;                                                           \
     }                                                                        \
     if ((_fn) == NULL) {                                                     \
         hook_once();                                                         \
     }                                                                        \
     ret = (*_fn)((_fe)->fd, ##_args);                                        \
-    if (ret >= 0) {                                                          \
+    if (ret > 0) {                                                           \
+        if (((_fe)->type & TYPE_KEEPIO) != 0) {                              \
+            SET_READING((_fe));                                              \
+        }                                                                    \
+        return ret;                                                          \
+    } else if (ret == 0) {                                                   \
         return ret;                                                          \
     }                                                                        \
     err = acl_fiber_last_error();                                            \
@@ -204,6 +209,7 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
         }                                                                    \
         return -1;                                                           \
     }                                                                        \
+    CLR_READING((_fe));                                                      \
 } while (1)
 
 #endif
@@ -215,6 +221,11 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 } while (0)
 
 #ifdef SYS_UNIX
+
+static ssize_t try_read(FILE_EVENT *fe, void *buf, size_t count)
+{
+	FIBER_READ(sys_read, fe, buf, count);
+}
 
 ssize_t fiber_read(FILE_EVENT *fe,  void *buf, size_t count)
 {
@@ -252,7 +263,11 @@ ssize_t fiber_read(FILE_EVENT *fe,  void *buf, size_t count)
 	}
 #endif
 
-	FIBER_READ(sys_read, fe, buf, count);
+	ssize_t ret = try_read(fe, buf, count);
+	if (ret > 0 && ret < (ssize_t) count && IS_READING(fe)) {
+		CLR_READING(fe);
+	}
+	return ret;
 }
 
 ssize_t fiber_readv(FILE_EVENT *fe, const struct iovec *iov, int iovcnt)
@@ -351,6 +366,15 @@ ssize_t fiber_recvmmsg(FILE_EVENT *fe, struct mmsghdr *msgvec,
 
 #endif  // SYS_UNIX
 
+static ssize_t try_recv(FILE_EVENT *fe, void *buf, size_t len, int flags)
+{
+#ifdef SYS_WIN
+	FIBER_READ(sys_recv, fe, buf, (int) len, flags);
+#else
+	FIBER_READ(sys_recv, fe, buf, len, flags);
+#endif
+}
+
 ssize_t fiber_recv(FILE_EVENT *fe, void *buf, size_t len, int flags)
 {
 	CLR_POLLING(fe);
@@ -392,10 +416,20 @@ ssize_t fiber_recv(FILE_EVENT *fe, void *buf, size_t len, int flags)
 	}
 #endif
 
+	ssize_t ret = try_recv(fe, buf, len, flags);
+	if (ret > 0 && ret < (ssize_t) len && IS_READING(fe)) {
+		CLR_READING(fe);
+	}
+	return ret;
+}
+
+static ssize_t try_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
+	int flags, struct sockaddr *src_addr, socklen_t *addrlen)
+{
 #ifdef SYS_WIN
-	FIBER_READ(sys_recv, fe, buf, (int) len, flags);
+	FIBER_READ(sys_recvfrom, fe, buf, (int) len, flags, src_addr, addrlen);
 #else
-	FIBER_READ(sys_recv, fe, buf, len, flags);
+	FIBER_READ(sys_recvfrom, fe, buf, len, flags, src_addr, addrlen);
 #endif
 }
 
@@ -439,9 +473,9 @@ ssize_t fiber_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
 	}
 #endif
 
-#ifdef SYS_WIN
-	FIBER_READ(sys_recvfrom, fe, buf, (int) len, flags, src_addr, addrlen);
-#else
-	FIBER_READ(sys_recvfrom, fe, buf, len, flags, src_addr, addrlen);
-#endif
+	ssize_t ret = try_recvfrom(fe, buf, len, flags, src_addr, addrlen);
+	if (ret > 0 && ret < (ssize_t) len && IS_READING(fe)) {
+		CLR_READING(fe);
+	}
+	return ret;
 }
