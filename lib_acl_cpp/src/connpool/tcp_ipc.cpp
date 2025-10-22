@@ -87,10 +87,10 @@ void tcp_ipc::get_addrs(std::vector<string>& addrs)
 bool tcp_ipc::send(const char* addr, const void* data, unsigned int len,
 	string* out /* = NULL */)
 {
-	tcp_pool* pool = (tcp_pool*) manager_->peek(addr);
+	tcp_pool* pool = (tcp_pool*) manager_->peek(addr, true);
 	if (pool == NULL) {
 		manager_->set(addr, max_, conn_timeout_, rw_timeout_);
-		pool = (tcp_pool*) manager_->peek(addr);
+		pool = (tcp_pool*) manager_->peek(addr, true);
 	}
 	return send(*pool, data, len, out);
 }
