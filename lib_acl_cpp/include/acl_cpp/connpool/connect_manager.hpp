@@ -88,7 +88,7 @@ public:
 	 * @param min {size_t} 设置连接池的最小连接数
 	 */
 	void set(const char* addr, size_t max, int conn_timeout = 30,
-		int rw_timeout = 30, bool sockopt_timeo = false, size_t = 0);
+		int rw_timeout = 30, bool sockopt_timeo = false, size_t min = 0);
 
 	/**
 	 * 根据指定地址获取该地址对应的连接池配置对象
@@ -157,7 +157,7 @@ public:
 	 *  管理连接池集群时，该值应为 true
 	 * @return {connect_pool*} 返回一个可用的连接池，返回指针永远非空
 	 */
-	virtual connect_pool* peek(const char* key, bool exclusive = true);
+	virtual connect_pool* peek(const char* key, bool exclusive);
 
 	/**
 	 * 当用户重载了 peek 函数时，可以调用此函数对连接池管理过程加锁
@@ -222,7 +222,7 @@ public:
 	 * @return {connect_pool*} 当调用 init 函数的 default_addr 为空时
 	 *  该函数返回 NULL
 	 */
-	connect_pool* get_default_pool() {
+	connect_pool* get_default_pool() const {
 		return default_pool_;
 	}
 
@@ -268,7 +268,8 @@ protected:
 	virtual connect_pool* create_pool(const char* addr,
 		size_t count, size_t idx) = 0;
 
-protected:
+	////////////////////////////////////////////////////////////////////////
+
 	typedef std::vector<connect_pool*> pools_t;
 	typedef pools_t::iterator          pools_it;
 	typedef pools_t::const_iterator    pools_cit;
@@ -310,13 +311,13 @@ protected:
 	void remove(pools_t& pools, const char* addr);
 	void set_status(pools_t& pools, const char* addr, bool alive);
 
-	unsigned long get_id(void) const;
+	unsigned long get_id() const;
 	void get_key(const char* addr, string& key);
 	void get_addr(const char* key, string& addr);
 	//connect_pool* add_pool(const char* addr);
 
 	// 线程局部变量初始化时的回调方法
-	static void thread_oninit(void);
+	static void thread_oninit();
 	// 线程退出前需要回调此方法，用来释放内部创建的线程局部变量
 	static void thread_onexit(void* ctx);
 };
