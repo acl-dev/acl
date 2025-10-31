@@ -39,7 +39,7 @@ private:
 
 class ACL_CPP_API atomic_long : public atomic<long long> {
 public:
-	explicit atomic_long(long long n = 0);
+	atomic_long(long long n = 0);
 	atomic_long(const atomic_long& n);
 
 	~atomic_long() {}
