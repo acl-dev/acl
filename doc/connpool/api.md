@@ -267,7 +267,7 @@ pool.put(conn, true,
 void bind_one(connect_client* conn);
 ```
 
-将一个外部连接绑定到连接池。
+将连接池绑定到独立线程，线程之间不共享连池。
 
 **参数**：
 - `conn` - 连接指针
@@ -441,7 +441,7 @@ connect_manager();
 void bind_thread(bool yes);
 ```
 
-设置是否启用线程绑定模式。
+设置是否启用线程绑定模式，设定绑定模式后，每个线程将创建各自的连接池，该连接池仅属于创建线程，不与其它线程共享。
 
 **参数**：
 - `yes` - `true` 启用，`false` 禁用
@@ -466,7 +466,7 @@ void init(const char* default_addr, const char* addr_list,
 - `count` - 默认最大连接数
 - `conn_timeout` - 连接超时（秒）
 - `rw_timeout` - 读写超时（秒）
-- `sockopt_timeo` - 是否使用 `setsockopt`
+- `sockopt_timeo` - 是否使用 `setsockopt` 设置超时
 
 **示例**：
 ```cpp
@@ -733,8 +733,7 @@ connect_monitor& set_conn_timeout(int n);
 
 ```cpp
 connect_monitor& set_check_conns(bool check_idle, bool kick_dead,
-                                  bool keep_conns, thread_pool* threads = NULL,
-                                  size_t step = 0);
+    bool keep_conns, thread_pool* threads = NULL, size_t step = 0);
 ```
 
 配置检查选项。
