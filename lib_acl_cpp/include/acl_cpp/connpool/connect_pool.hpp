@@ -272,12 +272,12 @@ protected:
 
 class ACL_CPP_API connect_guard : public noncopyable {
 public:
-	connect_guard(connect_pool& pool)
+	explicit connect_guard(connect_pool& pool)
 	: keep_(true), pool_(pool), conn_(NULL)
 	{
 	}
 
-	virtual ~connect_guard(void) {
+	virtual ~connect_guard() {
 		if (conn_) {
 			pool_.put(conn_, keep_);
 		}
@@ -287,7 +287,7 @@ public:
 		keep_ = keep;
 	}
 
-	connect_client* peek(void) {
+	connect_client* peek() {
 		conn_ = pool_.peek();
 		return conn_;
 	}

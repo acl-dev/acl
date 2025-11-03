@@ -383,8 +383,8 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		fe->oper &= ~EVENT_DEL_READ;
 	}
 
-	if (!(fe->mask & EVENT_READ) || (fe->type & TYPE_ONESHOT) != 0) {
-		if (fe->mask & EVENT_DIRECT) {
+	if (!(fe->mask & EVENT_READ)) {
+		if ((fe->mask & EVENT_DIRECT) || __directly) {
 			if (ev->add_read(ev, fe) < 0) {
 				return -1;
 			}
@@ -395,6 +395,10 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 			fe->oper |= EVENT_ADD_READ;
 		} else {
 			fe->oper |= EVENT_ADD_READ;
+		}
+	} else if ((fe->type & TYPE_ONESHOT) != 0) {
+		if (ev->add_read(ev, fe) < 0) {
+			return -1;
 		}
 	}
 
@@ -433,8 +437,8 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		fe->oper &= ~EVENT_DEL_WRITE;
 	}
 
-	if (!(fe->mask & EVENT_WRITE) || (fe->type & TYPE_ONESHOT) != 0) {
-		if (fe->mask & EVENT_DIRECT) {
+	if (!(fe->mask & EVENT_WRITE)) {
+		if ((fe->mask & EVENT_DIRECT) || __directly) {
 			if (ev->add_write(ev, fe) < 0) {
 				return -1;
 			}
@@ -443,6 +447,10 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 			fe->oper |= EVENT_ADD_WRITE;
 		} else {
 			fe->oper |= EVENT_ADD_WRITE;
+		}
+	} else if ((fe->type & TYPE_ONESHOT) != 0) {
+		if (ev->add_write(ev, fe) < 0) {
+			return -1;
 		}
 	}
 

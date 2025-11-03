@@ -373,13 +373,31 @@ void acl_fiber_mutex_stats_show(const ACL_FIBER_MUTEX_STATS *stats)
 
 /****************************************************************************/
 
-#if 1
-#define	LOCK(m) while(pthread_mutex_trylock(&(m)->lock) != 0) {}
+#ifdef	SYS_WIN
+# define LOCK(m) (pthread_mutex_trylock(&(m)->lock) != 0) {}
 #else
-#define	LOCK(m) do { \
-	pthread_mutex_lock(&(m)->lock); \
+# define LOCK_FATAL(_rc_) do {                                               \
+	if (rc == EINVAL) msg_fatal("invalid lock, rc=%d", rc);              \
+	if (rc == EAGAIN) msg_fatal("recursive exceeded, rc=%d", rc);        \
+	if (rc == EDEADLK) msg_fatal("already locked, rc=%d", rc);           \
+	msg_fatal("unkown error=%d", rc);                                    \
 } while (0)
+
+# define LOCK_WAIT(m) while(1) {                                             \
+	int rc = pthread_mutex_trylock(&(m)->lock);                          \
+	if (rc == 0) break;                                                  \
+	if (rc == EBUSY) continue;                                           \
+	LOCK_FATAL(rc);                                                      \
+}
 #endif
+
+/*
+#define	LOCK(m) do {                                                         \
+	int rc = pthread_mutex_lock(&(m)->lock);                             \
+	if (rc == 0) break;                                                  \
+	msg_fatal("lock error=%d, %s", rc, strerror(rc));                    \
+} while (0)
+*/
 
 #define	UNLOCK(m) do { \
 	pthread_mutex_unlock(&(m)->lock); \
@@ -390,7 +408,7 @@ static void thread_waiter_add(ACL_FIBER_MUTEX *mutex, unsigned long tid)
 {
 	THREAD_WAITER *waiter = (THREAD_WAITER*) mem_malloc(sizeof(THREAD_WAITER));
 	waiter->tid = tid;
-	LOCK(mutex);
+	LOCK_WAIT(mutex);
 	array_append(mutex->waiting_threads, waiter);
 	UNLOCK(mutex);
 }
@@ -400,7 +418,7 @@ static void thread_waiter_remove(ACL_FIBER_MUTEX *mutex, unsigned long tid)
 {
 	ITER iter;
 
-	LOCK(mutex);
+	LOCK_WAIT(mutex);
 	foreach(iter, mutex->waiting_threads) {
 		THREAD_WAITER *waiter = (THREAD_WAITER*) iter.data;
 		if (waiter->tid == tid) {
@@ -481,7 +499,7 @@ static int fiber_mutex_lock_once(ACL_FIBER_MUTEX *mutex)
 	ACL_FIBER *fiber;
 
 	while (1) {
-		LOCK(mutex);
+		LOCK_WAIT(mutex);
 		if (pthread_mutex_trylock(&mutex->thread_lock) == 0) {
 			UNLOCK(mutex);
 			return 0;
@@ -542,7 +560,7 @@ static int fiber_mutex_lock_try(ACL_FIBER_MUTEX *mutex)
 		fiber = acl_fiber_running();
 		fiber->sync = sync_waiter_get();
 
-		LOCK(mutex);
+		LOCK_WAIT(mutex);
 		pos = array_append(mutex->waiters, fiber);
 
 		if (pthread_mutex_trylock(&mutex->thread_lock) == 0) {
@@ -604,7 +622,7 @@ int acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *mutex)
 	ACL_FIBER *fiber;
 	int ret;
 
-	LOCK(mutex);
+	LOCK_WAIT(mutex);
 	fiber = (ACL_FIBER*) array_pop_front(mutex->waiters);
 
 	// Just a sanity check!
