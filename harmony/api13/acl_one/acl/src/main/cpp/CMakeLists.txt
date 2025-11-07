@@ -28,6 +28,7 @@ add_definitions("-DNDEBUG")
 add_definitions("-fvisibility=hidden")
 add_definitions("-fvisibility-inlines-hidden")
 add_definitions("-fdata-sections -ffunction-sections")
+add_definitions("-DHAS_MBEDTLS=YES")
 
 set(mysrc ${CMAKE_CURRENT_SOURCE_DIR})
 set(mysources
