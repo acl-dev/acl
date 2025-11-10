@@ -8,7 +8,7 @@
          location = "container:"
          name = "fiber">
          <FileRef
-            location = "group:lib_fiber/samples/xcode/fiber_server/fiber_server.xcodeproj">
+            location = "group:lib_fiber/samples-c++/xcode/fiber_server/fiber_server.xcodeproj">
          </FileRef>
       </Group>
    </Group>

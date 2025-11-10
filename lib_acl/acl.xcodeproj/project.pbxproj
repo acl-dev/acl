@@ -1865,14 +1865,12 @@
 					"-fvisibility=hidden",
 					"-fvisibility-inlines-hidden",
 					"-Os",
-					"-fembed-bitcode",
 					"-fdata-sections",
 					"-ffunction-sections",
 					"-fvisibility=hidden",
 					"-fvisibility-inlines-hidden",
 					"-fdata-sections",
 					"-ffunction-sections",
-					"-flto=thin",
 					"-Os",
 				);
 				SDKROOT = iphoneos;
@@ -1939,14 +1937,12 @@
 					"-fvisibility=hidden",
 					"-fvisibility-inlines-hidden",
 					"-Os",
-					"-fembed-bitcode",
 					"-fdata-sections",
 					"-ffunction-sections",
 					"-fvisibility=hidden",
 					"-fvisibility-inlines-hidden",
 					"-fdata-sections",
 					"-ffunction-sections",
-					"-flto=thin",
 					"-Os",
 				);
 				SDKROOT = iphoneos;
