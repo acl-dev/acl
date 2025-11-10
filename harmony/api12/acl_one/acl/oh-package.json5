@@ -1,0 +1,11 @@
+{
+  "name": "acl",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "libacl.so": "file:./src/main/cpp/types/libacl"
+  }
+}
