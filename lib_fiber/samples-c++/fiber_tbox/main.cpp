@@ -7,9 +7,9 @@ static int __total_count = 2;
 static int __diff_delay = 10000;
 static int __delay = 10;
 static acl::fiber_event_t __event_type = acl::FIBER_EVENT_T_KERNEL;
-static acl::atomic_long __producing = 0;
-static acl::atomic_long __consuming = 0;
-static acl::atomic_long __timedout  = 0;
+static acl::atomic_long __producing;
+static acl::atomic_long __consuming;
+static acl::atomic_long __timedout;
 
 class myobj
 {
