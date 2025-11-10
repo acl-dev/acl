@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <thread>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -6,15 +7,23 @@ int main()
 {
 	acl::fiber_tbox<int> box;
 
-	go[&box] {
+#define THREAD_PRODUCER
+#ifdef THREAD_PRODUCER
+	std::thread thr([&box] {
+#else
+	go([&box] {
+#endif
 		for (int i = 0; i < 10000; i++) {
 			int *n = new int(i);
 			printf("fiber-%d: Push %d\r\n", acl::fiber::self(), *n);
 			box.push(n);
 			acl::fiber::delay(1000);
 		}
-	};
+	});
 
+
+	acl::fiber::set_event_keepio(true);
+	acl::fiber::set_event_oneshot(true);
 
 	go[&box] {
 		while (true) {
