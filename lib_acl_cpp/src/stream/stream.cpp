@@ -172,7 +172,7 @@ int stream::get_rw_timeout(bool use_sockopt /* false */) const
 		return -1;
 	}
 
-	return tm.tv_sec;
+	return (int) tm.tv_sec;
 # endif
 }
 

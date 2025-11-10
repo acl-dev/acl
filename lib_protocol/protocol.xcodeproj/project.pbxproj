@@ -373,8 +373,6 @@
 					"-fvisibility=hidden",
 					"-fvisibility-inlines-hidden",
 					"-Os",
-					"-fembed-bitcode",
-					"-flto=thin",
 					"-fdata-sections",
 					"-ffunction-sections",
 				);
@@ -439,8 +437,6 @@
 					"-fvisibility=hidden",
 					"-fvisibility-inlines-hidden",
 					"-Os",
-					"-fembed-bitcode",
-					"-flto=thin",
 					"-fdata-sections",
 					"-ffunction-sections",
 				);

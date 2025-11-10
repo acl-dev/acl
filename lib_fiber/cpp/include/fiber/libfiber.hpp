@@ -7,10 +7,10 @@
 #include "fiber_mutex.hpp"
 #include "fiber_mutex_stat.hpp"
 #include "fiber_cond.hpp"
-#include "fiber_sem.hpp"
 #include "channel.hpp"
 
 #if defined(ACL_CPP_API)
+# include "fiber_sem.hpp"
 # include "fiber_tbox.hpp"
 # include "fiber_tbox2.hpp"
 # include "go_fiber.hpp"
