@@ -2067,6 +2067,7 @@
 					../include/polarssl,
 					../include/zlib,
 					../include,
+					../include/mbedtls/3.6.5,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LLVM_LTO = YES_THIN;
@@ -2078,6 +2079,7 @@
 					"-Os",
 					"-fdata-sections",
 					"-ffunction-sections",
+					"-DUSE_MBEDTLS3",
 				);
 				SDKROOT = iphoneos;
 				VALID_ARCHS = "arm64 arm64e armv7 armv7s i386 x86_64";
@@ -2142,6 +2144,7 @@
 					../include/polarssl,
 					../include/zlib,
 					../include,
+					../include/mbedtls/3.6.5,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LLVM_LTO = YES_THIN;
@@ -2153,6 +2156,7 @@
 					"-Os",
 					"-fdata-sections",
 					"-ffunction-sections",
+					"-DUSE_MBEDTLS3",
 				);
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
