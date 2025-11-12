@@ -29,6 +29,14 @@
 #  include "mbedtls/3.3.0/mbedtls/x509_crt.h"
 #  include "mbedtls/3.3.0/mbedtls/x509.h"
 #  include "mbedtls/3.3.0/mbedtls/ssl_cache.h"
+# elif MBEDTLS_VERSION_MAJOR==3 && MBEDTLS_VERSION_MINOR==6 && MBEDTLS_VERSION_PATCH==5
+#  include "mbedtls/3.6.5/mbedtls/ssl.h"
+#  include "mbedtls/3.6.5/mbedtls/error.h"
+#  include "mbedtls/3.6.5/mbedtls/ctr_drbg.h"
+#  include "mbedtls/3.6.5/mbedtls/entropy.h"
+#  include "mbedtls/3.6.5/mbedtls/x509_crt.h"
+#  include "mbedtls/3.6.5/mbedtls/x509.h"
+#  include "mbedtls/3.6.5/mbedtls/ssl_cache.h"
 # else
 #  error "Unsupport the current version"
 # endif
@@ -108,7 +116,14 @@ typedef void (*threading_set_alt_fn)(
 
 typedef void (*pk_init_fn)(PKEY*);
 typedef void (*pk_free_fn)(PKEY*);
+#if MBEDTLS_VERSION_MAJOR==2
 typedef int  (*pk_parse_keyfile_fn)(PKEY*, const char*, const char*);
+#elif MBEDTLS_VERSION_MAJOR==3
+typedef int  (*pk_parse_keyfile_fn)(PKEY*, const char*, const char*,
+		mbedtls_f_rng_t*, void*);
+#else
+#error "Unknown MBEDTLS_VERSION_MAJOR"
+#endif
 
 # ifdef HAS_HAVEGE
 typedef void (*havege_init_fn)(mbedtls_havege_state*);
@@ -798,7 +813,31 @@ int mbedtls_conf::on_sni_callback(mbedtls_ssl_context* ssl,
 #endif
 }
 
-mbedtls_ssl_config* mbedtls_conf::create_ssl_config(void)
+#if defined(HAS_MBEDTLS) && MBEDTLS_VERSION_MAJOR==3
+static bool set_ssl_version(mbedtls_ssl_config* conf, int ver_min, int ver_max)
+{
+	if (ver_min > ver_max) {
+		return false;
+	}
+
+	if (ver_min == tls_ver_1_2) {
+		mbedtls_ssl_conf_max_tls_version(conf, MBEDTLS_SSL_VERSION_TLS1_2);
+	} else if (ver_min == tls_ver_1_3) {
+		mbedtls_ssl_conf_max_tls_version(conf, MBEDTLS_SSL_VERSION_TLS1_3);
+	}
+
+	if (ver_max == tls_ver_1_2) {
+		mbedtls_ssl_conf_max_tls_version(conf, MBEDTLS_SSL_VERSION_TLS1_2);
+	} else if (ver_min == tls_ver_1_3) {
+		mbedtls_ssl_conf_max_tls_version(conf, MBEDTLS_SSL_VERSION_TLS1_3);
+	}
+
+	return true;
+}
+
+#endif
+
+mbedtls_ssl_config* mbedtls_conf::create_ssl_config()
 {
 
 #if defined(HAS_MBEDTLS)
@@ -832,6 +871,12 @@ mbedtls_ssl_config* mbedtls_conf::create_ssl_config(void)
 		return NULL;
 	}
 
+#if MBEDTLS_VERSION_MAJOR==3
+	if (!set_ssl_version(conf, this->ver_min_, this->ver_max_)) {
+		logger_warn("set_ssl_version failed");
+	}
+#endif
+
 	// 设置随机数生成器
 	__ssl_conf_rng(conf, __ctr_drbg_random,
 		(mbedtls_ctr_drbg_context*) rnd_);
@@ -850,6 +895,25 @@ mbedtls_ssl_config* mbedtls_conf::create_ssl_config(void)
 	return conf;
 #else
 	return NULL;
+#endif
+}
+
+bool mbedtls_conf::set_version(int ver_min, int ver_max)
+{
+#if defined(HAS_MBEDTLS) && MBEDTLS_VERSION_MAJOR==3
+	for (std::set<mbedtls_ssl_config*>::iterator it = certs_.begin();
+		it != certs_.end(); ++it) {
+		if (!set_ssl_version(*it, ver_min, ver_max)) {
+			logger_warn("set_ssl_version failed");
+		}
+	}
+	this->ver_min_ = ver_min;
+	this->ver_max_ = ver_max;
+	return true;
+#else
+	(void) ver_min;
+	(void) ver_max;
+	return false;
 #endif
 }
 
@@ -1093,7 +1157,13 @@ bool mbedtls_conf::add_cert(const char* crt_file, const char* key_file,
 
 	pkey = static_cast<PKEY*>(acl_mycalloc(1, sizeof(PKEY)));
 	__pk_init(pkey);
+
+#if MBEDTLS_VERSION_MAJOR==2
 	ret = __pk_parse_keyfile(pkey, key_file, key_pass ? key_pass : "");
+#elif MBEDTLS_VERSION_MAJOR==3
+	ret = __pk_parse_keyfile(pkey, key_file, key_pass ? key_pass : "",
+			__ctr_drbg_random, (mbedtls_ctr_drbg_context*) rnd_);
+#endif
 	if (ret != 0) {
 		FREE_CERT_KEY;
 		return false;

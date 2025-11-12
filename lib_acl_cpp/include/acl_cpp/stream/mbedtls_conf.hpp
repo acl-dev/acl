@@ -116,6 +116,9 @@ public:
 	// @override sslbase_conf
 	sslbase_io* create(bool nblock);
 
+	// @override sslbase_conf
+	bool set_version(int ver_min, int ver_max);
+
 public:
 	mbedtls_ssl_config* create_ssl_config();
 

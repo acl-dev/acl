@@ -27,8 +27,12 @@ acl::master_str_tbl var_conf_str_tab[] = {
 };
 
 int  var_cfg_session_cache;
+int  var_cfg_tls_1_2_force;
+int  var_cfg_tls_1_3_force;
 acl::master_bool_tbl var_conf_bool_tab[] = {
 	{ "session_cache", 1, &var_cfg_session_cache },
+	{ "tls_1_2_force", 0, &var_cfg_tls_1_2_force },
+	{ "tls_1_3_force", 0, &var_cfg_tls_1_3_force },
 
 	{ 0, 0, 0 }
 };
@@ -188,6 +192,14 @@ void master_service::proc_on_init()
 	} else {
 		logger_error("not support this ssl lib=%s!", var_cfg_libssl_path);
 		exit (1);
+	}
+
+	if (var_cfg_tls_1_2_force) {
+		conf_->set_version(acl::tls_ver_1_2, acl::tls_ver_1_2);
+	} else if (var_cfg_tls_1_3_force) {
+		conf_->set_version(acl::tls_ver_1_3, acl::tls_ver_1_3);
+	} else {
+		conf_->set_version(acl::tls_ver_1_2, acl::tls_ver_1_3);
 	}
 
 	// 允许服务端的 SSL 会话缓存功能

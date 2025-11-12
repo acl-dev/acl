@@ -15,9 +15,9 @@
 #ifndef MBEDTLS_VERSION_H
 #define MBEDTLS_VERSION_H
 
-#include "3.6.5/mbedtls/build_info.h"
+#include "mbedtls/build_info.h"
 
-//#if defined(MBEDTLS_VERSION_C)
+#if defined(MBEDTLS_VERSION_C)
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,8 +75,4 @@ int mbedtls_version_check_feature(const char *feature);
 
 #endif /* MBEDTLS_VERSION_C */
 
-#define MBEDTLS_VERSION_MAJOR  3
-#define MBEDTLS_VERSION_MINOR  6
-#define MBEDTLS_VERSION_PATCH  5
-
-//#endif /* version.h */
+#endif /* version.h */

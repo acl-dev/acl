@@ -21,6 +21,12 @@
 #  include "mbedtls/3.3.0/mbedtls/ctr_drbg.h"
 #  include "mbedtls/3.3.0/mbedtls/entropy.h"
 #  include "mbedtls/3.3.0/mbedtls/net_sockets.h"
+# elif MBEDTLS_VERSION_MAJOR==3 && MBEDTLS_VERSION_MINOR==6 && MBEDTLS_VERSION_PATCH==5
+#  include "mbedtls/3.6.5/mbedtls/ssl.h"
+#  include "mbedtls/3.6.5/mbedtls/error.h"
+#  include "mbedtls/3.6.5/mbedtls/ctr_drbg.h"
+#  include "mbedtls/3.6.5/mbedtls/entropy.h"
+#  include "mbedtls/3.6.5/mbedtls/net_sockets.h"
 # else
 #  error "Unsupport the current version"
 # endif

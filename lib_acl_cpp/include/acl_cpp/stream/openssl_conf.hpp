@@ -78,6 +78,9 @@ public:
 	// @override sslbase_conf
 	sslbase_io* create(bool nblock);
 
+	// @override sslbase_conf
+	bool set_version(int ver_min, int ver_max);
+
 	// Bind io with ssl.
 	static void bind(SSL* ssl, openssl_io* io);
 
