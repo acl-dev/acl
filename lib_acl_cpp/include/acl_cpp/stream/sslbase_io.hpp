@@ -37,6 +37,12 @@ public:
 	}
 
 	/**
+	 * 获得当前连接的 SSL 版本,以字符串表示
+	 * @return {const char*} 返回非空版本字符串
+	 */
+	const char* get_version_s() const;
+
+	/**
 	 * 设置套接字为阻塞模式/非阻塞模式
 	 * @param yes {bool} 当为 false 时则设为阻塞模式，否则设为非阻塞模式
 	 */

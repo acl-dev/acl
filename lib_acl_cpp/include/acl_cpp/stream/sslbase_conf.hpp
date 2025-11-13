@@ -4,6 +4,7 @@
 
 namespace acl {
 
+class string;
 class sslbase_io;
 
 class ACL_CPP_API ssl_sni_checker {
@@ -53,6 +54,27 @@ public:
 		return false;
 	}
 
+	/**
+	 * 将版本号转为字符串
+	 * @param v {int}
+	 * @return {const char*}
+	 */
+	static const char* version_s(int v) {
+		switch (v) {
+		case ssl_ver_3_0:
+			return "ssl_ver_3_0";
+		case tls_ver_1_0:
+			return "tls_ver_1_0";
+		case tls_ver_1_1:
+			return "tls_ver_1_1";
+		case tls_ver_1_2:
+			return "tls_ver_1_2";
+		case tls_ver_1_3:
+			return "tls_ver_1_3";
+		default:
+			return "ssl_ver_unknown";
+		}
+	}
 //public:
 	/**
 	 * 加载 CA 根证书(每个配置实例只需调用一次本方法)

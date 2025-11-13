@@ -93,8 +93,7 @@ static acl::sslbase_io* setup_ssl(acl::socket_stream& conn, acl::sslbase_conf& c
 		return NULL;
 	}
 
-	logger("handshake_ok");
-
+	//logger("handshake ok, ssl version: %s", ssl->get_version_s());
 	return ssl;
 }
 
@@ -119,8 +118,7 @@ bool master_service::thread_on_read(acl::socket_stream* conn)
 
 bool master_service::thread_on_accept(acl::socket_stream* conn)
 {
-	logger("connect from %s, fd: %d", conn->get_peer(true),
-		conn->sock_handle());
+	//logger("connect from %s, fd: %d", conn->get_peer(true), conn->sock_handle());
 
 	conn->set_rw_timeout(var_cfg_io_timeout);
 
@@ -139,8 +137,7 @@ bool master_service::thread_on_timeout(acl::socket_stream* conn)
 
 void master_service::thread_on_close(acl::socket_stream* conn)
 {
-	logger("disconnect from %s, fd: %d", conn->get_peer(),
-		conn->sock_handle());
+	//logger("disconnect from %s, fd: %d", conn->get_peer(), conn->sock_handle());
 
 	http_servlet* servlet = (http_servlet*) conn->get_ctx();
 	delete servlet;
@@ -193,6 +190,8 @@ void master_service::proc_on_init()
 		logger_error("not support this ssl lib=%s!", var_cfg_libssl_path);
 		exit (1);
 	}
+
+	//var_cfg_tls_1_3_force = 1;
 
 	if (var_cfg_tls_1_2_force) {
 		conf_->set_version(acl::tls_ver_1_2, acl::tls_ver_1_2);

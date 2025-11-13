@@ -49,7 +49,7 @@ public:
 	 */
 	bool check_peer();
 
-	// @override sslbase_io
+	// @override sslbase_io, 目前仅支持mbedtls3.x.x系列.
 	int get_version() const;
 
 protected:
