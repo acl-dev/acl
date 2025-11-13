@@ -21,11 +21,12 @@ public:
 };
 
 enum {
-    ssl_ver_3_0,  // Not support.
-    tls_ver_1_0,  // Not support.
-    tls_ver_1_1,  // Not support.
-    tls_ver_1_2,
-    tls_ver_1_3,
+	ssl_ver_unknown,
+	ssl_ver_3_0,  // Not support.
+	tls_ver_1_0,  // Not support.
+	tls_ver_1_1,  // Not support.
+	tls_ver_1_2,
+	tls_ver_1_3,
 };
 
 class ACL_CPP_API sslbase_conf : public noncopyable {

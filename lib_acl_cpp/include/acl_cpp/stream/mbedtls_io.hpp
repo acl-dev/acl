@@ -49,6 +49,9 @@ public:
 	 */
 	bool check_peer();
 
+	// @override sslbase_io
+	int get_version() const;
+
 protected:
 	~mbedtls_io();
 

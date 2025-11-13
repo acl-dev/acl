@@ -29,6 +29,14 @@ public:
 	virtual bool handshake() = 0;
 
 	/**
+	 * 获得当前连接的 SSL 版本，定义参考 sslbase_conf.hpp 中.
+	 * @return 0 表示无法获得
+	 */
+	virtual int get_version() const {
+		return 0;
+	}
+
+	/**
 	 * 设置套接字为阻塞模式/非阻塞模式
 	 * @param yes {bool} 当为 false 时则设为阻塞模式，否则设为非阻塞模式
 	 */

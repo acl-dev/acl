@@ -24,6 +24,9 @@ public:
 	 */
 	bool handshake();
 
+	// @override sslbase_io
+	int get_version() const;
+
 protected:
 	~openssl_io();
 

@@ -357,6 +357,25 @@ bool mbedtls_io::handshake()
 #endif
 }
 
+int mbedtls_io::get_version() const
+{
+# if MBEDTLS_VERSION_MAJOR==3
+	if (ssl_ == NULL) {
+		return ssl_ver_unknown;
+	}
+
+	mbedtls_ssl_protocol_version v = mbedtls_ssl_get_version_number(
+		(const mbedtls_ssl_context*) ssl_);
+	if (v == MBEDTLS_SSL_VERSION_TLS1_2) {
+		return tls_ver_1_2;
+	}
+	if (v == MBEDTLS_SSL_VERSION_TLS1_3) {
+		return tls_ver_1_3;
+	}
+#endif
+	return ssl_ver_unknown;
+}
+
 bool mbedtls_io::check_peer()
 {
 #ifdef HAS_MBEDTLS
