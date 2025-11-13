@@ -986,7 +986,7 @@ bool mbedtls_conf::create_host_key(string& host, string& key, size_t skip /* 0 *
 		return false;
 	}
 
-	// Reverse the host name splitted with '.'. for example:
+	// Reverse the host name split with '.'. for example:
 	// www.sina.com --> com.sina.com
 	// *.sina.com   --> com.sina.
 	// The last char '*' will be changed to '.' above.
@@ -1009,6 +1009,10 @@ bool mbedtls_conf::create_host_key(string& host, string& key, size_t skip /* 0 *
 
 MBEDTLS_CERT_KEY* mbedtls_conf::find_ssl_config(const char* host)
 {
+	if (conf_table_ == NULL) {
+		return NULL;
+	}
+
 	string host_buf(host), key;
 	if (!create_host_key(host_buf, key)) {
 		return NULL;
