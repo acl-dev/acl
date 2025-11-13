@@ -21,6 +21,12 @@
 #  include "mbedtls/3.3.0/mbedtls/ctr_drbg.h"
 #  include "mbedtls/3.3.0/mbedtls/entropy.h"
 #  include "mbedtls/3.3.0/mbedtls/net_sockets.h"
+# elif MBEDTLS_VERSION_MAJOR==3 && MBEDTLS_VERSION_MINOR==6 && MBEDTLS_VERSION_PATCH==5
+#  include "mbedtls/3.6.5/mbedtls/ssl.h"
+#  include "mbedtls/3.6.5/mbedtls/error.h"
+#  include "mbedtls/3.6.5/mbedtls/ctr_drbg.h"
+#  include "mbedtls/3.6.5/mbedtls/entropy.h"
+#  include "mbedtls/3.6.5/mbedtls/net_sockets.h"
 # else
 #  error "Unsupport the current version"
 # endif
@@ -349,6 +355,25 @@ bool mbedtls_io::handshake()
 	logger_error("HAS_MBEDTLS not defined!");
 	return false;
 #endif
+}
+
+int mbedtls_io::get_version() const
+{
+# if MBEDTLS_VERSION_MAJOR==3
+	if (ssl_ == NULL) {
+		return ssl_ver_unknown;
+	}
+
+	mbedtls_ssl_protocol_version v = mbedtls_ssl_get_version_number(
+		(const mbedtls_ssl_context*) ssl_);
+	if (v == MBEDTLS_SSL_VERSION_TLS1_2) {
+		return tls_ver_1_2;
+	}
+	if (v == MBEDTLS_SSL_VERSION_TLS1_3) {
+		return tls_ver_1_3;
+	}
+#endif
+	return ssl_ver_unknown;
 }
 
 bool mbedtls_io::check_peer()

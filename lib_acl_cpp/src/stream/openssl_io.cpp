@@ -85,6 +85,10 @@ static ssl_read_fn __ssl_read;
 typedef int (*ssl_write_fn)(SSL*, const void*, int);
 static ssl_write_fn __ssl_write;
 
+# define SSL_VERSION			"SSL_version"
+typedef int (*ssl_version_fn)(const SSL*);
+static ssl_version_fn __ssl_version;
+
 extern ACL_DLL_HANDLE __openssl_ssl_dll;  // defined in openssl_conf.cpp
 extern ACL_DLL_HANDLE __openssl_crypto_dll;  // defined in openssl_conf.cpp
 
@@ -128,6 +132,7 @@ bool openssl_load_io(void)
 	LOAD(SSL_SHUTDOWN, ssl_shutdown_fn, __ssl_shutdown);
 	LOAD(SSL_READ, ssl_read_fn, __ssl_read);
 	LOAD(SSL_WRITE, ssl_write_fn, __ssl_write);
+	LOAD(SSL_VERSION, ssl_version_fn, __ssl_version);
 
 	return true;
 }
@@ -150,6 +155,7 @@ bool openssl_load_io(void)
 # define __ssl_shutdown			SSL_shutdown
 # define __ssl_read			SSL_read
 # define __ssl_write			SSL_write
+# define __ssl_version			SSL_version
 
 #endif // !HAS_OPENSSL_DLL
 
@@ -275,6 +281,22 @@ bool openssl_io::open(ACL_VSTREAM* s)
 	logger_error("define HAS_OPENSSL first!");
 	return false;
 #endif
+}
+
+int openssl_io::get_version() const {
+#ifdef HAS_OPENSSL
+	if (ssl_ == NULL) {
+		return ssl_ver_unknown;
+	}
+	int v = __ssl_version(ssl_);
+	if (v == TLS1_2_VERSION) {
+		return tls_ver_1_2;
+	}
+	if (v == TLS1_3_VERSION) {
+		return tls_ver_1_3;
+	}
+#endif
+	return ssl_ver_unknown;
 }
 
 bool openssl_io::handshake()

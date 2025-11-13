@@ -84,6 +84,7 @@ set(mysql_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/mysql)
 set(pgsql_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/pgsql)
 set(sqlite_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/sqlite)
 set(polarssl_include ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+set(mbedtls_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/mbedtls/3.6.5)
 set(openssl_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/openssl-1.1.1q)
 
 include_directories(
@@ -91,6 +92,7 @@ include_directories(
 	${pgsql_include}
 	${sqlite_include}
 	${polarssl_include}
+	${mbedtls_include}
 	${openssl_include}
 	${acl_include}
 	${proto_include}
@@ -155,6 +157,7 @@ if (${UNIX_OS})
 		"-DACL_PREPARE_COMPILE"
 		"-Wno-unused-parameter"
 		"-fexceptions"
+		"-DUSE_MBEDTLS3"
 		)
 
 	if (!CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
@@ -242,6 +245,7 @@ elseif (${WIN_OS})
 		"-DHAS_PGSQL_DLL"
 		"-DHAS_POLARSSL_DLL"
 		"-DHAS_MBEDTLS_DLL"
+		"-DUSE_MBEDTLS3"
 		"-DUSE_WIN_ICONV")
 	if (ACL_BUILD_SHARED MATCHES "YES")
 		add_definitions("-DACL_CPP_DLL -DACL_CPP_EXPORTS"

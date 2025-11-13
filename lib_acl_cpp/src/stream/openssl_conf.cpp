@@ -620,6 +620,48 @@ void openssl_conf::use_sockopt_timeout(bool yes)
 	sockopt_timeout_ = yes;
 }
 
+#ifdef HAS_OPENSSL
+static void set_ssl_version(SSL_CTX* ctx, int min_ver, int max_ver)
+{
+	if (min_ver > max_ver) {
+		return;
+	}
+
+	if (min_ver == tls_ver_1_2) {
+		__ssl_ctx_ctrl(ctx, SSL_CTRL_SET_MIN_PROTO_VERSION, TLS1_2_VERSION, NULL);
+	} else if (min_ver == tls_ver_1_3) {
+		__ssl_ctx_ctrl(ctx, SSL_CTRL_SET_MIN_PROTO_VERSION, TLS1_3_VERSION, NULL);
+	}
+
+	if (max_ver == tls_ver_1_2) {
+		__ssl_ctx_ctrl(ctx, SSL_CTRL_SET_MAX_PROTO_VERSION, TLS1_2_VERSION, NULL);
+	} else if (max_ver == tls_ver_1_3) {
+		__ssl_ctx_ctrl(ctx, SSL_CTRL_SET_MAX_PROTO_VERSION, TLS1_3_VERSION, NULL);
+	}
+}
+#endif
+
+bool openssl_conf::set_version(int ver_min, int ver_max) {
+#ifdef HAS_OPENSSL
+	if (ver_min > ver_max) {
+		return false;
+	}
+
+	this->ver_min_ = ver_min;
+	this->ver_max_ = ver_max;
+
+	for (std::set<SSL_CTX*>::iterator it = ssl_ctxes_.begin();
+		it != ssl_ctxes_.end(); ++it) {
+		set_ssl_version(*it, ver_min_, ver_max_);
+	}
+	return true;
+#else
+	(void) ver_min;
+	(void) ver_max;
+	return false;
+#endif
+}
+
 SSL_CTX* openssl_conf::create_ssl_ctx()
 {
 #ifdef HAS_OPENSSL
@@ -642,6 +684,8 @@ SSL_CTX* openssl_conf::create_ssl_ctx()
 				(void (*)(void)) sni_callback);
 		__ssl_ctx_ctrl(ctx, SSL_CTRL_SET_TLSEXT_SERVERNAME_ARG, 0, this);
 	}
+
+	set_ssl_version(ctx, ver_min_, ver_max_);
 
 	if (ssl_ctx_ == NULL) {
 		ssl_ctx_ = ctx;

@@ -4,6 +4,7 @@
 
 namespace acl {
 
+class string;
 class sslbase_io;
 
 class ACL_CPP_API ssl_sni_checker {
@@ -20,9 +21,18 @@ public:
 	virtual bool check(sslbase_io* io, const char* sni, string& host) = 0;
 };
 
+enum {
+	ssl_ver_unknown,
+	ssl_ver_3_0,  // Not support.
+	tls_ver_1_0,  // Not support.
+	tls_ver_1_1,  // Not support.
+	tls_ver_1_2,
+	tls_ver_1_3,
+};
+
 class ACL_CPP_API sslbase_conf : public noncopyable {
 public:
-	sslbase_conf() : checker_(NULL) {}
+	sslbase_conf() : checker_(NULL), ver_min_(tls_ver_1_2), ver_max_(tls_ver_1_3) {}
 	virtual ~sslbase_conf() {}
 
 	/**
@@ -32,7 +42,40 @@ public:
 	 */
 	virtual sslbase_io* create(bool nblock) = 0;
 
-public:
+	/**
+ 	 * 设置SSL/TLS版本
+ 	 * @param ver_min {int} 最小版本号，内部默认值为 tls_ver_1_2
+ 	 * @param ver_max {int} 最大版本号，内部默认值为 tls_ver_1_3
+ 	 * @return {bool} 返回true表示设置成功，否则表示不支持设置版本
+	 */
+	virtual bool set_version(int ver_min, int ver_max) {
+		(void) ver_min;
+		(void) ver_max;
+		return false;
+	}
+
+	/**
+	 * 将版本号转为字符串
+	 * @param v {int}
+	 * @return {const char*}
+	 */
+	static const char* version_s(int v) {
+		switch (v) {
+		case ssl_ver_3_0:
+			return "ssl_ver_3_0";
+		case tls_ver_1_0:
+			return "tls_ver_1_0";
+		case tls_ver_1_1:
+			return "tls_ver_1_1";
+		case tls_ver_1_2:
+			return "tls_ver_1_2";
+		case tls_ver_1_3:
+			return "tls_ver_1_3";
+		default:
+			return "ssl_ver_unknown";
+		}
+	}
+//public:
 	/**
 	 * 加载 CA 根证书(每个配置实例只需调用一次本方法)
 	 * @param ca_file {const char*} CA 证书文件全路径
@@ -122,6 +165,8 @@ public:
 
 protected:
 	ssl_sni_checker* checker_;
+	int ver_min_;
+	int ver_max_;
 };
 
 } // namespace acl

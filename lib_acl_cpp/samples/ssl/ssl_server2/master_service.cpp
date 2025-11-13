@@ -75,7 +75,8 @@ static acl::sslbase_io* setup_ssl(acl::socket_stream& conn,
 		return NULL;
 	}
 
-	logger("setup hook ok, tid: %lu", acl::thread::thread_self());
+	logger("setup hook ok, tid: %lu, ssl version: %s",
+		acl::thread::thread_self(), ssl->get_version_s());
 	return ssl;
 }
 
@@ -198,6 +199,8 @@ void master_service::proc_on_init()
 	} else {
 		conf_ = new acl::polarssl_conf();
 	}
+
+	//conf_->set_version(acl::tls_ver_1_3, acl::tls_ver_1_3);
 
 	// 允许服务端的 SSL 会话缓存功能
 	conf_->enable_cache(var_cfg_session_cache);

@@ -92,7 +92,14 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	int   ch, max_loop = 10, max_connections = 10;
-	acl::string addr("127.0.0.1:9001"), libpath("../libpolarssl.so");
+	acl::string addr("127.0.0.1:9800");
+#ifdef __linux__
+	acl::string libpath("../libmbedcrypto.so;../libmbedx509.so;../libmbedtls.so");
+#elif defined(APPLE)
+	acl::string libpath("../libmbedcrypto.dylib;../libmbedx509.dylib;../libmbedtls.dylib");
+#else
+# error "Not supported!"
+#endif
 
 	acl::acl_cpp_init();
 
@@ -138,6 +145,8 @@ int main(int argc, char* argv[])
 		}
 		__ssl_conf = new acl::polarssl_conf;
 	}
+
+	//__ssl_conf->set_version(acl::tls_ver_1_3, acl::tls_ver_1_3);
 
 	if (max_connections <= 0) {
 		max_connections = 100;

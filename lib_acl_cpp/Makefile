@@ -111,6 +111,8 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 		CFLAGS += -DHAS_MBEDTLS_DLL
 	endif
 
+	CFLAGS += -DUSE_MBEDTLS3
+
 	shared_ldflags = -lprotocol -lacl -L/usr/local/lib -liconv -lz -lpthread
 endif
 
@@ -146,6 +148,8 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 		CFLAGS += -DHAS_MBEDTLS_DLL
 	endif
 
+	CFLAGS += -DUSE_MBEDTLS3
+
 	shared_ldflags = -lprotocol -lacl -L/usr/lib -liconv -lz -lpthread
 	SHARED_LIBNAME = libacl_cpp.dylib
 endif
@@ -179,6 +183,8 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 			CFLAGS += -DHAS_MBEDTLS_DLL
 		endif
 	endif
+
+	CFLAGS += -DUSE_MBEDTLS3
 
 	shared_ldflags = -lprotocol -lacl -lrt -lpthread -lz -ldl
 endif
@@ -250,7 +256,7 @@ DEF_PATH_DST = ./Debug
 CFLAGS += -I./src -I./include -I../lib_acl/include -I../lib_protocol/include \
 	  -I../include/sqlite -I../include/mysql -I../include \
 	  -I../include/pgsql \
-	  -I../include/mbedtls/3.3.0
+	  -I../include/mbedtls/3.6.5
 
 #Project's objs
 OBJS_DST = $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/*.cpp))) \

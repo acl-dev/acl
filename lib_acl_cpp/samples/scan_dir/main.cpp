@@ -114,6 +114,15 @@ static void diff_path(acl::scan_dir& scan, const char* spath, const char* dpath,
 
 	acl::string buf(file_types);
 	std::vector<acl::string>& types = buf.split2(",;");
+	bool all = false;
+	for (std::vector<acl::string>::const_iterator cit = types.begin();
+		cit != types.end(); ++cit) {
+		if (*cit == "*") {
+			all = true;
+			break;
+		}
+	}
+
 	const char* filepath;
 
 	(void) dpath;
@@ -122,17 +131,22 @@ static void diff_path(acl::scan_dir& scan, const char* spath, const char* dpath,
 		acl::string path;
 		acl::string& file = path.basename(filepath);
 		const char* type = strrchr(file.c_str(), '.');
-		if (type == NULL || *(++type) == 0)
+		if (type == NULL || *(++type) == 0) {
 			continue;
+		}
 
-		std::vector<acl::string>::const_iterator it =
-			std::find(types.begin(), types.end(),  type);
-		if (it == types.end())
-			continue;
+		if (!all) {
+			std::vector<acl::string>::const_iterator it =
+				std::find(types.begin(), types.end(),  type);
+			if (it == types.end()) {
+				continue;
+			}
+		}
 
 		path.clear();
-		if (get_relative_path(spath, filepath, path) == false)
+		if (!get_relative_path(spath, filepath, path)) {
 			continue;
+		}
 
 		acl::string dfilepath;
 		dfilepath << dpath << path;

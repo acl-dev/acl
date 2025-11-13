@@ -27,6 +27,11 @@ sslbase_io::~sslbase_io()
 	delete refers_;
 }
 
+const char* sslbase_io::get_version_s() const
+{
+	return sslbase_conf::version_s(this->get_version());
+}
+
 void sslbase_io::set_non_blocking(bool yes)
 {
 	// 此处仅设置非阻塞 IO 标志位，至于套接字是否被设置了非阻塞模式
