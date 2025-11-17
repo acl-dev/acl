@@ -1,0 +1,5 @@
+{
+  "libacl.so": {
+    "source": "src/mock/Libacl.mock.ets"
+  }
+}
