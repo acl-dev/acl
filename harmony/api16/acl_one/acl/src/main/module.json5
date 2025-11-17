@@ -1,0 +1,53 @@
+{
+  "module": {
+    "name": "acl",
+    "type": "entry",
+    "description": "$string:module_desc",
+    "mainElement": "AclAbility",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+      "2in1",
+      "car"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": false,
+    "pages": "$profile:main_pages",
+    "abilities": [
+      {
+        "name": "AclAbility",
+        "srcEntry": "./ets/aclability/AclAbility.ets",
+        "description": "$string:AclAbility_desc",
+        "icon": "$media:layered_image",
+        "label": "$string:AclAbility_label",
+        "startWindowIcon": "$media:startIcon",
+        "startWindowBackground": "$color:start_window_background",
+        "exported": true,
+        "skills": [
+          {
+            "entities": [
+              "entity.system.home"
+            ],
+            "actions": [
+              "action.system.home"
+            ]
+          }
+        ]
+      }
+    ],
+    "extensionAbilities": [
+      {
+        "name": "AclBackupAbility",
+        "srcEntry": "./ets/aclbackupability/AclBackupAbility.ets",
+        "type": "backup",
+        "exported": false,
+        "metadata": [
+          {
+            "name": "ohos.extension.backup",
+            "resource": "$profile:backup_config"
+          }
+        ],
+      }
+    ]
+  }
+}

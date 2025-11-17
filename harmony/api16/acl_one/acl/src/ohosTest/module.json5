@@ -1,0 +1,14 @@
+{
+  "module": {
+    "name": "acl_test",
+    "type": "feature",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+      "2in1",
+      "car"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": false
+  }
+}

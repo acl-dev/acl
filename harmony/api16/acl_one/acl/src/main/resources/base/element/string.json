@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "AclAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "AclAbility_label",
+      "value": "label"
+    }
+  ]
+}
