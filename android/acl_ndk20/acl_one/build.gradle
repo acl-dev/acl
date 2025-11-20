@@ -1,0 +1,53 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 36
+    //buildToolsVersion "28.0.3"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 36
+
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_STL=c++_shared"
+                arguments "-DHAS_ATOMIC=YES"
+                arguments "-DCMAKE_BUILD_TYPE=RELEASE"
+                arguments "-DCMAKE_CXX_FLAGS_RELEASE=-O3"
+                arguments "-DCMAKE_C_FLAGS_RELEASE=-O3"
+                arguments "-DACL_CLIENT_ONLY=YES"
+                arguments "-DHAS_MBEDTLS=YES"
+                arguments "-DACL_BUILD_SHARED=YES"
+                arguments "-Wl,-z,max-page-size=16384"
+                arguments "-Wl,-z,common-page-size=16384"
+
+                abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86'
+                targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static', 'acl_shared', 'protocol_shared', 'acl_cpp_shared', 'fiber_shared', 'fiber_cpp_shared'  // for ndk20 or above
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            jniDebuggable true
+            debuggable true
+            minifyEnabled false
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path '../../../CMakeLists.txt'
+            //version "3.6.0"
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+}
