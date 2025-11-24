@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     //compileSdk 29
-    buildToolsVersion "29.0.2"
+    buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "com.example.http"
         minSdkVersion 14
-        targetSdkVersion 29
+        targetSdkVersion 30
         //versionCode 14
         //versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
