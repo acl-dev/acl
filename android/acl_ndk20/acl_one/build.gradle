@@ -48,7 +48,7 @@ android {
     }
     
     // 指定 NDK 版本
-    ndkVersion "20.1.5948944"
+    //ndkVersion "20.1.5948944"
 }
 
 dependencies {
