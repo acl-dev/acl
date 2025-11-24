@@ -3,7 +3,6 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 30  // 使用旧语法，兼容 AGP 4.2.2
     buildToolsVersion "30.0.2"
-    //ndkVersion "20.1.5948944"
     
     defaultConfig {
         minSdkVersion 14
