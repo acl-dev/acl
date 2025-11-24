@@ -1,13 +1,14 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 36
-    //buildToolsVersion "28.0.3"
-
+    compileSdkVersion 29  // 使用旧语法，兼容 AGP 4.2.2
+    //buildToolsVersion "29.0.2"
+    //ndkVersion "20.1.5948944"
+    
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 36
-
+        targetSdkVersion 29
+        
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_STL=c++_shared"
@@ -22,7 +23,7 @@ android {
                 arguments "-Wl,-z,common-page-size=16384"
 
                 abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86'
-                targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static', 'acl_shared', 'protocol_shared', 'acl_cpp_shared', 'fiber_shared', 'fiber_cpp_shared'  // for ndk20 or above
+                targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static', 'acl_shared', 'protocol_shared', 'acl_cpp_shared', 'fiber_shared', 'fiber_cpp_shared'
             }
         }
     }
@@ -43,9 +44,11 @@ android {
     externalNativeBuild {
         cmake {
             path '../../../CMakeLists.txt'
-            //version "3.6.0"
         }
     }
+    
+    // 指定 NDK 版本
+    ndkVersion "20.1.5948944"
 }
 
 dependencies {
