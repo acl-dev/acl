@@ -821,14 +821,14 @@ static bool set_ssl_version(mbedtls_ssl_config* conf, int ver_min, int ver_max)
 	}
 
 	if (ver_min == tls_ver_1_2) {
-		mbedtls_ssl_conf_max_tls_version(conf, MBEDTLS_SSL_VERSION_TLS1_2);
+		mbedtls_ssl_conf_min_tls_version(conf, MBEDTLS_SSL_VERSION_TLS1_2);
 	} else if (ver_min == tls_ver_1_3) {
-		mbedtls_ssl_conf_max_tls_version(conf, MBEDTLS_SSL_VERSION_TLS1_3);
+		mbedtls_ssl_conf_min_tls_version(conf, MBEDTLS_SSL_VERSION_TLS1_3);
 	}
 
 	if (ver_max == tls_ver_1_2) {
 		mbedtls_ssl_conf_max_tls_version(conf, MBEDTLS_SSL_VERSION_TLS1_2);
-	} else if (ver_min == tls_ver_1_3) {
+	} else if (ver_max == tls_ver_1_3) {
 		mbedtls_ssl_conf_max_tls_version(conf, MBEDTLS_SSL_VERSION_TLS1_3);
 	}
 
