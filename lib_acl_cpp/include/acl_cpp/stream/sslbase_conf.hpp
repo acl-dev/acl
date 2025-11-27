@@ -55,6 +55,16 @@ public:
 	}
 
 	/**
+	 * 获得所设置的SSL版本号
+	 * @param ver_min {int&} 用来存放最小版本号
+	 * @param ver_max {int&} 用来存放最大版本号
+	 */
+	void get_version(int& ver_min, int& ver_max) {
+		ver_min = ver_min_;
+		ver_max = ver_max_;
+	}
+
+	/**
 	 * 将版本号转为字符串
 	 * @param v {int}
 	 * @return {const char*}

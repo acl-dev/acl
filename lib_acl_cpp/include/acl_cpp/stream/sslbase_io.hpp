@@ -99,6 +99,14 @@ public:
 		return ctx_;
 	}
 
+	/**
+	 * 获得传入的SSL配置项
+	 * @return {sslbase_conf&}
+	 */
+	sslbase_conf& get_conf() {
+		return base_conf_;
+	}
+
 protected:
 	sslbase_conf& base_conf_;
 	bool server_side_;
