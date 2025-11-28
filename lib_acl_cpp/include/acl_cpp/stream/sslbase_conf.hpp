@@ -82,7 +82,7 @@ public:
 		case tls_ver_1_3:
 			return "tls_ver_1_3";
 		default:
-			return "ssl_ver_unknown";
+			return "ssl_ver_def";
 		}
 	}
 //public:

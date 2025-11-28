@@ -361,7 +361,7 @@ int mbedtls_io::get_version() const
 {
 # if MBEDTLS_VERSION_MAJOR==3
 	if (ssl_ == NULL) {
-		return ssl_ver_unknown;
+		return ssl_ver_def;
 	}
 
 	mbedtls_ssl_protocol_version v = mbedtls_ssl_get_version_number(
@@ -373,7 +373,7 @@ int mbedtls_io::get_version() const
 		return tls_ver_1_3;
 	}
 #endif
-	return ssl_ver_unknown;
+	return ssl_ver_def;
 }
 
 bool mbedtls_io::check_peer()

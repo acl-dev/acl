@@ -286,7 +286,7 @@ bool openssl_io::open(ACL_VSTREAM* s)
 int openssl_io::get_version() const {
 #ifdef HAS_OPENSSL
 	if (ssl_ == NULL) {
-		return ssl_ver_unknown;
+		return ssl_ver_def;
 	}
 	int v = __ssl_version(ssl_);
 	if (v == TLS1_2_VERSION) {
@@ -296,7 +296,7 @@ int openssl_io::get_version() const {
 		return tls_ver_1_3;
 	}
 #endif
-	return ssl_ver_unknown;
+	return ssl_ver_def;
 }
 
 bool openssl_io::handshake()
