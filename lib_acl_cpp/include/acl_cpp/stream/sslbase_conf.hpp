@@ -22,7 +22,7 @@ public:
 };
 
 enum {
-	ssl_ver_unknown,
+	ssl_ver_def,  // Don't set the SSL version.
 	ssl_ver_3_0,  // Not support.
 	tls_ver_1_0,  // Not support.
 	tls_ver_1_1,  // Not support.
@@ -32,7 +32,7 @@ enum {
 
 class ACL_CPP_API sslbase_conf : public noncopyable {
 public:
-	sslbase_conf() : checker_(NULL), ver_min_(tls_ver_1_2), ver_max_(tls_ver_1_3) {}
+	sslbase_conf() : checker_(NULL), ver_min_(ssl_ver_def), ver_max_(ssl_ver_def) {}
 	virtual ~sslbase_conf() {}
 
 	/**
