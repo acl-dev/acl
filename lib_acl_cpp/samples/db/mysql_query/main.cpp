@@ -265,7 +265,7 @@ int main(void)
 #elif	defined(__APPLE__)
 	const char* libname = "libmysqlclient.dylib";
 #else
-	const char* libname = "libmysqlclient_r.so";
+	const char* libname = "libmysqlclient.so";
 #endif
 
 	acl::string path;
