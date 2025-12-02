@@ -1,6 +1,16 @@
 #include "acl_stdafx.hpp"
-#include "mysql.h"
-#include "errmsg.h"
+#include "mysql_version.h"
+
+#if MYSQL_VERSION_ID==50508
+# include "mysql/5.5.8/mysql.h"
+# include "mysql/5.5.8/errmsg.h"
+#elif MYSQL_VERSION_ID==90500
+# include <stdbool.h>
+# define my_bool bool
+# include "mysql/9.5.0/mysql.h"
+# include "mysql/9.5.0/errmsg.h"
+#endif
+
 #ifndef ACL_PREPARE_COMPILE
 #include <assert.h>
 #include "acl_cpp/stdlib/snprintf.hpp"
@@ -747,10 +757,8 @@ bool db_mysql::dbopen(const char* charset /* = NULL */)
 
 	my_bool reconnect = 1;
 
-#if MYSQL_VERSION_ID >= 50500
+#if MYSQL_VERSION_ID >= 50500 && MYSQL_VERSION_ID < 80000
 	__mysql_options((MYSQL*) conn_, MYSQL_OPT_RECONNECT, (const void*) &reconnect);
-#else
-	__mysql_options((MYSQL*) conn_, MYSQL_OPT_RECONNECT, (const char*) &reconnect);
 #endif
 
 	if (__mysql_open((MYSQL*) conn_, db_host, dbuser_ ? dbuser_ : "",

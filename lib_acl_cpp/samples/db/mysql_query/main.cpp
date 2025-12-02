@@ -2,6 +2,9 @@
 //
 
 #include "acl_cpp/lib_acl.hpp"
+#if defined(__linux__) || defined(__APPLE__)
+#include <unistd.h>
+#endif
 
 const char* CREATE_TBL =
 	"create table group_tbl\r\n"
@@ -45,9 +48,15 @@ static bool db_create(const char* dbaddr, const char* dbname,
 		return false;
 	}
 	db.free_result();
-	
-	sql.format("grant CREATE,DROP,INSERT,DELETE,UPDATE,SELECT on %s.* to %s",
+
+	// 对于Mysql8.0 + ，使用下面方式
+	sql.format("grant CREATE,DROP,INSERT,DELETE,UPDATE,SELECT on %s.* to %s@localhost",
 		dbname, dbuser);
+
+	// Mysql8.0以前版本使用
+	//sql.format("grant CREATE,DROP,INSERT,DELETE,UPDATE,SELECT on %s.* to %s",
+	//	dbname, dbuser);
+
 	if (db.sql_update(sql.c_str()) == false)
 	{
 		printf("'%s' error: %s\r\n", sql.c_str(), db.get_error());
@@ -253,6 +262,8 @@ int main(void)
 
 #if	defined(_WIN32) || defined(_WIN64)
 	const char* libname = "libmysql.dll";
+#elif	defined(__APPLE__)
+	const char* libname = "libmysqlclient.dylib";
 #else
 	const char* libname = "libmysqlclient_r.so";
 #endif
@@ -269,6 +280,14 @@ int main(void)
 #endif
 	else
 		path = libname;
+
+#if defined(__linux__) || defined(__APPLE__)
+	if (access(path, R_OK) != 0)
+	{
+		printf("%s not found\r\n", path.c_str());
+		return 1;
+	}
+#endif
 
 	out.format("%s path: %s\r\n", libname, path.c_str());
 	// 设置动态库加载的全路径
