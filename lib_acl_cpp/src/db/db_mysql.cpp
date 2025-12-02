@@ -755,9 +755,9 @@ bool db_mysql::dbopen(const char* charset /* = NULL */)
 #endif
 	}
 
-	my_bool reconnect = 1;
 
 #if MYSQL_VERSION_ID >= 50500 && MYSQL_VERSION_ID < 80000
+	my_bool reconnect = 1;
 	__mysql_options((MYSQL*) conn_, MYSQL_OPT_RECONNECT, (const void*) &reconnect);
 #endif
 
