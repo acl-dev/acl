@@ -71,48 +71,39 @@ public:
 	 */
 	pgsql_conf& set_charset(const char* charset);
 
-	const char* get_dbaddr() const
-	{
+	const char* get_dbaddr() const {
 		return dbaddr_;
 	}
 
-	const char* get_dbname() const
-	{
+	const char* get_dbname() const {
 		return dbname_;
 	}
 
-	const char* get_dbkey() const
-	{
+	const char* get_dbkey() const {
 		return dbkey_;
 	}
 
-	const char* get_dbuser() const
-	{
+	const char* get_dbuser() const {
 		return dbuser_;
 	}
 
-	const char* get_dbpass() const
-	{
+	const char* get_dbpass() const {
 		return dbpass_;
 	}
 
-	size_t get_dblimit() const
-	{
+	size_t get_dblimit() const {
 		return dblimit_;
 	}
 
-	int get_conn_timeout() const
-	{
+	int get_conn_timeout() const {
 		return conn_timeout_;
 	}
 
-	int get_rw_timeout() const
-	{
+	int get_rw_timeout() const {
 		return rw_timeout_;
 	}
 
-	const char* get_charset() const
-	{
+	const char* get_charset() const {
 		return charset_;
 	}
 

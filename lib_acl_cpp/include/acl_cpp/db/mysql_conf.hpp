@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include <string>
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
 
@@ -80,73 +81,69 @@ public:
 	 */
 	mysql_conf& set_charset(const char* charset);
 
-	const char* get_dbaddr() const
-	{
-		return dbaddr_;
+	const char* get_dbaddr() const {
+		return dbaddr.c_str();
 	}
 
-	const char* get_dbname() const
-	{
-		return dbname_;
+	const char* get_dbname() const {
+		return dbname.c_str();
 	}
 
-	const char* get_dbkey() const
-	{
-		return dbkey_;
+	const char* get_dbkey() const {
+		return dbkey.c_str();
 	}
 
-	const char* get_dbuser() const
-	{
-		return dbuser_;
+	const char* get_dbuser() const {
+		return dbuser.c_str();
 	}
 
-	const char* get_dbpass() const
-	{
-		return dbpass_;
+	const char* get_dbpass() const {
+		return dbpass.c_str();
 	}
 
-	size_t get_dblimit() const
-	{
-		return dblimit_;
+	size_t get_dblimit() const {
+		return dblimit;
 	}
 
-	unsigned long get_dbflags() const
-	{
-		return dbflags_;
+	unsigned long get_dbflags() const {
+		return dbflags;
 	}
 
-	bool get_auto_commit() const
-	{
-		return auto_commit_;
+	bool get_auto_commit() const {
+		return auto_commit;
 	}
 
-	int get_conn_timeout() const
-	{
-		return conn_timeout_;
+	int get_conn_timeout() const {
+		return conn_timeout;
 	}
 
-	int get_rw_timeout() const
-	{
-		return rw_timeout_;
+	int get_rw_timeout() const {
+		return rw_timeout;
 	}
 
-	const char* get_charset() const
-	{
-		return charset_;
+	const char* get_charset() const {
+		return charset.c_str();
 	}
 
-private:
-	char* dbaddr_;          // 数据库监听地址
-	char* dbname_;          // 数据库名
-	char* dbkey_;           // dbname@dbaddr
-	char* dbuser_;          // 数据库账号
-	char* dbpass_;          // 数据库账号密码
-	char* charset_;         // 连接数据库时的字符集
-	size_t dblimit_;        // 数据库连接池连接数上限
-	unsigned long dbflags_; // 打开数据库时的标志位
-	bool  auto_commit_;     // 是否自动提交修改后的数据
-	int   conn_timeout_;    // 连接数据库的超时时间
-	int   rw_timeout_;      // 与数据库通信的超时时间
+	//////////////////////////////////////////////////////////////////////
+
+	std::string dbaddr;     // 数据库监听地址
+	std::string dbname;     // 数据库名
+	std::string dbkey;      // dbname@dbaddr
+	std::string dbuser;     // 数据库账号
+	std::string dbpass;     // 数据库账号密码
+	std::string charset;    // 连接数据库时的字符集
+	size_t dblimit;         // 数据库连接池连接数上限
+	unsigned long dbflags;  // 打开数据库时的标志位
+	bool  auto_commit;      // 是否自动提交修改后的数据
+	int   conn_timeout;     // 连接数据库的超时时间
+	int   rw_timeout;       // 与数据库通信的超时时间
+
+	std::string sslcrt;
+	std::string sslkey;
+	std::string sslca;
+	std::string sslcapath;
+	std::string sslcipher;
 };
 
 } // namespace acl

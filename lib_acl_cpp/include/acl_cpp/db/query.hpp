@@ -160,8 +160,7 @@ public:
 		const char* fmt = "%Y-%m-%d %H:%M:%S");
 
 private:
-	typedef enum
-	{
+	typedef enum {
 		DB_PARAM_CHAR,
 		DB_PARAM_SHORT,
 		DB_PARAM_INT32,
@@ -171,13 +170,11 @@ private:
 		DB_PARAM_STR
 	} db_param_type;
 
-	struct query_param
-	{
+	struct query_param {
 		char type;
 		int  dlen;
 		int  precision;
-		union
-		{
+		union {
 			char  c;
 			short s;
 			int   n;

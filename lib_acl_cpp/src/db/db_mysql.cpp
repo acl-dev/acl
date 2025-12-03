@@ -46,6 +46,9 @@ typedef MYSQL* (STDCALL *mysql_open_fn)(MYSQL*, const char*, const char*,
 typedef void (STDCALL *mysql_close_fn)(MYSQL*);
 typedef int  (STDCALL *mysql_options_fn)(MYSQL*,enum mysql_option option,
 	const void*);
+typedef bool (STDCALL *mysql_ssl_set_fn)(MYSQL *mysql, const char *key,
+	const char *cert, const char *ca, const char *capath, const char *cipher);
+typedef const char* (STDCALL *mysql_get_ssl_cipher_fn)(MYSQL *mysql);
 typedef my_bool (STDCALL *mysql_autocommit_fn)(MYSQL*, my_bool);
 typedef unsigned int (STDCALL *mysql_errno_fn)(MYSQL*);
 typedef const char* (STDCALL *mysql_error_fn)(MYSQL*);
@@ -71,6 +74,8 @@ static mysql_init_fn __mysql_init = NULL;
 static mysql_open_fn __mysql_open = NULL;
 static mysql_close_fn __mysql_close = NULL;
 static mysql_options_fn __mysql_options = NULL;
+static mysql_ssl_set_fn __mysql_ssl_set = NULL;
+static mysql_get_ssl_cipher_fn __mysql_get_ssl_cipher = NULL;
 static mysql_autocommit_fn __mysql_autocommit = NULL;
 static mysql_errno_fn __mysql_errno = NULL;
 static mysql_error_fn __mysql_error = NULL;
@@ -207,6 +212,26 @@ static void __mysql_dll_load(void)
 		acl_dlsym(__mysql_dll, "mysql_options");
 	if (__mysql_options == NULL) {
 		logger_error("load mysql_options from %s error: %s",
+			path, acl_dlerror());
+		acl_dlclose(__mysql_dll);
+		__mysql_dll = NULL;
+		return;
+	}
+
+	__mysql_ssl_set = (mysql_ssl_set_fn)
+		acl_dlsym(__mysql_dll, "mysql_ssl_set");
+	if (__mysql_ssl_set == NULL) {
+		logger_error("load mysql_ssl_set from %s error: %s",
+			path, acl_dlerror());
+		acl_dlclose(__mysql_dll);
+		__mysql_dll = NULL;
+		return;
+	}
+
+	__mysql_get_ssl_cipher = (mysql_get_ssl_cipher_fn)
+		acl_dlsym(__mysql_dll, "mysql_get_ssl_cipher");
+	if (__mysql_get_ssl_cipher == NULL) {
+		logger_error("load mysql_get_ssl_cipher from %s error: %s",
 			path, acl_dlerror());
 		acl_dlclose(__mysql_dll);
 		__mysql_dll = NULL;
@@ -395,6 +420,8 @@ static void __mysql_dll_load(void)
 #  define  __mysql_open mysql_real_connect
 #  define  __mysql_close mysql_close
 #  define  __mysql_options mysql_options
+#  define  __mysql_ssl_set mysql_ssl_set
+#  define  __mysql_get_ssl_cipher mysql_get_ssl_cipher
 #  define  __mysql_autocommit mysql_autocommit
 #  define  __mysql_errno mysql_errno
 #  define  __mysql_error mysql_error
@@ -469,50 +496,44 @@ static void mysql_rows_save(MYSQL_RES* my_res, db_rows& result)
 
 //////////////////////////////////////////////////////////////////////////
 
-void db_mysql::sane_mysql_init(const char* dbaddr, const char* dbname,
-	const char* dbuser, const char* dbpass,
-	unsigned long dbflags, bool auto_commit,
-	int conn_timeout, int rw_timeout,
-	const char* charset)
+void db_mysql::sane_mysql_init(const mysql_conf& conf)
 {
-	if (dbaddr == NULL || *dbaddr == 0) {
+	if (conf.dbaddr.empty()) {
 		logger_fatal("dbaddr null");
 	}
-	if (dbname == NULL || *dbname == 0) {
+
+	if (conf.dbname.empty()) {
 		logger_fatal("dbname null");
 	}
 
 	// 地址格式：[dbname@]dbaddr
-	const char* ptr = strchr(dbaddr, '@');
+	const char* ptr = strchr(conf.dbaddr.c_str(), '@');
 	if (ptr) {
 		ptr++;
 	} else {
-		ptr = dbaddr;
+		ptr = conf.dbaddr.c_str();
 	}
+
 	acl_assert(*ptr);
-	dbaddr_ = acl_mystrdup(ptr);
-	dbname_ = acl_mystrdup(dbname);
+	dbaddr_  = ptr;
+	dbname_  = conf.dbname;
+	dbuser_  = conf.dbuser;
 
-	if (dbuser && *dbuser) {
-		dbuser_ = acl_mystrdup(dbuser);
-	} else {
-		dbuser_ = NULL;
+	dbpass_  = conf.dbpass;
+	charset_ = conf.charset;
+
+	dbflags_      = conf.dbflags;
+	auto_commit_  = conf.auto_commit;
+	conn_timeout_ = conf.conn_timeout;
+	rw_timeout_   = conf.rw_timeout;
+
+	if (!conf.sslcrt.empty() && !conf.sslkey.empty() && !conf.sslca.empty()) {
+		sslcrt_ = conf.sslcrt;
+		sslkey_ = conf.sslkey;
+		sslca_  = conf.sslca;
+		sslcapath_ = conf.sslcapath;
+		sslcipher_ = conf.sslcipher;
 	}
-
-	if (dbpass && *dbpass) {
-		dbpass_ = acl_mystrdup(dbpass);
-	} else {
-		dbpass_ = NULL;
-	}
-
-	if (charset && *charset) {
-		charset_ = charset;
-	}
-
-	dbflags_      = dbflags;
-	auto_commit_  = auto_commit;
-	conn_timeout_ = conn_timeout;
-	rw_timeout_   = rw_timeout;
 
 #ifdef HAS_MYSQL_DLL
 	acl_pthread_once(&__mysql_once, __mysql_dll_load);
@@ -545,28 +566,21 @@ db_mysql::db_mysql(const char* dbaddr, const char* dbname,
 	int conn_timeout /* = 60 */, int rw_timeout /* = 60 */,
 	const char* charset /* = "utf8" */)
 {
-	sane_mysql_init(dbaddr, dbname, dbuser, dbpass, dbflags,
-		auto_commit, conn_timeout, rw_timeout, charset);
+	mysql_conf conf(dbaddr, dbname);
+	conf.set_dbuser(dbuser).set_dbpass(dbpass).set_dbflags(dbflags)
+		.set_auto_commit(auto_commit).set_conn_timeout(conn_timeout)
+		.set_rw_timeout(rw_timeout).set_charset(charset);
+
+	sane_mysql_init(conf);
 }
 
 db_mysql::db_mysql(const mysql_conf& conf)
 {
-	sane_mysql_init(conf.get_dbaddr(), conf.get_dbname(),
-		conf.get_dbuser(), conf.get_dbpass(), conf.get_dbflags(),
-		conf.get_auto_commit(), conf.get_conn_timeout(),
-		conf.get_rw_timeout(), conf.get_charset());
+	sane_mysql_init(conf);
 }
 
 db_mysql::~db_mysql(void)
 {
-	acl_myfree(dbaddr_);
-	acl_myfree(dbname_);
-	if (dbuser_) {
-		acl_myfree(dbuser_);
-	}
-	if (dbpass_) {
-		acl_myfree(dbpass_);
-	}
 #ifdef HAS_MYSQL_DLL
 	if (conn_ && __mysql_dll) {
 #else
@@ -672,29 +686,29 @@ bool db_mysql::dbopen(const char* charset /* = NULL */)
 	}
 
 	char  tmpbuf[256];
-	char *db_host, *db_unix;
+	const char *db_host, *db_unix;
 	int   db_port;
 
-	char* ptr = strchr(dbaddr_, '/');
+	const char* ptr = strchr(dbaddr_.c_str(), '/');
 	if (ptr == NULL) {
-		ACL_SAFE_STRNCPY(tmpbuf, dbaddr_, sizeof(tmpbuf));
-		ptr = strchr(tmpbuf, ':');
-		if (ptr == NULL || *(ptr + 1) == 0) {
-			logger_error("invalid db_addr=%s", dbaddr_);
+		ACL_SAFE_STRNCPY(tmpbuf, dbaddr_.c_str(), sizeof(tmpbuf));
+		char *p = strchr(tmpbuf, ':');
+		if (p == NULL || *(p + 1) == 0) {
+			logger_error("invalid db_addr=%s", dbaddr_.c_str());
 			return false;
 		} else {
-			*ptr++ = 0;
+			*p++ = 0;
 		}
 		db_host = tmpbuf;
 
-		db_port = atoi(ptr);
+		db_port = atoi(p);
 		if (db_port <= 0) {
 			logger_error("invalid port=%d", db_port);
 			return false;
 		}
 		db_unix = NULL;
 	} else {
-		db_unix = dbaddr_;
+		db_unix = dbaddr_.c_str();
 		db_host = NULL;
 		db_port = 0;
 	}
@@ -758,27 +772,40 @@ bool db_mysql::dbopen(const char* charset /* = NULL */)
 
 #if MYSQL_VERSION_ID >= 50500 && MYSQL_VERSION_ID < 80000
 	my_bool reconnect = 1;
-	__mysql_options((MYSQL*) conn_, MYSQL_OPT_RECONNECT, (const void*) &reconnect);
+	__mysql_options((MYSQL*) conn_, MYSQL_OPT_RECONNECT,
+		(const void*) &reconnect);
 #endif
 
-	if (__mysql_open((MYSQL*) conn_, db_host, dbuser_ ? dbuser_ : "",
-		dbpass_ ? dbpass_ : "", dbname_, db_port,
+	if (!sslcrt_.empty() && !sslkey_.empty() && !sslca_.empty()) {
+		__mysql_ssl_set((MYSQL*) conn_, sslkey_.c_str(),
+			sslcrt_.c_str(), sslca_.c_str(),
+			sslcapath_.empty() ? NULL : sslcapath_.c_str(),
+			sslcipher_.empty() ? NULL : sslcipher_.c_str());
+		dbflags_ |= CLIENT_SSL;
+	}
+
+	if (__mysql_open((MYSQL*) conn_, db_host, dbuser_.empty() ? "" : dbuser_.c_str(),
+		dbpass_.empty() ? "": dbpass_.c_str(), dbname_.c_str(), db_port,
 		db_unix, dbflags_) == NULL) {
 
 		logger_error("connect mysql error(%s), db_host=%s, db_port=%d,"
 			" db_unix=%s, db_name=%s, db_user=%s, db_pass=%s,"
-			" dbflags=%ld",
+			" dbflags=%ld, sslkey=%s, sslcrt=%s, sslca=%s",
 			__mysql_error((MYSQL*) conn_),
 			db_host ? db_host : "null", db_port,
 			db_unix ? db_unix : "null",
-			dbname_ ? dbname_ : "null",
-			dbuser_ ? dbuser_ : "null",
-			dbpass_ ? dbpass_ : "null", dbflags_);
+			dbname_.empty() ? "null" : dbname_.c_str(),
+			dbuser_.empty() ? "null" : dbuser_.c_str(),
+			dbpass_.empty() ? "null" : dbpass_.c_str(), dbflags_,
+			sslkey_.c_str(), sslcrt_.c_str(), sslca_.c_str());
 
 		__mysql_close((MYSQL*) conn_);
 		conn_ = NULL;
 		return false;
 	}
+
+	//const char *cipher = __mysql_get_ssl_cipher((MYSQL*) conn_);
+	//printf("cipher=%s\n", cipher);
 #if 0
 	logger("connect mysql ok(%s), db_host=%s, db_port=%d, "
 		"db_unix=%s, db_name=%s, db_user=%s, db_pass=%s, dbflags=%ld",
@@ -839,7 +866,7 @@ bool db_mysql::close(void)
 bool db_mysql::sane_mysql_query(const char* sql)
 {
 	if (conn_ == NULL && !dbopen()) {
-		logger_error("open mysql error, db=%s", dbname_);
+		logger_error("open mysql error, db=%s", dbname_.c_str());
 		return false;
 	}
 
@@ -850,14 +877,14 @@ bool db_mysql::sane_mysql_query(const char* sql)
 	int errnum = __mysql_errno((MYSQL*) conn_);
 	if (errnum != CR_SERVER_LOST && errnum != CR_SERVER_GONE_ERROR) {
 		logger_error("db(%s): sql(%s) error(%s)",
-			dbname_, sql, __mysql_error((MYSQL*) conn_));
+			dbname_.c_str(), sql, __mysql_error((MYSQL*) conn_));
 		return false;
 	}
 
 	/* 重新打开MYSQL连接进行重试 */
 	close();
 	if (!dbopen()) {
-		logger_error("reopen db(%s) error", dbname_);
+		logger_error("reopen db(%s) error", dbname_.c_str());
 		return false;
 	}
 	if (__mysql_query((MYSQL*) conn_, sql) == 0) {
@@ -865,7 +892,7 @@ bool db_mysql::sane_mysql_query(const char* sql)
 	}
 
 	logger_error("db(%s), sql(%s) error(%s)",
-		dbname_, sql, __mysql_error((MYSQL*) conn_));
+		dbname_.c_str(), sql, __mysql_error((MYSQL*) conn_));
 	return false;
 }
 
@@ -881,7 +908,7 @@ bool db_mysql::tbl_exists(const char* tbl_name)
 	if (my_res == NULL) {
 		if (__mysql_errno((MYSQL*) conn_) != 0) {
 			logger_error("db(%s), sql(%s) error(%s)",
-				dbname_, sql, __mysql_error((MYSQL*) conn_));
+				dbname_.c_str(), sql, __mysql_error((MYSQL*) conn_));
 			close();
 		}
 		return false;
@@ -909,7 +936,7 @@ bool db_mysql::sql_select(const char* sql, db_rows* result /* = NULL */)
 	if (my_res == NULL) {
 		if (__mysql_errno((MYSQL*) conn_) != 0) {
 			logger_error("db(%s), sql(%s) error(%s)",
-				dbname_, sql, __mysql_error((MYSQL*) conn_));
+				dbname_.c_str(), sql, __mysql_error((MYSQL*) conn_));
 			close();
 		}
 		return false;
@@ -999,9 +1026,7 @@ bool db_mysql::load(void)
 	return false;
 }
 
-void db_mysql::sane_mysql_init(const char*, const char*,
-	const char*, const char*,
-	unsigned long, bool, int, int, const char*)
+void db_mysql::sane_mysql_init(const mysql_conf&)
 {
 }
 

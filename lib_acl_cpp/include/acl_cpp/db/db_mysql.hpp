@@ -56,8 +56,7 @@ public:
 	 * 或出错时内部自动关闭了 mysql 连接
 	 * @return {void*} 类型同 MYSQL*
 	 */
-	void* get_conn(void) const
-	{
+	void* get_conn(void) const {
 		return conn_;
 	}
 
@@ -142,11 +141,17 @@ public:
 	bool rollback(void);
 
 private:
-	char*  dbaddr_;  // 数据库监听地址
-	char*  dbname_;  // 数据库名
-	char*  dbuser_;  // 数据库账号
-	char*  dbpass_;  // 数据库账号密码
+	std::string dbaddr_;  // 数据库监听地址
+	std::string dbname_;  // 数据库名
+	std::string dbuser_;  // 数据库账号
+	std::string dbpass_;  // 数据库账号密码
 	string charset_; // 连接数据库采用的字符集
+
+	std::string sslcrt_;
+	std::string sslkey_;
+	std::string sslca_;
+	std::string sslcapath_;
+	std::string sslcipher_;
 
 	unsigned long dbflags_;
 	int    conn_timeout_;
@@ -155,10 +160,7 @@ private:
 	void*  conn_;	// MYSQL 对象指针
 
 	bool sane_mysql_query(const char* sql);
-	void sane_mysql_init(const char* dbaddr, const char* dbname,
-		const char* dbuser, const char* dbpass,
-		unsigned long dbflags, bool auto_commit,
-		int conn_timeout, int rw_timeout, const char* charset);
+	void sane_mysql_init(const mysql_conf& conf);
 };
 
 } // namespace acl

@@ -7,145 +7,111 @@
 
 namespace acl {
 
-mysql_conf::mysql_conf(const char* dbaddr, const char* dbname)
+mysql_conf::mysql_conf(const char* addr, const char* name)
 {
-	acl_assert(dbaddr && *dbaddr);
-	acl_assert(dbname && *dbname);
+	acl_assert(addr && *addr);
+	acl_assert(name && *name);
 
 	// µÿ÷∑∏Ò Ω£∫[dbname@]dbaddr
-	const char* ptr = strchr(dbaddr, '@');
+	const char* ptr = strchr(addr, '@');
 	if (ptr != NULL) {
 		ptr++;
 	} else {
-		ptr = dbaddr;
+		ptr = addr;
 	}
 	acl_assert(*ptr);
 
-	dbaddr_ = acl_mystrdup(ptr);
-	dbname_ = acl_mystrdup(dbname);
-	dbkey_  = acl_concatenate(dbname, "@", ptr, NULL);
-	acl_lowercase(dbkey_);
+	dbaddr = ptr;
+	dbname = name;
 
-	dbuser_  = NULL;
-	dbpass_  = NULL;
-	charset_ = NULL;
-	dblimit_ = 64;
-	dbflags_ = 0;
-	auto_commit_  = true;
-	conn_timeout_ = 60;
-	rw_timeout_   = 60;
+	acl::string buf;
+	buf.format("%s@%s", name, ptr);
+	buf.lower();
+	dbkey  = buf.c_str();
+
+	dblimit      = 64;
+	dbflags      = 0;
+	auto_commit  = true;
+	conn_timeout = 60;
+	rw_timeout   = 60;
 }
 
 mysql_conf::mysql_conf(const mysql_conf& conf)
 {
-	dbaddr_ = acl_mystrdup(conf.get_dbaddr());
-	dbname_ = acl_mystrdup(conf.get_dbname());
-	dbkey_  = acl_mystrdup(conf.get_dbkey());
+	dbaddr       = conf.dbaddr;
+	dbname       = conf.dbname;
+	dbkey        = conf.dbkey;
 
-	const char* ptr = conf.get_dbuser();
+	dbuser       = conf.dbuser;
+	dbpass       = conf.dbpass;
+	charset      = conf.charset;
+	dblimit      = conf.dblimit;
+	dbflags      = conf.dbflags;
+	auto_commit  = conf.auto_commit;
+	conn_timeout = conf.conn_timeout;
+	rw_timeout   = conf.rw_timeout;
+	sslcrt       = conf.sslcrt;
+	sslkey       = conf.sslkey;
+	sslca        = conf.sslca;
+	sslcapath    = conf.sslcapath;
+	sslcipher    = conf.sslcipher;
+}
+
+mysql_conf::~mysql_conf()
+{
+}
+
+mysql_conf& mysql_conf::set_dbuser(const char* user)
+{
+	if (user && *user) {
+		dbuser = user;
+	}
+	return *this;
+}
+
+mysql_conf& mysql_conf::set_dbpass(const char* pass)
+{
+	if (pass && *pass) {
+		dbpass = pass;
+	}
+	return *this;
+}
+
+mysql_conf& mysql_conf::set_charset(const char* ptr)
+{
 	if (ptr && *ptr) {
-		dbuser_ = acl_mystrdup(ptr);
-	} else {
-		dbuser_ = NULL;
+		charset = ptr;
 	}
-	ptr = conf.get_dbpass();
-	if (ptr && *ptr) {
-		dbpass_ = acl_mystrdup(ptr);
-	} else {
-		dbpass_ = NULL;
-	}
-	ptr = conf.get_charset();
-	if (ptr && *ptr) {
-		charset_ = acl_mystrdup(ptr);
-	} else {
-		charset_ = NULL;
-	}
-	dblimit_      = conf.get_dblimit();
-	dbflags_      = conf.get_dbflags();
-	auto_commit_  = conf.get_auto_commit();
-	conn_timeout_ = conf.get_conn_timeout();
-	rw_timeout_   = conf.get_rw_timeout();
-}
-
-mysql_conf::~mysql_conf(void)
-{
-	acl_myfree(dbaddr_);
-	acl_myfree(dbname_);
-	acl_myfree(dbkey_);
-	if (dbuser_) {
-		acl_myfree(dbuser_);
-	}
-	if (dbpass_) {
-		acl_myfree(dbpass_);
-	}
-	if (charset_) {
-		acl_myfree(charset_);
-	}
-}
-
-mysql_conf& mysql_conf::set_dbuser(const char* dbuser)
-{
-	if (dbuser == NULL || *dbuser == 0) {
-		return *this;
-	}
-	if (dbuser_) {
-		acl_myfree(dbuser_);
-	}
-	dbuser_ = acl_mystrdup(dbuser);
 	return *this;
 }
 
-mysql_conf& mysql_conf::set_dbpass(const char* dbpass)
+mysql_conf& mysql_conf::set_dblimit(size_t n)
 {
-	if (dbpass == NULL || *dbpass == 0) {
-		return *this;
-	}
-	if (dbpass_) {
-		acl_myfree(dbpass_);
-	}
-	dbpass_ = acl_mystrdup(dbpass);
+	dblimit = n;
 	return *this;
 }
 
-mysql_conf& mysql_conf::set_charset(const char* charset)
+mysql_conf& mysql_conf::set_dbflags(unsigned long flags)
 {
-	if (charset == NULL || *charset == 0) {
-		return *this;
-	}
-	if (charset_) {
-		acl_myfree(charset_);
-	}
-	charset_ = acl_mystrdup(charset);
-	return *this;
-}
-
-mysql_conf& mysql_conf::set_dblimit(size_t dblimit)
-{
-	dblimit_ = dblimit;
-	return *this;
-}
-
-mysql_conf& mysql_conf::set_dbflags(unsigned long dbflags)
-{
-	dbflags_ = dbflags;
+	dbflags = flags;
 	return *this;
 }
 
 mysql_conf& mysql_conf::set_auto_commit(bool on)
 {
-	auto_commit_ = on;
+	auto_commit = on;
 	return *this;
 }
 
 mysql_conf& mysql_conf::set_conn_timeout(int timeout)
 {
-	conn_timeout_ = timeout;
+	conn_timeout = timeout;
 	return *this;
 }
 
 mysql_conf& mysql_conf::set_rw_timeout(int timeout)
 {
-	rw_timeout_ = timeout;
+	rw_timeout = timeout;
 	return *this;
 }
 

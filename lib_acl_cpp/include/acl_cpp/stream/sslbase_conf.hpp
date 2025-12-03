@@ -90,7 +90,7 @@ public:
 	 * 加载 CA 根证书(每个配置实例只需调用一次本方法)
 	 * @param ca_file {const char*} CA 证书文件全路径
 	 * @param ca_path {const char*} 多个 CA 证书文件所在目录
-	 * @return {bool} 加载  CA 根证书是否成功
+	 * @return {bool} 加载 CA 根证书是否成功
 	 * 注：如果 ca_file、ca_path 均非空，则会依次加载所有证书
 	 */
 	virtual bool load_ca(const char* ca_file, const char* ca_path) {

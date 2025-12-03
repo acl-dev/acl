@@ -35,8 +35,8 @@ protected:
 
 private:
 	// sqlite 数据文件名
-	char* dbfile_;
-	char* charset_;
+	char*  dbfile_;
+	char*  charset_;
 	size_t dblimit_;
 };
 

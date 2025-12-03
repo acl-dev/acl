@@ -347,7 +347,16 @@ int main(void)
 
 	//////////////////////////////////////////////////////////////////////
 
-	acl::db_mysql db(dbaddr, dbname, dbuser, dbpass, 0, false);
+	acl::mysql_conf conf(dbaddr, dbname);
+	conf.dbuser = dbuser.c_str();
+	conf.dbpass = dbpass.c_str();
+	//conf.sslcrt = "/opt/soft/mysql-8.4.7/data/client-cert.pem";
+	//conf.sslkey = "/opt/soft/mysql-8.4.7/data/client-key.pem";
+	//conf.sslca  = "/opt/soft/mysql-8.4.7/data/ca.pem";
+
+	//acl::db_mysql db(dbaddr, dbname, dbuser, dbpass, 0, false);
+	acl::db_mysql db(conf);
+
 	int   max = 100;
 
 	// 先打开数据库连接

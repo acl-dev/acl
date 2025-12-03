@@ -28,8 +28,7 @@ public:
 	 * 获得查询 SQL 语句
 	 * @return {const string&}
 	 */
-	const string& get_sql(void) const
-	{
+	const string& get_sql(void) const {
 		return sql_;
 	}
 
@@ -37,8 +36,7 @@ public:
 	 * 在遍历查询结构集时，每次查询后可通过本方法获得结果行
 	 * @return {db_row*}
 	 */
-	db_row* get_row(void) const
-	{
+	db_row* get_row(void) const {
 		return row_;
 	}
 

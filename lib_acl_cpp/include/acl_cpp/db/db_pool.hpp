@@ -36,8 +36,7 @@ public:
 	 * 获得当前数据库连接池的最大连接数限制
 	 * @return {size_t}
 	 */
-	size_t get_dblimit() const
-	{
+	size_t get_dblimit() const {
 		return get_max();
 	}
 
@@ -45,8 +44,7 @@ public:
 	 * 获得当前数据库连接池当前的连接数
 	 * @return {size_t}
 	 */
-	size_t get_dbcount() const
-	{
+	size_t get_dbcount() const {
 		return get_count();
 	}
 
@@ -54,8 +52,7 @@ public:
 	 * 设置数据库连接池中空闲连接的生存周期(秒)
 	 * @param ttl {int} 生存周期(秒)
 	 */
-	void set_idle(int ttl)
-	{
+	void set_idle(int ttl) {
 		set_idle_ttl(ttl);
 	}
 };

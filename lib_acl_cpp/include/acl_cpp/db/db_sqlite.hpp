@@ -72,8 +72,7 @@ public:
 	 * 或出错时内部自动关闭了 sqlite
 	 * @return {sqlite3*}
 	 */
-	sqlite3* get_conn(void) const
-	{
+	sqlite3* get_conn(void) const {
 		return db_;
 	}
 
