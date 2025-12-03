@@ -4,25 +4,16 @@
 
 static bool __show_results = false;
 
-class mysql_oper
-{
+class mysql_oper {
 public:
-	mysql_oper(acl::db_pool& dbp, unsigned long id)
-		: dbp_(dbp), id_(id)
-	{
-	}
+	mysql_oper(acl::db_pool& dbp, unsigned long id) : dbp_(dbp), id_(id) {}
 
-	~mysql_oper(void)
-	{
-	}
+	~mysql_oper(void) {}
 
-	void mysql_add(int count)
-	{
-		for (int i = 0; i < count; i++)
-		{
+	void mysql_add(int count) {
+		for (int i = 0; i < count; i++) {
 			acl::db_handle* db = dbp_.peek_open();
-			if (db == NULL)
-			{
+			if (db == NULL) {
 				printf("peek db connection error i: %d\r\n", i);
 				break;
 			}
@@ -32,13 +23,10 @@ public:
 		}
 	}
 
-	void mysql_get(int count)
-	{
-		for (int i = 0; i < count; i++)
-		{
+	void mysql_get(int count) {
+		for (int i = 0; i < count; i++) {
 			acl::db_handle* db = dbp_.peek_open();
-			if (db == NULL)
-			{
+			if (db == NULL) {
 				printf("peek db connection error i: %d\r\n", i);
 				break;
 			}
@@ -52,33 +40,32 @@ private:
 	acl::db_pool& dbp_;
 	unsigned long id_;
 
-	bool add(acl::db_handle& db, int n)
-	{
+	bool add(acl::db_handle& db, int n) {
 		acl::query query;
 		query.create_sql("insert into group_tbl(group_name, uvip_tbl,"
 			" update_date) values(:group, :test, :date)")
 			.set_format("group", "group:%lu:%d", id_, n)
 			.set_parameter("test", "test")
 			.set_date("date", time(NULL), "%Y-%m-%d");
-		if (db.exec_update(query) == false)
-		{
+		if (db.exec_update(query) == false) {
 			printf("exec_update error: %s\r\n", db.get_error());
 			return false;
 		}
 
+		if (__show_results && n < 10) {
+			printf(">>>fiber-%d: add ok\r\n", acl::fiber::self());
+		}
 		return true;
 	}
 
-	bool get(acl::db_handle& db, int n)
-	{
+	bool get(acl::db_handle& db, int n) {
 		acl::query query;
 		query.create_sql("select * from group_tbl"
 			" where group_name=:group"
 			" and uvip_tbl=:test")
 			.set_format("group", "group:%lu:%d", id_, n)
 			.set_format("test", "test");
-		if (db.exec_select(query) == false)
-		{
+		if (db.exec_select(query) == false) {
 			printf("exec_select error: %s\r\n", db.get_error());
 			return false;
 		}
@@ -86,17 +73,19 @@ private:
 		//printf("query=%s\r\n", query.to_string().c_str());
 
 		const acl::db_rows* result = db.get_result();
-		if (__show_results && result)
-		{
+		if (__show_results && result) {
 			const std::vector<acl::db_row*>& rows =
 				result->get_rows();
-			for (size_t i = 0; i < rows.size(); i++)
-			{
-				if (n > 10)
+			for (size_t i = 0; i < rows.size(); i++) {
+				if (n > 10) {
 					continue;
+				}
+
+				printf(">>>fiber-%d: ", acl::fiber::self());
 				const acl::db_row* row = rows[i];
-				for (size_t j = 0; j < row->length(); j++)
+				for (size_t j = 0; j < row->length(); j++) {
 					printf("%s, ", (*row)[j]);
+				}
 				printf("\r\n");
 			}
 		}
@@ -109,24 +98,23 @@ private:
 //////////////////////////////////////////////////////////////////////////////
 // mysql thread class
 
-class mysql_thread : public acl::thread
-{
+class mysql_thread : public acl::thread {
 public:
 	mysql_thread(int id, acl::db_pool& dbp, const char* oper, int count)
 		: id_(id), dbp_(dbp), oper_(oper), count_(count) {}
 	~mysql_thread(void) {}
 
 protected:
-	void* run(void)
-	{
+	void* run(void) {
 		mysql_oper dboper(dbp_, id_);
 
-		if (oper_.equal("add", false))
+		if (oper_.equal("add", false)) {
 			dboper.mysql_add(count_);
-		else if (oper_.equal("get", false))
+		} else if (oper_.equal("get", false)) {
 			dboper.mysql_get(count_);
-		else
+		} else {
 			printf("unknown command: %s\r\n", oper_.c_str());
+		}
 
 		return NULL;
 	}
@@ -144,8 +132,7 @@ private:
 static int __max_fibers = 2;
 static int __cur_fibers = 2;
 
-class mysql_fiber : public acl::fiber
-{
+class mysql_fiber : public acl::fiber {
 public:
 	mysql_fiber(int id, acl::db_pool& dbp, const char* oper, int count)
 		: id_(id), dbp_(dbp), oper_(oper), count_(count) {}
@@ -153,26 +140,25 @@ public:
 
 protected:
 	// @override
-	void run(void)
-	{
+	void run(void) {
 //		printf("fiber-%d-%d running\r\n", get_id(), acl::fiber::self());
 		acl_fiber_delay(10);
 
 		mysql_oper dboper(dbp_, id_);
 
-		if (oper_.equal("add", false))
+		if (oper_.equal("add", false)) {
 			dboper.mysql_add(count_);
-		else if (oper_.equal("get", false))
+		} else if (oper_.equal("get", false)) {
 			dboper.mysql_get(count_);
-		else
+		} else {
 			printf("unknown command: %s\r\n", oper_.c_str());
+		}
 
 		delete this;
 
 		printf("----__cur_fibers: %d----\r\n", __cur_fibers);
 
-		if (--__cur_fibers == 0)
-		{
+		if (--__cur_fibers == 0) {
 			printf("All fibers Over\r\n");
 			acl::fiber::schedule_stop();
 		}
@@ -187,8 +173,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////
 
-static void usage(const char* procname)
-{
+static void usage(const char* procname) {
 	printf("usage: %s\r\n"
 		" -h [help]\r\n"
 		" -c cocurrent\r\n"
@@ -206,8 +191,7 @@ static void usage(const char* procname)
 		procname);
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	int  ch, count = 10, conn_timeout = 10, rw_timeout = 10, cocurrent = 2;
 	acl::string mysql_path("../../lib/libmysqlclient_r.so");
 	acl::string dbaddr("127.0.0.1:3306"), dbname("acl_db");
@@ -217,10 +201,8 @@ int main(int argc, char *argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hc:tn:f:s:u:o:p:C:R:d:D")) > 0)
-	{
-		switch (ch)
-		{
+	while ((ch = getopt(argc, argv, "hc:tn:f:s:u:o:p:C:R:d:D")) > 0) {
+		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
@@ -280,12 +262,10 @@ int main(int argc, char *argv[])
 	// init mysql connections pool
 	acl::mysql_pool dbpool(dbconf);
 
-	if (use_threads)
-	{
+	if (use_threads) {
 		std::vector<acl::thread*> threads;
 
-		for (int i = 0; i < cocurrent; i++)
-		{
+		for (int i = 0; i < cocurrent; i++) {
 			acl::thread* thread = new
 				mysql_thread(i, dbpool, oper, count);
 
@@ -295,19 +275,15 @@ int main(int argc, char *argv[])
 		}
 
 		for (std::vector<acl::thread*>::iterator it = threads.begin();
-				it != threads.end(); ++it)
-		{
+			  it != threads.end(); ++it) {
 			(*it)->wait(NULL);
 			delete (*it);
 		}
-	}
-	else
-	{
+	} else {
 		__max_fibers = cocurrent;
 		__cur_fibers = __max_fibers;
 
-		for (int i = 0; i < __max_fibers; i++)
-		{
+		for (int i = 0; i < __max_fibers; i++) {
 			acl::fiber* f = new mysql_fiber(i, dbpool, oper, count);
 			f->start();
 		}
