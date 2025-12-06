@@ -1106,6 +1106,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\stdlib\class_counter.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\stdlib\dbuf_pool.cpp"
 					>
 				</File>
@@ -2053,6 +2057,10 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\charset_conv.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\class_counter.hpp"
 					>
 				</File>
 				<File

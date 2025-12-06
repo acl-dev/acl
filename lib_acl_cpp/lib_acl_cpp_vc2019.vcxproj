@@ -543,6 +543,7 @@
     <ClCompile Include="src\stdlib\atomic.cpp" />
     <ClCompile Include="src\stdlib\bitmap.cpp" />
     <ClCompile Include="src\stdlib\charset_conv.cpp" />
+    <ClCompile Include="src\stdlib\class_counter.cpp" />
     <ClCompile Include="src\stdlib\dbuf_pool.cpp" />
     <ClCompile Include="src\stdlib\dns_service.cpp" />
     <ClCompile Include="src\stdlib\diff_manager.cpp" />
@@ -761,6 +762,7 @@
     <ClInclude Include="include\acl_cpp\stdlib\bitmap.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\box.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\charset_conv.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\class_counter.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\dbuf_pool.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\dns_service.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\diff_manager.hpp" />

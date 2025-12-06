@@ -11,7 +11,7 @@ fiber_sem::fiber_sem(size_t max, fiber_sem_attr_t attr)
 		flags |= ACL_FIBER_SEM_F_ASYNC;
 	}
 
-	sem_ = acl_fiber_sem_create2(max, flags);
+	sem_ = acl_fiber_sem_create2((int) max, flags);
 }
 
 fiber_sem::fiber_sem(size_t max, size_t buf)

@@ -29,7 +29,7 @@ class redis_pipeline_channel;
  * The message for transferring between redis command, redis client pipline
  * and redis pipeline channel, which holds the redis command.
  */
-class redis_pipeline_message {
+class ACL_CPP_API redis_pipeline_message {
 public:
 	redis_pipeline_message(redis_pipeline_type_t type,
 		box<redis_pipeline_message>* box);
@@ -154,7 +154,7 @@ class redis_client_pipeline;
  * One pipeline channel thread for one redis node, which waits for message
  * from pipline thread and try to combine more messages and sends to redis.
  */
-class redis_pipeline_channel : public thread {
+class ACL_CPP_API redis_pipeline_channel : public thread {
 public:
 	redis_pipeline_channel(redis_client_pipeline& pipeline,
 		const char* addr, int conn_timeout, int rw_timeout, bool retry);

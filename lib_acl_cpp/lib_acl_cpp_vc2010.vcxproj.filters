@@ -139,6 +139,9 @@
     <ClCompile Include="src\stdlib\charset_conv.cpp">
       <Filter>src\stdlib</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\class_counter.cpp">
+      <Filter>src\stdlib</Filter>
+    </ClCompile>
     <ClCompile Include="src\stdlib\dns_service.cpp">
       <Filter>src\stdlib</Filter>
     </ClCompile>
@@ -913,6 +916,9 @@
       <Filter>include\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\charset_conv.hpp">
+      <Filter>include\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\class_counter.hpp">
       <Filter>include\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\dns_service.hpp">

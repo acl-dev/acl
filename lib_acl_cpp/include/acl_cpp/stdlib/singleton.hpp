@@ -66,7 +66,7 @@ namespace acl {
 // attempt to retieve a mutable instances while locked will
 // generate a assertion if compiled for debug.
 
-class singleton_module : public noncopyable {
+class ACL_CPP_API singleton_module : public noncopyable {
 public:
 	static void lock() {
 		get_lock() = true;

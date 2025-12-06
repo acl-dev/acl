@@ -676,6 +676,9 @@
     <ClCompile Include="src\net\rfc1035.cpp">
       <Filter>Source Files\net</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\class_counter.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -904,6 +907,9 @@
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\charset_conv.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\class_counter.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\dns_service.hpp">

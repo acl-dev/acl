@@ -374,7 +374,7 @@ void acl_fiber_mutex_stats_show(const ACL_FIBER_MUTEX_STATS *stats)
 /****************************************************************************/
 
 #ifdef	SYS_WIN
-# define LOCK(m) (pthread_mutex_trylock(&(m)->lock) != 0) {}
+# define LOCK_WAIT(m) while (pthread_mutex_trylock(&(m)->lock) != 0) {}
 #else
 # define LOCK_FATAL(_rc_) do {                                               \
 	if (rc == EINVAL) msg_fatal("invalid lock, rc=%d", rc);              \
