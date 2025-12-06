@@ -4,6 +4,11 @@
 #if MYSQL_VERSION_ID==50508
 # include "mysql/5.5.8/mysql.h"
 # include "mysql/5.5.8/errmsg.h"
+#elif MYSQL_VERSION_ID==80407
+# include <stdbool.h>
+# define my_bool bool
+# include "mysql/8.4.7/mysql.h"
+# include "mysql/8.4.7/errmsg.h"
 #elif MYSQL_VERSION_ID==90500
 # include <stdbool.h>
 # define my_bool bool
