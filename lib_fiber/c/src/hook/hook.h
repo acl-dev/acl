@@ -46,7 +46,9 @@ typedef socket_t (WSAAPI *WSAAccept_fn)(SOCKET, struct sockaddr FAR *,
 
 typedef int (*fcntl_fn)(int, int, ...);
 typedef int (*pipe_fn)(int pipefd[2]);
+# ifdef __linux__
 typedef int (*pipe2_fn)(int pipefd[2], int flags);
+# endif
 typedef int (*socketpair_fn)(int domain, int type, int protocol, int sv[2]);
 typedef int (*setsockopt_fn)(socket_t, int, int, const void *, socklen_t);
 typedef int (*getsockopt_fn)(socket_t, int, int, void *, socklen_t*);
@@ -158,7 +160,9 @@ extern WSAAccept_fn         *sys_WSAAccept;
 
 extern fcntl_fn             *sys_fcntl;
 extern pipe_fn              *sys_pipe;
+# ifdef __linux__
 extern pipe2_fn             *sys_pipe2;
+# endif
 extern socketpair_fn        *sys_socketpair;
 extern setsockopt_fn        *sys_setsockopt;
 extern getsockopt_fn        *sys_getsockopt;

@@ -536,6 +536,7 @@ int pipe(int pipefd[2])
 	return 0;
 }
 
+#ifdef __linux__
 int pipe2(int pipefd[2], int flags)
 {
 	if (sys_pipe2 == NULL) {
@@ -558,6 +559,7 @@ int pipe2(int pipefd[2], int flags)
 
 	return 0;
 }
+#endif
 
 int socketpair(int domain, int type, int protocol, int sv[2])
 {
