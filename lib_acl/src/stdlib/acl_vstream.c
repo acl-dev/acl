@@ -856,21 +856,22 @@ int acl_vstream_readtags(ACL_VSTREAM *fp, void *vptr, size_t maxlen,
 
 int acl_vstream_gets(ACL_VSTREAM *fp, void *vptr, size_t maxlen)
 {
-	int   n, ch;
+	size_t i;
+	int ch, n = 0;
 	unsigned char *ptr;
 
-	if (fp == NULL || vptr == NULL || maxlen <= 0) {
-		acl_msg_error("%s(%d), %s: fp %s, vptr %s, maxlen %d",
+	if (fp == NULL || vptr == NULL || maxlen < 2) {
+		acl_msg_error("%s(%d), %s: fp %s, vptr %s, maxlen %d < 2",
 			__FILE__, __LINE__, __FUNCTION__, fp ? "not null" : "null",
 			vptr ? "not null" : "null", (int) maxlen);
 		return ACL_VSTREAM_EOF;
 	}
 
+	maxlen--; /* left one byte for '\0' */
 	fp->flag &= ~ACL_VSTREAM_FLAG_TAGYES;
 
 	ptr = (unsigned char *) vptr;
-	for (n = 1; n < (int) maxlen; n++) {
-		/* left one byte for '\0' */
+	for (i = 0; i < maxlen; i++) {
 
 #ifdef	_USE_FAST_MACRO
 		ch = ACL_VSTREAM_GETC(fp);
@@ -878,13 +879,15 @@ int acl_vstream_gets(ACL_VSTREAM *fp, void *vptr, size_t maxlen)
 		ch = acl_vstream_getc(fp);
 #endif
 		if (ch == ACL_VSTREAM_EOF) {
-			if (n == 1) { /* EOF, nodata read */
+			if (n == 0) { /* EOF, nodata read */
 				return ACL_VSTREAM_EOF;
 			}
 			break;  /* EOF, some data was read */
 		}
 
+		n++;
 		*ptr++ = ch;
+
 		if (ch == '\n') {
 			/* newline is stored, like fgets() */
 			fp->flag |= ACL_VSTREAM_FLAG_TAGYES;
@@ -899,32 +902,37 @@ int acl_vstream_gets(ACL_VSTREAM *fp, void *vptr, size_t maxlen)
 
 int acl_vstream_gets_nonl(ACL_VSTREAM *fp, void *vptr, size_t maxlen)
 {
-	int   n, ch;
+	size_t i;
+	int ch, n = 0;
 	unsigned char *ptr;
 
-	if (fp == NULL || vptr == NULL || maxlen <= 0) {
+	if (fp == NULL || vptr == NULL || maxlen < 1) {
 		acl_msg_error("%s(%d), %s: fp %s, vptr %s, maxlen %d",
 			__FILE__, __LINE__, __FUNCTION__, fp ? "not null" : "null",
 			vptr ? "not null" : "null", (int) maxlen);
 		return ACL_VSTREAM_EOF;
 	}
 
+	maxlen--; /* left one byte for '\0' */
 	fp->flag &= ~ACL_VSTREAM_FLAG_TAGYES;
 
 	ptr = (unsigned char *) vptr;
-	for (n = 1; n < (int) maxlen; n++) {
+	for (i = 0; i < maxlen; i++) {
 #ifdef	_USE_FAST_MACRO
 		ch = ACL_VSTREAM_GETC(fp);
 #else
 		ch = acl_vstream_getc(fp);
 #endif
 		if (ch == ACL_VSTREAM_EOF) {
-			if (n == 1)  /* EOF, nodata read */
+			if (n == 0) { /* EOF, nodata read */
 				return ACL_VSTREAM_EOF;
+			}
 			break;  /* EOF, some data was read */
 		}
 
+		n++;
 		*ptr++ = ch;
+
 		if (ch == '\n') {
 			fp->flag |= ACL_VSTREAM_FLAG_TAGYES;
 			break;  /* newline is stored, like fgets() */
