@@ -52,6 +52,15 @@ sleep_fn                 *sys_sleep                = NULL;
 static fcntl_fn          __sys_fcntl               = NULL;
 fcntl_fn                 *sys_fcntl                = NULL;
 
+static pipe_fn           __sys_pipe                = NULL;
+pipe_fn                  *sys_pipe                 = NULL;
+
+static pipe2_fn          __sys_pipe2               = NULL;
+pipe2_fn                 *sys_pipe2                = NULL;
+
+static socketpair_fn     __sys_socketpair          = NULL;
+socketpair_fn            *sys_socketpair           = NULL;
+
 static setsockopt_fn     __sys_setsockopt          = NULL;
 setsockopt_fn            *sys_setsockopt           = NULL;
 
@@ -259,6 +268,9 @@ static void hook_api(void)
 	LOAD_FN("getsockopt", getsockopt_fn, __sys_getsockopt, sys_getsockopt, 1);
 	LOAD_FN("sleep", sleep_fn, __sys_sleep, sys_sleep, 1);
 	LOAD_FN("fcntl", fcntl_fn, __sys_fcntl, sys_fcntl, 1);
+	LOAD_FN("pipe", pipe_fn, __sys_pipe, sys_pipe, 1);
+	LOAD_FN("pipe2", pipe2_fn, __sys_pipe2, sys_pipe2, 1);
+	LOAD_FN("socketpair", socketpair_fn, __sys_socketpair, sys_socketpair, 1);
 	LOAD_FN("read", read_fn, __sys_read, sys_read, 1);
 	LOAD_FN("readv", readv_fn, __sys_readv, sys_readv, 1);
 	LOAD_FN("recv", recv_fn, __sys_recv, sys_recv, 1);

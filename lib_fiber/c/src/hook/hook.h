@@ -45,6 +45,9 @@ typedef socket_t (WSAAPI *WSAAccept_fn)(SOCKET, struct sockaddr FAR *,
 #elif defined(__linux__) || defined(LINUX2) || defined(__APPLE__) || defined(__FreeBSD__) || defined(MINGW)
 
 typedef int (*fcntl_fn)(int, int, ...);
+typedef int (*pipe_fn)(int pipefd[2]);
+typedef int (*pipe2_fn)(int pipefd[2], int flags);
+typedef int (*socketpair_fn)(int domain, int type, int protocol, int sv[2]);
 typedef int (*setsockopt_fn)(socket_t, int, int, const void *, socklen_t);
 typedef int (*getsockopt_fn)(socket_t, int, int, void *, socklen_t*);
 typedef unsigned (*sleep_fn)(unsigned int seconds);
@@ -154,6 +157,9 @@ extern WSAAccept_fn         *sys_WSAAccept;
 #elif defined(__linux__) || defined(LINUX2) || defined(__APPLE__) || defined(__FreeBSD__)  || defined(MINGW) // SYS_UNIX
 
 extern fcntl_fn             *sys_fcntl;
+extern pipe_fn              *sys_pipe;
+extern pipe2_fn             *sys_pipe2;
+extern socketpair_fn        *sys_socketpair;
 extern setsockopt_fn        *sys_setsockopt;
 extern getsockopt_fn        *sys_getsockopt;
 extern sleep_fn             *sys_sleep;

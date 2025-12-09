@@ -34,6 +34,9 @@ socket_t WINAPI acl_fiber_socket(int domain, int type, int protocol)
 #else
 	if (sockfd == INVALID_SOCKET) {
 		fiber_save_errno(acl_fiber_last_error());
+	} else {
+		FILE_EVENT *fe = fiber_file_open(sockfd);
+		file_event_init(fe, sockfd);
 	}
 #endif
 
@@ -190,9 +193,12 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 		clifd = fe->iocp_sock;
 		if (clifd != INVALID_SOCKET) {
 			int ret;
+			FILE_EVENT *cfe;
+
 			non_blocking(clifd, NON_BLOCKING);
 			tcp_nodelay(clifd, 1);
 			fe->iocp_sock = INVALID_SOCKET;
+
 			/* iocp 方式下，需调用下面过程以允许调用
 			 * getpeername/getsockname
 			 */
@@ -203,6 +209,9 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 				closesocket(clifd);
 				continue;
 			}
+
+			cfe = fiber_file_open(clifd);
+			file_event_init(cfe, clifd);
 			return clifd;
 		}
 # endif
@@ -214,6 +223,9 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 # endif
 
 		if (clifd != INVALID_SOCKET) {
+			FILE_EVENT *cfe = fiber_file_open(clifd);
+			file_event_init(cfe, clifd);
+
 			non_blocking(clifd, NON_BLOCKING);
 			tcp_nodelay(clifd, 1);
 			return clifd;
@@ -252,15 +264,32 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 # ifdef HAS_IOCP
 		clifd = fe->iocp_sock;
 		if (clifd != INVALID_SOCKET) {
+			int ret;
+			FILE_EVENT *fe;
+
 			non_blocking(clifd, NON_BLOCKING);
 			tcp_nodelay(clifd, 1);
 			fe->iocp_sock = INVALID_SOCKET;
+
+			ret = setsockopt(clifd, SOL_SOCKET,
+				SO_UPDATE_ACCEPT_CONTEXT,
+				(char *)&fe->fd, sizeof(fe->fd));
+			if (ret == SOCKET_ERROR) {
+				closesocket(clifd);
+				continue;
+			}
+
+			cfe = fiber_file_open(clifd);
+			file_event_init(cfe, clifd);
 			return clifd;
 		}
 # endif
 		clifd = (*sys_accept)(sockfd, addr, addrlen);
 
 		if (clifd != INVALID_SOCKET) {
+			FILE_EVENT *cfe = fiber_file_open(clifd);
+			file_event_init(cfe, clifd);
+
 			non_blocking(clifd, NON_BLOCKING);
 			tcp_nodelay(clifd, 1);
 			return clifd;
@@ -482,6 +511,75 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
 	return acl_fiber_connect(sockfd, addr, addrlen);
+}
+
+int pipe(int pipefd[2])
+{
+	if (sys_pipe == NULL) {
+		hook_once();
+		if (sys_pipe == NULL) {
+			return -1;
+		}
+	}
+
+	if ((*sys_pipe)(pipefd) == -1) {
+		return -1;
+	}
+
+	if (var_hook_sys_api) {
+		FILE_EVENT *fe = fiber_file_open(pipefd[0]);
+		file_event_init(fe, pipefd[0]);
+		fe = fiber_file_open(pipefd[1]);
+		file_event_init(fe, pipefd[1]);
+	}
+
+	return 0;
+}
+
+int pipe2(int pipefd[2], int flags)
+{
+	if (sys_pipe2 == NULL) {
+		hook_once();
+		if (sys_pipe2 == NULL) {
+			return -1;
+		}
+	}
+
+	if ((*sys_pipe2)(pipefd, flags) == -1) {
+		return -1;
+	}
+
+	if (var_hook_sys_api) {
+		FILE_EVENT *fe = fiber_file_open(pipefd[0]);
+		file_event_init(fe, pipefd[0]);
+		fe = fiber_file_open(pipefd[1]);
+		file_event_init(fe, pipefd[1]);
+	}
+
+	return 0;
+}
+
+int socketpair(int domain, int type, int protocol, int sv[2])
+{
+	if (sys_socketpair == NULL) {
+		hook_once();
+		if (sys_socketpair == NULL) {
+			return -1;
+		}
+	}
+
+	if ((*sys_socketpair)(domain, type, protocol, sv) == -1) {
+		return -1;
+	}
+
+	if (var_hook_sys_api) {
+		FILE_EVENT *fe = fiber_file_open(sv[0]);
+		file_event_init(fe, sv[0]);
+		fe = fiber_file_open(sv[1]);
+		file_event_init(fe, sv[1]);
+	}
+
+	return 0;
 }
 
 #ifdef CREAT_TIMER_FIBER
