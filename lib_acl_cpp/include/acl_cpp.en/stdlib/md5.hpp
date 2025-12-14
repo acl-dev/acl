@@ -33,19 +33,22 @@ public:
 
 	/**
 	 * Get md5 result value in binary format
-	 * @return {const char*} Return value is always non-empty, and buffer length is 16 bytes
+	 * @return {const char*} Return value is always non-empty, and buffer length is
+	 * 16 bytes
 	 */
 	const char* get_digest() const;
 
 	/**
 	 * Get md5 result value represented as string
-	 * @return {const char*} Return value is always non-empty, ends with \0, and string
+	 * @return {const char*} Return value is always non-empty, ends with \0, and
+	 * string
 	 *  length is 32 bytes
 	 */
 	const char* get_string() const;
 
 	/**
-	 * Calculate signature value of data using md5 algorithm, get 128-bit (i.e., 16-byte) binary result
+	 * Calculate signature value of data using md5 algorithm, get 128-bit (i.e.,
+	 * 16-byte) binary result
 	 * @param dat {const void*} Source data
 	 * @param dlen {size_t} dat data length
 	 * @param key {const char*} When not empty, used as key data
@@ -58,7 +61,8 @@ public:
 		const void *key, size_t klen, void* out, size_t size);
 
 	/**
-	 * Calculate signature value of data using md5 algorithm, get result in string form
+	 * Calculate signature value of data using md5 algorithm, get result in string
+	 * form
 	 * @param dat {const void*} Source data
 	 * @param dlen {size_t} dat data length
 	 * @param key {const char*} When not empty, used as key data
@@ -72,13 +76,15 @@ public:
 		const void *key, size_t klen, char* out, size_t size);
 
 	/**
-	 * Calculate signature value of content in file using md5 algorithm, and get result in string form
+	 * Calculate signature value of content in file using md5 algorithm, and get
+	 * result in string form
 	 * @param path {const char*} Full file path
 	 * @param key {const char*} When not empty, used as key data
 	 * @param klen {size_t} When key is not empty, indicates length of key
 	 * @param out {void*} Store md5 result
 	 * @param size {size_t} out size, should be at least 33 bytes
-	 * @return {int64) Returns length of file data read. Returns -1 in the following cases:
+	 * @return {int64) Returns length of file data read. Returns -1 in the
+	 * following cases:
 	 *  1) Failed to open file
 	 *  2) No data read from file
 	 *  3) out buffer size is less than 33 bytes
@@ -92,13 +98,15 @@ public:
 #endif
 
 	/**
-	 * Calculate signature value of content in file using md5 algorithm, and get result in string form
+	 * Calculate signature value of content in file using md5 algorithm, and get
+	 * result in string form
 	 * @param in {istream&} Input file stream
 	 * @param key {const char*} When not empty, used as key data
 	 * @param klen {size_t} When key is not empty, indicates length of key
 	 * @param out {void*} Store md5 result
 	 * @param size {size_t} out size, should be at least 33 bytes
-	 * @return {int64) Returns length of file data read. Returns -1 in the following cases:
+	 * @return {int64) Returns length of file data read. Returns -1 in the
+	 * following cases:
 	 *  1) No data read from input stream
 	 *  2) out buffer size is less than 33 bytes
 	 */

@@ -59,9 +59,12 @@ public:
 	}
 
 	/**
-	 * In blocking check mode, call this function to set whether the check object is in blocking state.
-	 * When in blocking state, the check object is prohibited from being closed by calling the close method
-	 * @param on {bool} Set whether the check object is in blocking state, default is blocking state
+	 * In blocking check mode, call this function to set whether the check object
+	 * is in blocking state.
+	 * When in blocking state, the check object is prohibited from being closed by
+	 * calling the close method
+	 * @param on {bool} Set whether the check object is in blocking state, default
+	 * is blocking state
 	 */
 	void set_blocked(bool on);
 

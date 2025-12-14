@@ -9,8 +9,7 @@ namespace acl {
 
 class string;
 
-class ACL_CPP_API hsrow : public noncopyable
-{
+class ACL_CPP_API hsrow : public noncopyable {
 public:
 	/**
 	 * Constructor

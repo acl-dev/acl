@@ -56,8 +56,10 @@ public:
 	/////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * Set process-level timer. This function can only be set in main thread's running space (e.g., in function
-	 * proc_on_init). When all timer tasks are executed, it will be automatically destroyed
+	 * Set process-level timer. This function can only be set in main thread's
+	 * running space (e.g., in function
+	 * proc_on_init). When all timer tasks are executed, it will be automatically
+	 * destroyed
 	 * (i.e., internally will automatically call master_timer::destroy method)
 	 * @param timer {event_timer*} Timer task
 	 * @return {bool} Whether setting timer was successful
@@ -79,33 +81,39 @@ protected:
 	virtual ~master_base();
 
 	/**
-	 * When process starts, this function is called each time the service process successfully listens on a local address
+	 * When process starts, this function is called each time the service process
+	 * successfully listens on a local address
 	 * @param ss {const server_socket&} Listening object
 	 */
 	virtual void proc_on_listen(server_socket& ss) { (void) ss; }
 
 	/**
-	 * Callback function called before process switches user identity. Can perform some
+	 * Callback function called before process switches user identity. Can perform
+	 * some
 	 * operations requiring root privileges in this function
 	 */
 	virtual void proc_pre_jail() {}
 
 	/**
-	 * Callback function called after process switches user identity. When this function is called, process
+	 * Callback function called after process switches user identity. When this
+	 * function is called, process
 	 * permissions are at ordinary restricted level
 	 */
 	virtual void proc_on_init() {}
 
 	/**
-	 * This virtual method is called first before process exits. If subclass implementation returns false, it will sleep 1 second then
-	 * continue calling this virtual method until subclass implementation returns true. This gives application layer a way to decide
+	 * This virtual method is called first before process exits. If subclass
+	 * implementation returns false, it will sleep 1 second then
+	 * continue calling this virtual method until subclass implementation returns
+	 * true. This gives application layer a way to decide
 	 * whether to exit immediately
 	 *
 	 */
 	virtual bool proc_pre_exit() { return true; }
 
 	/**
-	 * Callback function called before process exits. After this function returns, process will officially exit. Note that this method
+	 * Callback function called before process exits. After this function returns,
+	 * process will officially exit. Note that this method
 	 * will be called after the above proc_pre_exit call
 	 */
 	virtual void proc_on_exit() {}

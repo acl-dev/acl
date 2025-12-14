@@ -62,8 +62,10 @@ public:
 	static bool load();
 
 	/**
-	 * After successfully loading OpenSSL dynamic library by calling load(), call this static function to get libssl
-	 * dynamically loaded library handle, so that function pointers can be obtained from this handle
+	 * After successfully loading OpenSSL dynamic library by calling load(), call
+	 * this static function to get libssl
+	 * dynamically loaded library handle, so that function pointers can be obtained
+	 * from this handle
 	 * @return {void*} Returns NULL if not yet loaded
 	 */
 	static void* get_libssl_handle();
@@ -106,27 +108,36 @@ public:
 	void get_ssl_ctxes(std::vector<SSL_CTX*>& out);
 
 	/**
-	 * In server mode, create SSL_CTX object. Internally automatically sets SNI callback process. Although internally also
-	 * creates SSL_CTX object by calling SSL_CTX_new() API, internally will automatically distinguish between dynamically
+	 * In server mode, create SSL_CTX object. Internally automatically sets SNI
+	 * callback process. Although internally also
+	 * creates SSL_CTX object by calling SSL_CTX_new() API, internally will
+	 * automatically distinguish between dynamically
 	 * loaded or statically loaded SSL_CTX_new() API.
-	 * @return {SSL_CTX*} Returns NULL indicates OpenSSL functionality is not enabled
+	 * @return {SSL_CTX*} Returns NULL indicates OpenSSL functionality is not
+	 * enabled
 	 */
 	SSL_CTX* create_ssl_ctx();
 
 	/**
-	 * In server mode, add externally initialized SSL_CTX. This object must be created by the above
-	 * create_ssl_ctx() to adapt to different ways of dynamically or statically loading OpenSSL.
-	 * @param {SSL_CTX*} SSL_CTX object initialized by user, after passing in, its ownership
+	 * In server mode, add externally initialized SSL_CTX. This object must be
+	 * created by the above
+	 * create_ssl_ctx() to adapt to different ways of dynamically or statically
+	 * loading OpenSSL.
+	 * @param {SSL_CTX*} SSL_CTX object initialized by user, after passing in, its
+	 * ownership
 	 *  will be managed and released internally by openssl_conf
-	 * @return {bool} Returns false indicates add failed, reason may be ctx is NULL, or
+	 * @return {bool} Returns false indicates add failed, reason may be ctx is
+	 * NULL, or
 	 *  current openssl_conf object is client mode
 	 */
 	bool push_ssl_ctx(SSL_CTX* ctx);
 
 	/**
 	 * When setting read/write timeout, whether to use setsockopt()
-	 * @param yes {bool} If true, use setsockopt to set read/write timeout, otherwise
-	 *  use acl_read_wait/acl_write_wait to check timeout situation. Internal default value is true.
+	 * @param yes {bool} If true, use setsockopt to set read/write timeout,
+	 * otherwise
+	 * use acl_read_wait/acl_write_wait to check timeout situation. Internal
+	 * default value is true.
 	 */
 	void use_sockopt_timeout(bool yes);
 

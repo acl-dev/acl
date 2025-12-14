@@ -126,7 +126,8 @@ public:
 	 *  the geospatial's loginitude
 	 * @param latitude {double} Latitude
 	 *  the geospatial's latitude
-	 * @return {int} 1: Add successful, 0: This geospatial coordinate identifier already exists. Even if its value was modified,
+	 * @return {int} 1: Add successful, 0: This geospatial coordinate identifier
+	 * already exists. Even if its value was modified,
 	 *  will also return 0. -1: Indicates error.
 	 *  the return value as below:
 	 *  1: add one new member successfully
@@ -144,11 +145,14 @@ public:
 	 *  the specified key
 	 * @param size {size_t} Array length
 	 *  the array's size
-	 * @param members {const char* []} Member array, its length is specified by size
+	 * @param members {const char* []} Member array, its length is specified by
+	 * size
 	 *  the members array, which's length was specified by size parameter
-	 * @param longitudes {const double[]} Longitude data array, its length is specified by size
+	 * @param longitudes {const double[]} Longitude data array, its length is
+	 * specified by size
 	 *  the logintitudes array, which's length was specifed by size parameter
-	 * @param latitudes {const double[]} Latitude data array, its length is specified by size
+	 * @param latitudes {const double[]} Latitude data array, its length is
+	 * specified by size
 	 *  the lattitudes array, which's length was specifed by size parameter
 	 * @return {int} Number of successfully added members. Return value meanings:
 	 *  return the successfully added members's count:
@@ -184,7 +188,8 @@ public:
 	 *   -1: Indicates error. Can check error reason through result_error function
 	 *       some error happened, the result_error function can be used
 	 *       to find the error's reason
-	 *  Note: Three arrays (members, longitudes, latitudes) must have equal array lengths
+	 * Note: Three arrays (members, longitudes, latitudes) must have equal array
+	 * lengths
 	 *  Notice: the three array's length must be equal between members,
 	 *    longitudes and latitudes
 	 */
@@ -262,7 +267,8 @@ public:
 	 * @param member2 {const char*} Geospatial coordinate member
 	 *  another member of a geospatial index
 	 * @param unit {int} Unit value of returned distance
-	 * @return {double} Length between two coordinates. Return value < 0 indicates error
+	 * @return {double} Length between two coordinates. Return value < 0 indicates
+	 * error
 	 *  returns the distance between two members, which was less than 0
 	 *  if some error happened.
 	 */
@@ -270,7 +276,8 @@ public:
 		const char* member2, int unit = GEO_UNIT_M);
 
 	/**
-	 * Get all coordinate points within given distance range from a specified coordinate position
+	 * Get all coordinate points within given distance range from a specified
+	 * coordinate position
 	 * Query a sorted set representing a geospatial index to fetch
 	 * members matching a given maximum distance from a point
 	 * @param key {const char*} Corresponding key value
@@ -283,11 +290,14 @@ public:
 	 *  the distance from the specified coordinate
 	 * @param unit {int} Unit type of radius distance
 	 *  the unit type of the raidus
-	 * @param with {int} Query condition options. See definitions above: GEO_WITH_XXX
+	 * @param with {int} Query condition options. See definitions above:
+	 * GEO_WITH_XXX
 	 *  the serach operations, defined as GEO_WITH_XXX above
-	 * @param sort {int} Sorting method of query results. See definitions: GEO_SORT_XXX
+	 * @param sort {int} Sorting method of query results. See definitions:
+	 * GEO_SORT_XXX
 	 *  the sorted type of the results, defined as GEO_SORT_XXX above
-	 * @return {const std::vector<geo_member>&} Result set of coordinate points meeting conditions
+	 * @return {const std::vector<geo_member>&} Result set of coordinate points
+	 * meeting conditions
 	 *  Returns the results according the searching conditions.
 	 */
 	const std::vector<geo_member>& georadius(const char* key,
@@ -297,7 +307,8 @@ public:
 		int sort = GEO_SORT_ASC);
 
 	/**
-	 * Get all coordinate points within given distance range from a specified coordinate position
+	 * Get all coordinate points within given distance range from a specified
+	 * coordinate position
 	 * Query a sorted set representing a geospatial index to fetch
 	 * members matching a given maximum distance from a member
 	 * @param key {const char*} Corresponding key value
@@ -308,11 +319,14 @@ public:
 	 *  the distance from the specified coordinate
 	 * @param unit {int} Unit type of radius distance
 	 *  the unit type of the raidus
-	 * @param with {int} Query condition options. See definitions above: GEO_WITH_XXX
+	 * @param with {int} Query condition options. See definitions above:
+	 * GEO_WITH_XXX
 	 *  the serach operations, defined as GEO_WITH_XXX above
-	 * @param sort {int} Sorting method of query results. See definitions: GEO_SORT_XXX
+	 * @param sort {int} Sorting method of query results. See definitions:
+	 * GEO_SORT_XXX
 	 *  the sorted type of the results, defined as GEO_SORT_XXX above
-	 * @return {const std::vector<geo_member>&} Result set of coordinate points meeting conditions
+	 * @return {const std::vector<geo_member>&} Result set of coordinate points
+	 * meeting conditions
 	 *  Returns the results according the searching conditions.
 	 */
 	const std::vector<geo_member>& georadiusbymember(const char* key,

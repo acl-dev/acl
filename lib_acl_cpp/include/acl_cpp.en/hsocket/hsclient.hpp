@@ -16,14 +16,16 @@ namespace acl {
 class hsrow;
 class hstable;
 
-class ACL_CPP_API hsclient : public noncopyable
-{
+class ACL_CPP_API hsclient : public noncopyable {
 public:
 	/**
 	 * Constructor
-	 * @param addr {const char*} HandlerSocket server listening address on MySQL, format: ip:port
-	 * @param cache_enable {bool} Whether to enable internal serialization cache functionality
-	 * @param retry_enable {bool} Whether to retry when connection fails due to network reasons
+	 * @param addr {const char*} HandlerSocket server listening address on MySQL,
+	 * format: ip:port
+	 * @param cache_enable {bool} Whether to enable internal serialization cache
+	 * functionality
+	 * @param retry_enable {bool} Whether to retry when connection fails due to
+	 * network reasons
 	 *  Format: ip:port
 	 */
 	hsclient(const char* addr, bool cache_enable = true, bool retry_enable = true);
@@ -31,14 +33,19 @@ public:
 
 	/**
 	 * Query database records matching field values.
-	 * @param values {const char*[]} Matching field value array. The order of field values should match the order
+	 * @param values {const char*[]} Matching field value array. The order of field
+	 * values should match the order
 	 *  of fields in the flds parameter of the open function.
-	 * @param num {int} Length of values array. This value should correspond to the number of
+	 * @param num {int} Length of values array. This value should correspond to the
+	 * number of
 	 *  fields in the flds array of the constructor.
 	 * @param cond {const char*} Matching condition operator, default is:
-	 *  = equal; >= greater than or equal; > greater than; < less than; <= less than or equal
-	 * @param nlimit {int} Maximum number of query results, 0 means no limit on the number
-	 * @param noffset {int} Starting position of query results (0 means starting from the first record)
+	 * = equal; >= greater than or equal; > greater than; < less than; <= less than
+	 * or equal
+	 * @param nlimit {int} Maximum number of query results, 0 means no limit on the
+	 * number
+	 * @param noffset {int} Starting position of query results (0 means starting
+	 * from the first record)
 	 * @return {const std::verctor<hsrow*>&} Returns results
 	 */
 	const std::vector<hsrow*>& get(const char* values[], int num,
@@ -46,9 +53,11 @@ public:
 
 	/**
 	 * Query database records matching field values.
-	 * @param first_value {const char*} Field value corresponding to the first field in the flds field set
+	 * @param first_value {const char*} Field value corresponding to the first
+	 * field in the flds field set
 	 *  of the constructor.
-	 * @param ... {const char*} Variable parameter list. The last parameter must be NULL to indicate the end.
+	 * @param ... {const char*} Variable parameter list. The last parameter must be
+	 * NULL to indicate the end.
 	 * @return {const std::verctor<hsrow*>&} Returns results
 	 */
 	const std::vector<hsrow*>& get(const char* first_value, ...)
@@ -56,17 +65,22 @@ public:
 
 	/**
 	 * Modify database records matching field values.
-	 * @param values {const char*[]} Matching field value array. The order of field values should match the order
+	 * @param values {const char*[]} Matching field value array. The order of field
+	 * values should match the order
 	 *  of fields in the flds parameter of the open function.
-	 * @param num {int} Length of values array. This value should correspond to the number of
-	 *  fields in the flds array of the constructor.
-	 * @param to_values {cosnt *[]} Matching field new values. The order of field values should match the open function's
+	 * @param num {int} Length of values array. This value should correspond to the
+	 * number of fields in the flds array of the constructor.
+	 * @param to_values {cosnt *[]} Matching field new values. The order of field
+	 * values should match the open function's
 	 *  field order.
 	 * @param to_num {int} Length of to_values array.
 	 * @param cond {const char*} Matching condition operator, default is:
-	 *  = equal; >= greater than or equal; > greater than; < less than; <= less than or equal
-	 * @param nlimit {int} Maximum number of query results, 0 means no limit on the number
-	 * @param noffset {int} Starting position of query results (0 means starting from the first record)
+	 * = equal; >= greater than or equal; > greater than; < less than; <= less than
+	 * or equal
+	 * @param nlimit {int} Maximum number of query results, 0 means no limit on the
+	 * number
+	 * @param noffset {int} Starting position of query results (0 means starting
+	 * from the first record)
 	 * @return {bool} Whether the operation was successful
 	 */
 	bool mod(const char* values[], int num,
@@ -75,14 +89,17 @@ public:
 
 	/**
 	 * Delete database records matching field values.
-	 * @param values {const char*[]} Matching field value array. The order of field values should match the order
-	 *  of fields in the flds parameter of the open function.
-	 * @param num {int} Length of values array. This value should correspond to the number of
-	 *  fields in the flds array of the constructor.
+	 * @param values {const char*[]} Matching field value array. The order of field
+	 * values should match the order  of fields in the flds parameter of the
+	 * open function.
+	 * @param num {int} Length of values array. This value should correspond to the
+	 * number of fields in the flds array of the constructor.
 	 * @param cond {const char*} Matching condition operator, default is:
-	 *  = equal; >= greater than or equal; > greater than; < less than; <= less than or equal
+	 * = equal; >= greater than or equal; > greater than; < less than; <= less than
+	 * or equal
 	 * @param nlimit {int} Number of records to delete, 0 means no limit
-	 * @param noffset {int} Starting position of query results (0 means starting from the first record)
+	 * @param noffset {int} Starting position of query results (0 means starting
+	 * from the first record)
 	 * @return {bool} Whether the operation was successful
 	 */
 	bool del(const char* values[], int num, const char* cond = "=",
@@ -90,35 +107,38 @@ public:
 
 	/**
 	 * Delete database records matching field values.
-	 * @param first_value {const char*} Field value corresponding to the first field in the flds field set
-	 *  of the constructor.
-	 * @param ... {const char*} Variable parameter list. The last parameter must be NULL to indicate the end.
+	 * @param first_value {const char*} Field value corresponding to the first
+	 * field in the flds field set of the constructor.
+	 * @param ... {const char*} Variable parameter list. The last parameter must be
+	 * NULL to indicate the end.
 	 * @return {bool} Whether adding record was successful
 	 */
 	bool fmt_del(const char* first_value, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
 	 * Add database record.
-	 * @param values {const char*[]} Matching field value array. The order of field values should match the constructor's
-	 *  flds field order.
-	 * @param num {int} Length of values array. This value should correspond to the number of
-	 *  fields in the flds array of the constructor.
+	 * @param values {const char*[]} Matching field value array. The order of field
+	 * values should match the constructor's flds field order.
+	 * @param num {int} Length of values array. This value should correspond to the
+	 * number of fields in the flds array of the constructor.
 	 * @return {bool} Whether adding record was successful
 	 */
 	bool add(const char* values[], int num);
 
 	/**
 	 * Add database record using variable parameters.
-	 * @param first_value {const char*} Field value corresponding to the first field in the flds field set
-	 *  of the constructor.
-	 * @param ... {const char*} Variable parameter list. The last parameter must be NULL to indicate the end.
+	 * @param first_value {const char*} Field value corresponding to the first
+	 * field in the flds field set of the constructor.
+	 * @param ... {const char*} Variable parameter list. The last parameter must be
+	 * NULL to indicate the end.
 	 * @return {bool} Whether adding record was successful
 	 */
 	bool fmt_add(const char* first_value, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
 	 * Set whether to enable debugging.
-	 * @param on {bool} true means enable debugging, will output some intermediate information to the log.
+	 * @param on {bool} true means enable debugging, will output some intermediate
+	 * information to the log.
 	 */
 	void debug_enable(bool on);
 
@@ -128,9 +148,11 @@ public:
 	 * @param tbl {const char*} Database table
 	 * @param idx {const char*} Index field name
 	 * @param flds {const char*} Field name set to open, format is
-	 *  field names separated by separators ",; \t", e.g., user_id,user_name,user_mail
+	 * field names separated by separators ",; \t", e.g.,
+	 * user_id,user_name,user_mail
 	 * @param auto_open {bool} Whether to automatically open if not opened
-	 * @return {bool} true means table opened successfully, false means opening failed
+	 * @return {bool} true means table opened successfully, false means opening
+	 * failed
 	 */
 	bool open_tbl(const char* dbn, const char* tbl,
 		const char* idx, const char* flds, bool auto_open = true);
@@ -186,7 +208,8 @@ private:
 	bool open_tbl(const char* dbn, const char* tbl,
 		const char* idx, const char* flds, const char* key);
 
-	// When reading and writing database operations fail, this function needs to be called
+	// When reading and writing database operations fail, this function needs to be
+	// called
 	// to close the connection stream and release resources.
 	void close_stream();
 

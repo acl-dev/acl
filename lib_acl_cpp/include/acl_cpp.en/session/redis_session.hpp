@@ -25,10 +25,12 @@ public:
 	// Base class virtual function, set hash attribute value to redis server
 	bool set(const char* name, const void* value, size_t len);
 
-	// Base class virtual function, get corresponding attribute value from hash object on redis server
+	// Base class virtual function, get corresponding attribute value from hash
+	// object on redis server
 	const session_string* get_buf(const char* name);
 
-	// Base class virtual function, delete an attribute value from hash object on redis server
+	// Base class virtual function, delete an attribute value from hash object on
+	// redis server
 	bool del(const char* name);
 
 	// Base class pure virtual function, delete data from redis

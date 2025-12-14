@@ -14,8 +14,7 @@
 
 namespace acl {
 
-class ACL_CPP_API hserror
-{
+class ACL_CPP_API hserror {
 public:
 	hserror();
 	~hserror();

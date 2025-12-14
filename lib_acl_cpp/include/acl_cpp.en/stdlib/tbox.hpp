@@ -10,7 +10,8 @@
 namespace acl {
 
 /**
- * Used for message communication between threads, implemented through thread condition variables and thread locks
+ * Used for message communication between threads, implemented through thread
+ * condition variables and thread locks
  *
  * Example:
  *
@@ -41,7 +42,8 @@ class tbox : public box<T> {
 public:
 	/**
 	 * Constructor
-	 * @param free_obj {bool} When tbox is destroyed, whether to automatically check and release
+	 * @param free_obj {bool} When tbox is destroyed, whether to automatically
+	 * check and release
 	 *  unconsumed dynamic objects
 	 */
 	explicit tbox(bool free_obj = true)
@@ -69,7 +71,8 @@ public:
 	/**
 	 * Send message object
 	 * @param t {T*} Non-empty message object
-	 * @param notify_first {bool} If true, notify first then unlock, otherwise unlock first
+	 * @param notify_first {bool} If true, notify first then unlock, otherwise
+	 * unlock first
 	 *  then notify. Note the difference between the two
 	 * @return {bool}
 	 * @override
@@ -94,13 +97,19 @@ public:
 	 * Receive message object
 	 * @param ms {int} When >= 0, set wait timeout (milliseconds),
 	 *  otherwise wait forever until message object is read or error occurs
-	 * @param found {bool*} When not NULL, used to store whether a message object was obtained, mainly used for
+	 * @param found {bool*} When not NULL, used to store whether a message object
+	 * was obtained, mainly used for
 	 *  checking when passing null objects is allowed
-	 * @return {T*} Non-NULL indicates a message object was obtained. When returns NULL, need to do further
-	 *  checking. If producer pushes a null object (NULL), consumer will also get NULL,
-	 *  but it is still considered that a message object was obtained, just that it's a null object. If wait_ms parameter
-	 *  is -1 and returns NULL, it is still considered that a null message object was obtained. If wait_ms is greater than
-	 *  or equal to 0 and returns NULL, then should check whether found parameter value is true or false to
+	 * @return {T*} Non-NULL indicates a message object was obtained. When returns
+	 * NULL, need to do further
+	 * checking. If producer pushes a null object (NULL), consumer will also get
+	 * NULL,
+	 * but it is still considered that a message object was obtained, just that
+	 * it's a null object. If wait_ms parameter
+	 * is -1 and returns NULL, it is still considered that a null message object
+	 * was obtained. If wait_ms is greater than
+	 * or equal to 0 and returns NULL, then should check whether found parameter
+	 * value is true or false to
 	 *  determine whether a null message object was obtained
 	 * @override
 	 */

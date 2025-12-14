@@ -15,7 +15,8 @@ public:
 	/**
 	 * Constructor
 	 * @param conf {sslbase_conf&} Class object for configuring each SSL connection
-	 * @param server_side {bool} Whether it is server mode. Because handshake methods differ between client mode and server
+	 * @param server_side {bool} Whether it is server mode. Because handshake
+	 * methods differ between client mode and server
 	 *  mode, this parameter is used to distinguish them
 	 * @param nblock {bool} Whether it is non-blocking mode
 	 */
@@ -29,7 +30,8 @@ public:
 	virtual bool handshake() = 0;
 
 	/**
-	 * Get SSL version of current connection. Definition reference see sslbase_conf.hpp.
+	 * Get SSL version of current connection. Definition reference see
+	 * sslbase_conf.hpp.
 	 * @return 0 indicates cannot obtain
 	 */
 	virtual int get_version() const {
@@ -44,13 +46,16 @@ public:
 
 	/**
 	 * Set socket to blocking mode/non-blocking mode
-	 * @param yes {bool} When false, set to blocking mode, otherwise set to non-blocking mode
+	 * @param yes {bool} When false, set to blocking mode, otherwise set to
+	 * non-blocking mode
 	 */
 	void set_non_blocking(bool yes);
 
 	/**
-	 * Determine whether the currently set SSL IO is blocking mode or non-blocking mode
-	 * @return {bool} Returns true indicates non-blocking mode, otherwise blocking mode
+	 * Determine whether the currently set SSL IO is blocking mode or non-blocking
+	 * mode
+	 * @return {bool} Returns true indicates non-blocking mode, otherwise blocking
+	 * mode
 	 */
 	bool is_non_blocking() const {
 		return nblock_;
@@ -86,7 +91,8 @@ public:
 	}
 
 	/**
-	 * Set binding object for this SSL IO object, convenient for applications to handle their own business logic
+	 * Set binding object for this SSL IO object, convenient for applications to
+	 * handle their own business logic
 	 * @param ctx {void*}
 	 */
 	void set_ctx(void* ctx);

@@ -44,14 +44,16 @@ public:
 	virtual ~redis_key();
 
 	/**
-	 * Delete one or some keys from redis. For variable args interface, the last parameter must be NULL.
+	 * Delete one or some keys from redis. For variable args interface, the last
+	 * parameter must be NULL.
 	 * delete one or some keys from redis, for deleting a variable
 	 * number of keys, the last key must be NULL indicating the end
 	 * of the variable args
 	 * @return {int} Returns number of keys deleted, as below:
 	 *  0: No KEY deleted.
 	 *  -1: Error occurred.
-	 *  >0: Number of keys deleted. Return value may be less than actual number of keys deleted.
+	 * >0: Number of keys deleted. Return value may be less than actual number of
+	 * keys deleted.
 	 *  return the number of keys been deleted, return value as below:
 	 *  0: none key be deleted
 	 * -1: error happened
@@ -72,7 +74,8 @@ public:
 	int del_keys(const char* keys[], const size_t lens[], size_t argc);
 
 	/**
-	 * Serialize object associated with key and get serialized value. RESTORE command can be used to deserialize value
+	 * Serialize object associated with key and get serialized value. RESTORE
+	 * command can be used to deserialize value
 	 * back to Redis.
 	 * serialize the object associate with the given key, and get the
 	 * value after serializing, RESTORE command can be used to
@@ -96,7 +99,8 @@ public:
 	 *  the key
 	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @return {bool} Returns true to indicate exists. Returns false to indicate error or does not exist.
+	 * @return {bool} Returns true to indicate exists. Returns false to indicate
+	 * error or does not exist.
 	 *  true returned if key existing, false if error or not existing
 	 */
 	bool exists(const char* key, size_t len);
@@ -151,7 +155,8 @@ public:
 	 *  the give matching pattern
 	 * @param out {std::vector<string>*} When not NULL, stores matched results.
 	 *  store the matched keys
-	 * @return {int} Returns number of matched keys. 0--empty, <0 -- indicates error.
+	 * @return {int} Returns number of matched keys. 0--empty, <0 -- indicates
+	 * error.
 	 *  return the number of the matched keys, 0 if none, < 0 if error
 	 *  Matching pattern examples:
 	 *   KEYS * matches all keys in database.
@@ -161,13 +166,17 @@ public:
 	 *
 	 *  When successful, result can be obtained by one of the following ways:
 	 *  1. Get specified subscript element value by base class function get_value.
-	 *  2. Get specified subscript element object (redis_result) by base class function get_child, then
+	 * 2. Get specified subscript element object (redis_result) by base class
+	 * function get_child, then
 	 *     get element value through redis_result::argv_to_string.
-	 *  3. Get overall result object redis_result by base class function get_result, then
-	 *     get first element object by redis_result::get_child, then get element value by method 2
+	 * 3. Get overall result object redis_result by base class function get_result,
+	 * then
+	 * get first element object by redis_result::get_child, then get element value
+	 * by method 2
 	 *     above.
-	 *  4. Get child array by base class function get_children, then get element value from each
-	 *     redis_result object in array through redis_result's method argv_to_string.
+	 * 4. Get child array by base class function get_children, then get element
+	 * value from each
+	 * redis_result object in array through redis_result's method argv_to_string.
 	 *  5. Pass non-empty storage container address in function call.
 	 */
 	int keys_pattern(const char* pattern, std::vector<string>* out);
@@ -179,11 +188,14 @@ public:
 	 *  the key
 	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @param addr {const char*} Destination redis-server listening address, format: ip:port
+	 * @param addr {const char*} Destination redis-server listening address,
+	 * format: ip:port
 	 *  the destination redis instance's address, format: ip:port
-	 * @param dest_db {unsigned} Destination database ID in destination redis-server.
+	 * @param dest_db {unsigned} Destination database ID in destination
+	 * redis-server.
 	 *  the databases ID in destination redis
-	 * @param timeout {unsigned} Timeout time for migration process (millisecond level)
+	 * @param timeout {unsigned} Timeout time for migration process (millisecond
+	 * level)
 	 *  timeout(microseconds) in transfering
 	 * @param options {const char*} COPY/REPLACE/AUTH/AUTH2...
 	 *  transfer option: COPY or REPLACE
@@ -207,7 +219,8 @@ public:
 	 *  the key's length
 	 * @param dest_db {unsigned} Destination database ID.
 	 *  the destination database
-	 * @return {int} Whether migration was successful. -1: indicates error. 0: migration failed because
+	 * @return {int} Whether migration was successful. -1: indicates error. 0:
+	 * migration failed because
 	 *  same key already exists in destination database. 1: migration successful.
 	 *  if moving succcessfully. -1 if error, 0 if moving failed because
 	 *  the same key already exists, 1 if successful
@@ -216,13 +229,15 @@ public:
 	int move(const char* key, unsigned dest_db);
 
 	/**
-	 * Get referring count of object associated with key. This is only for debugging.
+	 * Get referring count of object associated with key. This is only for
+	 * debugging.
 	 * get the referring count of the object, which just for debugging
 	 * @param key {const char*} Key value.
 	 *  the key
 	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @return {int} Returns 0 to indicate key does not exist. < 0 to indicate error.
+	 * @return {int} Returns 0 to indicate key does not exist. < 0 to indicate
+	 * error.
 	 *  0 if key not exists, < 0 if error
 	 */
 	int object_refcount(const char* key, size_t len);
@@ -243,7 +258,8 @@ public:
 	bool object_encoding(const char* key, string& out);
 
 	/**
-	 * Get idle time (idle: not read or written) of key since first stored, unit is seconds.
+	 * Get idle time (idle: not read or written) of key since first stored, unit is
+	 * seconds.
 	 * get the key's idle time in seconds since its first stored
 	 * @param key {const char*} Key value.
 	 *  the key
@@ -256,7 +272,8 @@ public:
 	int object_idletime(const char* key);
 
 	/**
-	 * Remove expiration time from key, converting key from "volatile" (key with expiration time) to
+	 * Remove expiration time from key, converting key from "volatile" (key with
+	 * expiration time) to
 	 * "persistent" (key without expiration time, never expires).
 	 * remove the expiration from a key
 	 * @param key {const char*} Key value.
@@ -372,7 +389,8 @@ public:
 	int renamenx(const char* key, const char* newkey);
 
 	/**
-	 * Create a key using provided serialized value, previously obtained by using DUMP.
+	 * Create a key using provided serialized value, previously obtained by using
+	 * DUMP.
 	 * create a key using the provided serialized value, previously
 	 * obtained by using DUMP
 	 * @param ttl {int} Survival time for key in milliseconds. If ttl is 0,
@@ -431,25 +449,31 @@ public:
 	 * incrementally iterate the keys space in the specified database
 	 * @param cursor {int} Cursor value. Write 0 when starting iteration.
 	 *  the iterating cursor beginning with 0
-	 * @param out {std::vector<acl::string>&} String array storing results. Array will be cleared
-	 *  internally and string results will be appended to array. To prevent results from growing too large, users should
+	 * @param out {std::vector<acl::string>&} String array storing results. Array
+	 * will be cleared
+	 * internally and string results will be appended to array. To prevent results
+	 * from growing too large, users should
 	 *  clear this parameter before each iteration.
 	 *  string array storing the results, the array will be cleared
 	 *  internal and the string result will be appened to the array
-	 * @param pattern {const char*} Matching pattern with glob style, effective when not empty.
+	 * @param pattern {const char*} Matching pattern with glob style, effective
+	 * when not empty.
 	 *  the matching pattern with glob style, only effective if not NULL
-	 * @param count {const size_t*} Limit maximum number of results stored in array, effective
+	 * @param count {const size_t*} Limit maximum number of results stored in
+	 * array, effective
 	 *  only when not NULL.
 	 *  limit the max number of the results stored in array, only
 	 *  effective when not NULL
 	 * @return {int} Next cursor position, as below:
 	 *  return the next cursor value as follow:
-	 *   0: Iteration is finished. At this time, you need to check if out results are empty. If
+	 * 0: Iteration is finished. At this time, you need to check if out results are
+	 * empty. If
 	 *      not empty, you need to process them.
 	 *      iterating is finished and the out should be checked if emtpy
 	 *  -1: Error occurred.
 	 *      some error happened
-	 *  >0: Next cursor position. Regardless of how many results are obtained, you need to check out, as it may be empty.
+	 * >0: Next cursor position. Regardless of how many results are obtained, you
+	 * need to check out, as it may be empty.
 	 *      the next cursor value for iterating
 	 */
 	int scan(int cursor, std::vector<string>& out,

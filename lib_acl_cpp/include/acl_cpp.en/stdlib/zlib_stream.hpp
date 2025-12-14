@@ -7,8 +7,10 @@ typedef struct z_stream_s z_stream;
 namespace acl {
 
 /**
- * Compression level type definition. This enumeration defines a trade-off between compression speed and compression ratio.
- * Higher compression values result in better compression ratio, but slower compression speed.
+ * Compression level type definition. This enumeration defines a trade-off
+ * between compression speed and compression ratio.
+ * Higher compression values result in better compression ratio, but slower
+ * compression speed.
  */
 typedef enum {
 	zlib_default = -1,      // Default compression level
@@ -27,8 +29,10 @@ typedef enum {
 } zlib_level_t;
 
 /**
- * Compression window size in compression library. Higher values result in better compression efficiency but use more memory.
- * For HTTP compression transfer, you need to use negative values of these values, e.g., -zlib_wbits_t
+ * Compression window size in compression library. Higher values result in
+ * better compression efficiency but use more memory.
+ * For HTTP compression transfer, you need to use negative values of these
+ * values, e.g., -zlib_wbits_t
  */
 enum {
 	zlib_wbits_8  = 8,
@@ -57,8 +61,10 @@ typedef enum {
 } zlib_mlevel_t;
 
 /**
- * Flush mode in compression/decompression library. Controls whether compression/decompression library flushes buffer.
- * Generally, to get higher compression ratio, you should choose zlib_flush_off mode.
+ * Flush mode in compression/decompression library. Controls whether
+ * compression/decompression library flushes buffer.
+ * Generally, to get higher compression ratio, you should choose zlib_flush_off
+ * mode.
  */
 typedef enum {
 	zlib_flush_off = 0,     // Do not flush buffer to user buffer
@@ -87,7 +93,8 @@ public:
 	 * @param in {const char*} Source data.
 	 * @param len {int} Source data length.
 	 * @param out {string*} User buffer to store compressed data.
-	 * @param level {zlib_level_t} Compression level. Higher level means higher compression ratio,
+	 * @param level {zlib_level_t} Compression level. Higher level means higher
+	 * compression ratio,
 	 *  but slower compression speed.
 	 * @return {bool} Whether compression was successful.
 	 */
@@ -114,17 +121,23 @@ public:
 	///////////////////////////////////////////////////////////////
 
 	/**
-	 * Initialize compression process. For streaming compression mode, the calling sequence is:
+	 * Initialize compression process. For streaming compression mode, the calling
+	 * sequence is:
 	 * zip_begin->zip_update->zip_finish. If any step in the middle
 	 * fails, you should call zip_reset.
-	 * @param level {zlib_level_t} Compression level. Higher level means higher compression
+	 * @param level {zlib_level_t} Compression level. Higher level means higher
+	 * compression
 	 *  ratio, but slower compression speed.
-	 * @param wbits {zlib_wbits_t} Window size in compression library. Higher values result in
-	 *  better compression efficiency but use more memory. For HTTP transfer compression, you should use
+	 * @param wbits {zlib_wbits_t} Window size in compression library. Higher
+	 * values result in
+	 * better compression efficiency but use more memory. For HTTP transfer
+	 * compression, you should use
 	 *  negative values of these values, e.g., -zlib_wbits_15
-	 * @param mlevel {zlib_mlevel_t} Memory level property in compression library. Higher values
+	 * @param mlevel {zlib_mlevel_t} Memory level property in compression library.
+	 * Higher values
 	 *  result in better compression efficiency but use more memory.
-	 * @return {bool} Whether compression initialization was successful. Failure reasons are generally
+	 * @return {bool} Whether compression initialization was successful. Failure
+	 * reasons are generally
 	 *  related to whether parameters are correct.
 	 */
 	bool zip_begin(zlib_level_t level = zlib_default,
@@ -137,18 +150,24 @@ public:
 	 * @param len {int} Source data length.
 	 * @param out {string*} User buffer. This function appends to user
 	 *  provided buffer with compressed results. Users should check the buffer
-	 *  capacity before calling this function to ensure the data length appended by this function. Additionally,
-	 *  depending on the zlib_flush_t option chosen, user buffer data may not have read all
+	 * capacity before calling this function to ensure the data length appended by
+	 * this function. Additionally,
+	 * depending on the zlib_flush_t option chosen, user buffer data may not have
+	 * read all
 	 *  results.
 	 * @param flag {zlib_flush_t} Buffer flush mode in compression library.
 	 *  zlib_flush_off: Data may not be flushed to user buffer immediately.
-	 *    zlib library itself flushes in its own way, which may get higher compression ratio.
+	 * zlib library itself flushes in its own way, which may get higher compression
+	 * ratio.
 	 *  zlib_flush_partial: Data may be partially flushed to user buffer.
 	 *  zlib_flush_sync: Synchronously flush data to user buffer.
 	 *  zlib_flush_full: Flush all buffered data in zlib library to user buffer.
-	 *  zlib_flush_finish: Calling this parameter indicates compression process ends, and will
-	 *    flush all results to user buffer. This parameter generally does not need to be used, because
-	 *    after calling zip_finish, it will automatically flush all buffers to user buffer.
+	 * zlib_flush_finish: Calling this parameter indicates compression process
+	 * ends, and will
+	 * flush all results to user buffer. This parameter generally does not need to
+	 * be used, because
+	 * after calling zip_finish, it will automatically flush all buffers to user
+	 * buffer.
 	 * @return {bool} Whether compression process failed.
 	 */
 	bool zip_update(const char* in, int len, string* out,
@@ -156,7 +175,8 @@ public:
 
 	/**
 	 * Call this parameter to indicate compression process ends.
-	 * @param out {string} User buffer. This function will flush zlib library buffer
+	 * @param out {string} User buffer. This function will flush zlib library
+	 * buffer
 	 *  data to user buffer in appending mode.
 	 * @return {bool} Whether successful.
 	 */
@@ -171,28 +191,34 @@ public:
 	}
 
 	/**
-	 * Reset compression state. Generally only called when compression process fails.
+	 * Reset compression state. Generally only called when compression process
+	 * fails.
 	 * @return {bool} Whether successful.
 	 */
 	bool zip_reset();
 
 	/**
-	 * In compression process, you can use this function to calculate crc32 checksum value of data.
-	 * @param n {unsigned} Last calculated checksum value. Write 0 for the first time.
-	 * @param buf {const void*} Address of data to be checksummed. Write NULL for the first use.
+	 * In compression process, you can use this function to calculate crc32
+	 * checksum value of data.
+	 * @param n {unsigned} Last calculated checksum value. Write 0 for the first
+	 * time.
+	 * @param buf {const void*} Address of data to be checksummed. Write NULL for
+	 * the first use.
 	 * @param dlen {size_t} Length of buf data. Write 0 for the first use.
 	 * @return {unsinged} Current calculated checksum value.
 	 */
 	unsigned crc32_update(unsigned n, const void* buf, size_t dlen);
 
 	/**
-	 * Initialize decompression process. For streaming decompression mode, the calling sequence is:
+	 * Initialize decompression process. For streaming decompression mode, the
+	 * calling sequence is:
 	 * unzip_begin->unzip_update->unzip_finish. If any step in the middle
 	 * fails, you should call unzip_reset.
 	 * @param have_zlib_header {bool} Whether there is zlib_header header.
 	 *  For HTTP transfer protocol, this value should be set to false.
 	 * @param wsize {int} Window size in decompression library.
-	 * @return {bool} Whether decompression initialization was successful. Failure reasons are generally
+	 * @return {bool} Whether decompression initialization was successful. Failure
+	 * reasons are generally
 	 *  related to whether parameters are correct.
 	 */
 	bool unzip_begin(bool have_zlib_header = true, int wsize = 15);
@@ -203,8 +229,10 @@ public:
 	 * @param len {int} Source data length.
 	 * @param out {string*} User buffer. This function appends to user
 	 *  provided buffer with decompressed results. Users should check the buffer
-	 *  capacity before calling this function to ensure the data length appended by this function. Additionally,
-	 *  depending on the zlib_flush_t option chosen, user buffer data may not have read all
+	 * capacity before calling this function to ensure the data length appended by
+	 * this function. Additionally,
+	 * depending on the zlib_flush_t option chosen, user buffer data may not have
+	 * read all
 	 *  results.
 	 * @param flag {zlib_flush_t} Buffer flush mode in decompression library.
 	 *  zlib_flush_off: Data may not be flushed to user buffer immediately.
@@ -212,9 +240,12 @@ public:
 	 *  zlib_flush_partial: Data may be partially flushed to user buffer.
 	 *  zlib_flush_sync: Synchronously flush data to user buffer.
 	 *  zlib_flush_full: Flush all buffered data in zlib library to user buffer.
-	 *  zlib_flush_finish: Calling this parameter indicates decompression process ends, and will
-	 *    flush all results to user buffer. This parameter generally does not need to be used, because
-	 *    after calling zip_finish, it will automatically flush all buffers to user buffer.
+	 * zlib_flush_finish: Calling this parameter indicates decompression process
+	 * ends, and will
+	 * flush all results to user buffer. This parameter generally does not need to
+	 * be used, because
+	 * after calling zip_finish, it will automatically flush all buffers to user
+	 * buffer.
 	 * @return {bool} Whether decompression process failed.
 	 */
 	bool unzip_update(const char* in, int len, string* out,
@@ -222,7 +253,8 @@ public:
 
 	/**
 	 * Call this parameter to indicate decompression process ends.
-	 * @param out {string} User buffer. This function will flush zlib library buffer
+	 * @param out {string} User buffer. This function will flush zlib library
+	 * buffer
 	 *  data to user buffer in appending mode.
 	 * @return {bool} Whether successful.
 	 */
@@ -237,7 +269,8 @@ public:
 	}
 
 	/**
-	 * Reset decompression state. Generally only called when decompression process fails.
+	 * Reset decompression state. Generally only called when decompression process
+	 * fails.
 	 * @return {bool} Whether successful.
 	 */
 	bool unzip_reset();
@@ -251,21 +284,26 @@ public:
 	}
 
 	/**
-	 * When using dynamic library loading method, you can use this function to set the dynamic library's full path.
+	 * When using dynamic library loading method, you can use this function to set
+	 * the dynamic library's full path.
 	 */
 	static void set_loadpath(const char* path);
 
 	/**
-	 * When you need to get the dynamic library's full path, you can get the dynamic library's full path through this function.
+	 * When you need to get the dynamic library's full path, you can get the
+	 * dynamic library's full path through this function.
 	 * @return {const char*} Returns NULL if not set.
 	 */
 	static const char* get_loadpath();
 
 	/**
-	 * Manually load dynamic library zlib method. This is for static linking. Generally, you do not need to call this function.
-	 * Additionally, when zlib dynamic library is not in the program's directory, you need to first call
+	 * Manually load dynamic library zlib method. This is for static linking.
+	 * Generally, you do not need to call this function.
+	 * Additionally, when zlib dynamic library is not in the program's directory,
+	 * you need to first call
 	 * set_loadpath() to set zlib dynamic library's full path.
-	 * This function internally uses pthread_once() to ensure it is only called once, so even if multiple
+	 * This function internally uses pthread_once() to ensure it is only called
+	 * once, so even if multiple
 	 * threads call it simultaneously, it is safe.
 	 * @return {bool} Whether loading was successful.
 	 */

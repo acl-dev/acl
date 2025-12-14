@@ -9,8 +9,7 @@ namespace acl {
 class db_handle;
 class mysql_conf;
 
-class ACL_CPP_API mysql_pool : public db_pool
-{
+class ACL_CPP_API mysql_pool : public db_pool {
 public:
 	/**
 	 * Constructor when using mysql database
@@ -23,8 +22,10 @@ public:
 	 * @param dbflags {unsigned long} MySQL flag bits
 	 * @param auto_commit {bool} Whether to auto commit
 	 * @param conn_timeout {int} Database connection timeout (seconds)
-	 * @param rw_timeout {int} IO timeout when communicating with database (seconds)
-	 * @param charset {const char*} Character set for connecting to database (utf8, gbk, ...)
+	 * @param rw_timeout {int} IO timeout when communicating with database
+	 * (seconds)
+	 * @param charset {const char*} Character set for connecting to database (utf8,
+	 * gbk, ...)
 	 */
 	mysql_pool(const char* dbaddr, const char* dbname,
 		const char* dbuser, const char* dbpass,
@@ -34,13 +35,15 @@ public:
 
 	/**
 	 * Constructor
-	 * @param conf {const mysql_conf&} MySQL database connection configuration object
+	 * @param conf {const mysql_conf&} MySQL database connection configuration
+	 * object
 	 */
 	mysql_pool(const mysql_conf& conf);
 	~mysql_pool();
 
 protected:
-	// Base class connect_pool pure virtual function: create database connection handle
+	// Base class connect_pool pure virtual function: create database connection
+	// handle
 	connect_client* create_connect();
 
 private:

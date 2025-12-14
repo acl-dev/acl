@@ -9,8 +9,7 @@ namespace acl {
 class db_handle;
 class pgsql_conf;
 
-class ACL_CPP_API pgsql_pool : public db_pool
-{
+class ACL_CPP_API pgsql_pool : public db_pool {
 public:
 	pgsql_pool(const pgsql_conf& conf);
 	~pgsql_pool(void);

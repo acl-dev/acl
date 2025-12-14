@@ -97,7 +97,8 @@ public:
 	 *  the key of the set
 	 * @param members {std::vector<string>*} When not empty, stores the result.
 	 *  if not NULL, it will store the members.
-	 * @return {int} Number of elements obtained, -1 indicates error or this key is not a set object.
+	 * @return {int} Number of elements obtained, -1 indicates error or this key is
+	 * not a set object.
 	 *  the number of elements got, -1 if error happened or it't not
 	 *  a set by the key.
 	 *
@@ -108,18 +109,22 @@ public:
 	 *     for this function 
 	 *  2. Call base class method get_value with specified subscript element.
 	 *     call redis_command::result_value with the specified subscript
-	 *  3. Call base class method get_child with specified subscript element object (redis_result), then get
+	 * 3. Call base class method get_child with specified subscript element object
+	 * (redis_result), then get
 	 *     element string through redis_result::argv_to_string.
 	 *     get redis_result object with the given subscript, and get the
 	 *     element by redis_result::argv_to_string
-	 *  4. Call base class method get_result to get the overall result object redis_result, then get
+	 * 4. Call base class method get_result to get the overall result object
+	 * redis_result, then get
 	 *     one element object through redis_result::get_child, then get the
 	 *     element by the way same as the way 2 above.
 	 *     get redis_result object by redis_command::get_result, and get
 	 *     the first element by redis_result::get_child, then get the
 	 *     element by the way same as the way 2 above
-	 *  5. Call base class method get_children to get result element array, then get each
-	 *     element object through redis_result's method argv_to_string to serialize element string.
+	 * 5. Call base class method get_children to get result element array, then get
+	 * each
+	 * element object through redis_result's method argv_to_string to serialize
+	 * element string.
 	 *     get child array by redis_command::get_children, and get the
 	 *     element from one of redis_result array by argv_to_string
 	 */
@@ -151,7 +156,8 @@ public:
 		const char* member, size_t len);
 
 	/**
-	 * Return the members of the set resulting from the difference between the first set and all successive sets.
+	 * Return the members of the set resulting from the difference between the
+	 * first set and all successive sets.
 	 * return the members of the set resulting from the difference
 	 * between the first set and all the successive sets.
 	 * @param members {std::vector<string>*} When not empty, stores the result.
@@ -159,7 +165,8 @@ public:
 	 * @param first_key {const char*} First non-empty set object key.
 	 *  the key of the first set in a variable sets list, the last one
 	 *  must be NULL indicating the end of the sets list.
-	 * @return {int} Number of elements obtained, -1 indicates error or one key is not a set object.
+	 * @return {int} Number of elements obtained, -1 indicates error or one key is
+	 * not a set object.
 	 *  the number of elements got, -1 if error happened or it't not
 	 *  a set by the key.
 	 *  If successful, one of the following methods can be used to get the result:
@@ -169,18 +176,22 @@ public:
 	 *     for this function
 	 *  2. Call base class method get_value with specified subscript element.
 	 *     get the specified subscript's element by redis_command::get_value
-	 *  3. Call base class method get_child with specified subscript element object (redis_result), then get
+	 * 3. Call base class method get_child with specified subscript element object
+	 * (redis_result), then get
 	 *     element string through redis_result::argv_to_string.
 	 *     get redis_result object with the given subscript, and get the
 	 *     element by redis_result::argv_to_string
-	 *  4. Call base class method get_result to get the overall result object redis_result, then get
+	 * 4. Call base class method get_result to get the overall result object
+	 * redis_result, then get
 	 *     one element object through redis_result::get_child, then get the
 	 *     element by the way same as the way 2 above.
 	 *     get redis_result object by redis_command::get_result, and get
 	 *     the first element by redis_result::get_child, then get the
 	 *     element by the way same as the way 2 above.
-	 *  5. Call base class method get_children to get result element array, then get each
-	 *     element object through redis_result's method argv_to_string to serialize element string.
+	 * 5. Call base class method get_children to get result element array, then get
+	 * each
+	 * element object through redis_result's method argv_to_string to serialize
+	 * element string.
 	 *     get child array by redis_command::get_children, and get the
 	 *     element from one of redis_result array by argv_to_string
 	 */
@@ -190,7 +201,8 @@ public:
 	int sdiff(const std::vector<string>& keys, std::vector<string>* members);
 
 	/**
-	 * Return the members of a set resulting from the intersection of all given sets.
+	 * Return the members of a set resulting from the intersection of all given
+	 * sets.
 	 * return the members of a set resulting from the intersection of
 	 * all the give sets.
 	 * @param members {std::vector<string>*} When not empty, stores the result.
@@ -198,7 +210,8 @@ public:
 	 * @param first_key {const char*} First set object key, non-NULL.
 	 *  the key of the first set in a variable set list, which isn't NULL,
 	 *  the last one must be NULL in the set list.
-	 * @return {int} Returns the number of members, -1 indicates error or one key is not a set object.
+	 * @return {int} Returns the number of members, -1 indicates error or one key
+	 * is not a set object.
 	 *  return the number of the members, -1 if error happened or
 	 *  it't not a set by the key.
 	 */
@@ -215,7 +228,8 @@ public:
 	 * @param first_key {const char*} First set object key, non-NULL.
 	 *  the key of the first set in a variable set list, which isn't NULL,
 	 *  and the last arg must be NULL indicating the end of the set list.
-	 * @return {int} Returns the number of members, -1 indicates error or one key is not a set object.
+	 * @return {int} Returns the number of members, -1 indicates error or one key
+	 * is not a set object.
 	 *  return the number of members, -1 if error happened or it's not
 	 *  a set by the key.
 	 */
@@ -224,7 +238,8 @@ public:
 	int sunion(const std::vector<string>& keys, std::vector<string>* members);
 
 	/**
-	 * This command is equal to SDIFF, but instead of returning the result, it stores the result in dst set.
+	 * This command is equal to SDIFF, but instead of returning the result, it
+	 * stores the result in dst set.
 	 * This command is equal to SDIFF, but instead of returning
 	 * the resulting set, it is stored in destination.
 	 * @param dst {const char*} Target set object key value.
@@ -241,7 +256,8 @@ public:
 	int sdiffstore(const char* dst, const std::vector<string>& keys);
 
 	/**
-	 * This command is equal to SINTER command, but instead of returning the result, it stores the result in dst set.
+	 * This command is equal to SINTER command, but instead of returning the
+	 * result, it stores the result in dst set.
 	 * This command is equal to SINTER, but instead of returning
 	 * the resulting set, it is stored in destination.
 	 * @param dst {const char*} Target set object key value.
@@ -258,7 +274,8 @@ public:
 	int sinterstore(const char* dst, const std::vector<string>& keys);
 
 	/**
-	 * This command is equal to SUNION command, but instead of returning the result, it stores the result in dst set.
+	 * This command is equal to SUNION command, but instead of returning the
+	 * result, it stores the result in dst set.
 	 * This command is equal to SUNION, but instead of returning
 	 * the resulting set, it is stored in destination.
 	 * @param dst {const char*} Target set object key value.
@@ -281,7 +298,8 @@ public:
 	 *  the key of a set
 	 * @param member {const char*} Given value.
 	 *  the given value
-	 * @return {bool} Returns true to indicate yes, otherwise returns false (not a member or error or key
+	 * @return {bool} Returns true to indicate yes, otherwise returns false (not a
+	 * member or error or key
 	 *  is not a set object).
 	 *  true if the given is a member of the set, false if it's not a
 	 *  member of the set, or error, or it's not a set by the key.
@@ -290,7 +308,8 @@ public:
 	bool sismember(const char* key, const char* member, size_t len);
 
 	/**
-	 * When only key is provided, returns one random element from the set. If the number of elements is also specified,
+	 * When only key is provided, returns one random element from the set. If the
+	 * number of elements is also specified,
 	 * returns an array of random elements with the specified count.
 	 * get one or multiple memebers from a set
 	 * @param key {const char*} Set object key value.
@@ -305,16 +324,19 @@ public:
 	int srandmember(const char* key, size_t n, std::vector<string>& out);
 
 	/**
-	 * Remove one or more member elements from the set stored at key. Non-existent member elements will be ignored.
+	 * Remove one or more member elements from the set stored at key. Non-existent
+	 * member elements will be ignored.
 	 * Remove the specified members from the set stored at key. if the
 	 * member doesn't exist, it will be ignored.
 	 * @param key {const char*} Set object key value.
 	 *  the key of the set
-	 * @param first_member {const char*} First non-NULL member in the list of members to be removed.
+	 * @param first_member {const char*} First non-NULL member in the list of
+	 * members to be removed.
 	 *  In variable parameter calls, the last parameter must be NULL.
 	 *  the first non-NULL member to be removed in a variable member list,
 	 *  and the last one must be NULL indicating the end of the list.
-	 * @retur {int} Number of member elements removed. Returns -1 when error or it's not a set object. Returns 0 when key
+	 * @retur {int} Number of member elements removed. Returns -1 when error or
+	 * it's not a set object. Returns 0 when key
 	 *  does not exist or member does not exist.
 	 *  the number of members be removed, 0 if the set is empty or the
 	 *  key doesn't exist, -1 if error happened or it's not a set by key
@@ -331,13 +353,17 @@ public:
 	 *  the key of a set
 	 * @param cursor {int} Cursor value, write 0 at the beginning.
 	 *  the cursor value, which is 0 at begin
-	 * @param out {std::vector<string>&} Store result. Internally uses append mode to add
-	 *  results to the result set. To prevent the overall result from being too large, users should clear
+	 * @param out {std::vector<string>&} Store result. Internally uses append mode
+	 * to add
+	 * results to the result set. To prevent the overall result from being too
+	 * large, users should clear
 	 *  the result set before calling this method.
 	 *  store result in appending mode.
-	 * @param pattern {const char*} Match pattern, glob style, effective only when non-empty.
+	 * @param pattern {const char*} Match pattern, glob style, effective only when
+	 * non-empty.
 	 *  match pattern, effective only on no-NULL
-	 * @param count {const size_t*} Maximum count of one scan process, effective only when non-empty pointer.
+	 * @param count {const size_t*} Maximum count of one scan process, effective
+	 * only when non-empty pointer.
 	 *  the max count of one scan process, effective only on no-NULL
 	 * @return {int} Next cursor position, as follows:
 	 *  return the next cursor position, as below:
@@ -345,7 +371,8 @@ public:
 	 *     scan finish
 	 *  -1: Error.
 	 *     some error happened
-	 *  >0: Next cursor position to scan. Regardless of how many results are obtained, you need to check out, as it may be empty.
+	 * >0: Next cursor position to scan. Regardless of how many results are
+	 * obtained, you need to check out, as it may be empty.
 	 *     the next cursor postion to scan
 	 */
 	int sscan(const char* key, int cursor, std::vector<string>& out,

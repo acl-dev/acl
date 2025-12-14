@@ -26,12 +26,15 @@ public:
 	}
 
 	/**
-	 * Read callback virtual function. When the callback object is registered in aio_istream instance's
-	 * gets/read readable callback, the asynchronous stream internally reads the data and
+	 * Read callback virtual function. When the callback object is registered in
+	 * aio_istream instance's
+	 * gets/read readable callback, the asynchronous stream internally reads the
+	 * data and
 	 * directly passes it to the user callback.
 	 * @param data {char*} Pointer to the read data
 	 * @param len {int} Length of the read data (> 0)
-	 * @return {bool} This function returns false to notify the asynchronous stream to close the asynchronous stream.
+	 * @return {bool} This function returns false to notify the asynchronous stream
+	 * to close the asynchronous stream.
 	 */
 	virtual bool read_callback(char* data, int len) {
 		(void) data;
@@ -40,8 +43,10 @@ public:
 	}
 
 	/**
-	 * Read callback virtual function. When the callback object is registered in aio_istream instance's
-	 * read_wait readable callback, it is called when the asynchronous stream has readable data. On timeout,
+	 * Read callback virtual function. When the callback object is registered in
+	 * aio_istream instance's
+	 * read_wait readable callback, it is called when the asynchronous stream has
+	 * readable data. On timeout,
 	 * timeout_callback is called. On abnormal close, close_callback is called.
 	 */
 	virtual bool read_wakeup() {
@@ -50,15 +55,18 @@ public:
 
 	/**
 	 * Write success callback virtual function.
-	 * @return {bool} This function returns false to notify the asynchronous stream to close the asynchronous stream.
+	 * @return {bool} This function returns false to notify the asynchronous stream
+	 * to close the asynchronous stream.
 	 */
 	virtual bool write_callback() {
 		return true;
 	}
 
 	/**
-	 * Write callback virtual function. When the callback object is registered in aio_ostream instance's
-	 * write_wait writable callback, it is called when the asynchronous stream is writable. On timeout,
+	 * Write callback virtual function. When the callback object is registered in
+	 * aio_ostream instance's
+	 * write_wait writable callback, it is called when the asynchronous stream is
+	 * writable. On timeout,
 	 * timeout_callback is called. On abnormal close, close_callback is called.
 	 */
 	virtual bool write_wakeup() {
@@ -75,7 +83,8 @@ class aio_handle;
 class stream_hook;
 
 /**
- * Asynchronous stream base class. This is a base class and cannot be directly instantiated. It can only be inherited and used.
+ * Asynchronous stream base class. This is a base class and cannot be directly
+ * instantiated. It can only be inherited and used.
  * This class can only be allocated on the heap, not on the stack.
  */
 class ACL_CPP_API aio_stream : public noncopyable {
@@ -88,62 +97,81 @@ public:
 
 	/**
 	 * Close asynchronous stream.
-	 * @param flush_out {bool} When true, it needs to wait until all buffered data is written
-	 *  before closing. Otherwise, it does not wait for data in the write buffer to be closed.
+	 * @param flush_out {bool} When true, it needs to wait until all buffered data
+	 * is written
+	 * before closing. Otherwise, it does not wait for data in the write buffer to
+	 * be closed.
 	 */
 	void close(bool flush_out = false);
 
 	/**
-	 * Add callback object pointer for when closing. If the callback object already exists, it will only
+	 * Add callback object pointer for when closing. If the callback object already
+	 * exists, it will only
 	 * make the object in an open and available state.
-	 * @param callback {aio_callback*} Subclass callback class object inheriting from aio_callback.
-	 *  Before the asynchronous stream closes, the close_callback interface in this callback class object will be called first.
+	 * @param callback {aio_callback*} Subclass callback class object inheriting
+	 * from aio_callback.
+	 * Before the asynchronous stream closes, the close_callback interface in this
+	 * callback class object will be called first.
 	 */
 	void add_close_callback(aio_callback* callback);
 
 	/**
-	 * Add callback object pointer for when timeout occurs. If the callback object already exists, it will only
+	 * Add callback object pointer for when timeout occurs. If the callback object
+	 * already exists, it will only
 	 * make the object in an open and available state.
-	 * @param callback {aio_callback*} Subclass callback class object inheriting from aio_callback.
-	 *  Before the asynchronous stream closes, the timeout_callback interface in this callback class object will be called first.
+	 * @param callback {aio_callback*} Subclass callback class object inheriting
+	 * from aio_callback.
+	 * Before the asynchronous stream closes, the timeout_callback interface in
+	 * this callback class object will be called first.
 	 */
 	void add_timeout_callback(aio_callback* callback);
 
 	/**
 	 * Delete callback object pointer for when closing.
-	 * @param callback {aio_callback*} Subclass object pointer inheriting from aio_callback.
+	 * @param callback {aio_callback*} Subclass object pointer inheriting from
+	 * aio_callback.
 	 *  If this value is empty, all close callback objects will be deleted.
-	 * @return {int} Returns the number of callback objects deleted from the callback object collection.
+	 * @return {int} Returns the number of callback objects deleted from the
+	 * callback object collection.
 	 */
 	int del_close_callback(aio_callback* callback = NULL);
 
 	/**
 	 * Delete callback object pointer for when timeout occurs.
-	 * @param callback {aio_callback*} Subclass object pointer inheriting from aio_callback.
+	 * @param callback {aio_callback*} Subclass object pointer inheriting from
+	 * aio_callback.
 	 *  If this value is empty, all timeout callback objects will be deleted.
-	 * @return {int} Returns the number of callback objects deleted from the callback object collection.
+	 * @return {int} Returns the number of callback objects deleted from the
+	 * callback object collection.
 	 */
 	int del_timeout_callback(aio_callback* callback = NULL);
 
 	/**
-	 * Disable close callback objects, but do not delete them from the close callback object collection.
-	 * @param callback {aio_callback*} Subclass object pointer inheriting from aio_callback.
+	 * Disable close callback objects, but do not delete them from the close
+	 * callback object collection.
+	 * @param callback {aio_callback*} Subclass object pointer inheriting from
+	 * aio_callback.
 	 *  If this value is empty, all close callback objects will be disabled.
-	 * @return {int} Returns the number of callback objects disabled in the callback object collection.
+	 * @return {int} Returns the number of callback objects disabled in the
+	 * callback object collection.
 	 */
 	int disable_close_callback(aio_callback* callback = NULL);
 
 	/**
-	 * Disable timeout callback objects, but do not delete them from the timeout callback object collection.
-	 * @param callback {aio_callback*} Subclass object pointer inheriting from aio_callback.
+	 * Disable timeout callback objects, but do not delete them from the timeout
+	 * callback object collection.
+	 * @param callback {aio_callback*} Subclass object pointer inheriting from
+	 * aio_callback.
 	 *  If this value is empty, all timeout callback objects will be disabled.
-	 * @return {int} Returns the number of callback objects disabled in the callback object collection.
+	 * @return {int} Returns the number of callback objects disabled in the
+	 * callback object collection.
 	 */
 	int disable_timeout_callback(aio_callback* callback = NULL);
 
 	/**
 	 * Enable all callback objects to be called.
-	 * @param callback {aio_callback*} Specified callback object. If this value is empty,
+	 * @param callback {aio_callback*} Specified callback object. If this value is
+	 * empty,
 	 *  all close callback objects will be enabled.
 	 * @return {int} Returns the number of enabled callback objects.
 	 */
@@ -151,7 +179,8 @@ public:
 
 	/**
 	 * Enable all callback objects to be called.
-	 * @param callback {aio_callback*} Specified callback object. If this value is empty,
+	 * @param callback {aio_callback*} Specified callback object. If this value is
+	 * empty,
 	 *  all timeout callback objects will be enabled.
 	 * @return {int} Returns the number of enabled callback objects.
 	 */
@@ -171,7 +200,8 @@ public:
 
 	/**
 	 * Get SOCKET handle in asynchronous stream.
-	 * @return {ACL_SOCKET} Returns -1(UNIX) or INVALID_SOCKET(win32) if not connected.
+	 * @return {ACL_SOCKET} Returns -1(UNIX) or INVALID_SOCKET(win32) if not
+	 * connected.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	SOCKET get_socket(void) const;
@@ -186,18 +216,22 @@ public:
 
 	/**
 	 * Get remote connection address.
-	 * @param full {bool} Whether to return full address format (IP:PORT). If this parameter
+	 * @param full {bool} Whether to return full address format (IP:PORT). If this
+	 * parameter
 	 *  is false, only IP is returned. Otherwise, IP:PORT is returned.
-	 * @return {const char*} Remote connection address. If return value == '\0', it means
+	 * @return {const char*} Remote connection address. If return value == '\0', it
+	 * means
 	 *  unable to get remote connection address.
 	 */
 	const char* get_peer(bool full = false) const;
 
 	/**
 	 * Get local address of connection.
-	 * @param full {bool} Whether to return full address format (IP:PORT). If this parameter
+	 * @param full {bool} Whether to return full address format (IP:PORT). If this
+	 * parameter
 	 *  is false, only IP is returned. Otherwise, IP:PORT is returned.
-	 * @return {const char*} Local address of connection. If return value == "", it means
+	 * @return {const char*} Local address of connection. If return value == "", it
+	 * means
 	 *  unable to get local address.
 	 */
 	const char* get_local(bool full = false) const;
@@ -211,17 +245,23 @@ public:
 	/**
 	 * Update asynchronous event engine.
 	 * @param handle {aio_handle&}
-	 * Note: This method should only be called once after object creation. Generally, it is used when IO operations are stopped.
+	 * Note: This method should only be called once after object creation.
+	 * Generally, it is used when IO operations are stopped.
 	 */
 	void set_handle(aio_handle& handle);
 
 	/**
-	 * Register read/write hook. Internally automatically calls hook->open process. If successful, returns the previously
-	 * registered object (may be NULL). If failed, returns the same pointer as input. Applications can
-	 * determine whether registration was successful by checking if return value is different from input value.
-	 * xxx: Before calling this method, it must be ensured that the connection has been established.
+	 * Register read/write hook. Internally automatically calls hook->open process.
+	 * If successful, returns the previously
+	 * registered object (may be NULL). If failed, returns the same pointer as
+	 * input. Applications can
+	 * determine whether registration was successful by checking if return value is
+	 * different from input value.
+	 * xxx: Before calling this method, it must be ensured that the connection has
+	 * been established.
 	 * @param hook {stream_hook*} Non-empty object pointer.
-	 * @return {stream_hook*} Return value. If different from input value, it means success.
+	 * @return {stream_hook*} Return value. If different from input value, it means
+	 * success.
 	 */
 	stream_hook* setup_hook(stream_hook* hook);
 
@@ -232,7 +272,8 @@ public:
 	stream_hook* get_hook() const;
 
 	/**
-	 * Remove currently registered read/write hook and return this object, restore default read/write hook.
+	 * Remove currently registered read/write hook and return this object, restore
+	 * default read/write hook.
 	 * @return {stream_hook*}
 	 */
 	stream_hook* remove_hook();
@@ -245,12 +286,14 @@ protected:
 	virtual ~aio_stream();
 
 	/**
-	 * Through this function, dynamically release asynchronous stream objects that are only allocated on the heap.
+	 * Through this function, dynamically release asynchronous stream objects that
+	 * are only allocated on the heap.
 	 */
 	virtual void destroy();
 
 	/**
-	 * This function should be called after connection is successfully established to notify the application layer that the asynchronous stream is ready,
+	 * This function should be called after connection is successfully established
+	 * to notify the application layer that the asynchronous stream is ready,
 	 * and register close and timeout callback functions at the same time.
 	 */
 	void enable_error();

@@ -39,21 +39,26 @@ public:
 	 * remove and get a element from list head, or block until one
 	 * is available; when multiple keys were given, multiple elements
 	 * will be gotten according the sequence of keys given.
-	 * @param result {std::pair<string, string>&} Store element pair result. This pair's
+	 * @param result {std::pair<string, string>&} Store element pair result. This
+	 * pair's
 	 *  first string indicates list's key, second is element popped from head.
 	 *  store the elements result, the first string of pair is the key,
 	 *  and the second string of pair is the element
-	 * @param timeout {size_t} Blocking timeout in seconds before one element available. When timeout expires and no element pair is
-	 *  available, returns false. When this value is 0, waits indefinitely until element pair is available.
+	 * @param timeout {size_t} Blocking timeout in seconds before one element
+	 * available. When timeout expires and no element pair is
+	 * available, returns false. When this value is 0, waits indefinitely until
+	 * element pair is available.
 	 *  the blocking timeout in seconds before one element availble;
 	 *  false will be returned when the timeout is arrived; if the timeout
 	 *  was set to be 0, this function will block until a element was
 	 *  available or some error happened.
-	 * @param first_key {const char*} First non-empty string key. The last parameter must
+	 * @param first_key {const char*} First non-empty string key. The last
+	 * parameter must
 	 *  be NULL, indicating end of variable args.
 	 *  the first key of a variable args, the last arg must be NULL
 	 *  indicating the end of the variable args.
-	 * @return {bool} Whether got element pair from head. When false, possible reasons:
+	 * @return {bool} Whether got element pair from head. When false, possible
+	 * reasons:
 	 *  true if got a element in the head of list, when false was be
 	 *  returned, there'are some reasons show below:
 	 *  1. Error occurred.
@@ -98,12 +103,15 @@ public:
 	 *  the key of destination list
 	 * @param buf {string*} When not empty, stores element popped from src tail.
 	 *  if not NULL, buf will store the element poped from the head of src
-	 * @param timeout {size_t} Wait timeout. When 0, waits indefinitely until data is available or
+	 * @param timeout {size_t} Wait timeout. When 0, waits indefinitely until data
+	 * is available or
 	 *  error occurs.
 	 *  the timeout to wait, if the timeout is 0 this function will
 	 *  block until a element was available or error happened.
-	 * @return {bool} When successfully popped element from src list tail and pushed to dst list head,
-	 *  this function returns true. Returns false to indicate timeout, error occurred, or one of src/dst is not a list object.
+	 * @return {bool} When successfully popped element from src list tail and
+	 * pushed to dst list head,
+	 * this function returns true. Returns false to indicate timeout, error
+	 * occurred, or one of src/dst is not a list object.
 	 *  true if success, false if timeout arrived, or error happened,
 	 *  or one of the src and dst is not a list object
 	 * @see rpoplpush
@@ -120,8 +128,10 @@ public:
 	 *  the specified subscript
 	 * @param buf {string&} Store result.
 	 *  store the result
-	 * @return {bool} When returns true, if successful, buf data is non-empty, indicating correctly got
-	 *  element at specified subscript. If buf.empty(), it means no element was got. When false, error occurred.
+	 * @return {bool} When returns true, if successful, buf data is non-empty,
+	 * indicating correctly got
+	 * element at specified subscript. If buf.empty(), it means no element was got.
+	 * When false, error occurred.
 	 *  true if success, and if buf is empty, no element was got;
 	 *  false if error happened
 	 */
@@ -174,7 +184,8 @@ public:
 	 * get the number of elements in list specified the given key
 	 * @param key {const char*} List object's key.
 	 *  the list's key
-	 * @return {int} Returns length of specified list (element count). Returns -1 if error occurred.
+	 * @return {int} Returns length of specified list (element count). Returns -1
+	 * if error occurred.
 	 *  return the number of elements in list, -1 if error
 	 */
 	int llen(const char* key);
@@ -186,7 +197,8 @@ public:
 	 *  the key of one list
 	 * @param buf {string&} Store popped element value.
 	 *  store the element when successful.
-	 * @return {int} Return value meaning: >0 -- Indicates successfully got one element and return value indicates element length.
+	 * @return {int} Return value meaning: >0 -- Indicates successfully got one
+	 * element and return value indicates element length.
 	 *  -1 -- Indicates error occurred, object is not a list specified
 	 *  by the key, or list specified by key is empty.
 	 *  return value as below:
@@ -201,12 +213,15 @@ public:
 	 * add one or more element(s) to the head of a list
 	 * @param key {const char*} List object's key.
 	 *  the list key
-	 * @param first_value {const char*} First non-empty string. The last parameter of variable args must
+	 * @param first_value {const char*} First non-empty string. The last parameter
+	 * of variable args must
 	 *  be NULL.
 	 *  the first no-NULL element of the variable args, the last arg must
 	 *  be NULL indicating the end of the args.
-	 * @return {int} Returns current list's element count after adding. Returns -1 to indicate error occurred or key
-	 *  is not a list object. When key does not exist, creates a new list object and adds elements.
+	 * @return {int} Returns current list's element count after adding. Returns -1
+	 * to indicate error occurred or key
+	 * is not a list object. When key does not exist, creates a new list object and
+	 * adds elements.
 	 *  return the number of elements in list. -1 if error happened,
 	 *  or the object specified by key is not a list.
 	 */
@@ -247,17 +262,21 @@ public:
 	 *  the start subscript of list
 	 * @param end {int} End subscript value.
 	 *  the end subscript of list
-	 * @param result {std::vector<string>*} When not empty, stores element set in specified range.
+	 * @param result {std::vector<string>*} When not empty, stores element set in
+	 * specified range.
 	 *  if not NULL, result will be used to store the results
-	 * @return {bool} Whether operation was successful. Returns false to indicate error occurred or key is not a list object.
+	 * @return {bool} Whether operation was successful. Returns false to indicate
+	 * error occurred or key is not a list object.
 	 *  if success for this operation, false if the key is not a list or
 	 *  error happened
 	 *  Examples:
 	 *  for example:
-	 *  1) When start = 0, end = 10, it specifies 11 elements from subscript 0 to 10.
+	 * 1) When start = 0, end = 10, it specifies 11 elements from subscript 0 to
+	 * 10.
 	 *     if start is 0 and end is 10, then the subscript range is
 	 *     between 0 and 10(include 10).
-	 *  2) When start = -1, end = -2, it specifies from last element backward to second element (2 elements).
+	 * 2) When start = -1, end = -2, it specifies from last element backward to
+	 * second element (2 elements).
 	 *     if start is -1 and end is -2, the range is from the end and
 	 *     backward the second element.
 	 *
@@ -269,17 +288,21 @@ public:
 	 *     for this function
 	 *  2. Get specified subscript element by base class function get_value.
 	 *     get the specified subscript's element by redis_command::get_value 
-	 *  3. Get specified subscript element object (redis_result) by base class function get_child, then get
+	 * 3. Get specified subscript element object (redis_result) by base class
+	 * function get_child, then get
 	 *     element value through redis_result::argv_to_string.
 	 *     get redis_result object with the given subscript, and get the
 	 *     element by redis_result::argv_to_string
-	 *  4. Get overall result object redis_result by base class function get_result, then get
-	 *     first element object by redis_result::get_child, then get element value by method 2 above.
+	 * 4. Get overall result object redis_result by base class function get_result,
+	 * then get
+	 * first element object by redis_result::get_child, then get element value by
+	 * method 2 above.
 	 *     get redis_result object by redis_command::get_result, and get
 	 *     the first element by redis_result::get_child, then get the
 	 *     element by the way same as the way 2 above.
-	 *  5. Get child array by base class function get_children, then get element value from each
-	 *     redis_result object in array through redis_result's method argv_to_string.
+	 * 5. Get child array by base class function get_children, then get element
+	 * value from each
+	 * redis_result object in array through redis_result's method argv_to_string.
 	 *     get child array by redis_command::get_children, and get the
 	 *     element from one of redis_result array by argv_to_string.
 	 */
@@ -295,13 +318,16 @@ public:
 	 *  the key of a list
 	 * @param count {int} Number of elements to remove. count meaning:
 	 *  the first count of elements to be removed, as below:
-	 *  count > 0 : Remove elements equal to value moving from head to tail, count is count.
+	 * count > 0 : Remove elements equal to value moving from head to tail, count
+	 * is count.
 	 *              remove elements equal to value moving from head to tail
-	 *  count < 0 : Remove elements equal to value moving from tail to head, count is absolute value of count.
+	 * count < 0 : Remove elements equal to value moving from tail to head, count
+	 * is absolute value of count.
 	 *              remove elements equal to value moving from tail to head
 	 *  count = 0 : Remove all elements equal to value.
 	 *              remove all elements equal to value
-	 * @param value {const char*} Specified element value. Need to compare with values in list.
+	 * @param value {const char*} Specified element value. Need to compare with
+	 * values in list.
 	 *  the specified value for removing elements
 	 * @return {int} Number of elements removed. Return value meaning:
 	 *  the count of elements removed, meaning show below:
@@ -323,12 +349,14 @@ public:
 	 * @param key {const char*} List object's key.
 	 *  the key of list
 	 * @param idx {int} Index position. When negative, iterating data will be
-	 *  from tail to head, or be from head to tail. For example: 0 means first element at head, -1 means first element from tail.
+	 * from tail to head, or be from head to tail. For example: 0 means first
+	 * element at head, -1 means first element from tail.
 	 *  the index in the list, if it's negative, iterating data will be
 	 *  from tail to head, or be from head to tail.
 	 * @param value {const char*} Element new value.
 	 *  the new value of the element by its index
-	 * @return {bool} Returns false when key is not a list object, key does not exist, or idx is out of bounds.
+	 * @return {bool} Returns false when key is not a list object, key does not
+	 * exist, or idx is out of bounds.
 	 *  if success. false if the object of the key isn't list, or key's
 	 *  list not exist, or the index out of bounds.
 	 */
@@ -344,8 +372,10 @@ public:
 	 *  the start index in a list
 	 * @param end {int} End subscript value.
 	 *  the end index in a list
-	 * @return {bool} Whether operation was successful. Returns false to indicate error occurred, key's object is not
-	 *  a list, or key's object does not exist. Returns true when successfully deleted or key object does not exist.
+	 * @return {bool} Whether operation was successful. Returns false to indicate
+	 * error occurred, key's object is not
+	 * a list, or key's object does not exist. Returns true when successfully
+	 * deleted or key object does not exist.
 	 *  if success. false if error happened, or the key's object is not
 	 *  a list, or the key's object not exist.
 	 */
@@ -358,7 +388,8 @@ public:
 	 *  the key of the list
 	 * @param buf {string&} Store popped element value.
 	 *  store the element pop from list
-	 * @return {int} Return value meaning: >0 -- Indicates successfully got one element and return value indicates element length.
+	 * @return {int} Return value meaning: >0 -- Indicates successfully got one
+	 * element and return value indicates element length.
 	 *  -1 -- Indicates error occurred, object is not a list specified
 	 *  by the key, or list specified by key is empty.
 	 *  return value as below:
@@ -379,8 +410,10 @@ public:
 	 *  the key of the destination list
 	 * @param buf {string*} When not empty, stores element popped from src tail.
 	 *  if not NULL, it will store the element
-	 * @return {bool} When successfully popped element from src list tail and pushed to dst list head,
-	 *  this function returns true. Returns false to indicate error occurred or one of src/dst is not a list object.
+	 * @return {bool} When successfully popped element from src list tail and
+	 * pushed to dst list head,
+	 * this function returns true. Returns false to indicate error occurred or one
+	 * of src/dst is not a list object.
 	 *  true if the element was removed from a list to another list,
 	 *  false if error happened, one of src or dst is not a list.
 	 */
@@ -391,12 +424,15 @@ public:
 	 * append one or multiple values to a list
 	 * @param key {const char*} List object's key.
 	 *  the key of a list
-	 * @param first_value {const char*} First element of variable args must be not NULL, and the
+	 * @param first_value {const char*} First element of variable args must be not
+	 * NULL, and the
 	 *  last arg must be NULL indicating the end of the args.
 	 *  the first element of a variable args must be not NULL, and the
 	 *  last arg must be NULL indicating the end of the args.
-	 * @return {int} Returns number of elements in list specified by key after adding. Returns -1 to indicate error
-	 *  occurred, or key's object isn't a list. If the list by the key does not exist, a new list will be created with the key.
+	 * @return {int} Returns number of elements in list specified by key after
+	 * adding. Returns -1 to indicate error
+	 * occurred, or key's object isn't a list. If the list by the key does not
+	 * exist, a new list will be created with the key.
 	 *  return the number of a list specified by a key. -1 if error
 	 *  happened, or the key's object isn't a list, if the list by the
 	 *  key doese not exist, a new list will be created with the key.

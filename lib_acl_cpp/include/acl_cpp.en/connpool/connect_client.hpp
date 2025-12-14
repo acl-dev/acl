@@ -32,14 +32,17 @@ public:
 	}
 
 	/**
-	 * Pure virtual function, subclasses must implement this function to connect to the server
+	 * Pure virtual function, subclasses must implement this function to connect to
+	 * the server
 	 * @return {bool} Whether the connection was successful
 	 */
 	virtual bool open() = 0;
 
 	/**
-	 * Virtual function, subclasses can implement this method to indicate whether the current connection is normal,
-	 * so that the connection pool object can automatically close disconnected connections when detecting connection liveness
+	 * Virtual function, subclasses can implement this method to indicate whether
+	 * the current connection is normal,
+	 * so that the connection pool object can automatically close disconnected
+	 * connections when detecting connection liveness
 	 * @return {bool}
 	 */
 	virtual bool alive() {
@@ -48,7 +51,8 @@ public:
 
 	/**
 	 * Get the connection pool object reference, created inside connect_pool
-	 * The connection object will call set_pool to set the connection pool object handle
+	 * The connection object will call set_pool to set the connection pool object
+	 * handle
 	 * @return {connect_pool*}
 	 */
 	connect_pool* get_pool() const {
@@ -57,7 +61,8 @@ public:
 
 //public:
 	/**
-	 * Virtual function, this function sets the network connection timeout and network IO timeout,
+	 * Virtual function, this function sets the network connection timeout and
+	 * network IO timeout,
 	 * subclasses can override this virtual function to set internal object timeout
 	 * @param conn_timeout {int} Network connection timeout (seconds)
 	 * @param rw_timeout {int} Network IO timeout (seconds)

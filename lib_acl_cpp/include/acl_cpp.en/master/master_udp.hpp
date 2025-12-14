@@ -12,19 +12,25 @@ namespace acl {
 class ACL_CPP_API master_udp : public master_base {
 public:
 	/**
-	 * Start running. Calling this function indicates that the service process runs under the control of acl_master service framework,
+	 * Start running. Calling this function indicates that the service process runs
+	 * under the control of acl_master service framework,
 	 * generally used in production environment
-	 * @param argc {int} First parameter passed from main, indicates number of parameters
+	 * @param argc {int} First parameter passed from main, indicates number of
+	 * parameters
 	 * @param argv {char**} Second parameter passed from main
 	 */
 	void run_daemon(int argc, char** argv);
 
 	/**
-	 * Processing function when running standalone. Users can call this function to perform necessary debugging work
-	 * @param addrs {const char*} Service listening address list, format: IP:PORT, IP:PORT...
+	 * Processing function when running standalone. Users can call this function to
+	 * perform necessary debugging work
+	 * @param addrs {const char*} Service listening address list, format: IP:PORT,
+	 * IP:PORT...
 	 * @param path {const char*} Full path of configuration file
-	 * @param count {unsigned int} Number of service loops. After reaching this value, function automatically returns;
-	 *  if this value is 0, it means the program continuously loops processing incoming requests without returning
+	 * @param count {unsigned int} Number of service loops. After reaching this
+	 * value, function automatically returns;
+	 * if this value is 0, it means the program continuously loops processing
+	 * incoming requests without returning
 	 * @return {bool} Whether listening was successful
 	 */
 	bool run_alone(const char* addrs, const char* path = NULL,
@@ -36,18 +42,21 @@ protected:
 	virtual ~master_udp();
 
 	/**
-	 * Pure virtual function: When UDP stream has data to read, callback subclass this function. This method is called in child thread
+	 * Pure virtual function: When UDP stream has data to read, callback subclass
+	 * this function. This method is called in child thread
 	 * @param stream {socket_stream*}
 	 */
 	virtual void on_read(socket_stream* stream) = 0;
 
 	/**
-	 * Virtual method callback when UDP address is successfully bound. This method is called in child thread
+	 * Virtual method callback when UDP address is successfully bound. This method
+	 * is called in child thread
 	 */
 	virtual void proc_on_bind(socket_stream&) {}
 
 	/**
-	 * Virtual method callback when UDP address is unbound. This method is called in child thread
+	 * Virtual method callback when UDP address is unbound. This method is called
+	 * in child thread
 	 */
 	virtual void proc_on_unbind(socket_stream&) {}
 

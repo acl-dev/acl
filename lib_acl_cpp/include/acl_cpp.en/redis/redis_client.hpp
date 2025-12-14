@@ -16,8 +16,10 @@ class redis_command;
 class sslbase_conf;
 
 /**
- * Redis client object network communication class. Through this class, organized redis request commands are sent to redis
- * server, and redis server response results are received. This class inherits from connect_client class, mainly
+ * Redis client object network communication class. Through this class,
+ * organized redis request commands are sent to redis
+ * server, and redis server response results are received. This class inherits
+ * from connect_client class, mainly
  * to use connection pool functionality.
  * redis client network IO class. The redis request is sent to server
  * and the server's respond is handled in this class. The class inherits
@@ -32,7 +34,8 @@ public:
 	 *  the redis-server listening addr
 	 * @param conn_timeout {int} Timeout for connecting to redis-server (seconds)
 	 *  the timeout in seconds to connect the redis-server
-	 * @param rw_timeout {int} IO timeout for communicating with redis-server (seconds)
+	 * @param rw_timeout {int} IO timeout for communicating with redis-server
+	 * (seconds)
 	 *  the network IO timeout in seconds with the redis-server
 	 */
 	explicit redis_client(const char* addr, int conn_timeout = 60,
@@ -40,7 +43,8 @@ public:
 	~redis_client();
 
 	/**
-	 * Set SSL communication configuration handle. Internal default value is NULL. If SSL connection
+	 * Set SSL communication configuration handle. Internal default value is NULL.
+	 * If SSL connection
 	 * configuration object is set, internally switches to SSL communication mode
 	 * set SSL communication with Redis-server if ssl_conf not NULL
 	 * @param ssl_conf {sslbase_conf*}
@@ -48,13 +52,15 @@ public:
 	void set_ssl_conf(sslbase_conf* ssl_conf);
 
 	/**
-	 * Call this function to set connection password for connecting to redis service
+	 * Call this function to set connection password for connecting to redis
+	 * service
 	 * @param pass {const char*}
 	 */
 	void set_password(const char* pass);
 
 	/**
-	 * Set db corresponding to this connection. After connection is established, if specified db value is greater than 0, internally automatically
+	 * Set db corresponding to this connection. After connection is established, if
+	 * specified db value is greater than 0, internally automatically
 	 * selects corresponding db. Note: This function is only for non-cluster mode
 	 * if db > 0 in no cluster mode, select the db when the connection
 	 * is created.
@@ -72,7 +78,8 @@ public:
 	}
 
 	/**
-	 * Get current connection's server address, i.e., address passed in when redis_client is constructed
+	 * Get current connection's server address, i.e., address passed in when
+	 * redis_client is constructed
 	 * @return {const char*}
 	 */
 	const char* get_addr() const {
@@ -80,8 +87,10 @@ public:
 	}
 
 	/**
-	 * Before processing each command, whether to require checking socket handle and address matching. When
-	 * this option is enabled, will strictly check matching, but will affect performance to some extent, so this setting is only
+	 * Before processing each command, whether to require checking socket handle
+	 * and address matching. When
+	 * this option is enabled, will strictly check matching, but will affect
+	 * performance to some extent, so this setting is only
 	 * used in DEBUG runtime scenarios
 	 * @param on {bool}
 	 */
@@ -101,9 +110,11 @@ public:
 	void close();
 
 	/**
-	 * Get network connection stream. When connection is closed, internally will automatically reconnect once
+	 * Get network connection stream. When connection is closed, internally will
+	 * automatically reconnect once
 	 * get acl::socket_stream from the connection
-	 * @param auto_connect {bool} Whether internally needs to automatically connect to server
+	 * @param auto_connect {bool} Whether internally needs to automatically connect
+	 * to server
 	 *  if we should connect the redis server automatically
 	 * @return {acl::socket_stream*} Returns NULL if connection has been closed
 	 *  return NULL if the connection has been closed
@@ -111,17 +122,21 @@ public:
 	socket_stream* get_stream(bool auto_connect = true);
 
 	/**
-	 * For request data packets, this function sets flag to send as one data packet when assembling request data packets
+	 * For request data packets, this function sets flag to send as one data packet
+	 * when assembling request data packets
 	 * just for request package, setting flag for sending data with
 	 * multi data chunks; this is useful when the request data is large
-	 * @param on {bool} When true, request data will not be combined into one data packet for sending
+	 * @param on {bool} When true, request data will not be combined into one data
+	 * packet for sending
 	 *  if true the request data will not be combined one package
 	 */
 	void set_slice_request(bool on);
 
 	/**
-	 * For response data packets, this function sets whether to split redis-server response data into multiple data blocks.
-	 * This is useful for large data packets, avoiding allocating one large contiguous memory at once
+	 * For response data packets, this function sets whether to split redis-server
+	 * response data into multiple data blocks.
+	 * This is useful for large data packets, avoiding allocating one large
+	 * contiguous memory at once
 	 * just for response package, settint flag for receiving data
 	 * if split the large response data into multi little chunks
 	 * @param on {bool} When true, response data packets will be split
@@ -132,7 +147,8 @@ public:
 	void set_slice_respond(bool on);
 
 	/**
-	 * Used for non-sliced sending mode, send request data to redis-server, and read and analyze
+	 * Used for non-sliced sending mode, send request data to redis-server, and
+	 * read and analyze
 	 * response data returned by server
 	 * send request to redis-server, and read/anlyse response from server,
 	 * this function will be used for no-slice request mode.
@@ -142,8 +158,10 @@ public:
 	 *  the request package
 	 * @param nchildren {size_t} Number of data objects in response data
 	 *  the data object number in the server's response data
-	 * @return {const redis_result*} Server response object read. Returns NULL on error.
-	 *  This object does not need to be manually released, because it is dynamically allocated on pool memory pool object, so when
+	 * @return {const redis_result*} Server response object read. Returns NULL on
+	 * error.
+	 * This object does not need to be manually released, because it is dynamically
+	 * allocated on pool memory pool object, so when
 	 *  pool is released, this result object is also released
 	 *  the result object from server's response, NULL will be returned
 	 *  when some error happens; the result object needn't be freed

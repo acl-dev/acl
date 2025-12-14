@@ -137,8 +137,10 @@ public:
 	websocket& set_frame_masking_key(unsigned int mask);
 
 	/**
-	 * Send data body in data frame. Can call this method in a loop to send data of this frame. Total length of sent data
-	 * (i.e., sum of data lengths from multiple calls to this method) should be same as value set by set_frame_payload_len
+	 * Send data body in data frame. Can call this method in a loop to send data of
+	 * this frame. Total length of sent data
+	 * (i.e., sum of data lengths from multiple calls to this method) should be
+	 * same as value set by set_frame_payload_len
 	 * method
 	 * @param data {const void*}
 	 * @param len {size_t}
@@ -174,8 +176,10 @@ public:
 	bool send_frame_ping(char* str);
 
 	/**
-	 * Call non-blocking send interface to asynchronously send data. After sending data, application layer should call
-	 * reset() method to reset state. Before sending a data packet, application layer needs to call above
+	 * Call non-blocking send interface to asynchronously send data. After sending
+	 * data, application layer should call
+	 * reset() method to reset state. Before sending a data packet, application
+	 * layer needs to call above
 	 * set_frame_xxx methods to set frame header information for each data packet
 	 * @param conn {aio_socket_stream&}
 	 * @param data {void*} Data to be sent, will be modified internally
@@ -227,31 +231,39 @@ public:
 	bool read_frame_head();
 
 	/**
-	 * Read data frame body. Need to call this method in a loop until normally ends or error occurs
+	 * Read data frame body. Need to call this method in a loop until normally ends
+	 * or error occurs
 	 * @param buf {void*} Buffer for storing data
 	 * @param size {size_t} buf data buffer size
-	 * @return {int} Return value > 0 indicates length of data read, need to read again. == 0 indicates read complete,
+	 * @return {int} Return value > 0 indicates length of data read, need to read
+	 * again. == 0 indicates read complete,
 	 *  < 0 indicates read error
 	 */
 	int read_frame_data(void* buf, size_t size);
 
 	/**
-	 * Used in non-blocking network communication, try to read websocket header. Can call this method in a loop
-	 * until this method returns true indicating complete websocket header was read. If returns false,
-	 * need to determine whether network connection has been disconnected through eof() method. If eof() returns true,
+	 * Used in non-blocking network communication, try to read websocket header.
+	 * Can call this method in a loop
+	 * until this method returns true indicating complete websocket header was
+	 * read. If returns false,
+	 * need to determine whether network connection has been disconnected through
+	 * eof() method. If eof() returns true,
 	 * should release this object
-	 * @return {bool} Returns true indicates complete websocket header was read, can read body by calling
+	 * @return {bool} Returns true indicates complete websocket header was read,
+	 * can read body by calling
 	 *  read_frame_data()
 	 */
 	bool peek_frame_head();
 
 	/**
-	 * Used in non-blocking network communication, try to read websocket body. Can call this method in a loop
+	 * Used in non-blocking network communication, try to read websocket body. Can
+	 * call this method in a loop
 	 * @param buf {char*} Store read data
 	 * @param size {size_t} buf space size
 	 * @return {int} Length of data read. When return value is:
 	 *   0: Indicates body data of this frame is read complete
-	 *  -1: Indicates read error, need to determine whether connection has been closed by calling eof()
+	 * -1: Indicates read error, need to determine whether connection has been
+	 * closed by calling eof()
 	 *  >0: Indicates length of data read this time
 	 */
 	int peek_frame_data(char* buf, size_t size);

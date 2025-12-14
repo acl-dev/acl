@@ -3,13 +3,11 @@
 #include "../stdlib/noncopyable.hpp"
 #include <list>
 
-namespace acl
-{
+namespace acl {
 
 class event_task;
 
-class ACL_CPP_API event_timer : public noncopyable
-{
+class ACL_CPP_API event_timer : public noncopyable {
 public:
 	/**
 	 * Constructor
@@ -34,8 +32,7 @@ public:
 	 * Whether tasks in timer are empty
 	 * @return {bool}
 	 */
-	bool empty(void) const
-	{
+	bool empty(void) const {
 		return tasks_.empty();
 	}
 
@@ -43,8 +40,7 @@ public:
 	 * Number of tasks in timer
 	 * @return {size_t}
 	 */
-	size_t length(void) const
-	{
+	size_t length(void) const {
 		return length_;
 	}
 
@@ -58,8 +54,7 @@ public:
 	 * Determine whether this timer is auto-restart
 	 * @return {bool}
 	 */
-	bool keep_timer(void) const
-	{
+	bool keep_timer(void) const {
 		return keep_;
 	}
 
@@ -70,7 +65,8 @@ public:
 	int clear(void);
 
 	/**
-	 * Subclasses must implement this callback function. Note: Subclasses or callers are prohibited from calling
+	 * Subclasses must implement this callback function. Note: Subclasses or
+	 * callers are prohibited from calling
 	 * event_timer's destructor function inside timer_callback,
 	 * otherwise it will cause major problems
 	 * @param id {unsigned int} ID number corresponding to a task
@@ -82,18 +78,22 @@ public:
 	/****************************************************************/
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * Add new task ID number for this timer, so that multiple timer tasks can be started through one timer
+	 * Add new task ID number for this timer, so that multiple timer tasks can be
+	 * started through one timer
 	 * @param id {unsigned int} Timer task ID number
-	 * @param delay {__int64} How often to automatically trigger this timer, and pass back the corresponding timer task
+	 * @param delay {__int64} How often to automatically trigger this timer, and
+	 * pass back the corresponding timer task
 	 *  ID number (microseconds)
-	 * @return {__int64} How long until the first timer task ID of this timer will be triggered (microseconds)
+	 * @return {__int64} How long until the first timer task ID of this timer will
+	 * be triggered (microseconds)
 	 */
 	__int64 set_task(unsigned int id, __int64 delay);
 
 	/**
 	 * Delete timer task corresponding to a message ID in timer
 	 * @param {unsigned int} Timer task ID
-	 * @return {__int64} How long until the first timer task ID of this timer will be triggered (microseconds)
+	 * @return {__int64} How long until the first timer task ID of this timer will
+	 * be triggered (microseconds)
 	 */
 	__int64 del_task(unsigned int id);
 #else
@@ -109,14 +109,12 @@ public:
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 trigger(void);
-	__int64 min_delay(void) const
-	{
+	__int64 min_delay(void) const {
 		return min_delay_;
 	}
 #else
 	long long int trigger(void);
-	long long int min_delay(void) const
-	{
+	long long int min_delay(void) const {
 		return min_delay_;
 	}
 #endif

@@ -10,16 +10,17 @@ class ACL_CPP_API mysql_conf {
 public:
 	/**
 	 * Constructor
-	 * @param dbaddr {const char*} Database connection address, can be TCP socket or
-	 *  UNIX domain socket. When it is TCP socket, address format: ip:port. When it is UNIX
-	 *  domain socket, address format: /xxx/xxx/xxx.sock
+	 * @param dbaddr {const char*} Database connection address, can be TCP socket
+	 * or UNIX domain socket. When it is TCP socket, address format: ip:port.
+	 * When it is UNIX domain socket, address format: /xxx/xxx/xxx.sock
 	 * @param dbname {const char*} Database name
 	 */
 	mysql_conf(const char* dbaddr, const char* dbname);
 
 	/**
 	 * Copy constructor
-	 * @param conf {const mysql_conf&} Internally creates new object and copies input object content
+	 * @param conf {const mysql_conf&} Internally creates new object and copies
+	 * input object content
 	 */
 	mysql_conf(const mysql_conf& conf);
 
@@ -27,21 +28,24 @@ public:
 
 	/**
 	 * Set user account when connecting to database
-	 * @param dbuser {const char*} When it is a non-empty string, specifies user account
+	 * @param dbuser {const char*} When it is a non-empty string, specifies user
+	 * account
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_dbuser(const char* dbuser);
 
 	/**
 	 * Set account password when connecting to database
-	 * @param dbpass {const char*} When it is a non-empty string, specifies account password
+	 * @param dbpass {const char*} When it is a non-empty string, specifies account
+	 * password
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_dbpass(const char* dbpass);
 
 	/**
 	 * Set maximum connection limit for database connection pool
-	 * @param dblimit {size_t} Connection pool maximum connection limit, when 0 there is no limit
+	 * @param dblimit {size_t} Connection pool maximum connection limit, when 0
+	 * there is no limit
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_dblimit(size_t dblimit);
@@ -54,7 +58,8 @@ public:
 	mysql_conf& set_dbflags(unsigned long dbflags);
 
 	/**
-	 * Set whether to allow auto commit when modifying database content, default is auto commit
+	 * Set whether to allow auto commit when modifying database content, default is
+	 * auto commit
 	 * @param on {bool}
 	 * @return {mysql_conf&}
 	 */

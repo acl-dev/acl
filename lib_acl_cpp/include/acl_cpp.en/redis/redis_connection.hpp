@@ -43,9 +43,11 @@ public:
 	/**
 	 * Authenticate when connecting to redis-server.
 	 * AUTH command to login the redis server.
-	 * @param passwd {const char*} Authentication password specified in redis configuration file.
+	 * @param passwd {const char*} Authentication password specified in redis
+	 * configuration file.
 	 *  the password in redis-server configure
-	 * @return {bool} Whether authentication was successful. Returns false to indicate authentication failed or operation failed.
+	 * @return {bool} Whether authentication was successful. Returns false to
+	 * indicate authentication failed or operation failed.
 	 *  return true if success, or false because auth failed or error.
 	 */
 	bool auth(const char* passwd);

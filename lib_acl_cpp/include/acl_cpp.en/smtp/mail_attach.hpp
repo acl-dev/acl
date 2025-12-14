@@ -10,32 +10,39 @@ class mime_code;
 class ostream;
 
 /**
- * When composing emails, this class is used to create functionality related to email attachments
+ * When composing emails, this class is used to create functionality related to
+ * email attachments
  */
 class ACL_CPP_API mail_attach
 {
 public:
 	/**
 	 * Constructor when packaging a regular file into email
-	 * @param filepath {const char*} Attachment file storage path (including filename)
+	 * @param filepath {const char*} Attachment file storage path (including
+	 * filename)
 	 * @param content_type {const char*} Attachment file type
-	 * @param charset {const char*} If it is a plain file, this parameter indicates the character set of plain text
+	 * @param charset {const char*} If it is a plain file, this parameter indicates
+	 * the character set of plain text
 	 */
 	mail_attach(const char* filepath, const char* content_type,
 		const char* charset);
 	~mail_attach();
 
 	/**
-	 * Set attachment filename. Internally will automatically encode filename in rfc2047 format
+	 * Set attachment filename. Internally will automatically encode filename in
+	 * rfc2047 format
 	 * @param name {const char*} Non-empty string
-	 * @param charset {const char*} This parameter specifies character set. When not NULL, then internally
-	 *  automatically uses rfc2047 format to encode filename, otherwise internally directly stores input name
+	 * @param charset {const char*} This parameter specifies character set. When
+	 * not NULL, then internally
+	 * automatically uses rfc2047 format to encode filename, otherwise internally
+	 * directly stores input name
 	 * @return {mail_attach&}
 	 */
 	mail_attach& set_filename(const char* name, const char* charset = NULL);
 
 	/**
-	 * When email data body is multipart/relative type, call this function to set cid identifier
+	 * When email data body is multipart/relative type, call this function to set
+	 * cid identifier
 	 * in html body
 	 * @param id {const char*} cid identifier
 	 * @return {mail_attach&}
@@ -79,7 +86,8 @@ public:
 	}
 
 	/**
-	 * Encode attachment content using the passed encoder and store in memory buffer
+	 * Encode attachment content using the passed encoder and store in memory
+	 * buffer
 	 * @param coder {mime_code*} Encoder (base64/qp, etc.)
 	 * @param out {string&} Store result, using append method
 	 * @return {bool} Whether encoding process was successful
@@ -87,7 +95,8 @@ public:
 	bool save_to(mime_code* coder, string& out);
 
 	/**
-	 * Encode attachment content using the passed encoder and store in output stream
+	 * Encode attachment content using the passed encoder and store in output
+	 * stream
 	 * @param coder {mime_code*} Encoder (base64/qp, etc.)
 	 * @param out {out&} Store result
 	 * @return {bool} Whether encoding process was successful

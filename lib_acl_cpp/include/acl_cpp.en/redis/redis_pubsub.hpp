@@ -55,18 +55,22 @@ public:
 	int publish(const char* channel, const char* msg, size_t len);
 
 	/**
-	 * Subscribe to messages from one or more given channels. After calling this function, operations can only send commands:
+	 * Subscribe to messages from one or more given channels. After calling this
+	 * function, operations can only send commands:
 	 * subscribe, unsubscribe, psubscribe, punsubscribe, get_message. Only
-	 * after unsubscribing from all channels (or connection reestablished) can this restriction be lifted
+	 * after unsubscribing from all channels (or connection reestablished) can this
+	 * restriction be lifted
 	 * subscribe one or more channel(s). Once the client enters the
 	 * subscribed state it is not supposed to issue any other commands,
 	 * except for additional SUBSCRIBE, PSUBSCRIBE, UNSUBSCRIBE
 	 * and PUNSUBSCRIBE commands
-	 * @param first_channel {const char*} First non-empty string channel in subscribed channel list.
+	 * @param first_channel {const char*} First non-empty string channel in
+	 * subscribed channel list.
 	 *  For variable argument list, the last one must be NULL
 	 *  the first non-NULL channel in the channel list, and the last
 	 *  parameter must be NULL indicating the end of the channel list
-	 * @return {int} Returns number of channels currently successfully subscribed (i.e., total number of all subscribed channels)
+	 * @return {int} Returns number of channels currently successfully subscribed
+	 * (i.e., total number of all subscribed channels)
 	 *  the number of channels subscribed by the current client
 	 */
 	int subscribe(const char* first_channel, ...);
@@ -76,7 +80,8 @@ public:
 	/**
 	 * Unsubscribe from messages from one or more given channels
 	 * stop listening for messages posted to the given channels
-	 * @param first_channel {const char*} First channel in list of channels to unsubscribe
+	 * @param first_channel {const char*} First channel in list of channels to
+	 * unsubscribe
 	 *  the fist channel in channel list, and the last parameter must be
 	 *  NULL indicating the end of the channel list
 	 * @return {int} Returns remaining number of subscribed channels
@@ -87,14 +92,17 @@ public:
 	int unsubscribe(const std::vector<string>& channels);
 
 	/**
-	* Subscribe to one or more channels matching given patterns. Each pattern uses * as wildcard. After calling this function, operations
+	* Subscribe to one or more channels matching given patterns. Each pattern uses
+	* * as wildcard. After calling this function, operations
 	* can only send commands: subscribe, unsubscribe, psubscribe, punsubscribe,
-	* get_message. Only after unsubscribing from all channels (or connection reestablished) can this restriction be lifted
+	* get_message. Only after unsubscribing from all channels (or connection
+	* reestablished) can this restriction be lifted
 	* listen for messages published to channels matching the give patterns
 	 * @param first_pattern {const char*} First matching pattern string
 	 *  the first pattern in pattern list, the last parameter must be NULL
 	 *  int the variable args
-	 * @return {int} Returns number of channels currently successfully subscribed (i.e., total number of all subscribed channels)
+	 * @return {int} Returns number of channels currently successfully subscribed
+	 * (i.e., total number of all subscribed channels)
 	 *  the number of channels listened by the current client
 	 */
 	int psubscribe(const char* first_pattern, ...);
@@ -102,7 +110,8 @@ public:
 	int psubscribe(const std::vector<string>& patterns);
 
 	/**
-	 * Unsubscribe from messages from one or more channels based on pattern matching string
+	 * Unsubscribe from messages from one or more channels based on pattern
+	 * matching string
 	 * stop listening for messaged posted to channels matching
 	 * the given patterns
 	 * @param first_pattern {const char*} First matching pattern string
@@ -115,8 +124,10 @@ public:
 	int punsubscribe(const std::vector<string>& patterns);
 
 	/**
-	 * After subscribing to channels, can call this function in a loop to get subscription messages from subscribed channels.
-	 * Can call this function to get messages from subscribed channels only after calling subscribe or psubscribe
+	 * After subscribing to channels, can call this function in a loop to get
+	 * subscription messages from subscribed channels.
+	 * Can call this function to get messages from subscribed channels only after
+	 * calling subscribe or psubscribe
 	 * get messages posted to channels after SUBSCRIBE or PSUBSCRIBE
 	 * @param channel {string&} Store channel name that currently has message
 	 *  buffer for storing the channel associate with the msg
@@ -124,34 +135,45 @@ public:
 	 *  store the message posted to the channel
 	 * @param message_type {string*} will store messsage or pmessage
 	 * @param pattern {string*} will store pattern set by psubscribe
-	 * @param timeout {int} When this value >= 0, indicates wait timeout for messages (seconds)
-     *  when timeout >= 0, which was used as the waiting time for reading(second)
-	 * @return {bool} Whether successful. If returns false, it indicates error or timeout
+	 * @param timeout {int} When this value >= 0, indicates wait timeout for
+	 * messages (seconds)
+     * when timeout >= 0, which was used as the waiting time for reading(second)
+	 * @return {bool} Whether successful. If returns false, it indicates error or
+	 * timeout
 	 *  true on success, false on error or waiting timeout
 	 */
 	bool get_message(string& channel, string& msg, string* message_type = NULL,
 		string* pattern = NULL, int timeout = -1);
 
 	/**
-	 * List currently active channels: Active channels refer to those with at least one subscriber. Clients subscribed to patterns
+	 * List currently active channels: Active channels refer to those with at least
+	 * one subscriber. Clients subscribed to patterns
 	 * are not counted
 	 * Lists the currently active channels.
-	 * @param channels {std::vector<string>*} When not empty, stores channel result set
+	 * @param channels {std::vector<string>*} When not empty, stores channel result
+	 * set
 	 *  store the active channels
-	 * @param first_pattern {const char*} First matching string as additional matching pattern,
-	 *  this pointer can be NULL, in which case gets all active channels. For variable arguments, last parameter must be NULL
+	 * @param first_pattern {const char*} First matching string as additional
+	 * matching pattern,
+	 * this pointer can be NULL, in which case gets all active channels. For
+	 * variable arguments, last parameter must be NULL
 	 *  the first pattern in a variable args ending with NULL arg, and
 	 *  the first arg can be NULL.
 	 * @return {int} Returns number of active channels; -1 indicates error
 	 *  the number of active channels. -1 if error
 	 *
-	 *  After successful operation, can get data through any of the following methods:
+	 * After successful operation, can get data through any of the following
+	 * methods:
 	 *  1. Base class method get_value to get element data at specified index
-	 *  2. Base class method get_child to get element object (redis_result) at specified index, then get element data through
+	 * 2. Base class method get_child to get element object (redis_result) at
+	 * specified index, then get element data through
 	 *     redis_result::argv_to_string method
-	 *  3. Base class method get_result to get total result set object redis_result, then get an element object through
-	 *     redis_result::get_child, then get element data through method specified in method 2
-	 *  4. Base class method get_children to get result element array object, then get element data from each element object through methods in
+	 * 3. Base class method get_result to get total result set object redis_result,
+	 * then get an element object through
+	 * redis_result::get_child, then get element data through method specified in
+	 * method 2
+	 * 4. Base class method get_children to get result element array object, then
+	 * get element data from each element object through methods in
 	 *     redis_result through argv_to_string
 	 *  5. Pass non-empty address of storage result object in calling method
 	 *
@@ -164,14 +186,17 @@ public:
 		std::vector<string>* channels);
 
 	/**
-	 * Return number of subscribers for given channels. Clients subscribed to patterns are not counted
+	 * Return number of subscribers for given channels. Clients subscribed to
+	 * patterns are not counted
 	 * Returns the number of subscribers (not counting clients
 	 * subscribed to patterns) for the specified channels.
-	 * @param out {std::map<string, int>&} Store query result, where out->first stores
+	 * @param out {std::map<string, int>&} Store query result, where out->first
+	 * stores
 	 *  channel name, out->second stores number of subscribers for this channel
 	 *  store the results
 	 * @param first_channel {const char*} First channel
-	 *  This pointer can be NULL, in which case gets all active channels. For variable arguments, last parameter must be NULL
+	 * This pointer can be NULL, in which case gets all active channels. For
+	 * variable arguments, last parameter must be NULL
 	 *  the first pattern in a variable args ending with NULL arg, and
 	 *  the first arg can be NULL.
 	 * @return {int} Number of channels, -1 indicates error
@@ -184,10 +209,12 @@ public:
 		std::map<string, int>& out);
 
 	/**
-	 * Return number of subscribed patterns. This command returns not the number of clients subscribed to patterns, but the total
+	 * Return number of subscribed patterns. This command returns not the number of
+	 * clients subscribed to patterns, but the total
 	 * number of all patterns subscribed by clients
 	 * Returns the number of subscriptions to patterns.
-	 * @return {int} Total of all subscription patterns by clients, -1 indicates error
+	 * @return {int} Total of all subscription patterns by clients, -1 indicates
+	 * error
 	 *  the number of patterns all the clients are subscribed to,
 	 *  -1 if error.
 	 */

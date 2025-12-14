@@ -55,7 +55,8 @@ public:
 	}
 
 	/**
-	 * Return HTTP protocol server port number extracted from URL, internal default value is 80
+	 * Return HTTP protocol server port number extracted from URL, internal default
+	 * value is 80
 	 * @return {unsigned short}
 	 */
 	unsigned short get_port() const {
@@ -79,7 +80,8 @@ public:
 	}
 
 	/**
-	 * Clear intermediate state during parsing process, so that this class object can be reused to parse the next URL
+	 * Clear intermediate state during parsing process, so that this class object
+	 * can be reused to parse the next URL
 	 */
 	void reset();
 

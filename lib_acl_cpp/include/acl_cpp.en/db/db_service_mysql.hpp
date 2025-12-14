@@ -7,8 +7,7 @@
 
 namespace acl {
 
-class ACL_CPP_API db_service_mysql : public db_service
-{
+class ACL_CPP_API db_service_mysql : public db_service {
 	/**
 	 * Constructor when using mysql database
 	 * @param dbaddr {const char*} MySQL server address
@@ -21,9 +20,9 @@ class ACL_CPP_API db_service_mysql : public db_service
 	 * @param rw_timeout {int} IO read/write timeout when operating database
 	 * @param dblimit {size_t} Connection pool count limit for database
 	 * @param nthread {int} Maximum thread count for child thread pool
-	 * @param win32_gui {bool} Whether it is window class message. If yes, then internally
-	 *  communication mode is automatically set to _WIN32 message based, otherwise still uses common socket
-	 *  communication method
+	 * @param win32_gui {bool} Whether it is window class message. If yes, then
+	 * internally communication mode is automatically set to _WIN32 message
+	 * based, otherwise still uses common socket communication method
 	 */
 	db_service_mysql(const char* dbaddr, const char* dbname,
 		const char* dbuser, const char* dbpass,

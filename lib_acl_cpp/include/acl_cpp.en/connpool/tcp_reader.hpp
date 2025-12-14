@@ -7,7 +7,8 @@ class socket_stream;
 class string;
 
 /**
- * tcp ipc communication reader class. Internally automatically reads new data packets.
+ * tcp ipc communication reader class. Internally automatically reads new data
+ * packets.
  */
 class ACL_CPP_API tcp_reader : public noncopyable {
 public:
@@ -16,7 +17,8 @@ public:
 
 	/**
 	 * Read data from peer. Each call reads only one data packet.
-	 * @param out {string&} Buffer to store data packet. Internally uses append method, and automatically clears out buffer.
+	 * @param out {string&} Buffer to store data packet. Internally uses append
+	 * method, and automatically clears out buffer.
 	 */
 	bool read(string& out);
 

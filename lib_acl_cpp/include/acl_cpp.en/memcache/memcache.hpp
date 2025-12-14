@@ -14,7 +14,8 @@ class socket_stream;
 typedef class memcache mem_cache;
 
 /**
- * memcached client communication protocol library, supports connection pool and automatic reconnection.
+ * memcached client communication protocol library, supports connection pool and
+ * automatic reconnection.
  */
 class ACL_CPP_API memcache : public connect_client
 {
@@ -32,23 +33,29 @@ public:
 	~memcache();
 
 	/**
-	 * Set key prefix. The actual key consists of prefix+original key. By default, there is
-	 * no prefix. When multiple applications share the same memcached server, each application should set a different
+	 * Set key prefix. The actual key consists of prefix+original key. By default,
+	 * there is
+	 * no prefix. When multiple applications share the same memcached server, each
+	 * application should set a different
 	 * key prefix. This can prevent different applications' keys from conflicting.
-	 * @param keypre {const char*} When not empty, sets key prefix. When empty, removes key prefix.
+	 * @param keypre {const char*} When not empty, sets key prefix. When empty,
+	 * removes key prefix.
 	 * @return {memcache&}
 	 */
 	memcache& set_prefix(const char* keypre);
 
 	/**
-	 * Whether to automatically reconnect when connection is broken. Default is automatic reconnection.
-	 * @param onoff {bool} When true, it means when connection is broken, automatically reconnect.
+	 * Whether to automatically reconnect when connection is broken. Default is
+	 * automatic reconnection.
+	 * @param onoff {bool} When true, it means when connection is broken,
+	 * automatically reconnect.
 	 * @return {memcache&}
 	 */
 	memcache& auto_retry(bool onoff);
 
 	/**
-	 * Set whether to encode KEY value. By default, key is not encoded. When application's key
+	 * Set whether to encode KEY value. By default, key is not encoded. When
+	 * application's key
 	 * may contain special characters, you can use this function to encode the key.
 	 * @param onoff {bool} When true, it means internally need to encode key.
 	 * @return {memcache&}
@@ -82,8 +89,10 @@ public:
 		time_t timeout = 0, unsigned short flags = 0);
 
 	/**
-	* Extend the survival period of an existing key in memcached. Because currently libmemcached does not
-	* provide this interface, the implementation of this function first calls get to get the corresponding data value, and then
+	* Extend the survival period of an existing key in memcached. Because currently
+	* libmemcached does not
+	* provide this interface, the implementation of this function first calls get
+	* to get the corresponding data value, and then
 	 * calls set to set this key value with new timeout.
 	* @param key {const char*} Key value.
 	* @param klen {size_t} Key value length.
@@ -93,8 +102,10 @@ public:
 	bool set(const char* key, size_t klen, time_t timeout = 0);
 
 	/**
-	* Extend the survival period of an existing key in memcached. Because currently libmemcached does not
-	* provide this interface, the implementation of this function first calls get to get the corresponding data value, and then
+	* Extend the survival period of an existing key in memcached. Because currently
+	* libmemcached does not
+	* provide this interface, the implementation of this function first calls get
+	* to get the corresponding data value, and then
 	 * calls set to set this key value with new timeout.
 	* @param key {const char*} String key value.
 	* @param timeout {time_t} Survival time (seconds)
@@ -103,7 +114,8 @@ public:
 	bool set(const char* key, time_t timeout = 0);
 
 	/**
-	 * Streaming format upload. When uploading large data, call this function to send header.
+	 * Streaming format upload. When uploading large data, call this function to
+	 * send header.
 	 * @param key {const char*} Key value string.
 	 * @param dlen {size_t} Total length of data to be uploaded.
 	 * @param timeout {time_t} Data survival time (seconds)
@@ -114,9 +126,12 @@ public:
 		time_t timeout = 0, unsigned short flags = 0);
 
 	/**
-	 * Call this function in a loop to upload data value. Internally automatically checks whether the sum of already uploaded data
-	 *  reaches the total length set by set_begin function. When reached, automatically adds a "\r\n" terminator.
-	 *  Users should not call this function to upload data again, but should start a new upload process.
+	 * Call this function in a loop to upload data value. Internally automatically
+	 * checks whether the sum of already uploaded data
+	 * reaches the total length set by set_begin function. When reached,
+	 * automatically adds a "\r\n" terminator.
+	 * Users should not call this function to upload data again, but should start a
+	 * new upload process.
 	 * @param data {const void*} Data address pointer.
 	 * @param len {data} Data length of data.
 	 * @return {bool} Whether successful.
@@ -127,9 +142,11 @@ public:
 	* Get corresponding value cache from memcached.
 	* @param key {const char*} String key value.
 	* @param klen {size_t} Key value length.
-	* @param buf {string&} Buffer to store returned cache. Internally first clears this buffer.
+	* @param buf {string&} Buffer to store returned cache. Internally first clears
+	* this buffer.
 	* @param flags {unsigned short*} Store returned flag bits.
-	* @return {bool} Returns true to indicate correctly got value. Returns false to indicate key value corresponding
+	* @return {bool} Returns true to indicate correctly got value. Returns false to
+	* indicate key value corresponding
 	*  data does not exist or error.
 	*/
 	bool get(const char* key, size_t klen, string& buf,
@@ -138,9 +155,11 @@ public:
 	/**
 	* Get corresponding value cache from memcached.
 	* @param key {const char*} String key value.
-	* @param buf {string&} Buffer to store returned cache. Internally first clears this buffer.
+	* @param buf {string&} Buffer to store returned cache. Internally first clears
+	* this buffer.
 	* @param flags {unsigned short*} Store returned flag bits.
-	* @return {bool} Returns true to indicate correctly got value. Returns false to indicate key value corresponding
+	* @return {bool} Returns true to indicate correctly got value. Returns false to
+	* indicate key value corresponding
 	*  data does not exist or error.
 	*/
 	bool get(const char* key, string& buf, unsigned short* flags = NULL);
@@ -169,7 +188,8 @@ public:
 	int get_begin(const char* key, unsigned short* flags = NULL);
 
 	/**
-	 * Streaming format to get data from server. Call this function in a loop to read data.
+	 * Streaming format to get data from server. Call this function in a loop to
+	 * read data.
 	 * @param buf {void*} Buffer address.
 	 * @param size {size_t} Buffer size.
 	 * @return {int} Size of data read this time. Return values are as follows:
@@ -207,15 +227,18 @@ public:
 	int  last_error() const;
 
 	/**
-	* Open memcached connection. Because set/get/del operations will automatically reconnect
-	* memcached connection, you generally do not need to explicitly call this function to open memcached
+	* Open memcached connection. Because set/get/del operations will automatically
+	* reconnect
+	* memcached connection, you generally do not need to explicitly call this
+	* function to open memcached
 	* connection.
 	* @return {bool} Whether opening was successful.
 	*/
 	virtual bool open();
 
 	/**
-	* Close memcached connection. Generally this function does not need to be called, because when the object
+	* Close memcached connection. Generally this function does not need to be
+	* called, because when the object
 	* is destroyed, it will automatically call this function.
 	*/
 	void close();

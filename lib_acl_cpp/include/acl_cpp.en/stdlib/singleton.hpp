@@ -98,9 +98,12 @@ template<class T>
 bool singleton_wrapper< T >::destroyed_ = false;
 
 /**
- * Singleton template class. When compiled with VC2010 or GCC, singleton objects are executed before the main function,
- * so it is thread-safe; but when compiled with VC2003 in release mode with optimization enabled,
- * it may be thread-unsafe, and the constructor of singleton objects cannot be guaranteed to execute
+ * Singleton template class. When compiled with VC2010 or GCC, singleton objects
+ * are executed before the main function,
+ * so it is thread-safe; but when compiled with VC2003 in release mode with
+ * optimization enabled,
+ * it may be thread-unsafe, and the constructor of singleton objects cannot be
+ * guaranteed to execute
  * before main.
  * Usage example:
  * class singleton_test : public acl::singleton<singlegon_test> {
@@ -145,9 +148,12 @@ T& singleton< T >::instance_ = singleton< T >::get_instance();
 //////////////////////////////////////////////////////////////////////////
 
 /**
- * The above implementation cannot guarantee that the singleton constructor executes before main
- * when compiled with VC2003 release mode with optimization enabled. If compiling singleton programs
- * under VC2003 and using singleton objects in multiple threads, it is recommended to use the following
+ * The above implementation cannot guarantee that the singleton constructor
+ * executes before main
+ * when compiled with VC2003 release mode with optimization enabled. If
+ * compiling singleton programs
+ * under VC2003 and using singleton objects in multiple threads, it is
+ * recommended to use the following
  * singleton template class. Example:
  * class singleton_test {
  * public:

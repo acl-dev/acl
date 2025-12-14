@@ -7,8 +7,10 @@ namespace acl {
 class diff_manager;
 
 /**
- * Pure virtual class for difference set comparison. Subclasses must inherit this class and implement its pure virtual methods.
- * This class inherits from dbuf_obj class, facilitating unified management and destruction by dbuf_guard
+ * Pure virtual class for difference set comparison. Subclasses must inherit
+ * this class and implement its pure virtual methods.
+ * This class inherits from dbuf_obj class, facilitating unified management and
+ * destruction by dbuf_guard
  */
 class diff_object : public dbuf_obj {
 public:
@@ -43,7 +45,8 @@ public:
 	 * Whether it is redundant data outside the given range (closed interval)
 	 * @param range_from {long long} Start position
 	 * @param range_to {long long} End position
-	 * @return {bool} Whether it is a redundant data object exceeding the given range
+	 * @return {bool} Whether it is a redundant data object exceeding the given
+	 * range
 	 */
 	virtual bool check_range(long long range_from, long long range_to) const {
 		(void) range_from;

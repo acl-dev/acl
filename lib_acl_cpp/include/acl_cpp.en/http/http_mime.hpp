@@ -48,7 +48,8 @@ public:
 
 	/**
 	 * When type returned by get_mime_type is HTTP_MIME_PARAM, can
-	 * call this function to get parameter value. Parameter name can be obtained through base class get_name()
+	 * call this function to get parameter value. Parameter name can be obtained
+	 * through base class get_name()
 	 * @return {const char*} Returns NULL indicates parameter does not exist
 	 */
 	const char* get_value() const;
@@ -64,14 +65,16 @@ private:
 
 /**
  * HTTP mime parser. This parser is a streaming parser. Users can input only
- * partial data to update function each time. When this function returns true, it indicates parsing is complete and correct
+ * partial data to update function each time. When this function returns true,
+ * it indicates parsing is complete and correct
  */
 class ACL_CPP_API http_mime : public dbuf_obj {
 public:
 	/**
 	 * Constructor
 	 * @param boundary {const char*} Delimiter, cannot be empty
-	 * @param local_charset {const char*} Local character set. When not empty, automatically converts
+	 * @param local_charset {const char*} Local character set. When not empty,
+	 * automatically converts
 	 *  parameter content to local character set
 	 */
 	http_mime(const char* boundary, const char* local_charset  = "gb2312");
@@ -79,8 +82,10 @@ public:
 
 	/**
 	 * Set storage path for MIME data. After analyzing MIME data, if want to
-	 * extract data from it, must provide storage location of original data of this MIME, otherwise
-	 * cannot get corresponding data, i.e., save_xxx/get_nodes/get_node functions cannot
+	 * extract data from it, must provide storage location of original data of this
+	 * MIME, otherwise
+	 * cannot get corresponding data, i.e., save_xxx/get_nodes/get_node functions
+	 * cannot
 	 * be used normally
 	 * @param path {const char*} File path name. If this parameter is empty, cannot
 	 *  get body data, and cannot call save_xxx related interfaces
@@ -92,10 +97,12 @@ public:
 	 * @param data {const char*} Body data (may be data header or body data,
 	 *  and does not need to be complete data line)
 	 * @param len {size_t} data data length
-	 * @return {bool} For multipart data, returns true indicates parsing is complete;
+	 * @return {bool} For multipart data, returns true indicates parsing is
+	 * complete;
 	 *  For non-multipart files, this return value is always false, has no meaning,
 	 *  need caller to judge end position of body data itself
-	 * Note: After calling this function, must call update_end function to notify parser
+	 * Note: After calling this function, must call update_end function to notify
+	 * parser
 	 * that parsing is complete
 	 */
 	bool update(const char* data, size_t len);
@@ -109,7 +116,8 @@ public:
 	/**
 	 * Get HTTP MIME node based on variable name
 	 * @param name {const char*} Variable name
-	 * @return {const http_mime_node*} Returns NULL indicates node corresponding to variable name
+	 * @return {const http_mime_node*} Returns NULL indicates node corresponding to
+	 * variable name
 	 *  does not exist
 	 */
 	const http_mime_node* get_node(const char* name) const;

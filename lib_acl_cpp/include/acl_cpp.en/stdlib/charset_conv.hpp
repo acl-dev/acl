@@ -16,7 +16,8 @@ public:
 	/**
 	 * Set whether to allow directly copying invalid character sets
 	 * @param onoff {bool} When true, during transcoding process, if illegal
-	 *  character set is encountered, directly copy, otherwise skip. By default, directly copy
+	 * character set is encountered, directly copy, otherwise skip. By default,
+	 * directly copy
 	 */
 	void set_add_invalid(bool onoff);
 
@@ -39,7 +40,8 @@ public:
 	const char* serror() const;
 
 	/**
-	 * Reset transcoding state. This parser can be reused, but before using again, need to call
+	 * Reset transcoding state. This parser can be reused, but before using again,
+	 * need to call
 	 * set(from, to) to set source character set and target character set
 	 */
 	void reset();
@@ -64,7 +66,8 @@ public:
 	bool update(const char* in, size_t len, string* out);
 
 	/**
-	 * After streaming conversion ends, need to call this function to extract final conversion result
+	 * After streaming conversion ends, need to call this function to extract final
+	 * conversion result
 	 * @param out {string*} Store conversion result
 	 */
 	void update_finish(string* out);
@@ -73,8 +76,10 @@ public:
 	 * Create character set converter
 	 * @param fromCharset {const char*} Source character set
 	 * @param toCharset {const char*} Target character set
-	 * @return {charset_conv*} If input parameters are illegal, or source character set
-	 *  and target character set are the same, or conversion between two character sets is not supported, returns NULL.
+	 * @return {charset_conv*} If input parameters are illegal, or source character
+	 * set
+	 * and target character set are the same, or conversion between two character
+	 * sets is not supported, returns NULL.
 	 *  Need to call delete to delete after use
 	 */
 	static charset_conv* create(const char* fromCharset,
@@ -102,12 +107,14 @@ private:
 };
 
 /**
- * This C-like API can more conveniently and quickly perform character set conversion
+ * This C-like API can more conveniently and quickly perform character set
+ * conversion
  * @param in {const char*} Input string (non-empty string)
  * @param len {size_t} Input string length (>0)
  * @param from_charset {const char*} Source character set encoding
  * @param to_charset {constchar*} Target character set encoding
- * @return {string} When returned string object is not empty (i.e.: !string.empty()), it indicates conversion was successful
+ * @return {string} When returned string object is not empty (i.e.:
+ * !string.empty()), it indicates conversion was successful
  */
 ACL_CPP_API string strconv(const char* in, size_t len,
 	const char* from_charset, const char* to_charset);

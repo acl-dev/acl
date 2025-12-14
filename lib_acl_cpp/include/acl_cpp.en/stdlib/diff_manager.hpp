@@ -18,18 +18,24 @@ public:
 
 	/**
 	 * Get internally created memory pool object
-	 * @return {dbuf_guard&} Returns built-in memory pool object. Objects created using this memory pool
-	 *  must be destroyed before diff_manager object is destroyed, because when diff_manager is destroyed,
+	 * @return {dbuf_guard&} Returns built-in memory pool object. Objects created
+	 * using this memory pool
+	 * must be destroyed before diff_manager object is destroyed, because when
+	 * diff_manager is destroyed,
 	 *  this built-in memory pool will be automatically destroyed
 	 */
 	dbuf_guard& get_dbuf();
 
 	/**
-	 * Compare the difference set of two collections to get the set of newly added objects, deleted objects
+	 * Compare the difference set of two collections to get the set of newly added
+	 * objects, deleted objects
 	 * and changed objects of the two collections
-	 * @param curr_objs {const std::vector<diff_object*>&} Collection of current objects
-	 * @param old_olds {const std::list<diff_object*>&} Collection of old elements. Internally
-	 *  uses this collection to generate hash table, so that current collection can be compared with this old collection for differences
+	 * @param curr_objs {const std::vector<diff_object*>&} Collection of current
+	 * objects
+	 * @param old_olds {const std::list<diff_object*>&} Collection of old elements.
+	 * Internally
+	 * uses this collection to generate hash table, so that current collection can
+	 * be compared with this old collection for differences
 	 */
 	void diff_changes(const std::vector<diff_object*>& curr_objs,
 		const std::vector<diff_object*>& old_olds);
@@ -43,8 +49,10 @@ public:
 	}
 
 	/**
-	 * After diff_changes successfully performs difference comparison, this function is used to return, relative to old collection,
-	 * the collection of elements that do not exist in current collection (i.e., deleted)
+	 * After diff_changes successfully performs difference comparison, this
+	 * function is used to return, relative to old collection,
+	 * the collection of elements that do not exist in current collection (i.e.,
+	 * deleted)
 	 * @return {std::vector<diff_object*>&}
 	 */
 	const std::vector<diff_object*>& get_deleted() const {
@@ -52,10 +60,12 @@ public:
 	}
 
 	/**
-	 * After diff_changes successfully performs difference comparison, this function is used to return, relative to old collection,
+	 * After diff_changes successfully performs difference comparison, this
+	 * function is used to return, relative to old collection,
 	 * the collection of objects in current collection whose values have changed
 	 * @return {std::vector<std::pair<diff_object*, diff_object*> >&}
-	 *  Returns collection of objects that have changed, where first in pair is new object, second
+	 * Returns collection of objects that have changed, where first in pair is new
+	 * object, second
 	 *  is old object
 	 * @sample
 	 *  const std::vector<std::pair<diff_object*, diff_object*> >&
@@ -74,7 +84,8 @@ public:
 	}
 
 	/**
-	 * After diff_manger successfully performs difference comparison, this function is used to return collection of same objects
+	 * After diff_manger successfully performs difference comparison, this function
+	 * is used to return collection of same objects
 	 * @return {std::vector<diff_object*>&}
 	 */
 	const std::vector<diff_object*>& get_same() const {
@@ -107,8 +118,10 @@ public:
 	}
 
 	/**
-	 * When repeatedly using this diff_manager for difference comparison, need to call this method to clear
-	 * temporary memory and objects generated during the previous comparison process
+	 * When repeatedly using this diff_manager for difference comparison, need to
+	 * call this method to clear
+	 * temporary memory and objects generated during the previous comparison
+	 * process
 	 */
 	void reset();
 

@@ -12,12 +12,12 @@ namespace acl {
 /**
  * Database query result set record row object.
  */
-class ACL_CPP_API db_row : public noncopyable
-{
+class ACL_CPP_API db_row : public noncopyable {
 public:
 	/**
 	 * Constructor
-	 * @param names {const std::vector<const char*>&} Database table field name list.
+	 * @param names {const std::vector<const char*>&} Database table field name
+	 * list.
 	 */
 	db_row(const std::vector<const char*>& names);
 	~db_row();
@@ -25,15 +25,16 @@ public:
 	/**
 	 * Get field name corresponding to a certain subscript value in data table.
 	 * @param ifield {size_t} Subscript value.
-	 * @return {const char*} Returns empty to indicate subscript value out of bounds or does not exist.
+	 * @return {const char*} Returns empty to indicate subscript value out of
+	 * bounds or does not exist.
 	 */
 	const char* field_name(size_t ifield) const;
 
 	/**
 	 * Get corresponding field value from query result record set by field name.
 	 * @param name {const char*} Database table field name.
-	 * @return {const char*} Corresponding field value. Returns empty to indicate field value is NULL or
-	 *  field name is invalid.
+	 * @return {const char*} Corresponding field value. Returns empty to indicate
+	 * field value is NULL or field name is invalid.
 	 */
 	const char* field_value(const char* name) const;
 
@@ -41,50 +42,62 @@ public:
 	 * Get corresponding field value from query result record set by field name.
 	 * Same as field_value.
 	 * @param name {const char*} Database table field name.
-	 * @return {const char*} Corresponding field value. Returns empty to indicate field value is NULL or
-	 *  field name is invalid.
+	 * @return {const char*} Corresponding field value. Returns empty to indicate
+	 * field value is NULL or field name is invalid.
 	 */
 	const char* operator[](const char* name) const;
 
 	/**
 	 * Get corresponding field value from query result record set by subscript.
-	 * @param ifield {size_t} Subscript value. This value should be < number of fields.
-	 * @return {const char*} Corresponding field value. Returns empty to indicate subscript value is invalid or
-	 *  field value is NULL.
+	 * @param ifield {size_t} Subscript value. This value should be < number of
+	 * fields.
+	 * @return {const char*} Corresponding field value. Returns empty to indicate
+	 * subscript value is invalid or field value is NULL.
 	 */
 	const char* field_value(size_t ifield) const;
 
 	/**
-	 * Get corresponding field value from query result record set by subscript. Same as field_value.
-	 * @param ifield {size_t} Subscript value. This value should be < number of fields.
-	 * @return {const char*} Corresponding field value. Returns empty to indicate subscript value is invalid or
+	 * Get corresponding field value from query result record set by subscript.
+	 * Same as field_value.
+	 * @param ifield {size_t} Subscript value. This value should be < number of
+	 * fields.
+	 * @return {const char*} Corresponding field value. Returns empty to indicate
+	 * subscript value is invalid or
 	 *  field value is NULL.
 	 */
 	const char* operator[](size_t ifield) const;
 
 	/**
-	 * Get corresponding field value of integer type from query result record set by subscript.
+	 * Get corresponding field value of integer type from query result record set
+	 * by subscript.
 	 * @param ifield {size_t} Subscript value.
-	 * @param null_value {int} When field is NULL, returns this value to indicate no corresponding value.
-	 * @return {int} Returned value. If user-provided null_value is same as returned value, no value was found.
+	 * @param null_value {int} When field is NULL, returns this value to indicate
+	 * no corresponding value.
+	 * @return {int} Returned value. If user-provided null_value is same as
+	 * returned value, no value was found.
 	 */
 	int field_int(size_t ifield, int null_value = 0) const;
 
 	/**
-	 * Get corresponding field value of integer type from query result record set by field name.
+	 * Get corresponding field value of integer type from query result record set
+	 * by field name.
 	 * @param name {const char*} Subscript value.
-	 * @param null_value {int} When field is NULL, returns this value to indicate no corresponding value.
-	 * @return {int} Returned value. If user-provided null_value is same as returned value, no value was found.
+	 * @param null_value {int} When field is NULL, returns this value to indicate
+	 * no corresponding value.
+	 * @return {int} Returned value. If user-provided null_value is same as
+	 * returned value, no value was found.
 	 */
 	int field_int(const char* name, int null_value = 0) const;
 
 	
 	/**
-	 * Get corresponding field value of integer type from query result record set by subscript.
+	 * Get corresponding field value of integer type from query result record set
+	 * by subscript.
 	 * @param ifield {size_t} Subscript value.
-	 * @param null_value {acl_int64} When field is NULL, returns this value to indicate no corresponding value.
-	 * @return {acl_int64} Returned value. If user-provided null_value value is same, then
-	 *  no value was found.
+	 * @param null_value {acl_int64} When field is NULL, returns this value to
+	 * indicate no corresponding value.
+	 * @return {acl_int64} Returned value. If user-provided null_value value is
+	 * same, then no value was found.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 field_int64(size_t ifield, __int64 null_value = 0) const;
@@ -94,11 +107,13 @@ public:
 #endif
 
 	/**
-	 * Get corresponding field value of integer type from query result record set by field name.
+	 * Get corresponding field value of integer type from query result record set
+	 * by field name.
 	 * @param name {const char*} Subscript value.
-	 * @param null_value {acl_int64} When field is NULL, returns this value to indicate no corresponding value.
-	 * @return {acl_int64} Returned value. If user-provided null_value value is same, then
-	 *  no value was found.
+	 * @param null_value {acl_int64} When field is NULL, returns this value to
+	 * indicate no corresponding value.
+	 * @return {acl_int64} Returned value. If user-provided null_value value is
+	 * same, then no value was found.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 field_int64(const char* name, __int64 null_value = 0) const;
@@ -108,52 +123,63 @@ public:
 #endif
 
 	/**
-	 * Get corresponding field value of floating point type from query result record set by subscript.
+	 * Get corresponding field value of floating point type from query result
+	 * record set by subscript.
 	 * @param ifield {size_t} Subscript value.
-	 * @param null_value {double} When field is NULL, returns this value to indicate no corresponding value.
-	 * @return {double} Returned value. If user-provided null_value value is same, then no
-	 *  value was found.
+	 * @param null_value {double} When field is NULL, returns this value to
+	 * indicate no corresponding value.
+	 * @return {double} Returned value. If user-provided null_value value is same,
+	 * then no value was found.
 	 */
 	double field_double(size_t ifield, double null_value = 0.0) const;
 
 	/**
-	 * Get corresponding field value of floating point type from query result record set by field name.
+	 * Get corresponding field value of floating point type from query result
+	 * record set by field name.
 	 * @param name {const char*} Subscript value.
-	 * @param null_value {double} When field is NULL, returns this value to indicate no corresponding value.
-	 * @return {double} Returned value. If user-provided null_value value is same, then no
-	 *  value was found.
+	 * @param null_value {double} When field is NULL, returns this value to
+	 * indicate no corresponding value.
+	 * @return {double} Returned value. If user-provided null_value value is same,
+	 * then no value was found.
 	 */
 	double field_double(const char* name, double null_value = 0.0) const;
 
 	/**
-	 * Get corresponding field value of string type from query result record set by subscript.
+	 * Get corresponding field value of string type from query result record set by
+	 * subscript.
 	 * @param ifield {size_t} Subscript value.
-	 * @return {const char*} Returned value. When NULL, it means no value was found.
+	 * @return {const char*} Returned value. When NULL, it means no value was
+	 * found.
 	 */
 	const char* field_string(size_t ifield) const;
 
 	/**
-	 * Get corresponding field value of string type from query result record set by field name.
+	 * Get corresponding field value of string type from query result record set by
+	 * field name.
 	 * @param name {const char*} Subscript value.
-	 * @return {const char*} Returned value. When NULL, it means no value was found.
+	 * @return {const char*} Returned value. When NULL, it means no value was
+	 * found.
 	 */
 	const char* field_string(const char* name) const;
 
 	/**
-	 * Get corresponding field value length of string type from query result record set by subscript.
+	 * Get corresponding field value length of string type from query result record
+	 * set by subscript.
 	 * @param ifield {size_t} Subscript value.
 	 * @return {size_t}
 	 */
 	size_t field_length(size_t ifield) const;
 	/**
-	 * Get corresponding field value length of string type from query result record set by field name.
+	 * Get corresponding field value length of string type from query result record
+	 * set by field name.
 	 * @param name {const char*} Subscript value.
 	 * @return {size_t}
 	 */
 	size_t field_length(const char* name) const;
 
 	/**
-	 * Add a field value to record set. Field value order should match field name order.
+	 * Add a field value to record set. Field value order should match field name
+	 * order.
 	 * @param value {const char*} A certain field value in record set.
 	 * @param len {size_t} Data length of value.
 	 */
@@ -191,7 +217,8 @@ public:
 	virtual ~db_rows();
 
 	/**
-	 * Get matching record collection from query result record set by database table field name and corresponding field value.
+	 * Get matching record collection from query result record set by database
+	 * table field name and corresponding field value.
 	 * @param name {const char*} Database table field name (case-insensitive).
 	 * @param value {const char*} Database table field value (case-insensitive).
 	 * @return {const std::vector<const db_row*>&} Record collection object.
@@ -209,9 +236,10 @@ public:
 
 	/**
 	 * Get a certain record from query result record set by specified subscript.
-	 * @param idx {size_t} Record subscript. This value should be < result set size.
-	 * @return {const db_row*} Returns empty to indicate subscript value is invalid or field value is
-	 *  empty.
+	 * @param idx {size_t} Record subscript. This value should be < result set
+	 * size.
+	 * @return {const db_row*} Returns empty to indicate subscript value is invalid
+	 * or field value is empty.
 	 */
 	const db_row* operator[](size_t idx) const;
 
@@ -232,7 +260,8 @@ public:
 	std::vector<const char*> names_;
 
 	// Query result record set. All elements db_row in it are dynamically added,
-	// because when destructor is called, it automatically deletes all element objects in rows_.
+	// because when destructor is called, it automatically deletes all element
+	// objects in rows_.
 	std::vector<db_row*> rows_;
 
 	// Temporary record collection.
@@ -251,8 +280,7 @@ class query;
 /**
  * Database operation handle base class.
  */
-class ACL_CPP_API db_handle : public connect_client
-{
+class ACL_CPP_API db_handle : public connect_client {
 public:
 	db_handle();
 	virtual ~db_handle();
@@ -290,7 +318,8 @@ public:
 	}
 
 	/**
-	 * Pure virtual interface. Subclasses must implement this interface to open database.
+	 * Pure virtual interface. Subclasses must implement this interface to open
+	 * database.
 	 * @param charset {const char*} Character set used when connecting to database.
 	 * @return {bool} Whether successful.
 	 */
@@ -303,31 +332,35 @@ public:
 	virtual bool is_opened() const = 0;
 
 	/**
-	 * Pure virtual interface. Subclasses must implement this interface to determine whether specified table exists.
+	 * Pure virtual interface. Subclasses must implement this interface to
+	 * determine whether specified table exists.
 	 * @return {bool} Whether exists.
 	 */
 	virtual bool tbl_exists(const char* tbl_name) = 0;
 
 	/**
-	 * Pure virtual interface. Subclasses must implement this interface to close database.
+	 * Pure virtual interface. Subclasses must implement this interface to close
+	 * database.
 	 * @return {bool} Whether closing was successful.
 	 */
 	virtual bool close() = 0;
 
 	/**
-	 * Pure virtual interface. Subclasses must implement this interface to execute SELECT SQL statement.
-	 * @param sql {const char*} Standard SQL statement, cannot be empty. Note: you must
-	 *  escape SQL statements to prevent SQL injection attacks.
-	 * @param result {db_rows*} When not empty, stores query result in this result object.
-	 *  Otherwise, result is stored in a temporary storage inside db_handle.
+	 * Pure virtual interface. Subclasses must implement this interface to execute
+	 * SELECT SQL statement.
+	 * @param sql {const char*} Standard SQL statement, cannot be empty.
+	 * Note: you must escape SQL statements to prevent SQL injection attacks.
+	 * @param result {db_rows*} When not empty, stores query result in this result
+	 * object. Otherwise, result is stored in a temporary storage inside db_handle.
 	 * @return {bool} Whether execution was successful.
 	 */
 	virtual bool sql_select(const char* sql, db_rows* result = NULL) = 0;
 
 	/**
-	 * Pure virtual interface. Subclasses must implement this interface to execute INSERT/UPDATE/DELETE SQL statement.
-	 * @param sql {const char*} Standard SQL statement, cannot be empty. Note: you must
-	 *  escape SQL statements to prevent SQL injection attacks.
+	 * Pure virtual interface. Subclasses must implement this interface to execute
+	 * INSERT/UPDATE/DELETE SQL statement.
+	 * @param sql {const char*} Standard SQL statement, cannot be empty.
+	 * Note: you must escape SQL statements to prevent SQL injection attacks.
 	 * @return {bool} Whether execution was successful.
 	 */
 	virtual bool sql_update(const char* sql) = 0;
@@ -351,34 +384,36 @@ public:
 	virtual bool rollback() { return false; }
 
 	/**
-	 * Execute safe query process. Calling this function is equivalent to sql_select, except query
-	 * object's sql is safe, which can prevent sql injection. This function
-	 * executes SELECT SQL statement.
+	 * Execute safe query process. Calling this function is equivalent to
+	 * sql_select, except query object's sql is safe, which can prevent
+	 * sql injection. This function executes SELECT SQL statement.
 	 * @param query {query&}
-	 * @param result {db_rows*} When not empty, stores query result in this result object.
-	 *  Otherwise, result is stored in a temporary storage inside db_handle.
+	 * @param result {db_rows*} When not empty, stores query result in this
+	 * result object. Otherwise, result is stored in a temporary storage inside
+	 * db_handle.
 	 * @return {bool} Whether execution was successful.
 	 */
 	bool exec_select(query& query, db_rows* result = NULL);
 
 	/**
-	 * Execute safe update process. Calling this function is equivalent to sql_update, except query
-	 * object's sql is safe, which can prevent sql injection. This function
-	 * executes INSERT/UPDATE/DELETE SQL statement.
+	 * Execute safe update process. Calling this function is equivalent to
+	 * sql_update, except query object's sql is safe, which can prevent sql
+	 * injection. This function executes INSERT/UPDATE/DELETE SQL statement.
 	 * @param query {query&}
 	 * @return {bool} Whether execution was successful.
 	 */
 	bool exec_update(query& query);
 
 	/**
-	 * Interface: To prevent sql injection, users should call this function to escape string field values.
-	 * This interface escapes common special characters in strings. Subclasses can also implement their own
-	 * escaping methods.
+	 * Interface: To prevent sql injection, users should call this function to
+	 * escape string field values.
+	 * This interface escapes common special characters in strings. Subclasses can
+	 * also implement their own escaping methods.
 	 * @param in {const char*} Input string.
 	 * @param len {size_t} String length.
 	 * @param out {string&} Store escaped result.
-	 * @return {string&} Returns reference to out buffer for convenience, so users can chain calls when
-	 *  building SQL statements.
+	 * @return {string&} Returns reference to out buffer for convenience, so users
+	 * can chain calls when building SQL statements.
 	 */
 	virtual string& escape_string(const char* in, size_t len, string& out);
 
@@ -398,11 +433,13 @@ public:
 	const db_rows* get_result() const;
 
 	/**
-	 * Get matching record collection from query result record set by database table field name and corresponding field value.
+	 * Get matching record collection from query result record set by database
+	 * table field name and corresponding field value.
 	 * @param name {const char*} Database table field name (case-insensitive).
 	 * @param value {const char*} Database table field value (case-insensitive).
 	 * @return {const std::vector<const db_row*>*} Record collection object.
-	 *  Returns result. When not empty, users need to call free_result() to release result memory.
+	 * Returns result. When not empty, users need to call free_result() to release
+	 * result memory.
 	 */
 	const std::vector<const db_row*>* get_rows(
 		const char* name, const char* value);
@@ -410,29 +447,39 @@ public:
 	/**
 	 * Get all query results.
 	 * @return {const std::vector<db_row*>*} Record collection object.
-	 *  Returns result. When not empty, users need to call free_result() to release result memory.
+	 * Returns result. When not empty, users need to call free_result() to release
+	 * result memory.
 	 */
 	const std::vector<db_row*>* get_rows() const;
 
 	/**
-	 * Get first row of last executed SQL query result. More convenient for unique data queries.
-	 * @return {const db_row*} Returns empty to indicate query result is empty or error occurred.
-	 *  Users need to call free_result() to release result memory, otherwise memory leak will occur.
+	 * Get first row of last executed SQL query result. More convenient for unique
+	 * data queries.
+	 * @return {const db_row*} Returns empty to indicate query result is empty or
+	 * error occurred.
+	 * Users need to call free_result() to release result memory, otherwise memory
+	 * leak will occur.
 	 */
 	const db_row* get_first_row() const;
 
 	/**
-	 * Release last query result. After query completes, call this function to release last query result. This function
-	 * can be called multiple times without side effects, because when called again, it automatically sets internal
-	 * result_ to empty. Additionally, to prevent memory leaks, users should call this function before each SQL query execution.
-	 * When object is destroyed, it automatically calls this function to release any unreleased memory.
+	 * Release last query result. After query completes, call this function to
+	 * release last query result. This function
+	 * can be called multiple times without side effects, because when called
+	 * again, it automatically sets internal
+	 * result_ to empty. Additionally, to prevent memory leaks, users should call
+	 * this function before each SQL query execution.
+	 * When object is destroyed, it automatically calls this function to release
+	 * any unreleased memory.
 	 */
 	void free_result();
 
 	/**
 	 * Get record corresponding to a certain subscript value.
-	 * @param idx {size_t} Subscript value. Should be less than query result set size.
-	 * @return {const db_row*} Returns empty, possibly because subscript is out of bounds,
+	 * @param idx {size_t} Subscript value. Should be less than query result set
+	 * size.
+	 * @return {const db_row*} Returns empty, possibly because subscript is out of
+	 * bounds,
 	 *  or result is empty.
 	 */
 	const db_row* operator[](size_t idx) const;
@@ -451,7 +498,8 @@ public:
 
 	/**
 	 * Print database query result.
-	 * @param max {size_t} Maximum number of records to print. When this value is 0,
+	 * @param max {size_t} Maximum number of records to print. When this value is
+	 * 0,
 	 *  prints all results.
 	 */
 	void print_out(size_t max = 0) const;
@@ -488,12 +536,14 @@ public:
 	}
 
 	/**
-	 * When using dynamic library loading method, you need to call this function to set dynamic library's full path.
+	 * When using dynamic library loading method, you need to call this function to
+	 * set dynamic library's full path.
 	 */
 	static void set_loadpath(const char* path);
 
 	/**
-	 * When you need to get dynamic library's full path, you can get dynamic library's full path through this function.
+	 * When you need to get dynamic library's full path, you can get dynamic
+	 * library's full path through this function.
 	 * @return {const char*} Returns NULL when not set.
 	 */
 	static const char* get_loadpath();

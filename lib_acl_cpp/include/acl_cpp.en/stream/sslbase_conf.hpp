@@ -13,7 +13,8 @@ public:
 	virtual ~ssl_sni_checker() {}
 
 	/**
-	 * Virtual method used to check whether input sni host is valid. Subclasses must implement
+	 * Virtual method used to check whether input sni host is valid. Subclasses
+	 * must implement
 	 * @param sni {const char*} SNI field sent by client
 	 * @param host {acl::string&} Host field extracted from sni
 	 * @return {bool} Whether check is valid
@@ -44,9 +45,12 @@ public:
 
 	/**
  	 * Set SSL/TLS version
- 	 * @param ver_min {int} Minimum version number, internal default value is tls_ver_1_2
- 	 * @param ver_max {int} Maximum version number, internal default value is tls_ver_1_3
- 	 * @return {bool} Returns true indicates setting was successful, otherwise indicates version setting is not supported
+ 	 * @param ver_min {int} Minimum version number, internal default value is
+ 	 * tls_ver_1_2
+ 	 * @param ver_max {int} Maximum version number, internal default value is
+ 	 * tls_ver_1_3
+ 	 * @return {bool} Returns true indicates setting was successful, otherwise
+ 	 * indicates version setting is not supported
 	 */
 	virtual bool set_version(int ver_min, int ver_max) {
 		(void) ver_min;
@@ -87,11 +91,14 @@ public:
 	}
 //public:
 	/**
-	 * Load CA root certificate (each configuration instance only needs to call this method once)
+	 * Load CA root certificate (each configuration instance only needs to call
+	 * this method once)
 	 * @param ca_file {const char*} Full path of CA certificate file
-	 * @param ca_path {const char*} Directory where multiple CA certificate files are located
+	 * @param ca_path {const char*} Directory where multiple CA certificate files
+	 * are located
 	 * @return {bool} Whether loading CA root certificate was successful
-	 * Note: If both ca_file and ca_path are non-empty, will load all certificates in sequence
+	 * Note: If both ca_file and ca_path are non-empty, will load all certificates
+	 * in sequence
 	 */
 	virtual bool load_ca(const char* ca_file, const char* ca_path) {
 		(void) ca_file;
@@ -100,10 +107,12 @@ public:
 	}
 
 	/**
-	 * Add a server/client's own certificate. Can call this method multiple times to load multiple certificates
+	 * Add a server/client's own certificate. Can call this method multiple times
+	 * to load multiple certificates
 	 * @param crt_file {const char*} Full path of certificate file, non-empty
 	 * @param key_file {const char*} Full path of key file, non-empty
-	 * @param key_pass {const char*} Password of key file. Can write NULL if there is no key password
+	 * @param key_pass {const char*} Password of key file. Can write NULL if there
+	 * is no key password
 	 * @return {bool} Whether adding certificate was successful
 	 */
 	virtual bool add_cert(const char* crt_file, const char* key_file,
@@ -120,7 +129,8 @@ public:
 	}
 
 	/**
-	 * Add a server/client's own certificate. Can call this method multiple times to load multiple certificates
+	 * Add a server/client's own certificate. Can call this method multiple times
+	 * to load multiple certificates
 	 * @param crt_file {const char*} Full path of certificate file, non-empty
 	 * @return {bool} Whether adding certificate was successful
 	 * @deprecated use add_cert(const char*, const char*, const char*)
@@ -131,9 +141,11 @@ public:
 	}
 
 	/**
-	 * Add server/client's key (each configuration instance only needs to call this method once)
+	 * Add server/client's key (each configuration instance only needs to call this
+	 * method once)
 	 * @param key_file {const char*} Full path of key file, non-empty
-	 * @param key_pass {const char*} Password of key file. Can write NULL if there is no key password
+	 * @param key_pass {const char*} Password of key file. Can write NULL if there
+	 * is no key password
 	 * @return {bool} Whether setting was successful
 	 * @deprecated use add_cert(const char*, const char*, const char*)
 	 */
@@ -149,7 +161,8 @@ public:
 	}
 
 	/**
-	 * When in server mode, whether to enable session cache function, helps improve SSL handshake efficiency
+	 * When in server mode, whether to enable session cache function, helps improve
+	 * SSL handshake efficiency
 	 * @param on {bool}
 	 * Note: This function is only effective for server mode
 	 */

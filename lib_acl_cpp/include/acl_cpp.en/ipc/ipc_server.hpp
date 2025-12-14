@@ -58,7 +58,8 @@ protected:
 	virtual void on_close() {}
 
 	/**
-	 * Callback function after asynchronous listening stream gets a client connection
+	 * Callback function after asynchronous listening stream gets a client
+	 * connection
 	 * @param client {aio_socket_stream*} Client IPC stream
 	 */
 	virtual void on_accept(aio_socket_stream* client)
@@ -82,7 +83,8 @@ private:
 	aio_listen_stream* sstream_;
 
 	/**
-	 * Base class virtual function, callback process called when new connection arrives
+	 * Base class virtual function, callback process called when new connection
+	 * arrives
 	 * @param client {aio_socket_stream*} Asynchronous client stream
 	 * @return {bool} Returns true to notify listening stream to continue listening
 	 */
@@ -94,7 +96,8 @@ private:
 	virtual void close_callback();
 
 	/**
-	 * Base class virtual function, callback process when listening stream times out
+	 * Base class virtual function, callback process when listening stream times
+	 * out
 	 */
 	virtual bool timeout_callback();
 };

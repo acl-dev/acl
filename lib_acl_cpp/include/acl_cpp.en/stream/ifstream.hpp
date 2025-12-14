@@ -27,7 +27,8 @@ public:
 	bool load(string& s);
 
 	/**
-	 * Read all data from file into user-specified buffer. This function is a static member function
+	 * Read all data from file into user-specified buffer. This function is a
+	 * static member function
 	 * and can be used directly.
 	 * @param path {const char*} File path.
 	 * @param s {string*} User buffer.

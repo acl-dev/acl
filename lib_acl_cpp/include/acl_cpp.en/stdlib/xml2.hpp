@@ -157,12 +157,16 @@ public:
 	/**
 	 * Constructor, create XML object tree on specified memory-mapped file
 	 * @param filepath {const char*} Memory-mapped filename
-	 * @param max_len {size_t} Maximum size of memory-mapped file, i.e., memory-mapped file should not exceed
+	 * @param max_len {size_t} Maximum size of memory-mapped file, i.e.,
+	 * memory-mapped file should not exceed
 	 *  this size when automatically growing
-	 * @param data {const char*} When not empty, automatically calls parsing process
+	 * @param data {const char*} When not empty, automatically calls parsing
+	 * process
 	 * @param init_len {size_t} Initial size when memory-mapped file is created
-	 * @param dbuf_nblock {size_t} Initialization parameter for internally used dbuf_guard
-	 * @param dbuf_capacity {size_t} Initialization parameter for internally used dbuf_guard
+	 * @param dbuf_nblock {size_t} Initialization parameter for internally used
+	 * dbuf_guard
+	 * @param dbuf_capacity {size_t} Initialization parameter for internally used
+	 * dbuf_guard
 	 */
 	xml2(const char* filepath, size_t max_len, const char* data = NULL,
 		size_t init_len = 8192, size_t dbuf_nblock = 2,
@@ -170,14 +174,20 @@ public:
 
 	/**
 	 * Constructor, create XML object tree on specified memory-mapped file
-	 * @param fp {fstream&} Memory-mapped file handle. This file handle should remain open
-	 *  until this xml object is released, i.e., fp must be closed only after xml object is released
-	 * @param max_len {size_t} Maximum size of memory-mapped file, i.e., memory-mapped file should not exceed
+	 * @param fp {fstream&} Memory-mapped file handle. This file handle should
+	 * remain open
+	 * until this xml object is released, i.e., fp must be closed only after xml
+	 * object is released
+	 * @param max_len {size_t} Maximum size of memory-mapped file, i.e.,
+	 * memory-mapped file should not exceed
 	 *  this size when automatically growing
-	 * @param data {const char*} When not empty, automatically calls parsing process
+	 * @param data {const char*} When not empty, automatically calls parsing
+	 * process
 	 * @param init_len {size_t} Initial size when memory-mapped file is created
-	 * @param dbuf_nblock {size_t} Initialization parameter for internally used dbuf_guard
-	 * @param dbuf_capacity {size_t} Initialization parameter for internally used dbuf_guard
+	 * @param dbuf_nblock {size_t} Initialization parameter for internally used
+	 * dbuf_guard
+	 * @param dbuf_capacity {size_t} Initialization parameter for internally used
+	 * dbuf_guard
 	 */
 	xml2(fstream& fp, size_t max_len, const char* data = NULL,
 		size_t init_len = 8192, size_t dbuf_nblock = 2,
@@ -185,14 +195,20 @@ public:
 
 	/**
 	 * Constructor, create XML object tree on specified memory-mapped file
-	 * @param fd {ACL_FILE_HANDLE} Memory-mapped file handle. This file handle should remain open
-	 *  until this xml object is released, i.e., fp must be closed only after xml object is released
-	 * @param max_len {size_t} Maximum size of memory-mapped file, i.e., memory-mapped file should not exceed
+	 * @param fd {ACL_FILE_HANDLE} Memory-mapped file handle. This file handle
+	 * should remain open
+	 * until this xml object is released, i.e., fp must be closed only after xml
+	 * object is released
+	 * @param max_len {size_t} Maximum size of memory-mapped file, i.e.,
+	 * memory-mapped file should not exceed
 	 *  this size when automatically growing
-	 * @param data {const char*} When not empty, automatically calls parsing process
+	 * @param data {const char*} When not empty, automatically calls parsing
+	 * process
 	 * @param init_len {size_t} Initial size when memory-mapped file is created
-	 * @param dbuf_nblock {size_t} Initialization parameter for internally used dbuf_guard
-	 * @param dbuf_capacity {size_t} Initialization parameter for internally used dbuf_guard
+	 * @param dbuf_nblock {size_t} Initialization parameter for internally used
+	 * dbuf_guard
+	 * @param dbuf_capacity {size_t} Initialization parameter for internally used
+	 * dbuf_guard
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	xml2(void* fd,  size_t max_len, const char* data = NULL,

@@ -6,15 +6,14 @@
 
 #if !defined(ACL_DB_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 /**
- * SQL query statement query builder. This class automatically escapes some special characters in sql. Usage is similar to
+ * SQL query statement query builder. This class automatically escapes some
+ * special characters in sql. Usage is similar to
  * java hibernate's SQL statement building method
  */
-class ACL_CPP_API query : public noncopyable
-{
+class ACL_CPP_API query : public noncopyable {
 public:
 	query();
 	~query();
@@ -23,7 +22,7 @@ public:
 	 * Create sql statement, variable argument method, usage similar to printf
 	 * @param sql_fmt {const char*} sql statement, format:
 	 *  select * from xxx where name = :name and len >= %d
-	 *  where :name will be replaced by value in set_parameter, len is integer value
+	 * where :name will be replaced by value in set_parameter, len is integer value
 	 * @return {query&}
 	 */
 	query& create_sql(const char* sql_fmt, ...) ACL_CPP_PRINTF(2, 3);
@@ -134,7 +133,8 @@ public:
 	const string& to_string();
 
 	/**
-	 * Clear cached data from previous query. When this SQL query builder object is used multiple times, should call
+	 * Clear cached data from previous query. When this SQL query builder object is
+	 * used multiple times, should call
 	 * this function in advance to clear previous SQL query builder state
 	 */
 	void reset();
@@ -143,7 +143,8 @@ public:
 	 * Escape some special characters in sql to prevent SQL injection problems
 	 * @param in {const char*} Variable value
 	 * @param len {size_t} in data length
-	 * @param out {string&} Buffer for storing converted result. This parameter will be cleared first after input
+	 * @param out {string&} Buffer for storing converted result. This parameter
+	 * will be cleared first after input
 	 * @return {const string&} Escaped result (actually reference to out address)
 	 */
 	static const string& escape(const char* in, size_t len, string& out);
@@ -152,9 +153,11 @@ public:
 	 * Convert time to DateTime format string (YYYY-MM-DD HH:MM:SS)
 	 * @param t {time_t} Timestamp
 	 * @param out {string&} Buffer for storing conversion result
-	 * @param fmt {const char*} Date format. On _WIN32, must ensure correctness of this format,
+	 * @param fmt {const char*} Date format. On _WIN32, must ensure correctness of
+	 * this format,
 	 *  otherwise _WIN32 API will generate assertion. Format: "%Y-%m-%d %H:%M:%S"
-	 * @return {const char*} Converted buffer address. Returns NULL indicates conversion failed
+	 * @return {const char*} Converted buffer address. Returns NULL indicates
+	 * conversion failed
 	 */
 	static const char* to_date(time_t t, string& out,
 		const char* fmt = "%Y-%m-%d %H:%M:%S");

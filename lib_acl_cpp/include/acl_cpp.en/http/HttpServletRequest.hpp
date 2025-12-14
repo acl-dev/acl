@@ -25,7 +25,8 @@ class HttpCookie;
 class HttpServletResponse;
 
 /**
- * Class related to HTTP client request parsing. This class should not be inherited. Users also do not need to
+ * Class related to HTTP client request parsing. This class should not be
+ * inherited. Users also do not need to
  * create this object directly.
  */
 class ACL_CPP_API HttpServletRequest : public noncopyable {
@@ -34,11 +35,15 @@ public:
 	 * Constructor
 	 * @param res {HttpServletResponse&}
 	 * @param sess {session*} Object storing session data.
-	 * @param stream {socket_stream&} Connection stream. Internally automatically manages and closes it.
-	 * @param charset {const char*} Local character set. When this value is not empty,
-	 *  internally automatically converts HTTP request data to local character set for conversion.
+	 * @param stream {socket_stream&} Connection stream. Internally automatically
+	 * manages and closes it.
+	 * @param charset {const char*} Local character set. When this value is not
+	 * empty,
+	 * internally automatically converts HTTP request data to local character set
+	 * for conversion.
 	 * @param body_limit {int} When POST request body is text type,
-	 *  this parameter limits maximum request body length. When body length exceeds this value, it returns error. When body is MIME
+	 * this parameter limits maximum request body length. When body length exceeds
+	 * this value, it returns error. When body is MIME
 	 *  format, on is false, this parameter is invalid.
 	 */
 	HttpServletRequest(HttpServletResponse& res, session* sess,
@@ -47,16 +52,20 @@ public:
 	~HttpServletRequest();
 
 	/**
-	 * Set POST request. This function sets whether to parse Form request body data. Default is parsing.
-	 * This function must be called before doRun to be effective. When body is MIME format,
-	 * even if you call this function to disable parsing, it will still parse MIME data.
+	 * Set POST request. This function sets whether to parse Form request body
+	 * data. Default is parsing.
+	 * This function must be called before doRun to be effective. When body is MIME
+	 * format,
+	 * even if you call this function to disable parsing, it will still parse MIME
+	 * data.
 	 * @param yes {bool} Whether to parse.
 	 */
 	void setParseBody(bool yes);
 
 	/**
 	 * Get HTTP client request method: GET, POST, PUT, CONNECT, PURGE
-	 * @param method_s {string*} When not empty, stores string format request method.
+	 * @param method_s {string*} When not empty, stores string format request
+	 * method.
 	 * @return {http_method_t}
 	 */
 	http_method_t getMethod(string* method_s = NULL) const;
@@ -91,7 +100,8 @@ public:
 
 	/**
 	 * Get a certain field value in HTTP request header.
-	 * @param name {const char*} Field name in HTTP request header, cannot be empty.
+	 * @param name {const char*} Field name in HTTP request header, cannot be
+	 * empty.
 	 * @return {const char*} Field value in HTTP request header. Returns NULL
 	 *  when not found.
 	 */
@@ -120,11 +130,15 @@ public:
 
 	/**
 	 * Get HttpSession object related to HTTP session.
-	 * @param create {bool} When session does not exist, whether to automatically create
-	 *  a session object for this client. When this parameter is false, this function
+	 * @param create {bool} When session does not exist, whether to automatically
+	 * create
+	 * a session object for this client. When this parameter is false, this
+	 * function
 	 *  returns session object without binding, and cannot read/write.
-	 * @param sid {const char*} When session does not exist and create parameter is not empty,
-	 *  if sid is not empty, use this value as user's unique session ID, and add it to client's
+	 * @param sid {const char*} When session does not exist and create parameter is
+	 * not empty,
+	 * if sid is not empty, use this value as user's unique session ID, and add it
+	 * to client's
 	 *  cookie.
 	 * @return {HttpSession&}
 	 *  Note: Priority order: COOKIE > create = true > sid != NULL
@@ -155,11 +169,13 @@ public:
 #endif
 
 	/**
-	 * Determine whether client request is range data. This function gets start address and
+	 * Determine whether client request is range data. This function gets start
+	 * address and
 	 * end address from request header.
 	 * @param range_from {long long int&} Start offset position.
 	 * @param range_to {long long int&} End offset position.
-	 * @return {bool} When request is range data, returns true. When not range data, returns false.
+	 * @return {bool} When request is range data, returns true. When not range
+	 * data, returns false.
 	 *  Note: range_from/range_to subscript starts from 0.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
@@ -168,16 +184,20 @@ public:
 	bool getRange(long long int& range_from, long long int& range_to);
 #endif
 	/**
-	 * Get Content-Type field value in HTTP request header: Content-Type: text/html; charset=gb2312
+	 * Get Content-Type field value in HTTP request header: Content-Type:
+	 * text/html; charset=gb2312
 	 * @param part {bool} When true, returns text. Otherwise returns complete
 	 *  value, e.g.: text/html; charset=gb2312
-	 * @param ctype {http_ctype*} When pointer is not empty, stores parsed http_ctype information.
-	 * @return {const char*} Returns NULL to indicate Content-Type field does not exist.
+	 * @param ctype {http_ctype*} When pointer is not empty, stores parsed
+	 * http_ctype information.
+	 * @return {const char*} Returns NULL to indicate Content-Type field does not
+	 * exist.
 	 */
 	const char* getContentType(bool part = true, http_ctype* ctype = NULL) const;
 
 	/**
-	 * Get charset field value gb2312 in HTTP request header Content-Type: text/html; charset=gb2312.
+	 * Get charset field value gb2312 in HTTP request header Content-Type:
+	 * text/html; charset=gb2312.
 	 * @return {const char*} Returns NULL to indicate Content-Type field or
 	 *  charset=xxx does not exist.
 	 */
@@ -185,7 +205,8 @@ public:
 
 	/**
 	 * Get local character set field string.
-	 * @ return {const char*} Returns NULL to indicate local character set was not set.
+	 * @ return {const char*} Returns NULL to indicate local character set was not
+	 * set.
 	 */
 	const char* getLocalCharset() const;
 
@@ -231,29 +252,38 @@ public:
 	 * parameter value after ? in URL. For POST request, you can get
 	 * parameter value after ? in URL, plus all parameter values in body.
 	 * @param name {const char*} Parameter name.
-	 * @param case_sensitive {bool} Whether case-sensitive when comparing parameter names.
-	 * @return {const char*} Returns parameter value. Returns NULL when parameter does not exist.
+	 * @param case_sensitive {bool} Whether case-sensitive when comparing parameter
+	 * names.
+	 * @return {const char*} Returns parameter value. Returns NULL when parameter
+	 * does not exist.
 	 */
 	const char* getParameter(const char* name,
 		bool case_sensitive = false) const;
 
 	/**
 	 * When Content-Type in HTTP request header is
-	 * multipart/form-data; boundary=xxx format, it indicates file upload request type.
+	 * multipart/form-data; boundary=xxx format, it indicates file upload request
+	 * type.
 	 * You can get http_mime object through this function.
 	 * @return {const http_mime*} Returns NULL to indicate no MIME data.
-	 *  Returned value user should not manually release, because HttpServletRequest object
+	 * Returned value user should not manually release, because HttpServletRequest
+	 * object
 	 *  will automatically release it.
 	 */
 	http_mime* getHttpMime();
 
 	/**
-	 * When body is text/json or application/json format, you can call this method to get json
-	 * body and parse it. Returns json object on success. This object is internally automatically managed. When
+	 * When body is text/json or application/json format, you can call this method
+	 * to get json
+	 * body and parse it. Returns json object on success. This object is internally
+	 * automatically managed. When
 	 * HttpServletRequest object is destroyed, json object will also be destroyed.
-	 * @param body_limit {size_t} Limit body length to prevent memory overflow. When
-	 *  body length exceeds this value, returns error. When this value is 0, no length limit.
-	 * @return {json*} Returns successfully parsed json object. Returns NULL for following reasons:
+	 * @param body_limit {size_t} Limit body length to prevent memory overflow.
+	 * When
+	 * body length exceeds this value, returns error. When this value is 0, no
+	 * length limit.
+	 * @return {json*} Returns successfully parsed json object. Returns NULL for
+	 * following reasons:
 	 *  1. Data length exceeded.
 	 *  2. Invalid json data format.
 	 *  3. Error occurred.
@@ -261,10 +291,13 @@ public:
 	json* getJson(size_t body_limit = 1024000);
 
 	/**
-	 * Same as above function, except that result is stored in user-provided object.
+	 * Same as above function, except that result is stored in user-provided
+	 * object.
 	 * @param out {json&}
-	 * @param body_limit {size_t} Limit body length to prevent memory overflow. When
-	 *  body length exceeds this value, returns error. When this value is 0, no length limit.
+	 * @param body_limit {size_t} Limit body length to prevent memory overflow.
+	 * When
+	 * body length exceeds this value, returns error. When this value is 0, no
+	 * length limit.
 	 * @return {bool} Returns false for following reasons:
 	 *  1. Data length exceeded.
 	 *  2. Invalid json data format.
@@ -273,22 +306,30 @@ public:
 	bool getJson(json& out, size_t body_limit = 1024000);
 
 	/**
-	 * When body is text/xml or application/xml format, you can call this method to get xml
-	 * body and parse it. Returns mxl object on success. This object is internally automatically managed. When
+	 * When body is text/xml or application/xml format, you can call this method to
+	 * get xml
+	 * body and parse it. Returns mxl object on success. This object is internally
+	 * automatically managed. When
 	 * HttpServletRequest object is destroyed, xml object will also be destroyed.
-	 * @param body_limit {size_t} Limit body length to prevent memory overflow. When
-	 *  body length exceeds this value, returns error. When this value is 0, no length limit.
-	 * @return {xml*} Returns successfully parsed xml object. Returns NULL for following reasons:
+	 * @param body_limit {size_t} Limit body length to prevent memory overflow.
+	 * When
+	 * body length exceeds this value, returns error. When this value is 0, no
+	 * length limit.
+	 * @return {xml*} Returns successfully parsed xml object. Returns NULL for
+	 * following reasons:
 	 *  1. Data length exceeded.
 	 *  2. Invalid xml data format.
 	 */
 	xml* getXml(size_t body_limit = 1024000);
 
 	/**
-	 * Same as above function, except that result is stored in user-provided object.
+	 * Same as above function, except that result is stored in user-provided
+	 * object.
 	 * @param out {xml&}
-	 * @param body_limit {size_t} Limit body length to prevent memory overflow. When
-	 *  body length exceeds this value, returns error. When this value is 0, no length limit.
+	 * @param body_limit {size_t} Limit body length to prevent memory overflow.
+	 * When
+	 * body length exceeds this value, returns error. When this value is 0, no
+	 * length limit.
 	 * @return {bool} Returns false for following reasons:
 	 *  1. Data length exceeded.
 	 *  2. Invalid xml data format.
@@ -297,11 +338,15 @@ public:
 	bool getXml(xml& out, size_t body_limit = 1024000);
 
 	/**
-	 * Get POST request body data. For other request types, you can directly call this method to get
+	 * Get POST request body data. For other request types, you can directly call
+	 * this method to get
 	 * request body data.
-	 * @param body_limit {size_t} Limit body length to prevent memory overflow. When
-	 *  body length exceeds this value, returns error. When this value is 0, no length limit.
-	 * @return {string*} Returns successfully parsed object. Returns NULL for following reasons:
+	 * @param body_limit {size_t} Limit body length to prevent memory overflow.
+	 * When
+	 * body length exceeds this value, returns error. When this value is 0, no
+	 * length limit.
+	 * @return {string*} Returns successfully parsed object. Returns NULL for
+	 * following reasons:
 	 *  1. Data length exceeded.
 	 *  2. No request body.
 	 *  3. Error occurred.
@@ -309,7 +354,8 @@ public:
 	string* getBody(size_t body_limit = 1024000);
 
 	/**
-	 * Same as above function, except that result is stored in user-provided object.
+	 * Same as above function, except that result is stored in user-provided
+	 * object.
 	 * @param out {string&}
 	 * @param body_limit {size_t}
 	 * @return {bool} Returns false for following reasons:
@@ -322,14 +368,16 @@ public:
 	/**
 	 * Get HTTP request data type.
 	 * @return {http_request_t} For POST request with file upload, you need to call
-	 *  this function to determine whether it is file upload request type. When this function returns HTTP_REQUEST_OTHER,
+	 * this function to determine whether it is file upload request type. When this
+	 * function returns HTTP_REQUEST_OTHER,
 	 *  users can get request body type string by calling getContentType.
 	 */
 	http_request_t getRequestType() const;
 
 	/**
 	 * Get referer URL of HTTP request page.
-	 * @return {const char*} Returns NULL to indicate user directly accessed this URL.
+	 * @return {const char*} Returns NULL to indicate user directly accessed this
+	 * URL.
 	 */
 	const char* getRequestReferer() const;
 
@@ -346,7 +394,8 @@ public:
 	bool isKeepAlive() const;
 
 	/**
-	 * When client wants to keep connection alive, get timeout value from HTTP request header.
+	 * When client wants to keep connection alive, get timeout value from HTTP
+	 * request header.
 	 * @return {int} Return value < 0 indicates no Keep-Alive field.
 	 */
 	int getKeepAlive() const;
@@ -380,9 +429,12 @@ public:
 
 	/**
 	 * When HttpServlet runs in server mode (not CGI mode), you can call this
-	 * function to get HTTP client connection request, thereby getting more parameters.
-	 * @return {http_client*} When running in server mode, this function returns HTTP client
-	 *  connection non-empty object. When running in CGI mode, returns empty pointer.
+	 * function to get HTTP client connection request, thereby getting more
+	 * parameters.
+	 * @return {http_client*} When running in server mode, this function returns
+	 * HTTP client
+	 * connection non-empty object. When running in CGI mode, returns empty
+	 * pointer.
 	 */
 	http_client* getClient() const;
 

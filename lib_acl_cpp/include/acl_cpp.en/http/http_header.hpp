@@ -33,13 +33,17 @@ public:
 	 *   http://www.test.com/cgi-bin/test.cgi?name=value
 	 *   /cgi-bin/test.cgi?name=value
 	 * When url has no parameter part, internally automatically parses URL.
-	 * When url has parameter part, internally automatically parses parameters and calls add_param function.
-	 * After calling this function, users can call add_param and other functions to add more parameters.
-	 * When parameter part only has parameter name but no parameter value, this parameter will be ignored. If you need to add
+	 * When url has parameter part, internally automatically parses parameters and
+	 * calls add_param function.
+	 * After calling this function, users can call add_param and other functions to
+	 * add more parameters.
+	 * When parameter part only has parameter name but no parameter value, this
+	 * parameter will be ignored. If you need to add
 	 * parameters without values, you should call add_param function to add them.
 	 * @param dbuf {dbuf_guard*} When not empty, used as memory pool.
 	 * @param encoding {bool} Whether to URL encode parameters in url. When
-	 *  true, internally automatically URL encodes parameters in url. Otherwise, url remains original.
+	 * true, internally automatically URL encodes parameters in url. Otherwise, url
+	 * remains original.
 	 */
 	http_header(const char* url, dbuf_guard* dbuf = NULL,
 		bool encoding = true);
@@ -86,7 +90,8 @@ public:
 	/**
 	 * Set whether HTTP header is client request header or server response header.
 	 * @param onoff {bool} true means request header, false means response header.
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 	http_header& set_request_mode(bool onoff);
 
@@ -94,14 +99,17 @@ public:
 	 * Add field to HTTP header.
 	 * @param name {const char*} Field name, cannot be empty pointer.
 	 * @param value {const char*} Field value, cannot be empty pointer.
-	 * @param replace {bool} When field name repeats, whether to automatically replace old value.
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * @param replace {bool} When field name repeats, whether to automatically
+	 * replace old value.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 	http_header& add_entry(const char* name, const char* value,
 			bool replace = true);
 
 	/**
-	 * In already added HTTP header fields, disable a certain field (internal default is enabled state).
+	 * In already added HTTP header fields, disable a certain field (internal
+	 * default is enabled state).
 	 * @param name {const char*}
 	 * @param yes {bool} When true, means disable. false means enable.
 	 */
@@ -117,7 +125,8 @@ public:
 	/**
 	 * Set Content-Length field in HTTP header.
 	 * @param n {int64} Length value.
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	http_header& set_content_length(__int64 n);
@@ -138,13 +147,17 @@ public:
 #endif
 
 	/**
-	 * Set Range field in HTTP request header or response header, used for range request response data.
+	 * Set Range field in HTTP request header or response header, used for range
+	 * request response data.
 	 * Only WEB servers that support range requests support this.
-	 * @param from {http_off_t} Start offset position, subscript starts from 0. This
+	 * @param from {http_off_t} Start offset position, subscript starts from 0.
+	 * This
 	 *  value is effective when >= 0.
 	 * @param to {http_off_t} End offset position, subscript starts from 0.
-	 *  When value in request header is < 0, it means from start position to end position.
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * When value in request header is < 0, it means from start position to end
+	 * position.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	http_header& set_range(__int64 from, __int64 to);
@@ -153,8 +166,10 @@ public:
 #endif
 
 	/**
-	 * Before range response, you need to call this function to set total resource length.
-	 * @param total {http_off_t} Total resource length. This parameter must be set to total resource length.
+	 * Before range response, you need to call this function to set total resource
+	 * length.
+	 * @param total {http_off_t} Total resource length. This parameter must be set
+	 * to total resource length.
 	 * @return {http_header&}
 	 */
 #if defined(_WIN32) || defined(_WIN64)
@@ -177,16 +192,19 @@ public:
 	/**
 	 * Set Content-Type field in HTTP header.
 	 * @param value {const char*} Content type value.
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 	http_header& set_content_type(const char* value);
 
 	/**
 	 * Set Connection field in HTTP header, whether to keep connection alive.
-	 * Note: Currently, long connection is not yet supported. Even if you set this flag bit,
+	 * Note: Currently, long connection is not yet supported. Even if you set this
+	 * flag bit,
 	 * after getting response data, connection will still be closed.
 	 * @param on {bool} Whether to keep connection alive.
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 	http_header& set_keep_alive(bool on);
 
@@ -209,9 +227,12 @@ public:
 	 * @param value {const char*} Cookie value.
 	 * @param domain {const char*} Domain name.
 	 * @param path {const char*} Storage path.
-	 * @param expires {time_t} Expiration time. When parameter value is 0, it means no expiration.
-	 *  When > 0, it means expiration time. expires is absolute time, unit is seconds.
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * @param expires {time_t} Expiration time. When parameter value is 0, it means
+	 * no expiration.
+	 * When > 0, it means expiration time. expires is absolute time, unit is
+	 * seconds.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 	http_header& add_cookie(const char* name, const char* value,
 		const char* domain = NULL, const char* path = NULL,
@@ -220,7 +241,8 @@ public:
 	/**
 	 * Add cookie to HTTP header.
 	 * @param cookie {const http_cookie*} Cookie object.
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 	http_header& add_cookie(const HttpCookie* cookie);
 
@@ -243,7 +265,8 @@ public:
 	bool is_request() const;
 
 	/**
-	 * Set flag bit to control whether ? question mark in HTTP request URI is URL encoded (encoded as %3F). This flag bit
+	 * Set flag bit to control whether ? question mark in HTTP request URI is URL
+	 * encoded (encoded as %3F). This flag bit
 	 * affects URL encoding. Internal default is not to URL encode.
 	 * @param on {bool} When true, means URL encode.
 	 */
@@ -269,64 +292,80 @@ public:
 	 * 4. /cgi-bin/test.cgi?name=value
 	 * 5. http://www.test.com
 	 * When url has no parameter part, internally automatically parses URL.
-	 * When url has parameter part, internally automatically parses parameters and calls add_param function.
-	 * After calling this function, users can call add_param and other functions to add more parameters.
-	 * When parameter part only has parameter name but no parameter value, this parameter will be ignored. If you need to add
+	 * When url has parameter part, internally automatically parses parameters and
+	 * calls add_param function.
+	 * After calling this function, users can call add_param and other functions to
+	 * add more parameters.
+	 * When parameter part only has parameter name but no parameter value, this
+	 * parameter will be ignored. If you need to add
 	 * parameters without values, you should call add_param function to add them.
 	 * @param url {const char*} Request url, cannot be empty pointer.
 	 * @param encoding {bool} Whether to URL encode parameters in url. When
-	 *  true, internally automatically URL encodes parameters in url. Otherwise, url remains original.
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * true, internally automatically URL encodes parameters in url. Otherwise, url
+	 * remains original.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 	http_header& set_url(const char* url, bool encoding = true);
 
 	/**
 	 * Set HOST field in HTTP request header.
 	 * @param value {const char*} HOST field value in request header.
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 	http_header& set_host(const char* value);
 
 	/**
 	 * Get HOST field in HTTP request header that was set.
-	 * @return {const char*} Returns empty pointer to indicate HOST field was not set.
+	 * @return {const char*} Returns empty pointer to indicate HOST field was not
+	 * set.
 	 */
 	const char* get_host() const {
 		return host_[0] == 0 ? NULL : host_;
 	}
 
 	/**
-	 * Set HTTP protocol request method. If you don't call this function, default is GET request.
+	 * Set HTTP protocol request method. If you don't call this function, default
+	 * is GET request.
 	 * @param method {http_method_t} HTTP request method.
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 	http_header& set_method(http_method_t method);
 
 	/**
-	 * Set HTTP protocol request method. This function allows users to extend HTTP request methods.
-	 * Request method set through this function does not affect HTTP request building.
+	 * Set HTTP protocol request method. This function allows users to extend HTTP
+	 * request methods.
+	 * Request method set through this function does not affect HTTP request
+	 * building.
 	 * @param method {const char*} Request method.
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 	http_header& set_method(const char* method);
 
 	/**
-	 * When it is request header, you can get current request header's request method.
+	 * When it is request header, you can get current request header's request
+	 * method.
 	 * @param buf {string*} Store string representation of request method.
 	 * @return {http_method_t}
 	 */
 	http_method_t get_method(string* buf = NULL) const;
 
 	/**
-	 * Set whether HTTP request header accepts compressed data. Response HTTP header field is:
+	 * Set whether HTTP request header accepts compressed data. Response HTTP
+	 * header field is:
 	 * Accept-Encoding: gzip, deflate. Currently only gzip format is supported.
 	 * @param on {bool} When true, automatically adds HTTP compression header.
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 	http_header& accept_gzip(bool on);
 
 	/**
-	 * When calling add_param/add_int/add_format, whether to automatically override same parameters.
+	 * When calling add_param/add_int/add_format, whether to automatically override
+	 * same parameters.
 	 * Internal default value is false, i.e., do not override same parameters.
 	 * @param yes {bool}
 	 * @return {http_header&}
@@ -334,12 +373,17 @@ public:
 	http_header& set_param_override(bool yes);
 
 	/**
-	 * Add parameter to URL parameter part. When parameter only has parameter name but no parameter value:
-	 * 1. When parameter value is empty string, parameter value is empty pointer. URL parameter part only has: {name}
-	 * 2. When parameter value is not empty string, parameter value is empty string. URL parameter part is: {name}=
+	 * Add parameter to URL parameter part. When parameter only has parameter name
+	 * but no parameter value:
+	 * 1. When parameter value is empty string, parameter value is empty pointer.
+	 * URL parameter part only has: {name}
+	 * 2. When parameter value is not empty string, parameter value is empty
+	 * string. URL parameter part is: {name}=
 	 * @param name {const char*} Parameter name, cannot be empty pointer.
-	 * @param value {const char*} Parameter value. When empty pointer, parameter is not added.
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * @param value {const char*} Parameter value. When empty pointer, parameter is
+	 * not added.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 	http_header& add_param(const char* name, const char* value);
 	http_header& add_int(const char* name, short value);
@@ -389,7 +433,8 @@ public:
 	 * URL redirect.
 	 * @param url {const char*} Redirect URL, format:
 	 *  http://xxx.xxx.xxx/xxx or /xxx
-	 *  When it is the former, automatically extracts HOST field. When it is the latter,
+	 * When it is the former, automatically extracts HOST field. When it is the
+	 * latter,
 	 *  uses previously set HOST.
 	 */
 	bool redirect(const char* url);
@@ -398,7 +443,8 @@ public:
 	 * Set redirect count. When value == 0, it means no redirect. Otherwise,
 	 * redirect count can be set through this value.
 	 * @param n {int} Maximum redirect count.
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 	http_header& set_redirect(unsigned int n = 5);
 
@@ -409,7 +455,8 @@ public:
 	unsigned int get_redirect() const;
 
 	/**
-	 * When redirect is needed, subclasses can override this function to reset some common fields.
+	 * When redirect is needed, subclasses can override this function to reset some
+	 * common fields.
 	 */
 	virtual void redicrect_reset() {}
 
@@ -427,7 +474,8 @@ public:
 	/**
 	 * Set response status code in HTTP response header.
 	 * @param status {int} Status code, e.g.: 1xx, 2xx, 3xx, 4xx, 5xx
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 	http_header& set_status(int status);
 
@@ -457,7 +505,8 @@ public:
 	/**
 	 * Set whether to build CGI format response header.
 	 * @param on {bool} Whether CGI format response header.
-	 * @return {http_header&} Returns reference to this object, convenient for chaining calls.
+	 * @return {http_header&} Returns reference to this object, convenient for
+	 * chaining calls.
 	 */
 	http_header& set_cgi_mode(bool on);
 

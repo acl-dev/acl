@@ -38,7 +38,8 @@ void*  tbox_pop(void*, int);
 size_t tbox_size(void*);
 
 /**
- * Thread-safe message communication between threads, implemented through thread queue.
+ * Thread-safe message communication between threads, implemented through thread
+ * queue.
  *
  * Example:
  *
@@ -93,7 +94,8 @@ public:
 
 	/**
 	 * Pop message object.
-	 * @param wait_ms {int} When >= 0, wait timeout time (millisecond level). Otherwise,
+	 * @param wait_ms {int} When >= 0, wait timeout time (millisecond level).
+	 * Otherwise,
 	 *  wait forever until message is available.
 	 * @return {T*} Returns NULL to indicate no message object was obtained.
 	 */

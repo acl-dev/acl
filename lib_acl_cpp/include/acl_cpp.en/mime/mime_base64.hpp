@@ -10,14 +10,17 @@ class ACL_CPP_API mime_base64 : public mime_code {
 public:
 	/**
 	 * Constructor
-	 * @param addCrlf {bool} Whether to add "\r\n" at the end when non-streaming encoding
-	 * @param addInvalid {bool} Whether to copy invalid characters as-is when streaming decoding
+	 * @param addCrlf {bool} Whether to add "\r\n" at the end when non-streaming
+	 * encoding
+	 * @param addInvalid {bool} Whether to copy invalid characters as-is when
+	 * streaming decoding
 	 */
 	mime_base64(bool addCrlf = false, bool addInvalid = false);
 	~mime_base64();
 
 	/**
-	 * Static encoding function, directly encode input data and store in user buffer
+	 * Static encoding function, directly encode input data and store in user
+	 * buffer
 	 * User buffer
 	 * @param in {const char*} Input data address
 	 * @param n {int} Input data length

@@ -16,7 +16,8 @@ ACL_CPP_API int last_error();
 ACL_CPP_API void set_error(int errnum);
 
 /**
- * Get the error description when the last system call failed. This function uses thread-local variables internally, so it is thread-safe,
+ * Get the error description when the last system call failed. This function
+ * uses thread-local variables internally, so it is thread-safe,
  * but simpler to use
  * @return {const char *} Returns error message
  */
@@ -31,7 +32,8 @@ ACL_CPP_API const char* last_serror();
 ACL_CPP_API const char* last_serror(char* buf, size_t size);
 
 /**
- * Similar to standard C's strerror, but this function is cross-platform and thread-safe, gets the error
+ * Similar to standard C's strerror, but this function is cross-platform and
+ * thread-safe, gets the error
  * description for a specific error number
  * @param errnum {int} Error number
  * @param buf {char*} Memory buffer to store error description

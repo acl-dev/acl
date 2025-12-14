@@ -8,7 +8,8 @@ namespace acl {
 class string;
 
 /**
- * Input stream base class. Users cannot accurately know whether the stream is closed or has reached the end of the file. At the
+ * Input stream base class. Users cannot accurately know whether the stream is
+ * closed or has reached the end of the file. At the
  * end, users should call stream->eof() to determine.
  */
 
@@ -22,12 +23,14 @@ public:
 	 * @param buf {void*} User buffer.
 	 * @param size {size_t} User buffer size.
 	 * @param loop {bool} Whether to read until size bytes are read.
-	 * @return {int} Number of bytes read, -1 indicates closed or error, > 0 indicates success.
+	 * @return {int} Number of bytes read, -1 indicates closed or error, > 0
+	 * indicates success.
 	 */
 	int read(void* buf, size_t size, bool loop = true);
 
 	/**
-	 * Read data from input stream until a specified tag string is encountered, then stop reading.
+	 * Read data from input stream until a specified tag string is encountered,
+	 * then stop reading.
 	 * @param buf {void*} User buffer.
 	 * @param inout {size_t*} When not empty, *inout indicates available buf
 	 *  space size. After return, stores data length in buf.
@@ -41,15 +44,21 @@ public:
 	/**
 	 * Read one line from input stream.
 	 * @param buf {void*} User buffer.
-	 * @param size_inout {size_t*} When not empty, *size_inout indicates available buf
+	 * @param size_inout {size_t*} When not empty, *size_inout indicates available
+	 * buf
 	 *  space size. After return, stores data length in buf.
 	 * @param nonl {bool} When set to true, will remove "\r\n"
-	 *  or "\n" at the end of the read line. *size_inout stores data length after removing "\r\n" or "\n"
-	 *  length. Otherwise, this function will read all "\r\n" or "\n" in the stream, and *size_inout
+	 * or "\n" at the end of the read line. *size_inout stores data length after
+	 * removing "\r\n" or "\n"
+	 * length. Otherwise, this function will read all "\r\n" or "\n" in the stream,
+	 * and *size_inout
 	 *  will store data length including "\r\n" or "\n".
-	 * @return {bool} Whether one line was read. Returns false on error. For file stream
-	 *  characteristics, when reading the last line, if external data does not end with "\r\n" or "\n"
-	 *  it will also return false. At this time, users need to check if *size_inout value is greater than 0
+	 * @return {bool} Whether one line was read. Returns false on error. For file
+	 * stream
+	 * characteristics, when reading the last line, if external data does not end
+	 * with "\r\n" or "\n"
+	 * it will also return false. At this time, users need to check if *size_inout
+	 * value is greater than 0
 	 *  to determine whether the last line was read.
 	 */
 	bool gets(void* buf, size_t* size_inout, bool nonl = true);
@@ -112,22 +121,29 @@ public:
 	/**
 	 * Read one line string from input stream.
 	 * @param s {string&} String buffer. Internally automatically expands buffer.
-	 * @param nonl {bool} Whether to automatically remove "\r\n" or "\n" at the end of the read line.
-	 * @param max {size_t} When value > 0, this value limits the maximum length of the read line. When
-	 *  the received line length exceeds this value, this function will not return incomplete data, and internally will record an error;
+	 * @param nonl {bool} Whether to automatically remove "\r\n" or "\n" at the end
+	 * of the read line.
+	 * @param max {size_t} When value > 0, this value limits the maximum length of
+	 * the read line. When
+	 * the received line length exceeds this value, this function will not return
+	 * incomplete data, and internally will record an error;
 	 *  When value = 0, there is no limit on data length.
 	 * @return {bool} Whether one line was read.
-	 *  1. When returning true, it means one line of data was read. If the read line only contains
+	 * 1. When returning true, it means one line of data was read. If the read line
+	 * only contains
 	 *     "\r\n" or "\n", s content will be empty, i.e., s.empty() == true
-	 *  2. When returning false, it means stream is closed or one line was not read. At this time s may
+	 * 2. When returning false, it means stream is closed or one line was not read.
+	 * At this time s may
 	 *     store incomplete data. Users need to check if (s.empty() == true).
 	 */
 	bool gets(string& s, bool nonl = true, size_t max = 0);
 	bool gets(string* s, bool nonl = true, size_t max = 0);
 
 	/**
-	 * Read data from input stream until a specified tag string is encountered, then stop reading. The tag
-	 * is used as a delimiter for data. The last part of the read data should be the tag string.
+	 * Read data from input stream until a specified tag string is encountered,
+	 * then stop reading. The tag
+	 * is used as a delimiter for data. The last part of the read data should be
+	 * the tag string.
 	 * @param s {string&} String buffer. Internally automatically expands buffer.
 	 * @param tag {const string&} Tag string to search for.
 	 * @return {bool} Whether the specified tag string was encountered.
@@ -137,7 +153,8 @@ public:
 
 	/**
 	 * Read one byte character from input stream.
-	 * @return {int} ASCII value of the read byte. Return value of -1 indicates peer closed or
+	 * @return {int} ASCII value of the read byte. Return value of -1 indicates
+	 * peer closed or
 	 *  error.
 	 */
 	int getch();
@@ -145,12 +162,14 @@ public:
 	/**
 	 * Push back one byte character to input stream.
 	 * @param ch {int} ASCII value of a character.
-	 * @return {int} Return value. If same as ch value, it means correct. Otherwise indicates error.
+	 * @return {int} Return value. If same as ch value, it means correct. Otherwise
+	 * indicates error.
 	 */
 	int ugetch(int ch);
 
 	/**
-	 * Detect whether current stream is readable (readable, connection closed or error indicates readable). This method is used in conjunction
+	 * Detect whether current stream is readable (readable, connection closed or
+	 * error indicates readable). This method is used in conjunction
 	 * with xxx_peek() methods.
 	 * @return {bool}
 	 */
@@ -168,13 +187,18 @@ public:
 	 * @param buf {string&} Buffer.
 	 * @param nonl {bool} Whether to remove "\r\n" or "\n" from the read line.
 	 * @param clear {bool} Whether to internally automatically clear buf buffer.
-	 * @param max {int} When value > 0, limits the maximum length of the read line to prevent this
+	 * @param max {int} When value > 0, limits the maximum length of the read line
+	 * to prevent this
 	 *  function from reading too much data.
-	 * @return {bool} Whether one line was read; returning false does not indicate error.
-	 *  It only means one line was not read or incomplete data. Applications should call stream->eof()
-	 *  to determine whether the stream is closed. Additionally, if this function reads incomplete data, buf will store
+	 * @return {bool} Whether one line was read; returning false does not indicate
+	 * error.
+	 * It only means one line was not read or incomplete data. Applications should
+	 * call stream->eof()
+	 * to determine whether the stream is closed. Additionally, if this function
+	 * reads incomplete data, buf will store
 	 *  this incomplete data.
-	 *  Note: To prevent buf from growing too large, callers should extract data from buf after using the data, even if only
+	 * Note: To prevent buf from growing too large, callers should extract data
+	 * from buf after using the data, even if only
 	 *  one line is used, then call buf->clear() to prevent buf
 	 *  memory from continuously growing.
 	 */
@@ -186,10 +210,14 @@ public:
 	/**
 	 * Peek and read data from source stream buffer.
 	 * @param buf {string&} Buffer.
-	 * @param clear {bool} Whether to internally automatically clear buf buffer at the beginning.
-	 * @return {bool} Whether data was read. Returning false does not indicate error, it only means no data of required
-	 *  length was read. Applications should call stream->eof() to determine whether the stream is closed.
-	 *  Note: To prevent buf from growing too large, callers should extract data from buf after using the data, even if only
+	 * @param clear {bool} Whether to internally automatically clear buf buffer at
+	 * the beginning.
+	 * @return {bool} Whether data was read. Returning false does not indicate
+	 * error, it only means no data of required
+	 * length was read. Applications should call stream->eof() to determine whether
+	 * the stream is closed.
+	 * Note: To prevent buf from growing too large, callers should extract data
+	 * from buf after using the data, even if only
 	 *  one line is used, then call buf->clear() to prevent buf
 	 *  memory from continuously growing.
 	 */
@@ -200,8 +228,10 @@ public:
 	 * Peek and read data from source stream buffer.
 	 * @param buf {void*} Buffer.
 	 * @param size {size_t} Buffer size.
-	 * @return {int} Returns -1 to indicate stream closed or error, > 0 indicates number of bytes read,
-	 *  returning 0 indicates no readable data yet. You can continue reading. When return value < 0,
+	 * @return {int} Returns -1 to indicate stream closed or error, > 0 indicates
+	 * number of bytes read,
+	 * returning 0 indicates no readable data yet. You can continue reading. When
+	 * return value < 0,
 	 *  you should use eof() to determine whether the stream should be closed.
 	 */
 	int read_peek(void* buf, size_t size);
@@ -210,11 +240,15 @@ public:
 	 * Peek and read data of specified length from source stream buffer.
 	 * @param buf {string&} Buffer.
 	 * @param cnt {size_t} Length of data to be read.
-	 * @param clear {bool} Whether to internally automatically clear buf buffer at the beginning.
-	 * @return {bool} Whether data of required length was read. Returning false does not
-	 *  indicate no data of required length was read. Applications should call stream->eof() to determine
+	 * @param clear {bool} Whether to internally automatically clear buf buffer at
+	 * the beginning.
+	 * @return {bool} Whether data of required length was read. Returning false
+	 * does not
+	 * indicate no data of required length was read. Applications should call
+	 * stream->eof() to determine
 	 *  whether the stream is closed.
-	 *  Note: To prevent buf from growing too large, callers should extract data from buf after using the data, even if only
+	 * Note: To prevent buf from growing too large, callers should extract data
+	 * from buf after using the data, even if only
 	 *  one line is used, then call buf->clear() to prevent buf
 	 *  memory from continuously growing.
 	 */
@@ -237,7 +271,8 @@ public:
 
 public:
 	/**
-	 * When process initializes, you can call this method to set the process-level read buffer size. Internal default value is 4096.
+	 * When process initializes, you can call this method to set the process-level
+	 * read buffer size. Internal default value is 4096.
 	 * @param n {size_t}
 	 */
 	static void set_rbuf_size(size_t n);

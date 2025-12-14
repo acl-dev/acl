@@ -60,26 +60,32 @@ public:
 	void mkdate_gmt(time_t t, char* out, size_t size);
 
 	/**
-	 * Parse email address list. Parse email address list conforming to RFC822 standard into
-	 * email address list that humans can normally read, and decode username comment part according to
+	 * Parse email address list. Parse email address list conforming to RFC822
+	 * standard into
+	 * email address list that humans can normally read, and decode username
+	 * comment part according to
 	 * RFC2047
 	 * @param in {const char*} Email address list in RFC822 format, e.g.:
 	 *  "=?gb2312?B?1dSx+A==?= <zhaobing@51iker.com>;\r\n"
 	 *  "\t\"=?GB2312?B?t+vBosn6?=\" <fenglisheng@51iker.com>;\r\n"
 	 *  "\t\"zhengshuxin3\";\"zhengshuxin4\" <zhengshuxin2@51iker.com>;"
 	 *  "<xuganghui@51iker.com>;<wangwenquan@51iker.com>;"
-	 * @param to_charset {const char*} Target character set, e.g.: gbk, gb18030, utf-8
+	 * @param to_charset {const char*} Target character set, e.g.: gbk, gb18030,
+	 * utf-8
 	 * @return {const std::list<rfc822_addr*>&} Parsing result
 	 */
 	const std::list<rfc822_addr*>& parse_addrs(const char* in,
 		const char* to_charset = "utf-8");
 
 	/**
-	 * Parse an email address conforming to RFC822 standard, and decode username comment part according to
+	 * Parse an email address conforming to RFC822 standard, and decode username
+	 * comment part according to
 	 * RFC2047 standard
 	 * @param in {const char*} Email address in RFC822 format
-	 * @param to_charset {const char*} Target character set, e.g.: gbk, gb18030, utf-8
-	 * @return {const rfc822_addr*} Returns NULL indicates input email address does not conform to
+	 * @param to_charset {const char*} Target character set, e.g.: gbk, gb18030,
+	 * utf-8
+	 * @return {const rfc822_addr*} Returns NULL indicates input email address does
+	 * not conform to
 	 *  RFC822 specification
 	 */
 	const rfc822_addr* parse_addr(const char* in,

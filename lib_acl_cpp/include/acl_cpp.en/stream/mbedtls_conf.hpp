@@ -30,15 +30,20 @@ typedef enum {
 class mbedtls_io;
 
 /**
- * Configuration class for SSL connection objects. Objects of this class can generally be declared as global objects, used to configure certificates for each SSL
- * connection object. This class loads global certificate, key and other information. Each SSL object
- * (mbedtls_io) calls setup_certs method of this object to initialize its own certificate, key and other information
+ * Configuration class for SSL connection objects. Objects of this class can
+ * generally be declared as global objects, used to configure certificates for
+ * each SSL
+ * connection object. This class loads global certificate, key and other
+ * information. Each SSL object
+ * (mbedtls_io) calls setup_certs method of this object to initialize its own
+ * certificate, key and other information
  */
 class ACL_CPP_API mbedtls_conf : public sslbase_conf {
 public:
 	/**
 	 * Constructor
-	 * @param server_side {bool} Used to specify whether it is server or client. When true,
+	 * @param server_side {bool} Used to specify whether it is server or client.
+	 * When true,
 	 *  it is server mode, otherwise client mode
 	 * @param verify_mode {mbedtls_verify_t} SSL certificate verification level
 	 */
@@ -59,13 +64,15 @@ public:
 
 	/**
 	 * @override
-	 * Note: This method will be deprecated in mbedtls_conf, please use the above method directly
+	 * Note: This method will be deprecated in mbedtls_conf, please use the above
+	 * method directly
 	 */
 	bool add_cert(const char* /* crt_file */);
 
 	/**
 	 * @override
-	 * Note: This method will be deprecated in mbedtls_conf, please use the above method directly
+	 * Note: This method will be deprecated in mbedtls_conf, please use the above
+	 * method directly
 	 */
 	bool set_key(const char* /*key_file*/, const char* /* key_pass */);
 
@@ -76,7 +83,8 @@ public:
 
 public:
 	/**
-	 * mbedtls_io::open internally will call this method to install certificate for current SSL connection object
+	 * mbedtls_io::open internally will call this method to install certificate for
+	 * current SSL connection object
 	 * @param ssl {void*} SSL connection object, is ssl_context type
 	 * @return {bool} Whether configuring SSL object was successful
 	 */
@@ -92,8 +100,10 @@ public:
 
 public:
 	/**
-	 * If mbedtls is split into three libraries, can call this function to set full paths of three dynamic libraries
-	 * @param libmbedcrypto {const char*} Full path of libmbedcrypto dynamic library
+	 * If mbedtls is split into three libraries, can call this function to set full
+	 * paths of three dynamic libraries
+	 * @param libmbedcrypto {const char*} Full path of libmbedcrypto dynamic
+	 * library
 	 * @param libmbedx509 {const char*} Full path of libmbedx509 dynamic library
 	 * @param libmbedtls {const char*} Full path of libmbedtls dynamic library
 	 */
@@ -101,7 +111,8 @@ public:
 		const char* libmbedx509, const char* libmbedtls);
 
 	/**
-	 * If mbedtls is combined into one library, can call this function to set full path of one dynamic library
+	 * If mbedtls is combined into one library, can call this function to set full
+	 * path of one dynamic library
 	 * @param libmbedtls {const char*} Full path of libmbedtls dynamic library
 	 */
 	static void set_libpath(const char* libmbedtls);

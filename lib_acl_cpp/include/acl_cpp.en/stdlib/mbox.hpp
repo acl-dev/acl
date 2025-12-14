@@ -14,7 +14,8 @@ size_t mbox_nsend(void*);
 size_t mbox_nread(void*);
 
 /**
- * Class that can be used for communication between threads and between coroutines. Internal implementation uses lock-free queue + IO communication
+ * Class that can be used for communication between threads and between
+ * coroutines. Internal implementation uses lock-free queue + IO communication
  * combined approach
  *
  * Example:
@@ -51,7 +52,8 @@ class mbox : public box<T> {
 public:
 	/**
 	 * Constructor
-	 * @param free_obj {bool} When tbox is destroyed, whether to automatically check and release
+	 * @param free_obj {bool} When tbox is destroyed, whether to automatically
+	 * check and release
 	 *  unconsumed dynamic objects
 	 * @param mpsc {bool} Whether it is multi-producer-single-consumer mode
 	 */
@@ -81,8 +83,10 @@ public:
 	 * Receive message object
 	 * @param ms {int} When >= 0, set read wait timeout (milliseconds), otherwise
 	 *  wait forever until message object is read or error occurs
-	 * @param success {bool*} Can be used to help determine whether read operation was successful
-	 * @return {T*} Non-NULL indicates a message object was read. When NULL, need to check through
+	 * @param success {bool*} Can be used to help determine whether read operation
+	 * was successful
+	 * @return {T*} Non-NULL indicates a message object was read. When NULL, need
+	 * to check through
 	 *  success parameter return value whether operation was successful
 	 * @override
 	 */

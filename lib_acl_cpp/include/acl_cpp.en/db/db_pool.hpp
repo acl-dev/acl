@@ -11,23 +11,25 @@ namespace acl {
 class db_handle;
 class locker;
 
-class ACL_CPP_API db_pool : public connect_pool
-{
+class ACL_CPP_API db_pool : public connect_pool {
 public:
 	/**
 	 * Database constructor
 	 * @param dbaddr {const char*} Database address
 	 * @param count {size_t} Maximum connection limit for connection pool
-	 * @param idx {size_t} Index position of this connection pool object in the collection (starting from 0)
+	 * @param idx {size_t} Index position of this connection pool object in the
+	 * collection (starting from 0)
 	 */
 	db_pool(const char* dbaddr, size_t count, size_t idx = 0);
 	virtual ~db_pool() {};
 
 	/**
-	 * Get a database object from the database connection pool and require opening the database connection,
-	 * i.e., users don't need to explicitly call db_handle::open again;
-	 * After use, must call db_pool->put(db_handle*) to return the connection to the database connection pool.
-	 * The connection handle obtained by this function cannot be deleted, otherwise it will cause errors in the connection pool's internal counter
+	 * Get a database object from the database connection pool and require opening
+	 * the database connection, i.e., users don't need to explicitly call
+	 * db_handle::open again; After use, must call db_pool->put(db_handle*) to
+	 * return the connection to the database connection pool.
+	 * The connection handle obtained by this function cannot be deleted, otherwise
+	 * it will cause errors in the connection pool's internal counter
 	 * @return {db_handle*} Database connection object, returns NULL on error
 	 */
 	db_handle* peek_open();
@@ -49,7 +51,8 @@ public:
 	}
 
 	/**
-	 * Set the lifetime (seconds) of idle connections in the database connection pool
+	 * Set the lifetime (seconds) of idle connections in the database connection
+	 * pool
 	 * @param ttl {int} Lifetime (seconds)
 	 */
 	void set_idle(int ttl) {

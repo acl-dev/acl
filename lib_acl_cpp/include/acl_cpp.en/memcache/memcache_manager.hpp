@@ -20,8 +20,10 @@ protected:
 	/**
 	 * Base class pure virtual function, used to create connection pool objects
 	 * @param addr {const char*} Server listening address, format: ip:port
-	 * @param count {size_t} Connection pool size limit, when this value is 0 there is no limit
-	 * @param idx {size_t} Index position of this connection pool object in the collection (starting from 0)
+	 * @param count {size_t} Connection pool size limit, when this value is 0 there
+	 * is no limit
+	 * @param idx {size_t} Index position of this connection pool object in the
+	 * collection (starting from 0)
 	 */
 	connect_pool* create_pool(const char* addr, size_t count, size_t idx);
 };

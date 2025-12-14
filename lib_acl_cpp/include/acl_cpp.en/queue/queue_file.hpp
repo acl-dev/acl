@@ -20,13 +20,15 @@ public:
 
 	/**
 	 * Get file stream pointer
-	 * @return {acl::fstream*} File stream pointer. If NULL, it indicates file has not been opened yet
+	 * @return {acl::fstream*} File stream pointer. If NULL, it indicates file has
+	 * not been opened yet
 	 */
 	fstream* get_fstream(void) const;
 
 	/**
 	 * Get file creation time
-	 * @return {time_t}, Returns seconds since 1970. If return value is (time_t) -1,
+	 * @return {time_t}, Returns seconds since 1970. If return value is (time_t)
+	 * -1,
 	 *  it indicates error
 	 */
 	time_t get_ctime(void) const;
@@ -45,13 +47,15 @@ public:
 	 * Read data from file
 	 * @param buf {void*} Buffer address
 	 * @param len {size_t} buf size
-	 * @return {int} Length of data read. -1: Indicates read ended or read failed or input parameter error,
+	 * @return {int} Length of data read. -1: Indicates read ended or read failed
+	 * or input parameter error,
 	 *  should close this file object. > 0: Indicates success
 	 */
 	int read(void* buf, size_t len);
 
 	/**
-	 * Get key value of this queue file. This value is part of queue file name (excluding path,
+	 * Get key value of this queue file. This value is part of queue file name
+	 * (excluding path,
 	 * extension)
 	 * @return {const char*} Queue file key value
 	 */
@@ -120,20 +124,23 @@ private:
 	~queue_file();
 
 	/**
-	 * Create new queue file. After creation, will automatically create lock object for this file.
+	 * Create new queue file. After creation, will automatically create lock object
+	 * for this file.
 	 * Can directly call lock()/unlock() of this file
 	 * @param home {const char*} Root path where queue file is located
 	 * @param queueName {const char*} Queue name
 	 * @param extName {const char*} Queue file extension name
 	 * @param width {unsigned} Number of queue second-level directories
-	 * @return {bool} Whether creating new queue file was successful. If returns false, it indicates
+	 * @return {bool} Whether creating new queue file was successful. If returns
+	 * false, it indicates
 	 *  input path or extName is illegal
 	 */
 	bool create(const char* home, const char* queueName,
 		const char* extName, unsigned width);
 
 	/**
-	 * Open existing queue file. After opening, will automatically create lock object for this file.
+	 * Open existing queue file. After opening, will automatically create lock
+	 * object for this file.
 	 * Can directly call lock()/unlock() of this file
 	 * @param filePath {const char*} Queue file path
 	 * @return {bool} Whether opening queue file was successful

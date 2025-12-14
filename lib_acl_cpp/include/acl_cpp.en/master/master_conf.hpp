@@ -91,9 +91,12 @@ public:
 	const char* get_path() const;
 
 	/**
-	 * Reset configuration parser state, release previously allocated resources. After calling this function,
-	 * the memory of string configuration items obtained previously will be released, so they are forbidden to use;
-	 * After calling this function, the configuration parser object can be used again to parse other
+	 * Reset configuration parser state, release previously allocated resources.
+	 * After calling this function,
+	 * the memory of string configuration items obtained previously will be
+	 * released, so they are forbidden to use;
+	 * After calling this function, the configuration parser object can be used
+	 * again to parse other
 	 * configuration files
 	 */
 	void reset();

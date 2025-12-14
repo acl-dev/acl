@@ -7,8 +7,7 @@
 
 #ifndef ACL_CLIENT_ONLY
 
-namespace acl
-{
+namespace acl {
 
 typedef class redis_client disque_client;
 typedef class redis_client_pool disque_client_pool;
@@ -20,8 +19,7 @@ class disque_job;
 /**
  * Disque command operation class
  */
-class ACL_CPP_API disque : virtual public redis_command
-{
+class ACL_CPP_API disque : virtual public redis_command {
 public:
 	/**
 	 * see redis_command::redis_command()
@@ -57,13 +55,14 @@ public:
 	 * @param args {const std::map<acl::string, int>*} the condition
 	 *  for ADDJOB command, the conditions name include:
 	 *  REPLICATE, DELAY, RETRY, TTL, MAXLEN, ASYNC, if the args was NULL,
-	 *  none condition will be used in this operation
+	 *  none condition will be used in this operation;
 	 *  Processing condition set for adding message. Corresponding condition items:
 	 *   REPLICATE -- Number of replicas,
-	 *   DELAY -- How many seconds to wait before putting task into each node's queue
+	 * DELAY -- How many seconds to wait before putting task into each node's queue
 	 *   TTL -- Task lifetime (seconds)
 	 *   MAXLEN -- Maximum number of tasks that can be stored in specified queue
-	 *   ASYNC -- Server uses asynchronous method to synchronize tasks to their replica nodes
+	 * ASYNC -- Server uses asynchronous method to synchronize tasks to their
+	 * replica nodes
 	 * @return {const char*} a ID of the job will be returned, NULL will
 	 *  be returned if some error happened.
 	 *  Returns task ID. Returns NULL indicates error occurred
@@ -80,8 +79,7 @@ public:
 	 * Add task to specified message queue
 	 * @param name {const char*} the name of the specified queue
 	 *  Specified message queue name
-	 * @param job {const char*} a message to deliver
-	 *  Task to be added
+	 * @param job {const char*} a message to deliver  Task to be added
 	 * @param timeout {int} the command timeout in milliseconds
 	 *  Command timeout limit with millisecond precision
 	 * @param cond {const acl::disque_cond*} the condition for the ADDJOB
@@ -121,8 +119,10 @@ public:
 	 * receiving the ACK will replicate it to multiple nodes and will try
 	 * to garbage collect both the job and the ACKs from the cluster so
 	 * that memory can be freed.
-	 * Notify node that task has been executed via given task ID. Node receiving ACK message will copy this message
-	 * to multiple nodes, and try to perform garbage collection on task and ACK messages from cluster, thereby releasing
+	 * Notify node that task has been executed via given task ID. Node receiving
+	 * ACK message will copy this message
+	 * to multiple nodes, and try to perform garbage collection on task and ACK
+	 * messages from cluster, thereby releasing
 	 * occupied memory.
 	 * @param job_ids {const std::vector<acl::string>&} the jobs' IDs
 	 *  Task ID collection
@@ -135,10 +135,14 @@ public:
 	/**
 	 * perform a best effort cluster wide detection of the specified
 	 * job IDs.
-	 * Best effort deletion of given tasks cluster-wide. When network connection is good and all nodes are online,
-	 * this command's effect is same as ACKJOB command's effect, but because message exchange caused by this command is less than
-	 * ACKJOB, its speed is much faster than ACKJOB. However, when cluster contains failed nodes,
-	 * FASTACK command is more likely than ACKJOB command to send same message multiple times
+	 * Best effort deletion of given tasks cluster-wide. When network connection is
+	 * good and all nodes are online,
+	 * this command's effect is same as ACKJOB command's effect, but because
+	 * message exchange caused by this command is less than
+	 * ACKJOB, its speed is much faster than ACKJOB. However, when cluster contains
+	 * failed nodes,
+	 * FASTACK command is more likely than ACKJOB command to send same message
+	 * multiple times
 	 * @param job_ids {const std::vector<acl::string>&} the jobs' IDs
 	 *  Task ID collection
 	 * @return {int} return the number of IDs been ACKed, -1 will be
@@ -179,7 +183,8 @@ public:
 	 *  Specified task ID
 	 * @return {const acl::disque_job*} return the job's information,
 	 *  return NULL if the job doesn't exist or some error happens.
-	 *  Returns information of specified task, see class disque_job. Returns NULL if task does not exist or error occurs
+	 * Returns information of specified task, see class disque_job. Returns NULL if
+	 * task does not exist or error occurs
 	 */
 	const disque_job* show(const char* job_id);
 
@@ -207,8 +212,10 @@ public:
 
 	/**
 	 * completely delete a job from a node.
-	 * Completely delete given task in node. This command is very similar to FASTACK, the only difference is,
-	 * deletion operation caused by DELJOB command only executes in a single node, it does not send DELJOB cluster bus
+	 * Completely delete given task in node. This command is very similar to
+	 * FASTACK, the only difference is,
+	 * deletion operation caused by DELJOB command only executes in a single node,
+	 * it does not send DELJOB cluster bus
 	 * message (cluster bus message) to other nodes
 	 * @param job_ids {const std::vector<acl::string>&} the job IDs
 	 * Task ID collection to be deleted
@@ -233,7 +240,8 @@ public:
 	 * Get information of all nodes in cluster
 	 * @return {const std::vector<acl::disque_node*>*} all the nodes'
 	 *  information in the cluster, return NULL if some error happened.
-	 *  Returns result set of all node information in cluster. Returns NULL if error occurs. See class disque_node
+	 * Returns result set of all node information in cluster. Returns NULL if error
+	 * occurs. See class disque_node
 	 */
 	const std::vector<disque_node*>* hello();
 

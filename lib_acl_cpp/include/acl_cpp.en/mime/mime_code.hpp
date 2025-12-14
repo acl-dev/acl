@@ -12,8 +12,10 @@ class ACL_CPP_API mime_code : public pipe_stream {
 public:
 	/**
 	 * Constructor
-	 * @param addCrlf {bool} Whether to add "\r\n" at the end when not in streaming encoding mode
-	 * @param addInvalid {bool} Whether to copy illegal characters as-is when in streaming decoding mode
+	 * @param addCrlf {bool} Whether to add "\r\n" at the end when not in streaming
+	 * encoding mode
+	 * @param addInvalid {bool} Whether to copy illegal characters as-is when in
+	 * streaming decoding mode
 	 * @param encoding_type {const char*} Encoding type identifier
 	 */
 	mime_code(bool addCrlf, bool addInvalid, const char* encoding_type);
@@ -31,21 +33,29 @@ public:
 
 	/**
 	 * Encoding process, add source data, result stored in out. If input
-	 * data does not meet encoding cache condition, internally only temporarily caches without encoding
+	 * data does not meet encoding cache condition, internally only temporarily
+	 * caches without encoding
 	 * @param src {const char*} Source data address
 	 * @param n {int} Source data length
-	 * @param out {string*} Store encoding result. Can determine whether this function performed
-	 *  encoding process or temporary caching process by comparing out->length() before and after calling this function.
-	 *  If result data in out is used, should call out->clear() after use to clear used data
+	 * @param out {string*} Store encoding result. Can determine whether this
+	 * function performed
+	 * encoding process or temporary caching process by comparing out->length()
+	 * before and after calling this function.
+	 * If result data in out is used, should call out->clear() after use to clear
+	 * used data
 	 */
 	virtual void encode_update(const char *src, int n, string* out);
 
 	/**
-	 * After encoding ends, need to call this function to perform final encoding on source data
+	 * After encoding ends, need to call this function to perform final encoding on
+	 * source data
 	 * that may exist in temporary cache
-	 * @param out {string*} Store encoding result. Can determine whether this function performed
-	 *  encoding process or temporary caching process by comparing out->length() before and after calling this function.
-	 *  If result data in out is used, should call out->clear() after use to clear used data
+	 * @param out {string*} Store encoding result. Can determine whether this
+	 * function performed
+	 * encoding process or temporary caching process by comparing out->length()
+	 * before and after calling this function.
+	 * If result data in out is used, should call out->clear() after use to clear
+	 * used data
 	 */
 	virtual void encode_finish(string* out);
 
@@ -53,22 +63,30 @@ public:
 
 	/**
 	 * Decoding process, add encoded data, decode through this function. If
-	 * input data does not meet byte count condition for decoding, internally only temporarily caches
+	 * input data does not meet byte count condition for decoding, internally only
+	 * temporarily caches
 	 * this data, performs decoding only when decoding condition is met
 	 * @param src {const char*} Encoded data
 	 * @param n {int} Data length
-	 * @param out {string*} Store decoding result. Can determine whether this function performed
-	 *  decoding process or temporary caching process by comparing out->length() before and after calling this function.
-	 *  If result data in out is used, should call out->clear() after use to clear used data
+	 * @param out {string*} Store decoding result. Can determine whether this
+	 * function performed
+	 * decoding process or temporary caching process by comparing out->length()
+	 * before and after calling this function.
+	 * If result data in out is used, should call out->clear() after use to clear
+	 * used data
 	 */
 	virtual void decode_update(const char *src, int n, string* out);
 
 	/**
-	 * After decoding ends, need to call this function to perform final decoding on source data
+	 * After decoding ends, need to call this function to perform final decoding on
+	 * source data
 	 * that may exist in temporary cache
-	 * @param out {string*} Store decoding result. Can determine whether this function performed
-	 *  decoding process or temporary caching process by comparing out->length() before and after calling this function.
-	 *  If result data in out is used, should call out->clear() after use to clear used data
+	 * @param out {string*} Store decoding result. Can determine whether this
+	 * function performed
+	 * decoding process or temporary caching process by comparing out->length()
+	 * before and after calling this function.
+	 * If result data in out is used, should call out->clear() after use to clear
+	 * used data
 	 */
 	virtual void decode_finish(string* out);
 
@@ -78,13 +96,15 @@ public:
 	virtual void reset();
 
 	/**
-	 * Set whether to automatically add "\r\n" to each encoding segment during encoding process
+	 * Set whether to automatically add "\r\n" to each encoding segment during
+	 * encoding process
 	 * @param on {bool}
 	 */
 	virtual void add_crlf(bool on);
 
 	/**
-	 * During decoding process, if illegal character is encountered, whether to add it to decoding result
+	 * During decoding process, if illegal character is encountered, whether to add
+	 * it to decoding result
 	 * @param on {bool}
 	 */
 	virtual void add_invalid(bool on);
@@ -97,8 +117,10 @@ public:
 	static void create_decode_tab(const unsigned char *toTab, string *out);
 
 	/**
-	 * If subclass does not override above virtual functions and therefore uses base class's above default virtual functions,
-	 * subclass must call this function to set its own encoding table, decoding table and padding character
+	 * If subclass does not override above virtual functions and therefore uses
+	 * base class's above default virtual functions,
+	 * subclass must call this function to set its own encoding table, decoding
+	 * table and padding character
 	 * @param toTab {const unsigned char*} Encoding table
 	 * @param unTab {const unsigned char*} Decoding table
 	 * @param fillChar {unsigned char} Padding character
@@ -107,7 +129,8 @@ public:
 		const unsigned char* unTab, unsigned char fillChar);
 
 	/**
-	 * Set working state of transcoder. Because this transcoder consists of encoder and decoder,
+	 * Set working state of transcoder. Because this transcoder consists of encoder
+	 * and decoder,
 	 * when working in pipe_stream mode, must specify state of this transcoder
 	 * to specify whether it is in encoder state or decoder state
 	 * @param encoding {bool} If true, indicates encoder state, otherwise
@@ -122,13 +145,17 @@ public:
 	virtual void clear();
 
 	/**
-	 * Static function, get corresponding encoder/decoder object based on encoding type MIME_ENC_XXX (see: mime_define.hpp).
+	 * Static function, get corresponding encoder/decoder object based on encoding
+	 * type MIME_ENC_XXX (see: mime_define.hpp).
 	 * Only when encoding type is MIME_ENC_QP,
 	 * MIME_ENC_BASE64, MIME_ENC_UUCODE, MIME_ENC_XXCODE
-	 * @param encoding {int} Encoding type, can only be MIME_ENC_QP, MIME_ENC_BASE64,
+	 * @param encoding {int} Encoding type, can only be MIME_ENC_QP,
+	 * MIME_ENC_BASE64,
 	 *  MIME_ENC_UUCODE, MIME_ENC_XXCODE
-	 * @param warn_unsupport {bool} Whether to record warning information when matching encoder object is not found
-	 * @return {mime_code*} Encoder object. Returns NULL when matching encoding type is not found
+	 * @param warn_unsupport {bool} Whether to record warning information when
+	 * matching encoder object is not found
+	 * @return {mime_code*} Encoder object. Returns NULL when matching encoding
+	 * type is not found
 	 */
 	static mime_code* create(int encoding, bool warn_unsupport = true);
 

@@ -18,15 +18,20 @@ typedef enum {
 class polarssl_io;
 
 /**
- * Configuration class for SSL connection objects. Objects of this class can generally be declared as global objects, used to configure certificates for each SSL
- * connection object. This class loads global certificate, key and other information; each SSL object
- * (polarssl_io) calls setup_certs method of this object to initialize its own certificate, key and other information
+ * Configuration class for SSL connection objects. Objects of this class can
+ * generally be declared as global objects, used to configure certificates for
+ * each SSL
+ * connection object. This class loads global certificate, key and other
+ * information; each SSL object
+ * (polarssl_io) calls setup_certs method of this object to initialize its own
+ * certificate, key and other information
  */
 class ACL_CPP_API polarssl_conf : public sslbase_conf {
 public:
 	/**
 	 * Constructor
-	 * @param server_side {bool} Used to specify whether it is server or client. When true,
+	 * @param server_side {bool} Used to specify whether it is server or client.
+	 * When true,
 	 *  it is server mode, otherwise client mode
 	 * @param verify_mode {polarssl_verify_t} SSL certificate verification level
 	 */
@@ -62,7 +67,8 @@ public:
 
 public:
 	/**
-	 * Set SSL certificate verification method, internal default is not to verify certificate
+	 * Set SSL certificate verification method, internal default is not to verify
+	 * certificate
 	 * @param verify_mode {polarssl_verify_t}
 	 */
 	void set_authmode(polarssl_verify_t verify_mode);
@@ -76,7 +82,8 @@ public:
 	}
 
 	/**
-	 * stream_hook::open internally will call this method to install certificate for current SSL connection object
+	 * stream_hook::open internally will call this method to install certificate
+	 * for current SSL connection object
 	 * @param ssl {void*} SSL connection object, is ssl_context type
 	 * @param server_side {bool} Whether it is server or client
 	 * @return {bool} Whether configuring SSL object was successful

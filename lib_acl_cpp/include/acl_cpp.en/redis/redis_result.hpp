@@ -22,7 +22,8 @@ class dbuf_pool;
 class redis_client;
 
 /**
- * Redis-server return result object class. After analyzing data returned by redis-server, create
+ * Redis-server return result object class. After analyzing data returned by
+ * redis-server, create
  * redis_result class object.
  * the redis result for redis-server's reply
  */
@@ -31,7 +32,8 @@ public:
 	explicit redis_result(dbuf_pool* dbuf);
 
 	/**
-	 * Overloaded new/delete operators. When creating new object, makes memory allocation
+	 * Overloaded new/delete operators. When creating new object, makes memory
+	 * allocation
 	 * performed in memory pool
 	 * override new/delete operator, when the new object was created,
 	 * memory was alloc in dbuf_pool, which is a memroy pool allocator
@@ -52,45 +54,54 @@ public:
 	/**
 	 * Get number of objects stored in current result node
 	 * get the number of objects from redis-server
-	 * @return {size_t} Correspondence between return value and storage type is as follows:
+	 * @return {size_t} Correspondence between return value and storage type is as
+	 * follows:
 	 *  the relation between returned value and result type show below:
 	 *  REDIS_RESULT_ERROR: 1
 	 *  REDIS_RESULT_STATUS: 1
 	 *  REDIS_RESULT_INTEGER: 1
-	 *  REDIS_RESULT_STRING: > 0 indicates number of non-contiguous memory blocks this string data is split into
+	 * REDIS_RESULT_STRING: > 0 indicates number of non-contiguous memory blocks
+	 * this string data is split into
 	 *  REDIS_RESULT_ARRAY: children_->size()
 	 */
 	size_t get_size() const;
 
 	/**
-	 * When return value is REDIS_RESULT_INTEGER type, this method returns corresponding 32-bit integer value
+	 * When return value is REDIS_RESULT_INTEGER type, this method returns
+	 * corresponding 32-bit integer value
 	 * get the 32 bits integer for REDIS_RESULT_INTEGER result
-	 * @param success {bool*} When this pointer is not NULL, records whether operation process was successful
+	 * @param success {bool*} When this pointer is not NULL, records whether
+	 * operation process was successful
 	 *  when not NULL, storing the status of success
 	 * @return {int}
 	 */
 	int get_integer(bool* success = NULL) const;
 
 	/**
-	 * When return value is REDIS_RESULT_INTEGER type, this method returns corresponding 64-bit integer value
+	 * When return value is REDIS_RESULT_INTEGER type, this method returns
+	 * corresponding 64-bit integer value
 	 * get the 64 bits integer for REDIS_RESULT_INTEGER result
-	 * @param success {bool*} When this pointer is not NULL, records whether operation process was successful
+	 * @param success {bool*} When this pointer is not NULL, records whether
+	 * operation process was successful
 	 *  when not NULL, storing the status of success
 	 * @return {long long int}
 	 */
 	long long int get_integer64(bool* success = NULL) const;
 
 	/**
-	 * When return value is REDIS_RESULT_STRING type, this method returns corresponding double type value
+	 * When return value is REDIS_RESULT_STRING type, this method returns
+	 * corresponding double type value
 	 * get the double value for REDIS_RESULT_STRING result
-	 * @param success {bool*} When this pointer is not NULL, records whether operation process was successful
+	 * @param success {bool*} When this pointer is not NULL, records whether
+	 * operation process was successful
 	 *  when not NULL, storing the status of success
 	 * @return {double}
 	 */
 	double get_double(bool* success = NULL) const;
 
 	/**
-	 * When return value is REDIS_RESULT_STATUS type, this method returns status information
+	 * When return value is REDIS_RESULT_STATUS type, this method returns status
+	 * information
 	 * get operation status for REDIS_RESULT_STATUS result
 	 * @return {const char*} Returns "" indicates error
 	 *  error if empty string returned
@@ -98,20 +109,24 @@ public:
 	const char* get_status() const;
 
 	/**
-	 * When error occurs, return value is REDIS_RESULT_ERROR type, this method returns error information
+	 * When error occurs, return value is REDIS_RESULT_ERROR type, this method
+	 * returns error information
 	 * when some error happened, this can get the error information
-	 * @return {const char*} Returns empty string "" indicates there is no error information
+	 * @return {const char*} Returns empty string "" indicates there is no error
+	 * information
 	 *  there was no error information if empty string returned
 	 */
 	const char* get_error() const;
 
 	/**
-	 * Return data corresponding to index (when data type is not REDIS_RESULT_ARRAY)
+	 * Return data corresponding to index (when data type is not
+	 * REDIS_RESULT_ARRAY)
 	 * get the string data of associated subscript(just for the type
 	 * of no REDIS_RESULT_ARRAY)
 	 * @param i {size_t} Array index
 	 *  the array's subscript
-	 * @param len {size_t*} When it is not NULL pointer, stores length of returned data
+	 * @param len {size_t*} When it is not NULL pointer, stores length of returned
+	 * data
 	 *  when not NULL, the parameter will store the length of the result
 	 * @return {const char*} Returns NULL indicates index out of bounds
 	 *  NULL if nothing exists or the subscript is out of bounds
@@ -128,7 +143,8 @@ public:
 	}
 
 	/**
-	 * Return address of all data length array (when data type is not REDIS_RESULT_ARRAY)
+	 * Return address of all data length array (when data type is not
+	 * REDIS_RESULT_ARRAY)
 	 * return all length's array if the type isn't REDIS_RESULT_ARRAY
 	 * @return {const size_t*}
 	 */
@@ -144,33 +160,40 @@ public:
 	size_t get_length() const;
 
 	/**
-	 * When data type is REDIS_RESULT_STRING type, this function stores data stored in memory blocks
+	 * When data type is REDIS_RESULT_STRING type, this function stores data stored
+	 * in memory blocks
 	 * into contiguous memory, but need to be careful to prevent memory overflow
 	 * compose a continus data for the slicing chunk data internal
-	 * @param buf {string&} Store result data. Internally will first call buf.clear()
+	 * @param buf {string&} Store result data. Internally will first call
+	 * buf.clear()
 	 *  store the result
 	 * @param clear_auto {bool} if clear the buf internal.
-	 * @return {int} Total length of data. Return value 0 indicates internal array is empty
+	 * @return {int} Total length of data. Return value 0 indicates internal array
+	 * is empty
 	 *  return the total length of data, 0 if data array has no elements
 	 */
 	int argv_to_string(string& buf, bool clear_auto = true) const;
 	int argv_to_string(char* buf, size_t size) const;
 
 	/**
-	 * When data type is REDIS_RESULT_ARRAY type, this function returns all array objects
+	 * When data type is REDIS_RESULT_ARRAY type, this function returns all array
+	 * objects
 	 * return the objects array when result type is REDIS_RESULT_ARRAY
-	 * @param size {size_t*} When returned array is not empty, this address stores array length
+	 * @param size {size_t*} When returned array is not empty, this address stores
+	 * array length
 	 *  store the array's length if size isn't NULL
 	 * @return {const const redis_result*}
 	 */
 	const redis_result** get_children(size_t* size) const;
 
 	/**
-	 * When data type is REDIS_RESULT_ARRAY type, this function returns result object corresponding to index
+	 * When data type is REDIS_RESULT_ARRAY type, this function returns result
+	 * object corresponding to index
 	 * get one object of the given subscript from objects array
 	 * @param i {size_t} Index value
 	 *  the given subscript
-	 * @return {const redis_result*} When index value is out of bounds or result does not exist, returns NULL
+	 * @return {const redis_result*} When index value is out of bounds or result
+	 * does not exist, returns NULL
 	 *  NULL if subscript is out of bounds or object not exist
 	 */
 	const redis_result* get_child(size_t i) const;

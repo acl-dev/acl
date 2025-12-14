@@ -8,23 +8,29 @@ struct ACL_VSTRING;
 namespace acl {
 
 /**
- * Template class for triggers in acl_master server framework. Only one instance of objects of this class can run
+ * Template class for triggers in acl_master server framework. Only one instance
+ * of objects of this class can run
  */
 class ACL_CPP_API master_trigger : public master_base {
 public:
 	/**
-	 * Start running. Calling this function indicates that the service process runs under the control of acl_master service framework,
+	 * Start running. Calling this function indicates that the service process runs
+	 * under the control of acl_master service framework,
 	 * generally used in production environment
-	 * @param argc {int} First parameter passed from main, indicates number of parameters
+	 * @param argc {int} First parameter passed from main, indicates number of
+	 * parameters
 	 * @param argv {char**} Second parameter passed from main
 	 */
 	void run_daemon(int argc, char** argv);
 
 	/**
-	 * Processing function when running standalone. Users can call this function to perform necessary debugging work
+	 * Processing function when running standalone. Users can call this function to
+	 * perform necessary debugging work
 	 * @param path {const char*} Full path of configuration file
-	 * @param count {int} When this value > 0, after receiving this number of connections and completing them,
-	 *  this function will return, otherwise it will continuously loop receiving remote connections
+	 * @param count {int} When this value > 0, after receiving this number of
+	 * connections and completing them,
+	 * this function will return, otherwise it will continuously loop receiving
+	 * remote connections
 	 * @param interval {int} Trigger time interval (seconds)
 	 */
 	void run_alone(const char* path = NULL, int count = 1, int interval = 1);

@@ -19,7 +19,7 @@ public:
 	static bool load(void);
 
 	/********************************************************************/
-	/*         The following are virtual interfaces of base class db_handle                            */
+	/* The following are virtual interfaces of the base class db_handle */
 	/********************************************************************/
 
 	const char* dbtype(void) const;

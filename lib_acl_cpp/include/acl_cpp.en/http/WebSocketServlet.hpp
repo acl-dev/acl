@@ -17,9 +17,12 @@ public:
 
 	/**
 	 * Constructor
-	 * @param stream {socket_stream*} When running under control of acl_master server framework,
-	 *  this parameter must be non-empty. When running in CGI mode under apache, this parameter
-	 *  is set to NULL. In addition, this function internally will not close stream connection. Application should handle stream object
+	 * @param stream {socket_stream*} When running under control of acl_master
+	 * server framework,
+	 * this parameter must be non-empty. When running in CGI mode under apache,
+	 * this parameter
+	 * is set to NULL. In addition, this function internally will not close stream
+	 * connection. Application should handle stream object
 	 *  closing itself, which facilitates integration with acl_master architecture
 	 * @param session {session*} One session object per HttpServlet object
 	 */
@@ -27,9 +30,12 @@ public:
 
 	/**
 	 * Constructor
-	 * @param stream {socket_stream*} When running under control of acl_master server framework,
-	 *  this parameter must be non-empty. When running in CGI mode under apache, this parameter
-	 *  is set to NULL. In addition, this function internally will not close stream connection. Application should handle stream object
+	 * @param stream {socket_stream*} When running under control of acl_master
+	 * server framework,
+	 * this parameter must be non-empty. When running in CGI mode under apache,
+	 * this parameter
+	 * is set to NULL. In addition, this function internally will not close stream
+	 * connection. Application should handle stream object
 	 *  closing itself, which facilitates integration with acl_master architecture
 	 * @param memcache_addr {const char*}
 	 */
@@ -37,8 +43,11 @@ public:
 		const char* memcache_addr = "127.0.0.1:11211");
 
 	/**
-	 * HttpServlet object starts running, receives HTTP requests, and calls following doXXX virtual functions.
-	 * This function first calls start process, then decides whether to maintain long connection with client based on start's return result and whether request/response
+	 * HttpServlet object starts running, receives HTTP requests, and calls
+	 * following doXXX virtual functions.
+	 * This function first calls start process, then decides whether to maintain
+	 * long connection with client based on start's return result and whether
+	 * request/response
 	 * objects require maintaining long connection.
 	 */
 
@@ -115,18 +124,21 @@ protected:
 			bool text, bool finish) = 0;
 
 	/**
-	 * Subclasses can call this method in a loop to get data frame body data until return <= 0
+	 * Subclasses can call this method in a loop to get data frame body data until
+	 * return <= 0
 	 * @param buf {size_t*} Data buffer used to store result data
 	 * @param size {size_t} buf buffer size
 	 * @return {int} Length of data read, in the following three cases:
 	 *   0: Indicates data frame is normally read completely
 	 *  -1: Indicates read error
-	 *  >0: Indicates data read, should call this method again to read remaining data
+	 * >0: Indicates data read, should call this method again to read remaining
+	 * data
 	 */
 	int readPayload(void* buf, size_t size);
 
 	/**
-	 * Return websocket object. If returns NULL, it indicates websocket connection has not been established yet
+	 * Return websocket object. If returns NULL, it indicates websocket connection
+	 * has not been established yet
 	 * @return {websocket*}
 	 */
 	websocket* get_websocket() const

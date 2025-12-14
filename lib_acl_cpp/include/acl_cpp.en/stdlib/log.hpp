@@ -65,15 +65,19 @@ class ACL_CPP_API log {
 public:
 	/**
 	 * Open log file, call this function once during program initialization
-	 * @param recipients {const char*} Log recipient list, separated by "|". Recipients
+	 * @param recipients {const char*} Log recipient list, separated by "|".
+	 * Recipients
 	 *  can be local files or remote sockets, e.g.:
 	 *  /tmp/test.log|UDP:127.0.0.1:12345|TCP:127.0.0.1:12345|UNIX:/tmp/test.sock
-	 *  This configuration requires sending all logs to four log recipient objects simultaneously:
+	 * This configuration requires sending all logs to four log recipient objects
+	 * simultaneously:
 	 *  /tmp/test.log, UDP:127.0.0.1:12345,
 	 *  TCP:127.0.0.1:12345 and UNIX:/tmp/test.sock
 	 * @param procname Program name, e.g.: test
-	 * @param cfg Debug log configuration, format: {section}:{level}; {section}:{level}; ...
-	 *  e.g.: 100:2; 101:3; 102: 4, means only record logs with identifier 100/level < 2,
+	 * @param cfg Debug log configuration, format: {section}:{level};
+	 * {section}:{level}; ...
+	 * e.g.: 100:2; 101:3; 102: 4, means only record logs with identifier 100/level
+	 * < 2,
 	 *  and identifier 101/level < 3, and identifier 102/level < 4
 	 */
 	static void open(const char* recipients, const char* procname = "unknown",
@@ -93,7 +97,8 @@ public:
 	static void debug_init(const char* cfg);
 
 	/**
-	 * When log stream is not opened through open and logging related functions are called, whether to output information
+	 * When log stream is not opened through open and logging related functions are
+	 * called, whether to output information
 	 * to standard output
 	 * @param onoff {bool}
 	 */

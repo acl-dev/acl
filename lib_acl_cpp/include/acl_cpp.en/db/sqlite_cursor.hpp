@@ -7,19 +7,18 @@
 
 struct sqlite3_stmt;
 
-namespace acl
-{
+namespace acl {
 
 class db_row;
 class db_sqlite;
 class dbuf_guard;
 
-class sqlite_cursor : public db_cursor
-{
+class sqlite_cursor : public db_cursor {
 public:
 	/**
 	 * Constructor
-	 * @param q {query&} SQL query object, will be converted to SQL string in the constructor
+	 * @param q {query&} SQL query object, will be converted to SQL string in the
+	 * constructor
 	 */
 	sqlite_cursor(query& q);
 	~sqlite_cursor(void);
@@ -33,7 +32,8 @@ public:
 	}
 
 	/**
-	 * When traversing query result set, can get result row after each query through this method
+	 * When traversing query result set, can get result row after each query
+	 * through this method
 	 * @return {db_row*}
 	 */
 	db_row* get_row(void) const {
@@ -70,7 +70,8 @@ public:
 	void create_row(void);
 
 	/**
-	 * During traversal, db_sqlite::next method will first call this method to clear previous query results
+	 * During traversal, db_sqlite::next method will first call this method to
+	 * clear previous query results
 	 */
 	void clear(void);
 

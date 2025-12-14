@@ -9,7 +9,8 @@
 namespace acl {
 
 /**
- * Used for message communication between threads, implemented through thread condition variables and thread locks
+ * Used for message communication between threads, implemented through thread
+ * condition variables and thread locks
  *
  * Example:
  *
@@ -56,7 +57,8 @@ public:
 	/**
 	 * Send message object
 	 * @param t {T} Message object
-	 * @param notify_first {bool} If true, notify first then unlock, otherwise unlock first
+	 * @param notify_first {bool} If true, notify first then unlock, otherwise
+	 * unlock first
 	 *  then notify. Note the difference between the two
 	 * @return {bool}
 	 * @override

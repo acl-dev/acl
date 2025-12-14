@@ -17,14 +17,16 @@ struct acl_pthread_mutex_t;
 namespace acl {
 
 /**
- * Mutex lock, can create both file lock and thread lock simultaneously, or create only one type of lock
+ * Mutex lock, can create both file lock and thread lock simultaneously, or
+ * create only one type of lock
  */
 class ACL_CPP_API locker : public noncopyable {
 public:
 	/**
 	 * Constructor
 	 * @param use_mutex {bool} Whether to create thread lock
-	 * @param use_spinlock {bool} Whether to use spinlock internally when using thread lock
+	 * @param use_spinlock {bool} Whether to use spinlock internally when using
+	 * thread lock
 	 */
 	locker(bool use_mutex = true, bool use_spinlock = false);
 	virtual ~locker();
@@ -33,7 +35,8 @@ public:
 	 * Create file lock based on file path
 	 * @param file_path {const char*} File path, non-empty
 	 * @return {bool} Whether successful
-	 * Note: This function and the open function below can only be called one at a time
+	 * Note: This function and the open function below can only be called one at a
+	 * time
 	 */
 	bool open(const char* file_path);
 

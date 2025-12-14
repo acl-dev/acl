@@ -11,10 +11,14 @@ struct ACL_XML_NODE;
 struct ACL_XML_ATTR;
 
 /**
- * Wrapper for XML parsing library in ACL library, convenient for C++ users. If performance is not a major concern,
- * can directly use this class. If executing on server side and performance is very important, it is recommended to directly use ACL library's
- * XML parser, because this class also calls XML parsing process in ACL library, and has a secondary copy
- * process, which may slightly affect performance, but for general applications this impact is negligible
+ * Wrapper for XML parsing library in ACL library, convenient for C++ users. If
+ * performance is not a major concern,
+ * can directly use this class. If executing on server side and performance is
+ * very important, it is recommended to directly use ACL library's
+ * XML parser, because this class also calls XML parsing process in ACL library,
+ * and has a secondary copy
+ * process, which may slightly affect performance, but for general applications
+ * this impact is negligible
  */
 
 namespace acl {
@@ -140,7 +144,8 @@ public:
 public:
 	/**
 	 * Get XML node object corresponding to ACL library
-	 * @return {ACL_XML_NODE*} Returns node object. Note: Users cannot separately release this node
+	 * @return {ACL_XML_NODE*} Returns node object. Note: Users cannot separately
+	 * release this node
 	 */
 	ACL_XML_NODE* get_xml_node() const;
 
@@ -177,11 +182,14 @@ public:
 	 * Constructor
 	 * @param data {const char*} XML format string, can be complete
 	 *  XML string, can also be partial XML string, can also be NULL pointer.
-	 *  In any case, users can still call update function with partial or complete XML string
+	 * In any case, users can still call update function with partial or complete
+	 * XML string
 	 *  to parse XML during update call; actually, when constructor's
 	 *  data parameter is not empty, it will also call update
-	 * @param dbuf_nblock {size_t} Initialization parameter for internally used dbuf_guard
-	 * @param dbuf_capacity {size_t} Initialization parameter for internally used dbuf_guard
+	 * @param dbuf_nblock {size_t} Initialization parameter for internally used
+	 * dbuf_guard
+	 * @param dbuf_capacity {size_t} Initialization parameter for internally used
+	 * dbuf_guard
 	 */
 	xml1(const char* data = NULL, size_t dbuf_nblock = 2,
 		size_t dbuf_capacity = 100);
@@ -324,7 +332,8 @@ public:
 public:
 	/**
 	 * Get ACL_XML object in acl library
-	 * @return {ACL_XML*} This value cannot be NULL. Note: Users can modify the value of this object,
+	 * @return {ACL_XML*} This value cannot be NULL. Note: Users can modify the
+	 * value of this object,
 	 *  but cannot release this object
 	 */
 	ACL_XML* get_xml() const {

@@ -8,7 +8,8 @@ class tcp_pool;
 class string;
 
 /**
- * This class wraps tcp_manager management class, can dynamically add target server addresses, and dynamically create connection pools
+ * This class wraps tcp_manager management class, can dynamically add target
+ * server addresses, and dynamically create connection pools
  * with each server
  */
 class ACL_CPP_API tcp_ipc : public noncopyable {
@@ -18,13 +19,15 @@ public:
 
 	/**
 	 * Set maximum connection limit for connection pool built with each server
-	 * @param max {int} Maximum connection limit for each connection pool. When <= 0, there is no connection limit
+	 * @param max {int} Maximum connection limit for each connection pool. When <=
+	 * 0, there is no connection limit
 	 * @return {tcp_ipc&}
 	 */
 	tcp_ipc& set_limit(int max);
 
 	/**
-	 * Set idle time for each connection in connection pool. When connection idle time exceeds set value, it will be closed
+	 * Set idle time for each connection in connection pool. When connection idle
+	 * time exceeds set value, it will be closed
 	 * @param ttl {int} Maximum timeout for idle connections
 	 * @return {tcp_ipc&}
 	 */
@@ -51,16 +54,18 @@ public:
 	tcp_manager& get_manager(void) const;
 
 	/**
-	 * Can call this method to explicitly add a server address. Only adds when address does not exist
+	 * Can call this method to explicitly add a server address. Only adds when
+	 * address does not exist
 	 * @param addr {const char*} Server address, format: IP:PORT
 	 * @return {tcp_ipc&}
 	 */
 	tcp_ipc& add_addr(const char* addr);
 
 	/**
-	 * Delete specified connection pool object based on server address. When connection pool object is being referenced, this object
-	 * will not be deleted, but uses delayed deletion method. Only after the last connection is returned will this connection pool object
-	 * be truly deleted
+	 * Delete specified connection pool object based on server address. When
+	 * connection pool object is being referenced, this object will not be
+	 * deleted, but uses delayed deletion method. Only after the last connection
+	 * is returned will this connection pool object be truly deleted
 	 * @param addr {const char*} Server address, format: IP:PORT
 	 * @return {tcp_ipc&}
 	 */
@@ -84,9 +89,10 @@ public:
 	 * @param addr {const char*} Specified target server address
 	 * @param data {const void*} Address of data packet to be sent
 	 * @param len {unsigned int} Data length
-	 * @param out {string*} When this object is not NULL, it indicates that response data
-	 *  needs to be read from server. Response result will be stored in this buffer. If this object is NULL, it means no response data
-	 *  needs to be read from server
+	 * @param out {string*} When this object is not NULL, it indicates that
+	 * response data needs to be read from server. Response result will be stored
+	 * in this buffer. If this object is NULL, it means no response data needs
+	 * to be read from server
 	 * @return {bool} Whether sending was successful
 	 */
 	bool send(const char* addr, const void* data, unsigned int len,
@@ -96,9 +102,11 @@ public:
 	 * Send data packet to all servers
 	 * @param data {const void*} Address of data packet to be sent
 	 * @param len {unsigned int} Data length
-	 * @param exclusive {bool} When sending broadcast packet, whether to add thread lock to prevent other threads
-	 *  from competing for internal connection pool resources
-	 * @param check_result {bool} Whether to read server response to prove server received data
+	 * @param exclusive {bool} When sending broadcast packet, whether to add
+	 * thread lock to prevent other threads from competing for internal
+	 * connection pool resources
+	 * @param check_result {bool} Whether to read server response to prove server
+	 * received data
 	 * @param nerr {unsigned *} When not NULL, stores number of failed servers
 	 * @return {size_t} Returns number of servers sent to
 	 */

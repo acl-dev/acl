@@ -17,14 +17,16 @@ public:
 	virtual ~ipc_request();
 
 	/**
-	 * Virtual interface, subclasses implement this class to handle specific tasks. This interface is suitable
+	 * Virtual interface, subclasses implement this class to handle specific tasks.
+	 * This interface is suitable
 	 * for IO message mode
 	 */
 	virtual void run(ipc_client* ipc);
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * Virtual interface, subclasses implement this class to handle specific tasks. This interface is suitable
+	 * Virtual interface, subclasses implement this class to handle specific tasks.
+	 * This interface is suitable
 	 * for _WIN32 message mode
 	 */
 	virtual void run(HWND hWnd);
@@ -58,9 +60,11 @@ class ACL_CPP_API ipc_service : public ipc_server
 public:
 	/**
 	 * Constructor
-	 * @param nthread {int} If this value > 1, internally automatically uses thread pool, otherwise
+	 * @param nthread {int} If this value > 1, internally automatically uses thread
+	 * pool, otherwise
 	 *  it is one request per thread
-	 * @param ipc_keep {bool} Whether internal IPC message stream maintains long connection. Maintaining long
+	 * @param ipc_keep {bool} Whether internal IPC message stream maintains long
+	 * connection. Maintaining long
 	 *  connection helps improve message passing efficiency
 	 */
 	ipc_service(int nthread, bool ipc_keep = true);
@@ -69,7 +73,8 @@ public:
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * When using _WIN32 message mode, subclasses need to implement this virtual interface to handle specific
+	 * When using _WIN32 message mode, subclasses need to implement this virtual
+	 * interface to handle specific
 	 * message process. Subclasses must implement this interface
 	 * @param hWnd {HWND} Window handle
 	 * @param msg {UINT} User-defined message number
@@ -111,12 +116,14 @@ private:
 	HINSTANCE hInstance_;
 
 	/**
-	 * Base class virtual function: In Windows message mode, create hidden window handle
+	 * Base class virtual function: In Windows message mode, create hidden window
+	 * handle
 	 */
 	virtual bool create_window(void);
 
 	/**
-	 * Base class virtual function: In Windows message mode, close hidden window handle
+	 * Base class virtual function: In Windows message mode, close hidden window
+	 * handle
 	 */
 	virtual void close_window(void);
 #endif

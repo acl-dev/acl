@@ -5,24 +5,25 @@
 
 namespace acl {
 
-class ACL_CPP_API pgsql_conf
-{
+class ACL_CPP_API pgsql_conf {
 public:
 	/**
 	 * Constructor
 	 * @param dbaddr {const char*} Server address, address format: ip:port, or
-	 *  unix_domain_path. When it is a unix domain socket, it should be the directory
-	 *  where the unix domain socket file is located and does not include the filename. Assuming postgresql is listening on unix domain socket
-	 *  file: /tmp/.s.PGSQL.5432, then dbaddr address should be set to /tmp
-	 *  Note: Note the difference from mysql when connecting to unix domain socket. mysql's domain socket
-	 *  is the full path
+	 * unix_domain_path. When it is a unix domain socket, it should be the
+	 * directory where the unix domain socket file is located and does not
+	 * include the filename. Assuming postgresql is listening on unix domain
+	 * socket file: /tmp/.s.PGSQL.5432, then dbaddr address should be set to /tmp
+	 * Note: Note the difference from mysql when connecting to unix domain socket.
+	 * mysql's domain socket is the full path
 	 * @param dbname {const char*} Database name
 	 */
 	pgsql_conf(const char* dbaddr, const char* dbname);
 
 	/**
 	 * Copy constructor
-	 * @param conf {const pgsql_conf&} Internally will create a new configuration object and copy the content items
+	 * @param conf {const pgsql_conf&} Internally will create a new configuration
+	 * object and copy the content items
 	 *  from this parameter
 	 */
 	pgsql_conf(const pgsql_conf& conf);
@@ -30,22 +31,27 @@ public:
 	~pgsql_conf(void);
 
 	/**
-	 * Set user account when connecting to database. When this method is not called, no account is needed
-	 * @param dbuser {const char*} User account, only valid when it is a non-empty string
+	 * Set user account when connecting to database. When this method is not
+	 * called, no account is needed
+	 * @param dbuser {const char*} User account, only valid when it is a non-empty
+	 * string
 	 * @return {pgsql_conf&}
 	 */
 	pgsql_conf& set_dbuser(const char* dbuser);
 
 	/**
-	 * Set account password when connecting to database. When this method is not called, no password is set
-	 * @param dbpass {const char*} Account password, only valid when it is a non-empty string
+	 * Set account password when connecting to database. When this method is not
+	 * called, no password is set
+	 * @param dbpass {const char*} Account password, only valid when it is a
+	 * non-empty string
 	 * @return {pgsql_conf&}
 	 */
 	pgsql_conf& set_dbpass(const char* dbpass);
 
 	/**
 	 * Set maximum connection limit for database connection pool
-	 * @param dblimit {size_t} Connection pool maximum connection limit, when 0 there is no limit
+	 * @param dblimit {size_t} Connection pool maximum connection limit, when 0
+	 * there is no limit
 	 * @return {pgsql_conf&}
 	 */
 	pgsql_conf& set_dblimit(size_t dblimit);

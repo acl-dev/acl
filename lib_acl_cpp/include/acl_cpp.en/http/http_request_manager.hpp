@@ -23,11 +23,15 @@ public:
 
 protected:
 	/**
-	 * Base class pure virtual function, used to create connection pool objects. After this function returns,
-	 * the base class sets the network connection and network IO timeout for the connection pool
+	 * Base class pure virtual function, used to create connection pool objects.
+	 * After this function returns,
+	 * the base class sets the network connection and network IO timeout for the
+	 * connection pool
 	 * @param addr {const char*} Server listening address, format: ip:port
-	 * @param count {size_t} Connection pool size limit, when this value is 0 there is no limit
-	 * @param idx {size_t} Index position of this connection pool object in the collection (starting from 0)
+	 * @param count {size_t} Connection pool size limit, when this value is 0 there
+	 * is no limit
+	 * @param idx {size_t} Index position of this connection pool object in the
+	 * collection (starting from 0)
 	 * @return {connect_pool*} Returns the created connection pool object
 	 */
 	connect_pool* create_pool(const char* addr, size_t count, size_t idx);

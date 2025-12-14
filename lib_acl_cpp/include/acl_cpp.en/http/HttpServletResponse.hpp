@@ -18,14 +18,16 @@ class HttpCookie;
 class HttpServletRequest;
 
 /**
- * HTTP client response callback class. This class should not be inherited. Users also do not need to
+ * HTTP client response callback class. This class should not be inherited.
+ * Users also do not need to
  * dynamically create objects of this class.
  */
 class ACL_CPP_API HttpServletResponse : public noncopyable {
 public:
 	/**
 	 * Constructor
-	 * @param stream {socket_stream&} Connection stream. Internally will not automatically close it.
+	 * @param stream {socket_stream&} Connection stream. Internally will not
+	 * automatically close it.
 	 */
 	explicit HttpServletResponse(socket_stream& stream);
 	~HttpServletResponse();
@@ -43,7 +45,8 @@ public:
 	/**
 	 * Set HTTP chunked transfer mode.
 	 * @param on {bool} When set to true, even if setContentLength is called,
-	 *  internally will also use chunked transfer mode. According to HTTP RFC specification requirements,
+	 * internally will also use chunked transfer mode. According to HTTP RFC
+	 * specification requirements,
 	 *  chunked transfer has higher priority than content-length format.
 	 * @return {HttpServletResponse&}
 	 */
@@ -57,7 +60,8 @@ public:
 	HttpServletResponse& setKeepAlive(bool on);
 
 	/**
-	 * Set HTTP response header Content-Type field value. This field value can be in
+	 * Set HTTP response header Content-Type field value. This field value can be
+	 * in
 	 * text/html or text/html; charset=utf8 format.
 	 * @param value {const char*} Field value.
 	 * @return {HttpServletResponse&}
@@ -73,7 +77,8 @@ public:
 
 	/**
 	 * Set HTTP response body character set. If setContentType has already set
-	 * the character set, this function should not be called again to set the character set.
+	 * the character set, this function should not be called again to set the
+	 * character set.
 	 * @param charset {const char*} Character set of response data.
 	 * @return {HttpServletResponse&}
 	 */
@@ -101,10 +106,14 @@ public:
 	HttpServletResponse& setHeader(const char* name, int value);
 
 	/**
-	 * For partial response, set the offset position of the response body, subscript starts from 0.
-	 * @param from {http_off_t} Response body starting offset position (subscript starts from 0).
-	 * @param to {http_off_t} Response body ending position. This value should be less than the data length.
-	 * @param total {http_off_t} Total data length. When data source is a static file, this value
+	 * For partial response, set the offset position of the response body,
+	 * subscript starts from 0.
+	 * @param from {http_off_t} Response body starting offset position (subscript
+	 * starts from 0).
+	 * @param to {http_off_t} Response body ending position. This value should be
+	 * less than the data length.
+	 * @param total {http_off_t} Total data length. When data source is a static
+	 * file, this value
 	 *  should be equal to the total length of the file.
 	 * @return {HttpServletResponse&}
 	 */
@@ -123,7 +132,8 @@ public:
 	HttpServletResponse& setStatus(int status);
 
 	/**
-	 * Set to CGI mode. Users generally should not call this directly, because HttpServlet
+	 * Set to CGI mode. Users generally should not call this directly, because
+	 * HttpServlet
 	 * will automatically determine whether it is CGI mode.
 	 * @param on {bool} Whether in CGI mode.
 	 */
@@ -137,7 +147,8 @@ public:
 	HttpServletResponse& setRedirect(const char* location, int status = 302);
 
 	/**
-	 * Add cookie object. This object must be dynamically allocated. Users should not
+	 * Add cookie object. This object must be dynamically allocated. Users should
+	 * not
 	 * manually release this object, as internally will automatically release it.
 	 * @param cookie {HttpCookie*}
 	 */
@@ -170,25 +181,33 @@ public:
 	http_header& getHttpHeader() const;
 
 	/**
-	 * Send HTTP response body data to client. This function can be called in a loop.
+	 * Send HTTP response body data to client. This function can be called in a
+	 * loop.
 	 * If setChunkedTransferEncoding is called to set chunked transfer mode,
-	 * internally automatically uses chunked transfer mode. When calling this function, it will automatically
-	 * call sendHeader to send HTTP response header. Internally automatically sends HTTP response header on the first
-	 * write. Additionally, when using chunked format for transfer, applications should
+	 * internally automatically uses chunked transfer mode. When calling this
+	 * function, it will automatically
+	 * call sendHeader to send HTTP response header. Internally automatically sends
+	 * HTTP response header on the first
+	 * write. Additionally, when using chunked format for transfer, applications
+	 * should
 	 * call write(NULL, 0) at least once at the end to indicate data end.
 	 * @param data {const void*} Data address.
 	 * @param len {size_t} Data length of data.
-	 * @return {bool} Whether sending was successful. Returns false to indicate connection broken.
+	 * @return {bool} Whether sending was successful. Returns false to indicate
+	 * connection broken.
 	 */
 	bool write(const void* data, size_t len);
 
 	/**
-	 * Send HTTP response body data to client. This function can be called in a loop. This function
+	 * Send HTTP response body data to client. This function can be called in a
+	 * loop. This function
 	 * internally calls HttpServletResponse::write(const void*, size_t) process.
-	 * Additionally, when using chunked format for transfer, applications should call write(NULL, 0) at least once at the end
+	 * Additionally, when using chunked format for transfer, applications should
+	 * call write(NULL, 0) at least once at the end
 	 * or pass an empty buffer buf.empty() == true.
 	 * @param buf {const string&} Data buffer.
-	 * @return {bool} Whether sending was successful. Returns false to indicate connection broken.
+	 * @return {bool} Whether sending was successful. Returns false to indicate
+	 * connection broken.
 	 */
 	bool write(const string& buf);
 
@@ -196,7 +215,8 @@ public:
 	 * Send HTTP Xml response body to client.
 	 * @param body {const xml&} Data buffer.
 	 * @param charset {const char*} Character set encoding.
-	 * @return {bool} Whether sending was successful. Returns false to indicate connection broken.
+	 * @return {bool} Whether sending was successful. Returns false to indicate
+	 * connection broken.
 	 */
 	bool write(const xml& body, const char* charset = "utf-8");
 
@@ -204,12 +224,14 @@ public:
 	 * Send HTTP Json response body to client.
 	 * @param body {const json&} Data buffer.
 	 * @param charset {const char*} Character set encoding.
-	 * @return {bool} Whether sending was successful. Returns false to indicate connection broken.
+	 * @return {bool} Whether sending was successful. Returns false to indicate
+	 * connection broken.
 	 */
 	bool write(const json& body, const char* charset = "utf-8");
 
 	/**
-	 * Format HTTP client response data in variable parameter format. Internally automatically calls
+	 * Format HTTP client response data in variable parameter format. Internally
+	 * automatically calls
 	 * HttpServletResponse::write(const void*, size_t) process. When using
 	 * chunked format for transfer, applications should call write(NULL, 0)
 	 * at least once at the end to indicate data end.
@@ -219,9 +241,11 @@ public:
 	int format(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
-	 * Format HTTP client response data in variable parameter format. Internally automatically calls
+	 * Format HTTP client response data in variable parameter format. Internally
+	 * automatically calls
 	 * HttpServletResponse::write(const string&) process. When using chunked
-	 * format for transfer, applications should call write(NULL, 0) at least once at the end to indicate data end.
+	 * format for transfer, applications should call write(NULL, 0) at least once
+	 * at the end to indicate data end.
 	 * @param fmt {const char*} Variable parameter format string.
 	 * @param ap {va_list} Parameter list.
 	 * @return {int} Returns value > 0 on success, otherwise returns -1.
@@ -231,9 +255,11 @@ public:
 	///////////////////////////////////////////////////////////////////
 
 	/**
-	 * Send HTTP response header. Users should call this function before sending HTTP
+	 * Send HTTP response header. Users should call this function before sending
+	 * HTTP
 	 * response header to client.
-	 * @return {bool} Whether sending was successful. Returns false to indicate connection broken.
+	 * @return {bool} Whether sending was successful. Returns false to indicate
+	 * connection broken.
 	 *  When users use getOutputStream to get socket write stream, this function
 	 *  will be automatically called.
 	 */
@@ -261,7 +287,8 @@ public:
 	}
 
 	/**
-	 * Set http request object. This function should currently only be used internally by HttpServlet.
+	 * Set http request object. This function should currently only be used
+	 * internally by HttpServlet.
 	 * @param request {HttpServletRequest*}
 	 */
 	void setHttpServletRequest(HttpServletRequest* request);

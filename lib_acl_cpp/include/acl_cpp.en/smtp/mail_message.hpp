@@ -15,7 +15,8 @@ class mail_body;
 class ofstream;
 
 /**
- * Email data construction class. This class can generate a complete email, and is also used to build email envelope information
+ * Email data construction class. This class can generate a complete email, and
+ * is also used to build email envelope information
  * for SMTP sending process
  */
 class ACL_CPP_API mail_message : public noncopyable
@@ -37,7 +38,8 @@ public:
 	mail_message& set_auth(const char* user, const char* pass);
 
 	/**
-	 * Set sender's email address for email. This field can be used for MAIL FROM command in SMTP sending process,
+	 * Set sender's email address for email. This field can be used for MAIL FROM
+	 * command in SMTP sending process,
 	 * and can also be used as From field value in email header
 	 * @param from {const char*} Sender's email address
 	 * @param name {const char*} Sender's name
@@ -70,42 +72,52 @@ public:
 	mail_message& set_delivered_to(const char* delivered_to);
 
 	/**
-	 * Add recipient address. This address only appears in envelope, not in email header
-	 * @param recipients {const char*} Recipient collection, complies with RFC822 format
+	 * Add recipient address. This address only appears in envelope, not in email
+	 * header
+	 * @param recipients {const char*} Recipient collection, complies with RFC822
+	 * format
 	 * @return {mail_message&}
 	 */
 	mail_message& add_recipients(const char* recipients);
 
 	/**
-	 * Set To field value in email header. This recipient address collection is also used in envelope as recipients
-	 * @param to {const char*} Recipient email address collection, complies with RFC822 format
+	 * Set To field value in email header. This recipient address collection is
+	 * also used in envelope as recipients
+	 * @param to {const char*} Recipient email address collection, complies with
+	 * RFC822 format
 	 * @return {mail_message&}
 	 */
 	mail_message& add_to(const char* to);
 
 	/**
-	 * Set Cc field value in email header. This recipient address collection is also used in envelope as recipients
-	 * @param cc {const char*} Recipient email address collection, complies with RFC822 format
+	 * Set Cc field value in email header. This recipient address collection is
+	 * also used in envelope as recipients
+	 * @param cc {const char*} Recipient email address collection, complies with
+	 * RFC822 format
 	 * @return {mail_message&}
 	 */
 	mail_message& add_cc(const char* cc);
 
 	/**
-	 * Set blind carbon copy address collection for email sending. This address collection will not appear in email header
-	 * @param bcc {const char*} Blind carbon copy email address collection, complies with RFC822 format
+	 * Set blind carbon copy address collection for email sending. This address
+	 * collection will not appear in email header
+	 * @param bcc {const char*} Blind carbon copy email address collection,
+	 * complies with RFC822 format
 	 * @return {mail_message&}
 	 */
 	mail_message& add_bcc(const char* bcc);
 
 	/**
-	 * Set subject in email header. This subject will use rfc2047 encoding and use character set set by class constructor
+	 * Set subject in email header. This subject will use rfc2047 encoding and use
+	 * character set set by class constructor
 	 * @param subject {const char*} Email header subject field value
 	 * @return {mail_message&}
 	 */
 	mail_message& set_subject(const char* subject);
 
 	/**
-	 * Users can call this function to add header extension field values in email header
+	 * Users can call this function to add header extension field values in email
+	 * header
 	 * @param name {const char*} Field name
 	 * @param value {const char*} Field value
 	 * @return {mail_message&}
@@ -129,7 +141,8 @@ public:
 		const char* content_type);
 
 	/**
-	 * Construct a complete email and store email content in given disk file. If this file
+	 * Construct a complete email and store email content in given disk file. If
+	 * this file
 	 * exists, will clear it first, otherwise will create new file
 	 * @param filepath {const char*} Target file
 	 * @return {bool} Whether operation was successful
@@ -138,13 +151,15 @@ public:
 
 	/**
 	 * Can call this function separately to generate email header data
-	 * @param out {string&} Created email header data will be appended to this buffer
+	 * @param out {string&} Created email header data will be appended to this
+	 * buffer
 	 * @return {bool} Whether operation was successful
 	 */
 	bool build_header(string& out);
 
 	/**
-	 * Get full path of created email on disk. This function must be called after successfully calling save_to
+	 * Get full path of created email on disk. This function must be called after
+	 * successfully calling save_to
 	 * @return {const char*}
 	 */
 	const char* get_email() const

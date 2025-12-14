@@ -59,7 +59,8 @@ public:
 	virtual void on_close() {}
 
 	/**
-	 * Callback function when message is received. Subclasses must implement this interface
+	 * Callback function when message is received. Subclasses must implement this
+	 * interface
 	 * @param nMsg {int} User-added custom message value
 	 * @param data {void*} Message data
 	 * @param dlen {int} Length of message data
@@ -76,7 +77,8 @@ public:
 	bool open(aio_handle* handle, const char* addr, int timeout);
 
 	/**
-	 * Asynchronous stream has been established. Call this function to complete ipc_client connection process
+	 * Asynchronous stream has been established. Call this function to complete
+	 * ipc_client connection process
 	 * @param client {aio_socket_stream*} Asynchronous connection stream
 	 */
 	void open(aio_socket_stream* client);
@@ -90,7 +92,8 @@ public:
 	bool open(const char* addr, int timeout);
 
 	/**
-	 * Synchronous stream has been established. Call this function to complete ipc_client connection process
+	 * Synchronous stream has been established. Call this function to complete
+	 * ipc_client connection process
 	 * @param client {socket_stream*} Asynchronous connection stream
 	 */
 	void open(socket_stream* client);

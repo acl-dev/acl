@@ -4,52 +4,42 @@
 
 #ifndef ACL_CLIENT_ONLY
 
-namespace acl
-{
+namespace acl {
 
-class ACL_CPP_API disque_node
-{
+class ACL_CPP_API disque_node {
 public:
 	disque_node() : port_(0), priority_(0) {}
 	~disque_node() {}
 
-	void set_id(const char* id)
-	{
+	void set_id(const char* id) {
 		id_ = id;
 	}
 
-	void set_ip(const char* ip)
-	{
+	void set_ip(const char* ip) {
 		ip_ = ip;
 	}
 
-	void set_port(int port)
-	{
+	void set_port(int port) {
 		port_ = port;
 	}
 
-	void set_priority(int n)
-	{
+	void set_priority(int n) {
 		priority_ = n;
 	}
 
-	const char* get_id() const
-	{
+	const char* get_id() const {
 		return id_.c_str();
 	}
 
-	const char* get_ip() const
-	{
+	const char* get_ip() const {
 		return ip_.c_str();
 	}
 
-	int get_port() const
-	{
+	int get_port() const {
 		return port_;
 	}
 
-	int get_priority() const
-	{
+	int get_priority() const {
 		return priority_;
 	}
 

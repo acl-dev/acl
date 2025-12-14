@@ -8,7 +8,8 @@
 namespace acl {
 
 /**
- * Class definition related to Content-Type in HTTP headers, can parse the following data:
+ * Class definition related to Content-Type in HTTP headers, can parse the
+ * following data:
  * Content-Type: application/x-www-form-urlencoded
  * Content-Type: multipart/form-data; boundary=xxx
  * Content-Type: application/octet-stream
@@ -40,7 +41,8 @@ public:
 
 	/**
 	 * Get text from Content-Type field value text/html; charset=utf8
-	 * @return {const char*} Returns NULL if this data does not exist, generally because
+	 * @return {const char*} Returns NULL if this data does not exist, generally
+	 * because
 	 *  parse failed
 	 */
 	const char* get_ctype() const;
@@ -52,7 +54,8 @@ public:
 	const char* get_stype() const;
 
 	/**
-	 * Get boundary value xxx from Content-Type field value multipart/form-data; boundary=xxx
+	 * Get boundary value xxx from Content-Type field value multipart/form-data;
+	 * boundary=xxx
 	 * @return {const char*} Returns NULL if this data does not exist
 	 */
 	const char* get_bound() const;

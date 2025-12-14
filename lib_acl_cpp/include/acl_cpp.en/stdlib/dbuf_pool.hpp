@@ -8,9 +8,12 @@ struct ACL_DBUF_POOL;
 namespace acl {
 
 /**
- * Session-based memory pool management class, which provides memory allocation functions. When the object is destroyed, memory will
- * be released all at once. It is suitable for applications that need to frequently allocate some small-sized small memory blocks.
- * This implementation is actually a wrapper for the ACL_DBUF_POOL structure in lib_acl.
+ * Session-based memory pool management class, which provides memory allocation
+ * functions. When the object is destroyed, memory will
+ * be released all at once. It is suitable for applications that need to
+ * frequently allocate some small-sized small memory blocks.
+ * This implementation is actually a wrapper for the ACL_DBUF_POOL structure in
+ * lib_acl.
  */
 
 #if 0
@@ -29,14 +32,16 @@ public:
 	dbuf_pool(size_t nblock = 2, size_t align = 8);
 
 	/**
-	 * If the object needs to be dynamically allocated, after use, you need to call destroy
+	 * If the object needs to be dynamically allocated, after use, you need to call
+	 * destroy
 	 * to release the dynamically allocated object.
 	 */
 	void destroy() const;
 
 #ifdef ACL_DBUF_HOOK_NEW
 	/**
-	 * Override new/delete operators so that dbuf_pool objects can also be allocated on the memory pool,
+	 * Override new/delete operators so that dbuf_pool objects can also be
+	 * allocated on the memory pool,
 	 * thereby avoiding malloc/free overhead.
 	 * @param size {size_t} Variable parameter, dbuf_pool object's length size.
 	 * @param nblock {size_t} Internal memory block (4096) multiplier used.
@@ -51,16 +56,20 @@ public:
 
 	/**
 	 * Reset memory pool state to reuse this memory pool object.
-	 * @param reserve {size_t} When value > 0, you need to specify the reserved memory block size.
-	 *  This size should be less than or equal to the size already allocated in this memory pool object.
+	 * @param reserve {size_t} When value > 0, you need to specify the reserved
+	 * memory block size.
+	 * This size should be less than or equal to the size already allocated in this
+	 * memory pool object.
 	 * @return {bool} Whether reset was successful, returns false on error.
 	 */
 	bool dbuf_reset(size_t reserve = 0);
 
 	/**
 	 * Allocate memory of specified length.
-	 * @param len {size_t} Memory length to be allocated. When memory is relatively small (less than constructor's
-	 *  block_size), allocated memory will be allocated on dbuf_pool object's internal memory pool.
+	 * @param len {size_t} Memory length to be allocated. When memory is relatively
+	 * small (less than constructor's
+	 * block_size), allocated memory will be allocated on dbuf_pool object's
+	 * internal memory pool.
 	 *  When memory is large, malloc will be used directly for allocation.
 	 * @return {void*} Newly allocated memory address.
 	 */
@@ -99,26 +108,32 @@ public:
 	/**
 	 * Return memory allocated by memory pool.
 	 * @param addr {const void*} Memory address allocated by memory pool.
-	 * @return {bool} Returns false if memory address is not allocated by memory pool or released multiple times.
+	 * @return {bool} Returns false if memory address is not allocated by memory
+	 * pool or released multiple times.
 	 */
 	bool dbuf_free(const void* addr);
 
 	/**
-	 * Mark a certain address allocated by memory pool to prevent it from being released when dbuf_reset is called.
+	 * Mark a certain address allocated by memory pool to prevent it from being
+	 * released when dbuf_reset is called.
 	 * @param addr {const void*} Memory address allocated by memory pool.
-	 * @return {bool} Returns false if memory address is not allocated by memory pool.
+	 * @return {bool} Returns false if memory address is not allocated by memory
+	 * pool.
 	 */
 	bool dbuf_keep(const void* addr);
 
 	/**
-	 * Remove the mark on a certain address allocated by memory pool, so it will be released when dbuf_reset is called.
+	 * Remove the mark on a certain address allocated by memory pool, so it will be
+	 * released when dbuf_reset is called.
 	 * @param addr {const void*} Memory address allocated by memory pool.
-	 * @return {bool} Returns false if memory address is not allocated by memory pool.
+	 * @return {bool} Returns false if memory address is not allocated by memory
+	 * pool.
 	 */
 	bool dbuf_unkeep(const void* addr);
 
 	/**
-	 * Get internal ACL_DBUF_POOL handle to use C interface memory pool object internally.
+	 * Get internal ACL_DBUF_POOL handle to use C interface memory pool object
+	 * internally.
 	 * @return {ACL_DBUF_POOL*}
 	 */
 	ACL_DBUF_POOL *get_dbuf() const {
@@ -166,9 +181,12 @@ class ACL_CPP_API dbuf_obj { //: public noncopyable
 public:
 	/**
 	 * Constructor
-	 * @param guard {dbuf_guard*} When this parameter is not empty, this object will be
-	 *  automatically managed and uniformly destroyed by dbuf_guard object. If this parameter is empty, applications should
-	 *  call dbuf_guard::push_back to add this object to the object collection for unified management.
+	 * @param guard {dbuf_guard*} When this parameter is not empty, this object
+	 * will be
+	 * automatically managed and uniformly destroyed by dbuf_guard object. If this
+	 * parameter is empty, applications should
+	 * call dbuf_guard::push_back to add this object to the object collection for
+	 * unified management.
 	 */
 	dbuf_obj(dbuf_guard* guard = NULL);
 
@@ -176,8 +194,10 @@ public:
 
 	/**
 	 * Get this object's index position in dbuf_guard's object collection.
-	 * @return {int} Returns this object's index position in dbuf_guard's object collection. If
-	 *  this object has not been managed by dbuf_guard, returns -1. At this time, there may be a memory leak.
+	 * @return {int} Returns this object's index position in dbuf_guard's object
+	 * collection. If
+	 * this object has not been managed by dbuf_guard, returns -1. At this time,
+	 * there may be a memory leak.
 	 */
 	int pos() const {
 		return pos_;
@@ -205,15 +225,18 @@ private:
 };
 
 /**
- * Session memory pool guard class, manages objects allocated on dbuf_pool. When the object
+ * Session memory pool guard class, manages objects allocated on dbuf_pool. When
+ * the object
  * is destroyed, dbuf_pool will automatically release all allocated memory.
  */
 class ACL_CPP_API dbuf_guard { // : public noncopyable
 public:
 	/**
 	 * Constructor
-	 * @param dbuf {dbuf_pool*} Memory pool object. When not empty, dbuf is managed by dbuf_guard
-	 *  object. If empty, this constructor internally automatically creates a dbuf_pool object.
+	 * @param dbuf {dbuf_pool*} Memory pool object. When not empty, dbuf is managed
+	 * by dbuf_guard
+	 * object. If empty, this constructor internally automatically creates a
+	 * dbuf_pool object.
 	 * @param capacity {size_t} Initial capacity of internal objs_ array.
 	 */
 	dbuf_guard(dbuf_pool* dbuf, size_t capacity = 500);
@@ -228,7 +251,8 @@ public:
 	dbuf_guard(size_t nblock = 2, size_t capacity = 500, size_t align = 8);
 
 	/**
-	 * Destructor. When destroying, internally automatically destroys dbuf_pool object created by constructor.
+	 * Destructor. When destroying, internally automatically destroys dbuf_pool
+	 * object created by constructor.
 	 */
 	~dbuf_guard();
 
@@ -323,13 +347,18 @@ public:
 
 	/**
 	 * Add object. This method adds dbuf_obj objects allocated on dbuf_pool to
-	 * dbuf_guard object for unified management and destruction. If the same dbuf_obj object is added to the same
-	 * dbuf_guard object multiple times, the dbuf_guard object will have reference counting mechanism, which will
+	 * dbuf_guard object for unified management and destruction. If the same
+	 * dbuf_obj object is added to the same
+	 * dbuf_guard object multiple times, the dbuf_guard object will have reference
+	 * counting mechanism, which will
 	 * cause repeated releases.
 	 * @param obj {dbuf_obj*}
-	 * @return {int} Returns obj object's index position in dbuf_obj object collection after adding.
-	 *  dbuf_guard internally has reference counting mechanism for dbuf_obj objects, so when
-	 *  the same dbuf_obj object is added to the same dbuf_guard object multiple times, internally only one is recorded.
+	 * @return {int} Returns obj object's index position in dbuf_obj object
+	 * collection after adding.
+	 * dbuf_guard internally has reference counting mechanism for dbuf_obj objects,
+	 * so when
+	 * the same dbuf_obj object is added to the same dbuf_guard object multiple
+	 * times, internally only one is recorded.
 	 */
 	int push_back(dbuf_obj* obj);
 
@@ -343,20 +372,23 @@ public:
 
 	/**
 	 * Get object at specified index.
-	 * @param pos {size_t} Specified object index position, should not exceed bounds.
+	 * @param pos {size_t} Specified object index position, should not exceed
+	 * bounds.
 	 * @return {dbuf_obj*} Returns NULL when index position exceeds bounds.
 	 */
 	dbuf_obj* operator[](size_t pos) const;
 
 	/**
 	 * Get object at specified index.
-	 * @param pos {size_t} Specified object index position, should not exceed bounds.
+	 * @param pos {size_t} Specified object index position, should not exceed
+	 * bounds.
 	 * @return {dbuf_obj*} Returns NULL when index position exceeds bounds.
 	 */
 	dbuf_obj* get(size_t pos) const;
 
 	/**
-	 * Set the increment size when expanding objs_ array each time. Internal default value is 100.
+	 * Set the increment size when expanding objs_ array each time. Internal
+	 * default value is 100.
 	 * @param incr {size_t}
 	 */
 	void set_increment(size_t incr);
@@ -462,7 +494,8 @@ private:
 	dbuf_pool* dbuf_internal_;	// Memory pool object
 
 	// Here, dbuf_obj objects are used instead of std::vector.
-	// One reason is that objects are also allocated on dbuf_pool memory pool, which is another reason.
+	// One reason is that objects are also allocated on dbuf_pool memory pool,
+	// which is another reason.
 	// std::vector's internal memory allocation is not controllable.
 
 	struct dbuf_objs_link {
@@ -488,7 +521,8 @@ private:
  * // Inherit from acl::dbuf_obj class.
  * class myobj1 : public acl::dbuf_obj {
  * public:
- * 	// Pass guard object to constructor, and the object will be automatically added to guard's object collection.
+ * // Pass guard object to constructor, and the object will be automatically
+ * added to guard's object collection.
  * 	myobj1(acl::dbuf_guard* guard) : dbuf_obj(guard) {}
  *
  * 	void doit() {
@@ -504,12 +538,14 @@ private:
  *
  *	// Dynamically create 100 myobj objects on dbuf_guard memory pool.
  * 	for (int i = 0; i < 100; i++) {
- * 		// Dynamically create myobj object on guard memory pool and pass guard as constructor parameter.
+ * // Dynamically create myobj object on guard memory pool and pass guard as
+ * constructor parameter.
  * 		myobj* obj = new (dbuf.dbuf_alloc(sizeof(myobj))) myobj(&dbuf);
  * 		obj->doit();
  * 	}
  *
- *	// When dbuf is destroyed, all dynamically created objects will be automatically destroyed.
+ * // When dbuf is destroyed, all dynamically created objects will be
+ * automatically destroyed.
  * }
  *
  * // sample2

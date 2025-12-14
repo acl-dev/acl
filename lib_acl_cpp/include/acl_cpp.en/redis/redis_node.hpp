@@ -10,21 +10,25 @@
 namespace acl {
 
 /**
- * This class is mainly used for redis_cluster command class to get information about cluster redis nodes
+ * This class is mainly used for redis_cluster command class to get information
+ * about cluster redis nodes
  * this class is mainly used for redis_cluster command class to
  * get some information about the nodes in redis cluster
  */
 class ACL_CPP_API redis_node : public noncopyable {
 public:
 	/**
-	 * When using this constructor to instantiate class object, need to call set_id and set_addr methods to set
-	 * the unique identifier and service listening address of this redis node, and can also call other set_xxx setting methods
+	 * When using this constructor to instantiate class object, need to call set_id
+	 * and set_addr methods to set
+	 * the unique identifier and service listening address of this redis node, and
+	 * can also call other set_xxx setting methods
 	 */
 	redis_node();
 	~redis_node();
 
 	/**
-	 * In addition to passing this node's ID identifier in constructor parameters, can also set through this function
+	 * In addition to passing this node's ID identifier in constructor parameters,
+	 * can also set through this function
 	 * set the node's  ID
 	 * @param id {const char*} Unique identifier of redis node in cluster
 	 *  the unique ID for one redis node in the reids cluster
@@ -33,9 +37,11 @@ public:
 	redis_node& set_id(const char* id);
 
 	/**
-	 * In addition to passing this node's address in constructor parameters, can also set through this function
+	 * In addition to passing this node's address in constructor parameters, can
+	 * also set through this function
 	 * set the node's listening addr
-	 * @param addr {const char*} Service address of redis node in cluster, format: ip:port
+	 * @param addr {const char*} Service address of redis node in cluster, format:
+	 * ip:port
 	 *  the listening addr of one redis node in the reids cluster
 	 * @return {redis_node&}
 	 */
@@ -94,19 +100,22 @@ public:
 	/**
 	 * When this node is a master node, add a slave node
 	 * add one slave node to the current node if it's one master node
-	 * @return {bool} Whether add was successful. Returns false when slave node already exists in current master node
+	 * @return {bool} Whether add was successful. Returns false when slave node
+	 * already exists in current master node
 	 *  false will be returned when the slave to be added is already
 	 *  existing in the current master node
 	 */
 	bool add_slave(redis_node* slave);
 
 	/**
-	 * When this node is a master node, delete a slave node based on node unique identifier
+	 * When this node is a master node, delete a slave node based on node unique
+	 * identifier
 	 * when the current node is a master node, this function will
 	 * remove one slave node by the unique ID
 	 * @param id {const char*} Redis node unique identifier
 	 *  the unique ID of the redis node
-	 * @return {const redis_node*} Returns deleted slave node. Returns NULL if does not exist
+	 * @return {const redis_node*} Returns deleted slave node. Returns NULL if does
+	 * not exist
 	 *  the slave node according to the ID will be returned, and if
 	 *  not exists NULL will be returned
 	 */
@@ -131,7 +140,8 @@ public:
 	void add_slot_range(size_t min, size_t max);
 
 	/**
-	 * When this node is a master node, get master node's hash slot range. When it is a slave node, get its corresponding
+	 * When this node is a master node, get master node's hash slot range. When it
+	 * is a slave node, get its corresponding
 	 * master node's hash slot range
 	 * @return {const std::vector<std::pair<size_t, size_t> >&}
 	 */
@@ -183,7 +193,8 @@ public:
 	}
 
 	/**
-	 * When this node is a slave node, get this slave node's corresponding master node's ID identifier
+	 * When this node is a slave node, get this slave node's corresponding master
+	 * node's ID identifier
 	 * when the current node is slave, getting its master's ID
 	 * @return {const char*}
 	 */
@@ -229,7 +240,8 @@ public:
 
 	/**
 	 * result of CLUSTER NODES for redis.4.x.x:
-	 * d52ea3cb4cdf7294ac1fb61c696ae6483377bcfc 127.0.0.1:16385@116385 master - 0 1428410625374 73 connected 5461-10922
+	 * d52ea3cb4cdf7294ac1fb61c696ae6483377bcfc 127.0.0.1:16385@116385 master - 0
+	 * 1428410625374 73 connected 5461-10922
 	 * @return return 127.0.0.1:16385@116385 for redis.4.x.x
 	 */
 	const char* get_addr_info() const {

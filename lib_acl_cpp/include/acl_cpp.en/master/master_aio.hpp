@@ -15,21 +15,26 @@ class aio_handle;
 class aio_socket_stream;
 
 /**
- * Template class for single-threaded non-blocking mode in acl_master server framework. Only one instance of objects of this class can run
+ * Template class for single-threaded non-blocking mode in acl_master server
+ * framework. Only one instance of objects of this class can run
  */
 class ACL_CPP_API master_aio : public master_base, public aio_accept_callback {
 public:
 	/**
-	 * Start running. Calling this function indicates that the service process runs under the control of acl_master service framework,
+	 * Start running. Calling this function indicates that the service process runs
+	 * under the control of acl_master service framework,
 	 * generally used in production environment
-	 * @param argc {int} First parameter passed from main, indicates number of parameters
+	 * @param argc {int} First parameter passed from main, indicates number of
+	 * parameters
 	 * @param argv {char**} Second parameter passed from main
 	 */
 	void run_daemon(int argc, char** argv);
 
 	/**
-	 * Processing function when running standalone. Users can call this function to perform necessary debugging work
-	 * @param addrs {const char*} Service listening address list, format: IP:PORT, IP:PORT...
+	 * Processing function when running standalone. Users can call this function to
+	 * perform necessary debugging work
+	 * @param addrs {const char*} Service listening address list, format: IP:PORT,
+	 * IP:PORT...
 	 * @param path {const char*} Full path of configuration file
 	 * @param ht {aio_handle_type} Type of event engine
 	 * @return {bool} Whether listening was successful
@@ -38,7 +43,8 @@ public:
 		aio_handle_type ht = ENGINE_SELECT);
 
 	/**
-	 * Get asynchronous IO event engine handle. Through this handle, users can set timers and other functions
+	 * Get asynchronous IO event engine handle. Through this handle, users can set
+	 * timers and other functions
 	 * @return {aio_handle*}
 	 */
 	aio_handle* get_handle() const;
@@ -60,8 +66,10 @@ protected:
 
 	/**
 	 * Pure virtual function: Called when a client connection is received
-	 * @param stream {aio_socket_stream*} Newly received client asynchronous stream object
-	 * @return {bool} If this function returns false, it notifies server framework to stop receiving
+	 * @param stream {aio_socket_stream*} Newly received client asynchronous stream
+	 * object
+	 * @return {bool} If this function returns false, it notifies server framework
+	 * to stop receiving
 	 *  remote client connections, otherwise continues receiving client connections
 	 */
 	virtual bool on_accept(aio_socket_stream* stream) = 0;

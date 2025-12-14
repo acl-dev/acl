@@ -38,7 +38,8 @@
 #ifdef	_MSC_VER
 # pragma warning(disable:4251)
 //# if !defined(VC2003) && !defined(VC6)
-//extern "C" { FILE _iob[3] = {__iob_func()[0], __iob_func()[1], __iob_func()[2]}; }
+// extern "C" { FILE _iob[3] = {__iob_func()[0], __iob_func()[1],
+// __iob_func()[2]}; }
 //extern "C" { FILE _iob[3]; }
 //# endif
 # ifndef	HAS_SSIZE_T

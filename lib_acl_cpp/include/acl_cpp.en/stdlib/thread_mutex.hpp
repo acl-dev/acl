@@ -26,20 +26,23 @@ public:
 	~thread_mutex();
 
 	/**
-	 * Lock in current thread. Will wait until successful. Internal failure (generally does not fail, unless system error).
+	 * Lock in current thread. Will wait until successful. Internal failure
+	 * (generally does not fail, unless system error).
 	 * @return {bool} Returns false to indicate thread lock failed.
 	 */
 	bool lock();
 
 	/**
 	 * Try to lock. Returns immediately regardless of success or failure.
-	 * @return {bool} Returns true to indicate lock successful. Returns false to indicate lock failed.
+	 * @return {bool} Returns true to indicate lock successful. Returns false to
+	 * indicate lock failed.
 	 */
 	bool try_lock();
 
 	/**
 	 * Unlock thread lock.
-	 * @return {bool} Returns false to indicate unlock failed, possibly because lock was not successful before.
+	 * @return {bool} Returns false to indicate unlock failed, possibly because
+	 * lock was not successful before.
 	 */
 	bool unlock();
 

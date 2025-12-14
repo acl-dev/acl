@@ -79,12 +79,15 @@ public:
 	 *  the hash key
 	 * @param names Corresponding key field value array.
 	 *  the given hash fileds
-	 * @param result {std::vector<acl::string>*} When object pointer is not empty, stores query results.
-	 *  When this parameter is NULL, you can use base class methods like result_/get_ to get results.
+	 * @param result {std::vector<acl::string>*} When object pointer is not empty,
+	 * stores query results.
+	 * When this parameter is NULL, you can use base class methods like
+	 * result_/get_ to get results.
 	 *  store the result of the given hash files if not NULL.
 	 *  If NULL, the base class's method like result_/get can be used
 	 *  to get the values
-	 * @return {bool} Whether operation was successful. If successful, one of the following methods can be used to get data:
+	 * @return {bool} Whether operation was successful. If successful, one of the
+	 * following methods can be used to get data:
 	 *  if successul, one of below ways can be used to get the result:
 	 *
 	 *  1. Pass a non-empty storage buffer address in the call.
@@ -94,13 +97,15 @@ public:
 	 *  2. Call base class method result_value with specified subscript element.
 	 *     call redis_command::result_value with the specified subscript
 	 *
-	 *  3. Call base class method result_child with specified subscript element object (redis_result), then get
+	 * 3. Call base class method result_child with specified subscript element
+	 * object (redis_result), then get
 	 *     element string through redis_result::argv_to_string.
 	 *     call redis_command::result_child with specified subscript to
 	 *     get redis_result object, then call redis_result::argv_to_string
 	 *     with above result to get the values of the give fileds
 	 *
-	 *  4. Call base class method get_result to get the overall result object redis_result, then get
+	 * 4. Call base class method get_result to get the overall result object
+	 * redis_result, then get
 	 *     one element object through redis_result::get_child, then get the
 	 *     element by the way same as the way 2 above.
 	 *     call redis_command::get_result with the specified subscript to
@@ -108,8 +113,10 @@ public:
 	 *     get one result object, then call redis_result::argv_to_string
 	 *     to get the value of one filed.
 	 *
-	 *  5. Call base class method get_children to get result element array, then get each
-	 *     element object through redis_result's method argv_to_string to serialize element string.
+	 * 5. Call base class method get_children to get result element array, then get
+	 * each
+	 * element object through redis_result's method argv_to_string to serialize
+	 * element string.
 	 *     use redis_command::get_children to get the redis_result array,
 	 *     then use redis_result::argv_to_string to get every value of
 	 *     the given fileds
@@ -159,7 +166,8 @@ public:
 		size_t name_len, const char* value, size_t value_len);
 
 	/**
-	 * Only update this field value when a certain field in the hash table corresponding to key does not exist.
+	 * Only update this field value when a certain field in the hash table
+	 * corresponding to key does not exist.
 	 * set one new field of one key in hash only when the filed isn't
 	 * existing.
 	 * @param key {const char*} key value.
@@ -193,13 +201,16 @@ public:
 	 *  the hash key
 	 * @param name {const char*} key corresponding field name.
 	 *  the field's name
-	 * @param result {acl::string&} Store query result value (internally appends to this string).
+	 * @param result {acl::string&} Store query result value (internally appends to
+	 * this string).
 	 *  store the value result of the given field
 	 * @return {bool} Return value meaning:
-	 *  true -- Operation successful. When result is empty, it indicates KEY or field does not exist.
+	 * true -- Operation successful. When result is empty, it indicates KEY or
+	 * field does not exist.
 	 *          get the value associated with field; if result is empty then
 	 *          the key or the name field doesn't exist
-	 *  false -- Field does not exist or operation failed or key is not a hash table.
+	 * false -- Field does not exist or operation failed or key is not a hash
+	 * table.
 	 *           the field not exists, or error happened,
 	 *           or the key isn't a hash key
 	 */
@@ -214,12 +225,15 @@ public:
 	 * get all the fields and values in hash stored at key
 	 * @param key {const char*} key value.
 	 *  the hash key
-	 * @param result {std::map<string, string>&} Store field name-value query results.
+	 * @param result {std::map<string, string>&} Store field name-value query
+	 * results.
 	 *  store the result of all the fileds and values
 	 * @return {bool} Whether operation was successful. Meaning:
 	 *  if ok, show below:
-	 *  true -- Operation successful. Even when key does not exist, it returns success. Need to check if result changed.
-	 *          You can determine whether query results exist by checking result.size() changes.
+	 * true -- Operation successful. Even when key does not exist, it returns
+	 * success. Need to check if result changed.
+	 * You can determine whether query results exist by checking result.size()
+	 * changes.
 	 *          successful if the key is a hash key or the key not exists
 	 *  false -- Operation failed or key is not a hash table.
 	 *           error happened or the key isn't a hash key
@@ -239,10 +253,12 @@ public:
 	 * remove one or more fields from hash stored at key
 	 * @param key {const char*} key value.
 	 *  the hash key
-	 * @param first_name {const char*} First field name. The last field parameter must be NULL.
+	 * @param first_name {const char*} First field name. The last field parameter
+	 * must be NULL.
 	 *  the first field of the fields list, the last field must be NULL
 	 *  indicating the end of vary parameters
-	 * @return {int} Number of fields successfully deleted, -1 indicates error or key is not a hash table.
+	 * @return {int} Number of fields successfully deleted, -1 indicates error or
+	 * key is not a hash table.
 	 *  return the number of fields be removed successfully, or -1 when
 	 *  error happened or operating on a no hash key
 	 */
@@ -267,7 +283,8 @@ public:
 	int hdel_fields(const char* key, const char* first_name, ...);
 
 	/**
-	 * When a certain field in the hash table corresponding to key is an integer, perform addition/subtraction operation.
+	 * When a certain field in the hash table corresponding to key is an integer,
+	 * perform addition/subtraction operation.
 	 * inc(+n) or dec(-n) on a integer filed in hash stored at key
 	 * @param key {const char*} key value.
 	 *  the hash key
@@ -277,7 +294,8 @@ public:
 	 *  the integer value to be inc or dec on the field's value
 	 * @param result {long long int*} When not NULL, stores the result value.
 	 *  store the result if non-NULL
-	 * @return {bool} Whether operation was successful. Returns false when error or key is not a hash
+	 * @return {bool} Whether operation was successful. Returns false when error or
+	 * key is not a hash
 	 *  table or field is not an integer type.
 	 *  if successful: false when error, not a hash, or the field isn't
 	 *  integer type
@@ -286,7 +304,8 @@ public:
 		long long int inc, long long int* result = NULL);
 
 	/**
-	 * When a certain field in the hash table corresponding to key is a float, perform addition/subtraction operation.
+	 * When a certain field in the hash table corresponding to key is a float,
+	 * perform addition/subtraction operation.
 	 * inc(+n) or dec(-n) on a float filed in hash stored at key
 	 * @param key {const char*} key value.
 	 *  the hash key
@@ -296,7 +315,8 @@ public:
 	 *  the float value to be inc or dec on the field's value
 	 * @param result {double*} When not NULL, stores the result value.
 	 *  store the result if non-NULL
-	 * @return {bool} Whether operation was successful. Returns false when error or key is not a hash
+	 * @return {bool} Whether operation was successful. Returns false when error or
+	 * key is not a hash
 	 *  table or field is not a float type.
 	 *  if successful: false when error, not a hash, or the field isn't
 	 *  float type
@@ -309,9 +329,11 @@ public:
 	 * get all the fields in hash stored at key
 	 * @param key {const char*} key value.
 	 *  the hash key
-	 * @param names {std::vector<string>&} Store all field names in the hash table corresponding to key.
+	 * @param names {std::vector<string>&} Store all field names in the hash table
+	 * corresponding to key.
 	 *  store all the names of all fileds
-	 * @return {bool} Whether operation was successful. Returns false when error or key is not a hash table.
+	 * @return {bool} Whether operation was successful. Returns false when error or
+	 * key is not a hash table.
 	 *  return true on success, false if error happened or the
 	 *  key wasn't a hash key
 	 */
@@ -325,7 +347,8 @@ public:
 	 *  the hash key
 	 * @param name {const char*} key corresponding field name.
 	 *  the filed's name of the key
-	 * @return {bool} Whether operation was successful. Returns false when error or key is not a hash table
+	 * @return {bool} Whether operation was successful. Returns false when error or
+	 * key is not a hash table
 	 *  or field does not exist.
 	 *  return true on success, false if error happened or the
 	 *  key wasn't a hash key
@@ -388,13 +411,17 @@ public:
 	 *  the hash key
 	 * @param cursor {int} Cursor value, write 0 at the beginning.
 	 *  the cursor value, which is 0 at begin
-	 * @param out {std::map<acl::string>&} Store results. Internally uses append mode to add
-	 *  results to the result set. To prevent the overall result from being too large, users should
+	 * @param out {std::map<acl::string>&} Store results. Internally uses append
+	 * mode to add
+	 * results to the result set. To prevent the overall result from being too
+	 * large, users should
 	 *  clear the result set before calling this method.
 	 *  store scaning result in appending mode
-	 * @param pattern {const char*} Match pattern, glob style, effective only when non-empty.
+	 * @param pattern {const char*} Match pattern, glob style, effective only when
+	 * non-empty.
 	 *  match pattern, effective only on no-NULL
-	 * @param count {const size_t*} Maximum count of one scan process, effective only when non-empty pointer.
+	 * @param count {const size_t*} Maximum count of one scan process, effective
+	 * only when non-empty pointer.
 	 *  the max count of one scan process, effective only on no-NULL
 	 * @return {int} Next cursor position, as follows:
 	 *  return the next cursor position, as below:
@@ -402,7 +429,8 @@ public:
 	 *     scan finish
 	 *  -1: Error.
 	 *     some error happened
-	 *  >0: Next cursor position to scan. Regardless of how many results are obtained, you need to check out, as it may be empty.
+	 * >0: Next cursor position to scan. Regardless of how many results are
+	 * obtained, you need to check out, as it may be empty.
 	 *     the next cursor postion to scan
 	 */
 	int hscan(const char* key, int cursor, std::map<string, string>& out,

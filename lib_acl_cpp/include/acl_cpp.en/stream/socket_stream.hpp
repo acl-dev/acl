@@ -38,20 +38,28 @@ public:
 
 	/**
 	 * Connect to remote server and open connection.
-	 * @param addr {const char*} Server address. Can be UNIX domain socket address (UNIX platform),
-	 *  socket address like /tmp/test.sock. On Linux platform, abstract socket handle can also be used,
-	 *  abstract unix socket. To distinguish from ordinary file path unix socket address,
-	 *  ACL library stipulates that the first byte of the address is @, which means Linux abstract socket
-	 *  (abstract unix domain socket). Note: This function is only supported on Linux platform,
+	 * @param addr {const char*} Server address. Can be UNIX domain socket address
+	 * (UNIX platform),
+	 * socket address like /tmp/test.sock. On Linux platform, abstract socket
+	 * handle can also be used,
+	 * abstract unix socket. To distinguish from ordinary file path unix socket
+	 * address,
+	 * ACL library stipulates that the first byte of the address is @, which means
+	 * Linux abstract socket
+	 * (abstract unix domain socket). Note: This function is only supported on
+	 * Linux platform,
 	 *  example: @/tmp/test.sock;
 	 *  remote_addr[@local_ip]|[#interface], e.g.:
 	 *  1. www.sina.com|80@60.28.250.199, meaning bind local address to:
 	 *     60.28.250.199, connect to www.sina.com port 80;
 	 *  2.  211.150.111.12|80@192.168.1.1 means bind local address.
 	 *  3. 211.150.111.12|80#eth1 means bind to specified interface;
-	 *  4. Let OS automatically bind local IP address, can be written as: www.sina.com:80;
-	 * @param conn_timeout {int} Connection timeout time (unit value depends on use_ms)
-	 * @param rw_timeout {int} Read/write timeout time (unit value depends on use_ms)
+	 * 4. Let OS automatically bind local IP address, can be written as:
+	 * www.sina.com:80;
+	 * @param conn_timeout {int} Connection timeout time (unit value depends on
+	 * use_ms)
+	 * @param rw_timeout {int} Read/write timeout time (unit value depends on
+	 * use_ms)
 	 * @param unit {time_unit_t} Time unit for timeout time.
 	 * @return {bool} Whether opening was successful.
 	 */
@@ -60,8 +68,10 @@ public:
 
 	/**
 	 * Bind local UDP address and create UDP communication object.
-	 * @param addr {const char*} Local address, format: ip:port. This address can also be
-	 *  UNIX socket handle or Linux abstract socket handle (Linux abstract unix socket).
+	 * @param addr {const char*} Local address, format: ip:port. This address can
+	 * also be
+	 * UNIX socket handle or Linux abstract socket handle (Linux abstract unix
+	 * socket).
 	 * @param rw_timeout {int} Read/write timeout time (seconds)
 	 * @param flags {unsigned} Definition of this flag bit, see server_socket.hpp
 	 * @return {bool} Whether binding was successful.
@@ -81,14 +91,16 @@ public:
 		int rw_timeout = -1, unsigned flags = 0);
 
 	/**
-	 * After bind_multicast succeeds, you can call this method to set multicast TTL value.
+	 * After bind_multicast succeeds, you can call this method to set multicast TTL
+	 * value.
 	 * @param ttl {int} Value range is 1--255.
 	 * @return {bool} Whether setting was successful.
 	 */
 	bool multicast_set_ttl(int ttl);
 
 	/**
-	 * After bind_multicast succeeds, you can call this method to set multicast local IP address.
+	 * After bind_multicast succeeds, you can call this method to set multicast
+	 * local IP address.
 	 * @param iface {const char*}
 	 * @return {bool} Whether setting was successful.
 	 */
@@ -133,8 +145,10 @@ public:
 
 	/**
 	 * Unbind socket handle binding relationship, and return socket handle to user.
-	 * Ownership of socket handle is transferred to user. When user destroys and releases it, it will close this
-	 * socket handle. After user takes over this socket handle, it should not be closed
+	 * Ownership of socket handle is transferred to user. When user destroys and
+	 * releases it, it will close this
+	 * socket handle. After user takes over this socket handle, it should not be
+	 * closed
 	 * again. Note: See close/open documentation for details. Other calls (such as
 	 * read/write operations) are not affected.
 	 * @return {ACL_SOCKET} Returns ACL_SOCKET_INVALID to indicate socket handle
@@ -148,29 +162,35 @@ public:
 
 	/**
 	 * Get socket address family.
-	 * @return {int} Return values include: AF_INET, AF_INT6, AF_UNIX. Returns -1 on error.
+	 * @return {int} Return values include: AF_INET, AF_INT6, AF_UNIX. Returns -1
+	 * on error.
 	 */
 	int sock_type() const;
 
 	/**
 	 * Get remote connection address.
-	 * @param full {bool} Whether to return full address format (IP:PORT). If this parameter
+	 * @param full {bool} Whether to return full address format (IP:PORT). If this
+	 * parameter
 	 *  is false, only IP is returned. Otherwise, IP:PORT is returned.
-	 * @return {const char*} Remote connection address. If return value == '\0', it means
+	 * @return {const char*} Remote connection address. If return value == '\0', it
+	 * means
 	 *  unable to get remote connection address.
 	 */
 	const char* get_peer(bool full = false) const;
 
 	/**
 	 * Get remote connection IP address.
-	 * @return {const char*} Remote connection address. If return value == '\0', it means
+	 * @return {const char*} Remote connection address. If return value == '\0', it
+	 * means
 	 *  unable to get remote connection address.
 	 */
 	const char* get_peer_ip() const;
 
 	/**
-	 * Set remote connection object address. For TCP transmission mode, there is no need to call this function
-	 * to set remote object address. For UDP transmission mode, you need to call this function to set remote address before
+	 * Set remote connection object address. For TCP transmission mode, there is no
+	 * need to call this function
+	 * to set remote object address. For UDP transmission mode, you need to call
+	 * this function to set remote address before
 	 * you can read/write to remote.
 	 * @param addr {const char*} Remote connection object address, format: ip:port
 	 * @return {bool} Returns false when connection is not opened.
@@ -179,16 +199,19 @@ public:
 
 	/**
 	 * Get local address of connection.
-	 * @param full {bool} Whether to return full address format (IP:PORT). If this parameter
+	 * @param full {bool} Whether to return full address format (IP:PORT). If this
+	 * parameter
 	 *  is false, only IP is returned. Otherwise, IP:PORT is returned.
-	 * @return {const char*} Local address of connection. If return value == "", it means
+	 * @return {const char*} Local address of connection. If return value == "", it
+	 * means
 	 *  unable to get local address.
 	 */
 	const char* get_local(bool full = false) const;
 
 	/**
 	 * Get local IP address of connection.
-	 * @return {const char*} Local address of connection. If return value == "", it means
+	 * @return {const char*} Local address of connection. If return value == "", it
+	 * means
 	 *  unable to get local address.
 	 */
 	const char* get_local_ip() const;
@@ -201,10 +224,12 @@ public:
 	bool set_local(const char* addr);
 
 	/**
-	 * Detect socket connection status (internally uses ping-like method for detection).
+	 * Detect socket connection status (internally uses ping-like method for
+	 * detection).
 	 * @param tc1 {double*} When not empty, records first stage timeout (ms).
 	 * @param tc2 {double*} When not empty, records second stage timeout (ms).
-	 * @return {bool} This function returns false when connection is not opened or already closed. Otherwise
+	 * @return {bool} This function returns false when connection is not opened or
+	 * already closed. Otherwise
 	 *  returns true.
 	 */
 	bool alive(double* tc1 = NULL, double* tc2 = NULL) const;
@@ -219,7 +244,8 @@ public:
 	/**
 	 * Set TCP socket SO_LINGER option.
 	 * @param on {bool} Whether to enable SO_LINGER option.
-	 * @param linger {int} When SO_LINGER is enabled, timeout to cancel timed_wait time, unit is seconds.
+	 * @param linger {int} When SO_LINGER is enabled, timeout to cancel timed_wait
+	 * time, unit is seconds.
 	 * @return {socket_stream&}
 	 */
 	socket_stream& set_tcp_solinger(bool on, int linger);
@@ -241,7 +267,8 @@ public:
 	/**
 	 * Set TCP socket non-blocking state.
 	 * @param on {bool} Whether to set as non-blocking state. When true,
-	 *  socket handle will be set to non-blocking state, otherwise to blocking state.
+	 * socket handle will be set to non-blocking state, otherwise to blocking
+	 * state.
 	 * @return {socket_stream&}
 	 */
 	socket_stream& set_tcp_non_blocking(bool on);
@@ -254,8 +281,10 @@ public:
 
 	/**
 	 * Get TCP socket linger value.
-	 * @return {int} Returns -1 to indicate SO_LINGER option is not set. Otherwise returns >= 0
-	 *  to indicate SO_LINGER option is set and this value represents the timeout (seconds) for TCP connection
+	 * @return {int} Returns -1 to indicate SO_LINGER option is not set. Otherwise
+	 * returns >= 0
+	 * to indicate SO_LINGER option is set and this value represents the timeout
+	 * (seconds) for TCP connection
 	 *  to maintain TIME_WAIT state after socket is closed.
 	 */
 	int get_tcp_solinger() const;

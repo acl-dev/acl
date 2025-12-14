@@ -17,7 +17,8 @@ typedef enum {
 } aio_handle_type;
 
 /**
- * Non-blocking IO event engine class. This class encapsulates system's select/poll/epoll/kqueue/devpoll/iocp,
+ * Non-blocking IO event engine class. This class encapsulates system's
+ * select/poll/epoll/kqueue/devpoll/iocp,
  */
 
 class aio_timer_callback;
@@ -27,15 +28,19 @@ class aio_timer_delay_free;
 class ACL_CPP_API aio_handle : private noncopyable {
 public:
 	/**
-	 * Constructor, automatically creates IO event engine, and automatically releases in destructor
+	 * Constructor, automatically creates IO event engine, and automatically
+	 * releases in destructor
 	 * @param engine_type {aio_handle_type} Engine type to use
 	 *  ENGINE_SELECT: select method, supports win32/unix platforms
 	 *  ENGINE_POLL: poll method, supports unix platforms
-	 *  ENGINE_KERNEL: Automatically sets based on efficient kernel engine supported by each system platform
+	 * ENGINE_KERNEL: Automatically sets based on efficient kernel engine supported
+	 * by each system platform
 	 *  ENGINE_WINMSG: win32 GUI message method, supports win32 platform
 	 * @param nMsg {unsigned int} If engine_type is ENGINE_WINMSG, when this value
-	 *  is greater than 0, this asynchronous handle is bound to this message, otherwise bound to default message.
-	 *  When engine_type is not ENGINE_WINMSG, this value has no effect on other asynchronous handles
+	 * is greater than 0, this asynchronous handle is bound to this message,
+	 * otherwise bound to default message.
+	 * When engine_type is not ENGINE_WINMSG, this value has no effect on other
+	 * asynchronous handles
 	 *  
 	 */
 	aio_handle(aio_handle_type engine_type = ENGINE_SELECT,
@@ -51,8 +56,10 @@ public:
 	virtual ~aio_handle();
 
 	/**
-	 * For asynchronous read streams, set whether to continuously read. This configuration item will be inherited by all asynchronous read streams
-	 * based on this asynchronous engine handle. Generally aio_handle class objects are continuously reading by default
+	 * For asynchronous read streams, set whether to continuously read. This
+	 * configuration item will be inherited by all asynchronous read streams
+	 * based on this asynchronous engine handle. Generally aio_handle class objects
+	 * are continuously reading by default
 	 * @param onoff {bool} Set whether to continuously read
 	 */
 	void keep_read(bool onoff);
@@ -102,9 +109,12 @@ public:
 #endif
 
 	/**
-	 * When timer is in locked state, users cannot release this timer causing memory leak.
-	 * Through this function, timer in locked state can be deferred released by event
-	 * engine when in unlocked state (calls aio_delay_free::destroy()), thereby avoiding
+	 * When timer is in locked state, users cannot release this timer causing
+	 * memory leak.
+	 * Through this function, timer in locked state can be deferred released by
+	 * event
+	 * engine when in unlocked state (calls aio_delay_free::destroy()), thereby
+	 * avoiding
 	 * memory leak problems
 	 * @param callback {aio_delay_free*}
 	 */
@@ -129,7 +139,8 @@ public:
 	int length() const;
 
 	/**
-	 * Check status of all asynchronous streams and trigger processing of ready asynchronous streams
+	 * Check status of all asynchronous streams and trigger processing of ready
+	 * asynchronous streams
 	 * @return {bool} Whether asynchronous engine should be stopped
 	 */
 	bool check();
@@ -152,7 +163,8 @@ public:
 
 	/**
 	 * Set DNS server address list, format: ip1:port1;ip2:port2...
-	 * @param addrs {const char*} DNS server address list, e.g.: 8.8.8.8:53;1.1.1.1:53
+	 * @param addrs {const char*} DNS server address list, e.g.:
+	 * 8.8.8.8:53;1.1.1.1:53
 	 * @param timeout {int} DNS query timeout (seconds)
 	 *  Note: set_dns and dns_add perform same function
 	 */
@@ -191,18 +203,21 @@ public:
 public:
 	/**
 	 * Set second-level part of asynchronous engine loop's wait time
-	 * @param n {int} Set second-level wait time when using select/poll/epoll/kqueue/devpoll
+	 * @param n {int} Set second-level wait time when using
+	 * select/poll/epoll/kqueue/devpoll
 	 */
 	void set_delay_sec(int n);
 
 	/**
 	 * Set microsecond-level part of asynchronous engine loop's wait time
-	 * @param n {int} Set microsecond-level wait time when using select/poll/epoll/kqueue/devpoll
+	 * @param n {int} Set microsecond-level wait time when using
+	 * select/poll/epoll/kqueue/devpoll
 	 */
 	void set_delay_usec(int n);
 
 	/**
-	 * Set time interval for periodically checking all descriptor status during event loop process.
+	 * Set time interval for periodically checking all descriptor status during
+	 * event loop process.
 	 * Internal default value is 100 ms
 	 */
 	void set_check_inter(int n);

@@ -8,10 +8,14 @@ namespace acl
 {
 
 /**
- * memcache client connection pool class. This class's parent class is connect_pool. This class only needs to implement virtual function
- * create_connect in parent class to have connection pool parent class connect_pool's functionality. Additionally, connection objects created by this class
+ * memcache client connection pool class. This class's parent class is
+ * connect_pool. This class only needs to implement virtual function
+ * create_connect in parent class to have connection pool parent class
+ * connect_pool's functionality. Additionally, connection objects created by
+ * this class
  * are memcache objects, so when calling connect_pool::peek, returned
- * is http_request class. Callers need to cast peek returned class object to memcache
+ * is http_request class. Callers need to cast peek returned class object to
+ * memcache
  * class object, then can use all functions of memcache class. memcache class is
  * a subclass of connect_client.
  */
@@ -21,8 +25,10 @@ public:
 	/**
 	 * Constructor.
 	 * @param addr {const char*} Server address, format: ip:port.
-	 * @param count {size_t} Connection pool's maximum connection count limit. When this value is 0, there is no limit.
-	 * @param idx {size_t} This connection pool object's subscript position in collection (starting from 0).
+	 * @param count {size_t} Connection pool's maximum connection count limit. When
+	 * this value is 0, there is no limit.
+	 * @param idx {size_t} This connection pool object's subscript position in
+	 * collection (starting from 0).
 	 */
 	memcache_pool(const char* addr, size_t count, size_t idx = 0);
 	~memcache_pool();

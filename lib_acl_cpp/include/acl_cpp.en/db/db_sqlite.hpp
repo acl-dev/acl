@@ -35,8 +35,9 @@ public:
 	const char* version(void) const;
 
 	/**
-	 * After the database is opened, configure the database's pragma options through this function.
-	 * The pragma options used need to strictly follow sqlite's pragma option requirements.
+	 * After the database is opened, configure the database's pragma options
+	 * through this function. The pragma options used need to strictly follow
+	 * sqlite's pragma option requirements.
 	 * @param pragma {const char*} Pragma option content, format is:
 	 *  PRAGMA xxx=xxx
 	 *  e.g.: PRAGMA synchronous = NORMAL
@@ -47,17 +48,18 @@ public:
 	/**
 	 * After the database is opened, call this function to query pragma options.
 	 * @param pragma {const char*} Pragma option content, format is:
-	 *  PRAGMA xxx
-	 *  e.g.: PRAGMA synchronous
+	 *  PRAGMA xxx, e.g.: PRAGMA synchronous
 	 * @param out {string&} Non-empty buffer to store the result value.
-	 * @return {const char*} Returns NULL to indicate the option does not exist or database is not opened.
+	 * @return {const char*} Returns NULL to indicate the option does not exist or
+	 * database is not opened.
 	 */
 	const char* get_conf(const char* pragma, string& out);
 
 	/**
-	 * After the database is opened, call this function to display database pragma options.
-	 * @param pragma {const char*} Specify a pragma option. If this parameter is empty,
-	 *  display all pragma options, format: PRAGMA xxx, e.g.: PRAGMA synchronous
+	 * After the database is opened, call this function to display database pragma
+	 * options.
+	 * @param pragma {const char*} Specify a pragma option. If this parameter is
+	 * empty, display all pragma options, format: PRAGMA xxx, e.g.: PRAGMA synchronous
 	 */
 	void show_conf(const char* pragma = NULL);
 
@@ -68,7 +70,8 @@ public:
 	int affect_total_count(void) const;
 
 	/**
-	 * Directly get sqlite's native connection handle. Returns NULL to indicate sqlite has not been opened.
+	 * Directly get sqlite's native connection handle. Returns NULL to indicate
+	 * sqlite has not been opened.
 	 * When this handle is closed, internally automatically closes sqlite.
 	 * @return {sqlite3*}
 	 */
@@ -84,7 +87,8 @@ public:
 	bool prepare(sqlite_cursor& cursor);
 
 	/**
-	 * Execute the next step. If it is a query process, bind the query result to the cursor parameter.
+	 * Execute the next step. If it is a query process, bind the query result to
+	 * the cursor parameter.
 	 * @param cursor {sqlite_cursor&}
 	 * @return {bool}
 	 */
@@ -100,7 +104,8 @@ public:
 	 * @param nByte {int} Byte length of zSql string.
 	 * @param ppStmt {sqlite3_stmt**} OUT: prepared statement handle.
 	 * @param pzTail {const char**} OUT: Pointer to unused part of zSql.
-	 * @return {int} Returns SQLITE_OK on success, otherwise returns corresponding error code.
+	 * @return {int} Returns SQLITE_OK on success, otherwise returns corresponding
+	 * error code.
 	 */
 	int sqlite3_prepare_v2(const char *zSql,
 		int nByte, sqlite3_stmt **ppStmt, const char **pzTail);
@@ -134,7 +139,8 @@ public:
 	 * @param value {const void*} Parameter value in sql to bind.
 	 * @param n {int} Parameter byte length.
 	 * @param destory {void(*)(void*)} Parameter destruction callback function.
-	 * @return {int} Returns SQLITE_OK on success, otherwise returns corresponding error code.
+	 * @return {int} Returns SQLITE_OK on success, otherwise returns corresponding
+	 * error code.
 	 */
 	int sqlite3_bind_blob(sqlite3_stmt *stmt, int iCol,
 		const void *value, int n, void(*destory)(void*));
@@ -144,7 +150,8 @@ public:
 	 * @param stmt {sqlite3*} prepared statement
 	 * @param iCol {int} Parameter index in sql to bind.
 	 * @param value {int} Parameter value in sql to bind.
-	 * @return {int} Returns SQLITE_OK on success, otherwise returns corresponding error code.
+	 * @return {int} Returns SQLITE_OK on success, otherwise returns corresponding
+	 * error code.
 	 */
 	int sqlite3_bind_int(sqlite3_stmt *stmt, int iCol, int value);
 
@@ -153,7 +160,8 @@ public:
 	 * @param stmt {sqlite3*} prepared statement
 	 * @param iCol {int} Parameter index in sql to bind.
 	 * @param value {long long int} Parameter value in sql to bind.
-	 * @return {int} Returns SQLITE_OK on success, otherwise returns corresponding error code.
+	 * @return {int} Returns SQLITE_OK on success, otherwise returns corresponding
+	 * error code.
 	 */
 	int sqlite3_bind_int64(sqlite3_stmt* stmt, int iCol, long long int value);
 
@@ -164,7 +172,8 @@ public:
 	 * @param value {const void*} Parameter value in sql to bind.
 	 * @param n {int} Parameter byte length.
 	 * @param destory {void(*)(void*)} Parameter destruction callback function.
-	 * @return {int} Returns SQLITE_OK on success, otherwise returns corresponding error code.
+	 * @return {int} Returns SQLITE_OK on success, otherwise returns corresponding
+	 * error code.
 	 */
 	int sqlite3_bind_text(sqlite3_stmt *stmt, int iCol,
 		const char *value, int n, void(*destory)(void*));

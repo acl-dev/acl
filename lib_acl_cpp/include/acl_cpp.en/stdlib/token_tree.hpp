@@ -60,7 +60,8 @@ private:
 };
 
 /**
- * 256-way tree maximum matching search algorithm. This algorithm is universal and has very high performance (higher than hash performance).
+ * 256-way tree maximum matching search algorithm. This algorithm is universal
+ * and has very high performance (higher than hash performance).
  * Performs matching search by mapping strings to 256-way tree
  */
 class ACL_CPP_API token_tree : public noncopyable {
@@ -72,7 +73,8 @@ public:
 	 * Add a new item
 	 * @param key {const char*} Key value
 	 * @param ctx {void*} Object bound to this key, can be empty
-	 * @return {bool} Whether add was successful. Returns false indicates same key already exists
+	 * @return {bool} Whether add was successful. Returns false indicates same key
+	 * already exists
 	 */
 	bool insert(const char* key, void* ctx = NULL);
 
@@ -91,18 +93,27 @@ public:
 	const token_node* find(const char* key);
 
 	/**
-	 * Search matching tree in maximum string matching mode to find node matching given text string, and
+	 * Search matching tree in maximum string matching mode to find node matching
+	 * given text string, and
 	 * move text string pointer position
-	 * @param text {const char**} Text string to match and search. During matching process, this
+	 * @param text {const char**} Text string to match and search. During matching
+	 * process, this
 	 *  address pointer will be moved to next position
-	 * @param delimiters {const char*} When not NULL, specifies delimiter string, i.e., during
-	 *  search process, as long as encountered character is in this delimiter string, returns result of this search
-	 * @param delimiters_tab {const char*} When not NULL, specifies delimiter character array,
-	 *  i.e., during search process, as long as encountered character is in this delimiter character array, returns result of this search. This array
-	 *  must be created by create_delimiters_tab and released by free_delimiters_tab
-	 * @return {token_node*} Returns NULL indicates this search did not find matching item. Check
-	 *  whether *text is '\0' to determine if target text string matching is complete
-	 *  Note: When delimiters is not empty, delimiters is used as delimiter first, otherwise check
+	 * @param delimiters {const char*} When not NULL, specifies delimiter string,
+	 * i.e., during
+	 * search process, as long as encountered character is in this delimiter
+	 * string, returns result of this search
+	 * @param delimiters_tab {const char*} When not NULL, specifies delimiter
+	 * character array,
+	 * i.e., during search process, as long as encountered character is in this
+	 * delimiter character array, returns result of this search. This array
+	 * must be created by create_delimiters_tab and released by free_delimiters_tab
+	 * @return {token_node*} Returns NULL indicates this search did not find
+	 * matching item. Check
+	 * whether *text is '\0' to determine if target text string matching is
+	 * complete
+	 * Note: When delimiters is not empty, delimiters is used as delimiter first,
+	 * otherwise check
 	 *  whether delimiters_tab is not empty, if not empty, use it as delimiter
 	 */
 	const token_node* search(const char** text, const char* delimiters = NULL,
@@ -122,13 +133,15 @@ public:
 	static void free_delimiters_tab(char* delimiters_tab);
 
 	/**
-	 * When traversing 256 matching tree, need to call this method first to get first node object
+	 * When traversing 256 matching tree, need to call this method first to get
+	 * first node object
 	 * @return {token_node*}
 	 */
 	const token_node* first_node();
 
 	/**
-	 * When traversing 256 matching tree, need to call this method to get next node object
+	 * When traversing 256 matching tree, need to call this method to get next node
+	 * object
 	 * @return {token_node*}
 	 */
 	const token_node* next_node();

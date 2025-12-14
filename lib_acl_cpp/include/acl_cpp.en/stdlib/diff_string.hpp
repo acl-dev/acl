@@ -46,7 +46,8 @@ private:
 	const char* val_;
 	long long range_;
 
-	// Destructor declared as private, requiring dynamic creation of objects of this class
+	// Destructor declared as private, requiring dynamic creation of objects of
+	// this class
 	~diff_string();
 };
 

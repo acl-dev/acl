@@ -32,7 +32,8 @@ public:
 	/**
 	 * Delete a timer task with the same timestamp
 	 * @pararm o {T*}
-	 * @return {int} Return value >= 0 indicates remaining number of timer tasks with the same timestamp,
+	 * @return {int} Return value >= 0 indicates remaining number of timer tasks
+	 * with the same timestamp,
 	 *  returns -1 indicates this timer task does not exist
 	 */
 	int del(T* o) {
@@ -61,13 +62,17 @@ private:
 };
 
 /**
- * Timer task trigger manager. Add timer tasks through this class, and this class will trigger expired tasks.
- * Each timer task object T needs to implement the following methods so that it can be triggered by this trigger:
+ * Timer task trigger manager. Add timer tasks through this class, and this
+ * class will trigger expired tasks.
+ * Each timer task object T needs to implement the following methods so that it
+ * can be triggered by this trigger:
  *
- * bool on_trigger();		// Callback method when timer expires. Return value indicates
+ * bool on_trigger();              // Callback method when timer expires. Return
+ * value indicates
  * 					// whether this timer task needs to be triggered again
  * int get_ttl() const;		// Time interval (milliseconds) when timer task arrives
- * void set_key(long long key);		// Trigger sets key associated with this timer task
+ * void set_key(long long key);            // Trigger sets key associated with
+ * this timer task
  * long long get_key() const;	// Get key set by set_key
  *
  * Example of a T instance class declaration:
@@ -130,9 +135,11 @@ public:
 	}
 
 	/**
-	 * Delete a task object. Internally calls o->get_key() method to get the key of this task object
+	 * Delete a task object. Internally calls o->get_key() method to get the key of
+	 * this task object
 	 * @pararm o {T*} Specified task object to be deleted
-	 * @return {int} >= 0 indicates remaining task objects, -1 indicates this task object does not exist
+	 * @return {int} >= 0 indicates remaining task objects, -1 indicates this task
+	 * object does not exist
 	 */
 	int del(T* o) {
 		long long key     = o->get_key();
@@ -150,7 +157,8 @@ public:
 
 	/**
 	 * Trigger all expired timer tasks
-	 * @return {long long} Returns timestamp of the next timer task to be triggered. Returns -1
+	 * @return {long long} Returns timestamp of the next timer task to be
+	 * triggered. Returns -1
 	 *  indicates there are no timer tasks
 	 */
 	long long trigger() {
@@ -214,7 +222,8 @@ private:
 };
 
 /**
- * Timer management thread. This thread gets timer tasks from mbox, adds them to timer task trigger, then
+ * Timer management thread. This thread gets timer tasks from mbox, adds them to
+ * timer task trigger, then
  * periodically extracts expired tasks from trigger and triggers them
  */
 template <typename T>
@@ -237,7 +246,8 @@ public:
 	}
 
 	/**
-	 * Add timer task object to be deleted to temporary queue, then delete it from timer
+	 * Add timer task object to be deleted to temporary queue, then delete it from
+	 * timer
 	 * @pararm o {T*}
 	 */
 	void del(T* o) {

@@ -7,8 +7,10 @@
 namespace acl {
 
 /**
- * Bidirectional input/output buffered pipe stream. This stream can not only receive input data, but also output
- * input data. Pure virtual base class, subclasses need to implement three interface functions
+ * Bidirectional input/output buffered pipe stream. This stream can not only
+ * receive input data, but also output
+ * input data. Pure virtual base class, subclasses need to implement three
+ * interface functions
  */
 class ACL_CPP_API pipe_stream : public noncopyable {
 public:
@@ -81,8 +83,10 @@ private:
 };
 
 /**
- * Pipe stream manager. This class manages all pipe streams, passes data sequentially to all pipe streams'
- * input interfaces, and gets data from all pipe streams' output interfaces, then passes data to
+ * Pipe stream manager. This class manages all pipe streams, passes data
+ * sequentially to all pipe streams'
+ * input interfaces, and gets data from all pipe streams' output interfaces,
+ * then passes data to
  * next pipe stream's input interface, and so on, until the last pipe stream
  */
 class ACL_CPP_API pipe_manager : public noncopyable {
@@ -93,32 +97,39 @@ public:
 	/**
 	 * Register new pipe stream processor in append mode
 	 * @param stream {pipe_stream*} Pipe stream processor object
-	 * @return {bool} Returns false if this pipe stream processor object already exists
+	 * @return {bool} Returns false if this pipe stream processor object already
+	 * exists
 	 */
 	bool push_back(pipe_stream* stream);
 
 	/**
 	 * Register new pipe stream processor in prepend mode
 	 * @param stream {pipe_stream*} Pipe stream processor object
-	 * @return {bool} Returns false if this pipe stream processor object already exists
+	 * @return {bool} Returns false if this pipe stream processor object already
+	 * exists
 	 */
 	bool push_front(pipe_stream* stream);
 
 	/**
-	 * Application adds new data to pipe stream manager. This manager passes data sequentially to all registered pipe stream
-	 * processors, and receives processing results from registered pipe stream processors, passing them sequentially to the next
+	 * Application adds new data to pipe stream manager. This manager passes data
+	 * sequentially to all registered pipe stream
+	 * processors, and receives processing results from registered pipe stream
+	 * processors, passing them sequentially to the next
 	 * @param src {const char*} Address of data to be processed
 	 * @param len {size_t} src data length
-	 * @param out {pipe_stream*} If not empty, this pipe processor will be the last pipe processor that only receives
+	 * @param out {pipe_stream*} If not empty, this pipe processor will be the last
+	 * pipe processor that only receives
 	 *  input without output
 	 * @return {bool} Whether an error occurred
 	 */
 	bool update(const char* src, size_t len, pipe_stream* out = NULL);
 
 	/**
-	 * Must call this function once at the end, so that data in some pipes' buffers can be flushed
+	 * Must call this function once at the end, so that data in some pipes' buffers
+	 * can be flushed
 	 * to the final pipe at once
-	 * @param out {pipe_stream*} If not empty, this pipe processor will be the last pipe processor that only receives
+	 * @param out {pipe_stream*} If not empty, this pipe processor will be the last
+	 * pipe processor that only receives
 	 *  input without output
 	 * @return {bool} Whether an error occurred
 	 */

@@ -8,8 +8,7 @@
 
 namespace acl {
 
-typedef enum
-{
+typedef enum {
 	DB_OK,
 	DB_ERR_OPEN,
 	DB_ERR_EXEC_SQL,
@@ -19,8 +18,7 @@ typedef enum
 
 class db_rows;
 
-class ACL_CPP_API db_query
-{
+class ACL_CPP_API db_query {
 public:
 	db_query(void) {}
 	virtual ~db_query(void) {}
@@ -29,14 +27,14 @@ public:
 	virtual void on_ok(const db_rows* rows, int affected) = 0;
 
 	/**
-	 * When task processing is complete or error occurs, internal processing will automatically call destroy interface.
-	 * Subclasses can perform some release process in this interface, especially when this object is dynamically created,
-	 * subclasses should delete this in this function to delete themselves, because this function will definitely
-	 * be called, so subclasses should not perform destruction operations elsewhere
+	 * When task processing is complete or error occurs, internal processing will
+	 * automatically call destroy interface. Subclasses can perform some release
+	 * process in this interface, especially when this object is dynamically created,
+	 * subclasses should delete this in this function to delete themselves, because
+	 * this function will definitely be called, so subclasses should not perform
+	 * destruction operations elsewhere.
 	 */
 	virtual void destroy(void) {}
-protected:
-private:
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -45,19 +43,19 @@ class db_handle;
 class aio_socket_stream;
 
 /**
- * Database service class. This class is an asynchronous database operation management class. The thread where objects of this class are located must be
+ * Database service class. This class is an asynchronous database operation
+ * management class. The thread where objects of this class are located must be
  * a non-blocking thread process
  */
-class ACL_CPP_API db_service : public ipc_service
-{
+class ACL_CPP_API db_service : public ipc_service {
 public:
 	/**
 	 * Constructor when using sqlite database
 	 * @param dblimit {size_t} Connection pool count limit for database
 	 * @param nthread {int} Maximum thread count for child thread pool
-	 * @param win32_gui {bool} Whether it is window class message. If yes, then internally
-	 *  communication mode is automatically set to _WIN32 message based, otherwise still uses common socket
-	 *  communication method
+	 * @param win32_gui {bool} Whether it is window class message. If yes, then
+	 * internally communication mode is automatically set to _WIN32 message based,
+	 * otherwise still uses common socket communication method
 	 */
 	db_service(size_t dblimit = 100, int nthread = 2, bool win32_gui = false);
 	virtual ~db_service(void);
@@ -81,6 +79,7 @@ public:
 	 * @param db {db_handle*} Database connection object
 	 */
 	void push_back(db_handle* db);
+
 protected:
 	/**
 	 * Subclasses need to implement this function to create database objects
@@ -89,14 +88,16 @@ protected:
 	virtual db_handle* db_create() = 0;
 
 	/**
-	 * Base class virtual function. Called by base class when new connection arrives
+	 * Base class virtual function. Called by base class when new connection
+	 * arrives
 	 * @param client {aio_socket_stream*} Newly received client connection
 	 */
 	virtual void on_accept(aio_socket_stream* client);
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * Base class virtual function. Callback function when win32 message from child thread is received
+	 * Base class virtual function. Callback function when win32 message from child
+	 * thread is received
 	 * @param hWnd {HWND} Window handle
 	 * @param msg {UINT} User-defined message number
 	 * @param wParam {WPARAM} Parameter

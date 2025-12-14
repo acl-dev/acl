@@ -24,21 +24,24 @@ public:
 	/**
 	 * Map the given value in the bit set
 	 * @param n {size_t}
-	 * @return {bool} Returns true indicates add was successful, otherwise indicates value is out of bounds or already exists
+	 * @return {bool} Returns true indicates add was successful, otherwise
+	 * indicates value is out of bounds or already exists
 	 */
 	bool bit_set(size_t n);
 
 	/**
 	 * Determine whether the given data has been set in the bit mapping
 	 * @param n {size_t}
-	 * @return {bool} Determine whether the specified value exists in the bit mapping set
+	 * @return {bool} Determine whether the specified value exists in the bit
+	 * mapping set
 	 */
 	bool bit_isset(size_t n) const;
 
 	/**
 	 * Remove the specified value from the bit set
 	 * @param n {size_t}
-	 * @return {bool} Returns false indicates value is out of bounds or does not exist in the bit set
+	 * @return {bool} Returns false indicates value is out of bounds or does not
+	 * exist in the bit set
 	 */
 	bool bit_unset(size_t n);
 
@@ -46,7 +49,8 @@ public:
 	 * Copy bitmap information to buf
 	 * @param buf {void*} Store copy result
 	 * @param len {size_t} Maximum length of buf
-	 * @return {size_t} Returns successfully copied memory length. Returns 0 indicates buf is too small
+	 * @return {size_t} Returns successfully copied memory length. Returns 0
+	 * indicates buf is too small
 	 */
 	size_t tobuf(void* buf, size_t len) const;
 
@@ -64,7 +68,8 @@ public:
 	void reset(void);
 
 	/**
-	 * Get the number of bits that can be stored in the current bit mapping storage space
+	 * Get the number of bits that can be stored in the current bit mapping storage
+	 * space
 	 * @return {size_t}
 	 */
 	size_t size() const;

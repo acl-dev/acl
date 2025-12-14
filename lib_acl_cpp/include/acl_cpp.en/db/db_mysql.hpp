@@ -15,16 +15,20 @@ class ACL_CPP_API db_mysql : public db_handle {
 public:
 	/**
 	 * Constructor method one
-	 * @param dbaddr {const char*} Database listening address, can be TCP socket or domain socket on UNIX
+	 * @param dbaddr {const char*} Database listening address, can be TCP socket or
+	 * domain socket on UNIX
 	 *  platform, format: 127.0.0.1:3306, or /tmp/mysql.sock
 	 * @param dbname {const char*} Database name, non-NULL
 	 * @param dbuser {const char*} Username when connecting to database
 	 * @param dbpass {const char*} User password when connecting to database
 	 * @param dbflags {unsigned long} Flag bits when connecting to MYSQL
-	 * @param auto_commit {bool} Whether to auto commit transaction when modifying database
+	 * @param auto_commit {bool} Whether to auto commit transaction when modifying
+	 * database
 	 * @param conn_timeout {int} Timeout for connecting to database (seconds)
-	 * @param rw_timeout {int} Timeout when performing database operations (seconds)
-	 * @param charset {const char*} Local character set when connecting to database (gbk, utf8, ...)
+	 * @param rw_timeout {int} Timeout when performing database operations
+	 * (seconds)
+	 * @param charset {const char*} Local character set when connecting to database
+	 * (gbk, utf8, ...)
 	 */
 	db_mysql(const char* dbaddr, const char* dbname,
 		const char* dbuser, const char* dbpass,
@@ -34,7 +38,8 @@ public:
 
 	/**
 	 * Constructor method two: Construct using parameter configuration class object
-	 * @param conf {const mysql_conf&} MySQL database connection configuration class object
+	 * @param conf {const mysql_conf&} MySQL database connection configuration
+	 * class object
 	 */
 	db_mysql(const mysql_conf& conf);
 	~db_mysql(void);
@@ -52,7 +57,8 @@ public:
 	const char* mysql_client_info(void) const;
 
 	/**
-	 * Directly get MySQL connection handle. If returns NULL, it indicates MySQL has not been opened yet
+	 * Directly get MySQL connection handle. If returns NULL, it indicates MySQL
+	 * has not been opened yet
 	 * or MySQL connection was automatically closed internally when error occurred
 	 * @return {void*} Type is the same as MYSQL*
 	 */
@@ -61,10 +67,11 @@ public:
 	}
 
 	/**
-	 * When dynamically loading libmysqlclient.so / libmysqlclient.dll, can call this
-	 * static function to explicitly dynamically load MySQL client library. If loading fails, internally will automatically generate
-	 * assertion to avoid runtime errors. Can also not call this function, letting db_mysql class objects internally
-	 * implicitly load MySQL dynamic library when used
+	 * When dynamically loading libmysqlclient.so / libmysqlclient.dll, this
+	 * static function can be called to explicitly dynamically load MySQL client
+	 * library. If loading fails, internally will automatically generate assertion
+	 * to avoid runtime errors. Can also not call this function, letting db_mysql
+	 * class objects internally implicitly load MySQL dynamic library when used
 	 * @return {bool} Whether loading MySQL dynamic library was successful
 	 */
 	static bool load(void);
@@ -125,8 +132,9 @@ public:
 
 	/**
 	 * @override
-	 * Virtual function of base class db_handle, used to indicate start of transaction. Note that to use transaction mode,
-	 * need to pass parameter auto_commit as false in db_mysql constructor
+	 * Virtual function of base class db_handle, used to indicate start of
+	 * transaction. Note that to use transaction mode, need to pass parameter
+	 * auto_commit as false in db_mysql constructor
 	 */
 	bool begin_transaction(void);
 

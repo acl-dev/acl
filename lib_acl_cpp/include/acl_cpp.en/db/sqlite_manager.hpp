@@ -6,8 +6,7 @@
 
 namespace acl {
 
-class ACL_CPP_API sqlite_manager : public connect_manager
-{
+class ACL_CPP_API sqlite_manager : public connect_manager {
 public:
 	/**
 	 * Constructor.
@@ -27,8 +26,10 @@ protected:
 	/**
 	 * Implementation of connect_manager virtual function.
 	 * @param addr {const char*} Database connection address, format: ip:port.
-	 * @param count {size_t} Connection pool size limit. When value is 0, there is no limit.
-	 * @param idx {size_t} This connection pool object's subscript position in collection (starting from 0).
+	 * @param count {size_t} Connection pool size limit. When value is 0, there is
+	 * no limit.
+	 * @param idx {size_t} This connection pool object's subscript position in
+	 * collection (starting from 0).
 	 * @return {connect_pool*} Returns newly created connection pool object.
 	 */
 	connect_pool* create_pool(const char* addr, size_t count, size_t idx);

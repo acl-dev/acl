@@ -8,7 +8,8 @@ class aio_socket_stream;
 class aio_listen_stream;
 
 /**
- * When asynchronous listening stream receives new client stream, calls callback function in this callback class. This class is pure virtual class,
+ * When asynchronous listening stream receives new client stream, calls callback
+ * function in this callback class. This class is pure virtual class,
  * requires subclasses to implement accept_callback callback process
  */
 class ACL_CPP_API aio_accept_callback : public aio_callback {
@@ -20,17 +21,23 @@ public:
 	 * Callback function when new client stream is received
 	 * @param client {aio_socket_stream*} Client asynchronous connection stream.
 	 *  Can perform read/write operations on this stream
-	 * @return {bool} If want to close this asynchronous listening stream, can return false.
+	 * @return {bool} If want to close this asynchronous listening stream, can
+	 * return false.
 	 *  Generally should not return false
 	 */
 	virtual bool accept_callback(aio_socket_stream* client) = 0;
 };
 
 /**
- * When asynchronous listening stream receives event that new connection arrives, calls virtual function in this class. In subclass implementation of this virtual function
- * calls accept() system API to receive client connection. This class is different from aio_accept_callback above.
- * When aio_accept_callback::accept_callback() is called, client connection object
- * has already been created. In listen_callback(), application needs to receive connection object itself
+ * When asynchronous listening stream receives event that new connection
+ * arrives, calls virtual function in this class. In subclass implementation of
+ * this virtual function
+ * calls accept() system API to receive client connection. This class is
+ * different from aio_accept_callback above.
+ * When aio_accept_callback::accept_callback() is called, client connection
+ * object
+ * has already been created. In listen_callback(), application needs to receive
+ * connection object itself
  */
 class ACL_CPP_API aio_listen_callback : public aio_callback {
 public:
@@ -41,9 +48,12 @@ public:
 };
 
 /**
- * Asynchronous listening network stream. This class receives incoming connections from clients. This class can only
- * be allocated on heap, cannot be allocated on stack. Application can call close to actively close stream. After stream closes,
- * this asynchronous stream object is automatically released, no need to call delete to delete this class object
+ * Asynchronous listening network stream. This class receives incoming
+ * connections from clients. This class can only
+ * be allocated on heap, cannot be allocated on stack. Application can call
+ * close to actively close stream. After stream closes,
+ * this asynchronous stream object is automatically released, no need to call
+ * delete to delete this class object
  *
  */
 class ACL_CPP_API aio_listen_stream : public aio_stream {
@@ -55,44 +65,57 @@ public:
 	aio_listen_stream(aio_handle* handle);
 
 	/**
-	 * Add callback function when asynchronous listening stream receives new client stream
+	 * Add callback function when asynchronous listening stream receives new client
+	 * stream
 	 * @param callback {aio_accept_callback*}
 	 */
 	void add_accept_callback(aio_accept_callback* callback);
 
 	/**
-	 * Add callback function when asynchronous listening stream has client connection arriving
+	 * Add callback function when asynchronous listening stream has client
+	 * connection arriving
 	 * @param callback {aio_listen_stream*}
-	 *  Note: Difference between this method and add_accept_callback above. This method is reactor
+	 * Note: Difference between this method and add_accept_callback above. This
+	 * method is reactor
 	 *  mode, while add_accept_callback is proactor mode
 	 */
 	void add_listen_callback(aio_listen_callback* callback);
 
 	/**
-	 * When using add_listen_callback method, can call this method in aio_listen_callback subclass's
+	 * When using add_listen_callback method, can call this method in
+	 * aio_listen_callback subclass's
 	 * function listen_callback to get an asynchronous connection object
-	 * @return {aio_socket_stream*} Returns NULL indicates getting connection failed
+	 * @return {aio_socket_stream*} Returns NULL indicates getting connection
+	 * failed
 	 */
 	aio_socket_stream* accept();
 
 	/**
-	 * Start listening on a specified address. Can be network socket or domain socket.
-	 * @param addr {const char*} Listening address, TCP listening address or domain listening address
+	 * Start listening on a specified address. Can be network socket or domain
+	 * socket.
+	 * @param addr {const char*} Listening address, TCP listening address or domain
+	 * listening address
 	 * Format:
 	 *   For TCP connection: IP:PORT, e.g.: 127.0.0.1:9001
-	 *   For domain socket: {path}, e.g.: /tmp/my.sock. On Linux platform, can also support
-	 *   Linux abstract unix domain socket, requires first byte of address to be '@'. On Linux
-	 *   platform, if ACL internally detects first character of path is '@', internally automatically switches to Linux
-	 *   abstract unix domain socket listening mode (@ character is only used as marker, internal
+	 * For domain socket: {path}, e.g.: /tmp/my.sock. On Linux platform, can also
+	 * support
+	 * Linux abstract unix domain socket, requires first byte of address to be '@'.
+	 * On Linux
+	 * platform, if ACL internally detects first character of path is '@',
+	 * internally automatically switches to Linux
+	 * abstract unix domain socket listening mode (@ character is only used as
+	 * marker, internal
 	 *   listening address will automatically remove it)
-	 * @param flag {unsigned} Open flag bits when creating listening socket, see server_socket.hpp
+	 * @param flag {unsigned} Open flag bits when creating listening socket, see
+	 * server_socket.hpp
 	 * @param qlen {int} Specifies length of listening socket listening queue
 	 * @return {bool} Whether listening was successful
 	 */
 	bool open(const char* addr, unsigned flag = 0, int qlen = 128);
 
 	/**
-	 * Create listening object using socket. This socket handle must have already called bind/listen process
+	 * Create listening object using socket. This socket handle must have already
+	 * called bind/listen process
 	 * @param fd {int}
 	 * @return {bool} Whether successful
 	 */
@@ -123,7 +146,8 @@ public:
 	const char* get_addr() const;
 
 	/**
-	 * Override base class method. Called when asynchronous stream object is destroyed
+	 * Override base class method. Called when asynchronous stream object is
+	 * destroyed
 	 */
 	virtual void destroy();
 

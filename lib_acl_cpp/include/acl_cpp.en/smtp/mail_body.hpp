@@ -48,8 +48,10 @@ public:
 	/**
 	 * Set email body to TEXT/HTML format
 	 * @param html {const char*} HTML data
-	 * @param len {size_t} html data length (although html is string format, providing
-	 *  data length facilitates more flexible and efficient calls, internally no longer recalculates length through strlen)
+	 * @param len {size_t} html data length (although html is string format,
+	 * providing
+	 * data length facilitates more flexible and efficient calls, internally no
+	 * longer recalculates length through strlen)
 	 * @return {mail_body&}
 	 */
 	mail_body& set_html(const char* html, size_t len);
@@ -57,14 +59,17 @@ public:
 	/**
 	 * Set email body to TEXT/PLAIN format
 	 * @param plain {const char*} TEXT data
-	 * @param len {size_t} plain data length (although plain is text format, providing
-	 *  data length facilitates more flexible and efficient calls, internally no longer recalculates length through strlen)
+	 * @param len {size_t} plain data length (although plain is text format,
+	 * providing
+	 * data length facilitates more flexible and efficient calls, internally no
+	 * longer recalculates length through strlen)
 	 * @return {mail_body&}
 	 */
 	mail_body& set_plain(const char* plain, size_t len);
 
 	/**
-	 * When email content is multipart/alternative format, call this function to set corresponding type's
+	 * When email content is multipart/alternative format, call this function to
+	 * set corresponding type's
 	 * body content
 	 * @param html {const char*} HTML data in body (non-empty)
 	 * @param hlen {size_t} html data length (>0)
@@ -76,7 +81,8 @@ public:
 		const char* plain, size_t plen);
 
 	/**
-	 * When email body content is multipart/relative format, call this function to set body content
+	 * When email body content is multipart/relative format, call this function to
+	 * set body content
 	 * @param html {const char*} HTML data in body (non-empty)
 	 * @param hlen {size_t} html data length (>0)
 	 * @param plain {const char*} plain data in body (non-empty)
@@ -135,7 +141,8 @@ public:
 	bool save_to(string& out) const;
 
 	/**
-	 * Email body construction process for text/html format, and append result to given buffer
+	 * Email body construction process for text/html format, and append result to
+	 * given buffer
 	 * @param in {const char*} Input html format data
 	 * @param len {size_t} Data length of in
 	 * @param out {string&} Store result in append mode
@@ -144,7 +151,8 @@ public:
 	bool save_html(const char* in, size_t len, string& out) const;
 
 	/**
-	 * Email body construction process for text/plain format, and append result to given buffer
+	 * Email body construction process for text/plain format, and append result to
+	 * given buffer
 	 * @param in {const char*} Input plain format data
 	 * @param len {size_t} Data length of in
 	 * @param out {string&} Store result in append mode
@@ -153,7 +161,8 @@ public:
 	bool save_plain(const char* in, size_t len, string& out) const;
 
 	/**
-	 * Email body construction process for multipart/relative format, and append result to given buffer
+	 * Email body construction process for multipart/relative format, and append
+	 * result to given buffer
 	 * @param html {const char*} Input html format data
 	 * @param hlen {size_t} Data length of html
 	 * @param plain {const char*} TEXT data in body (non-empty)
@@ -169,7 +178,8 @@ public:
 		string& out) const;
 
 	/**
-	 * Email body construction process for multipart/alternative format, and append result to given buffer
+	 * Email body construction process for multipart/alternative format, and append
+	 * result to given buffer
 	 * @param html {const char*} Input html format data
 	 * @param hlen {size_t} Data length of html
 	 * @param plain {const char*} TEXT data in body (non-empty)

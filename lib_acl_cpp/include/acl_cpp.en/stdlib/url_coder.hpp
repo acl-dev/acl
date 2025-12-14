@@ -53,7 +53,8 @@ public:
 	 * When using URL encoding, call this function to add variables
 	 * @param name {const char*} Variable name
 	 * @param value Variable value
-	 * @param override {bool} If variable with same name exists, whether to directly override
+	 * @param override {bool} If variable with same name exists, whether to
+	 * directly override
 	 * @return Returns reference to url_coder object
 	 */
 	url_coder& set(const char* name, const char* value,
@@ -67,7 +68,8 @@ public:
 	/**
 	 * Get value of a variable name in params_ array after URL decoding
 	 * @param name {const char*} Variable name
-	 * @param found {bool*} When this pointer is not NULL, will store whether name exists, mainly used
+	 * @param found {bool*} When this pointer is not NULL, will store whether name
+	 * exists, mainly used
 	 *  when name's value is empty
 	 * @return {const char*} Returns NULL indicates does not exist
 	 */
@@ -76,8 +78,10 @@ public:
 	/**
 	 * Get value of a variable name in params_ array after URL decoding
 	 * @param name {const char*} Variable name
-	 * @return {const char*} Returns NULL indicates does not exist or name's value is empty
-	 *  Note: If name's value is empty, cannot correctly determine whether name exists
+	 * @return {const char*} Returns NULL indicates does not exist or name's value
+	 * is empty
+	 * Note: If name's value is empty, cannot correctly determine whether name
+	 * exists
 	 */
 	const char* operator[](const char* name) const;
 
@@ -99,7 +103,8 @@ public:
 	/**
 	 * Delete a variable from params_ parameter array
 	 * @param name {const char*} Variable name
-	 * @return {bool} Returns true indicates delete was successful, otherwise indicates does not exist
+	 * @return {bool} Returns true indicates delete was successful, otherwise
+	 * indicates does not exist
 	 */
 	bool del(const char* name);
 

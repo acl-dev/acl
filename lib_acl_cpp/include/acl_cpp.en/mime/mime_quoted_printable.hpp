@@ -12,8 +12,10 @@ class ACL_CPP_API mime_quoted_printable : public mime_code {
 public:
 	/**
 	 * Constructor
-	 * @param addCrlf {bool} Whether to add "\r\n" at the end when not in streaming encoding mode
-	 * @param addInvalid {bool} Whether to copy illegal characters as-is when in streaming decoding mode
+	 * @param addCrlf {bool} Whether to add "\r\n" at the end when not in streaming
+	 * encoding mode
+	 * @param addInvalid {bool} Whether to copy illegal characters as-is when in
+	 * streaming decoding mode
 	 */
 	mime_quoted_printable(bool addCrlf = false, bool addInvalid = false);
 	~mime_quoted_printable();
@@ -26,17 +28,23 @@ public:
 	 * Streaming encoding function
 	 * @param src {const char*} Original data
 	 * @param n {int} src data length
-	 * @param out {string*} Store encoding result. Can test whether out has result data through out->empty(),
-	 *  get length of result data in out through out->length(). Note: After using result data in out, must call out->clear()
-	 *  to clear used result data. Can also call this function multiple times, then get all data at once after finally calling
+	 * @param out {string*} Store encoding result. Can test whether out has result
+	 * data through out->empty(),
+	 * get length of result data in out through out->length(). Note: After using
+	 * result data in out, must call out->clear()
+	 * to clear used result data. Can also call this function multiple times, then
+	 * get all data at once after finally calling
 	 *  encode_finish
 	 */
 	void encode_update(const char *src, int n, string* out);
 
 	/**
-	 * Streaming encoding end function. After calling this function, extract final result data
-	 * @param out {string*} Store encoding result. Can test whether out has result data through out->empty(),
-	 *  get length of result data in out through out->length(). Note: After using result data in out, must call out->clear()
+	 * Streaming encoding end function. After calling this function, extract final
+	 * result data
+	 * @param out {string*} Store encoding result. Can test whether out has result
+	 * data through out->empty(),
+	 * get length of result data in out through out->length(). Note: After using
+	 * result data in out, must call out->clear()
 	 *  to clear used result data
 	 */
 	void encode_finish(string* out);
@@ -47,23 +55,30 @@ public:
 	 * Streaming decoding function
 	 * @param src {const char*} Original data
 	 * @param n {int} src data length
-	 * @param out {string*} Store decoding result. Can test whether out has result data through out->empty(),
-	 *  get length of result data in out through out->length(). Note: After using result data in out, must call out->clear()
-	 *  to clear used result data. Can also call this function multiple times, then get all data at once after finally calling
+	 * @param out {string*} Store decoding result. Can test whether out has result
+	 * data through out->empty(),
+	 * get length of result data in out through out->length(). Note: After using
+	 * result data in out, must call out->clear()
+	 * to clear used result data. Can also call this function multiple times, then
+	 * get all data at once after finally calling
 	 *  decode_finish
 	 */
 	void decode_update(const char *src, int n, string* out);
 
 	/**
-	 * Streaming decoding end function. After calling this function, extract final result data
-	 * @param out {string*} Store decoding result. Can test whether out has result data through out->empty(),
-	 *  get length of result data in out through out->length(). Note: After using result data in out, must call out->clear()
+	 * Streaming decoding end function. After calling this function, extract final
+	 * result data
+	 * @param out {string*} Store decoding result. Can test whether out has result
+	 * data through out->empty(),
+	 * get length of result data in out through out->length(). Note: After using
+	 * result data in out, must call out->clear()
 	 *  to clear used result data
 	 */
 	void decode_finish(string* out);
 
 	/**
-	 * Static encoding function, directly encode input data and store in user buffer
+	 * Static encoding function, directly encode input data and store in user
+	 * buffer
 	 * User buffer
 	 * @param in {const char*} Input data address
 	 * @param n {int} Input data length

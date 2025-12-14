@@ -8,7 +8,8 @@ namespace acl {
 class fstream;
 
 /**
- * Asynchronous file read/write stream. Objects of this class can only be used in UNIX systems
+ * Asynchronous file read/write stream. Objects of this class can only be used
+ * in UNIX systems
  */
 class ACL_CPP_API aio_fstream : public aio_istream , public aio_ostream {
 public:
@@ -25,9 +26,11 @@ public:
 #endif
 
 	/**
-	 * Open file stream based on file path. This is the most basic way to open a file
+	 * Open file stream based on file path. This is the most basic way to open a
+	 * file
 	 * @param path {const char*} Filename
-	 * @param oflags {unsigned int} Flag bits. We're assuming that O_RDONLY: 0x0000,
+	 * @param oflags {unsigned int} Flag bits. We're assuming that O_RDONLY:
+	 * 0x0000,
 	 *  O_WRONLY: 0x0001, O_RDWR: 0x0002, O_APPEND: 0x0008, O_CREAT: 0x0100,
 	 *  O_TRUNC: 0x0200, O_EXCL: 0x0400; just for win32, O_TEXT: 0x4000,
 	 *  O_BINARY: 0x8000, O_RAW: O_BINARY, O_SEQUENTIAL: 0x0020, O_RANDOM: 0x0010.
@@ -37,7 +40,8 @@ public:
 	bool open(const char* path, unsigned int oflags, unsigned int mode);
 
 	/**
-	 * Open file stream in read/write mode. When file does not exist, create new file. When file exists, then
+	 * Open file stream in read/write mode. When file does not exist, create new
+	 * file. When file exists, then
 	 * clear file content. File attributes are 0700
 	 * @param path {const char*} Filename
 	 * @param mode {int} Mode when opening file handle (e.g.: 0600)
@@ -46,7 +50,8 @@ public:
 	bool open_trunc(const char* path, unsigned int mode = 0600);
 
 	/**
-	 * Create new file in read/write mode. File attributes are 0600. If file does not exist, create new file. If exists, then
+	 * Create new file in read/write mode. File attributes are 0600. If file does
+	 * not exist, create new file. If exists, then
 	 * open old file
 	 * @param path {const char*} Full file path
 	 * @param mode {int} Mode when opening file handle (e.g.: 0600)
@@ -62,7 +67,8 @@ public:
 	bool open_read(const char* path);
 
 	/**
-	 * Open file in write-only mode. If file does not exist, create new file. If file
+	 * Open file in write-only mode. If file does not exist, create new file. If
+	 * file
 	 * exists, then clear file content
 	 * @param path {const char*} Filename
 	 * @return {bool} Whether successful
@@ -79,7 +85,8 @@ public:
 protected:
 	~aio_fstream();
 	/**
-	 * Dynamically release asynchronous stream class objects that can only be allocated on heap through this function
+	 * Dynamically release asynchronous stream class objects that can only be
+	 * allocated on heap through this function
 	 */
 	virtual void destroy();
 

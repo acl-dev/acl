@@ -22,7 +22,8 @@ class ACL_CPP_API thread_cond : public noncopyable {
 public:
 	/**
 	 * Constructor
-	 * @param mutex {thread_mutex*} When this parameter is not NULL, internally automatically references
+	 * @param mutex {thread_mutex*} When this parameter is not NULL, internally
+	 * automatically references
 	 *  this thread lock, otherwise, internally creates thread lock
 	 */
 	thread_cond(thread_mutex* mutex = NULL);
@@ -30,25 +31,31 @@ public:
 
 	/**
 	 * Wait for thread condition variable to be ready
-	 * @param microseconds {long long} Timeout for waiting condition variable to be ready (microseconds)
+	 * @param microseconds {long long} Timeout for waiting condition variable to be
+	 * ready (microseconds)
 	 *   > 0 means wait timeout duration
 	 *   == 0, don't wait
 	 *   < 0 means wait forever until condition variable is ready
-	 * @param locked {bool} This parameter indicates whether the lock has been locked. If not locked yet, then
-	 *  internally will automatically lock first, then unlock before method returns; if externally already locked, then internally does not
+	 * @param locked {bool} This parameter indicates whether the lock has been
+	 * locked. If not locked yet, then
+	 * internally will automatically lock first, then unlock before method returns;
+	 * if externally already locked, then internally does not
 	 *  perform lock/unlock operations on the mutex
-	 * @return {bool} Returns true indicates condition variable is ready, otherwise indicates timeout or not notified
+	 * @return {bool} Returns true indicates condition variable is ready, otherwise
+	 * indicates timeout or not notified
 	 */
 	bool wait(long long microseconds = -1, bool locked = false);
 
 	/**
-	 * Notify one or several threads waiting on the thread condition variable, indicating condition variable is ready
+	 * Notify one or several threads waiting on the thread condition variable,
+	 * indicating condition variable is ready
 	 * @return {bool} Returns false indicates notification failed
 	 */
 	bool notify();
 
 	/**
-	 * Notify all threads waiting on the thread condition variable, indicating condition variable is ready
+	 * Notify all threads waiting on the thread condition variable, indicating
+	 * condition variable is ready
 	 * @return {bool} Returns false indicates notification failed
 	 */
 	bool notify_all();

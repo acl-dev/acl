@@ -20,13 +20,18 @@ public:
 	/**
 	 * Constructor
 	 * @param emailFile {const char*} Source file name storing email data. If
-	 *  empty, when calling save_body function later, the source file must be specified.
+	 * empty, when calling save_body function later, the source file must be
+	 * specified.
 	 * @param node {const MIME_NODE*} A certain MIME node in the email.
-	 * @param enableDecode {bool} Whether to automatically decode when email content is in base64/qp encoding format.
+	 * @param enableDecode {bool} Whether to automatically decode when email
+	 * content is in base64/qp encoding format.
 	 * @param toCharset {const char*} Default target character set. If target
-	 *  character set is different from source character set, character set conversion will be performed.
-	 * @param off {off_t} Starting position offset in the email body data stream, with additional
-	 *  offset added, so that users can add their own private data before the email body.
+	 * character set is different from source character set, character set
+	 * conversion will be performed.
+	 * @param off {off_t} Starting position offset in the email body data stream,
+	 * with additional
+	 * offset added, so that users can add their own private data before the email
+	 * body.
 	 */
 	mime_node(const char* emailFile, const MIME_NODE* node,
 		bool enableDecode = true, const char* toCharset = "gb2312",
@@ -143,7 +148,8 @@ public:
 	 * @param out {pipe_manager&}
 	 * @param src {const char*} Starting address of email data. If NULL pointer,
 	 *  then use the emailFile file provided by the constructor to read email data.
-	 * @param len {int} Length of email data content. If 0, then use the constructor's
+	 * @param len {int} Length of email data content. If 0, then use the
+	 * constructor's
 	 *  provided emailFile file to read email data.
 	 * @return {bool} Whether successful
 	 */
@@ -154,7 +160,8 @@ public:
 	 * @param out {ostream&} Output stream
 	 * @param src {const char*} Starting address of email data. If NULL pointer,
 	 *  then use the emailFile file provided by the constructor to read email data.
-	 * @param len {int} Length of email data content. If 0, then use the constructor's
+	 * @param len {int} Length of email data content. If 0, then use the
+	 * constructor's
 	 *  provided emailFile file to read email data.
 	 * @return {bool} Whether successful
 	 */
@@ -165,7 +172,8 @@ public:
 	 * @param outFile {const char*} Target file name
 	 * @param src {const char*} Starting address of email data. If NULL pointer,
 	 *  then use the emailFile file provided by the constructor to read email data.
-	 * @param len {int} Length of email data content. If 0, then use the constructor's
+	 * @param len {int} Length of email data content. If 0, then use the
+	 * constructor's
 	 *  provided emailFile file to read email data.
 	 * @return {bool} Whether successful
 	 */
@@ -176,7 +184,8 @@ public:
 	 * @param out {string&} Output buffer
 	 * @param src {const char*} Starting address of email data. If NULL pointer,
 	 *  then use the emailFile file provided by the constructor to read email data.
-	 * @param len {int} Length of email data content. If 0, then use the constructor's
+	 * @param len {int} Length of email data content. If 0, then use the
+	 * constructor's
 	 *  provided emailFile file to read email data.
 	 * @return {bool} Whether successful
 	 */
@@ -185,7 +194,8 @@ public:
 	/**
 	 * Get the parent node corresponding to this node.
 	 * @return {mime_node*} Returns NULL if this node has no parent (i.e.,
-	 *  this node is the email's root node); otherwise, returns the parent node. The caller needs to use
+	 * this node is the email's root node); otherwise, returns the parent node. The
+	 * caller needs to use
 	 *  delete to release the corresponding memory.
 	 */
 	mime_node* get_parent() const;
@@ -197,7 +207,8 @@ public:
 	bool has_parent() const;
 
 	/**
-	 * Get parent node's main type (MIME_CTYPE_XXX). If return value is MIME_CTYPE_OTHER,
+	 * Get parent node's main type (MIME_CTYPE_XXX). If return value is
+	 * MIME_CTYPE_OTHER,
 	 * it means this node does not exist or parent node's main type is unknown.
 	 * @return {int} MIME_CTYPE_XXX
 	 */
@@ -205,7 +216,8 @@ public:
 	const char* parent_ctype_s() const;
 
 	/**
-	 * Get parent node's sub type (MIME_STYPE_XXX). If return value is MIME_STYPE_OTHER,
+	 * Get parent node's sub type (MIME_STYPE_XXX). If return value is
+	 * MIME_STYPE_OTHER,
 	 * it means this node does not exist or parent node's sub type is unknown.
 	 * @return {int} MIME_STYPE_XXX
 	 */
@@ -213,14 +225,17 @@ public:
 	const char* parent_stype_s() const;
 
 	/**
-	 * Get parent node's encoding method (MIME_ENC_XXX). If return value is MIME_ENC_OTHER,
-	 * it means this node does not exist or parent node's encoding method is unknown.
+	 * Get parent node's encoding method (MIME_ENC_XXX). If return value is
+	 * MIME_ENC_OTHER,
+	 * it means this node does not exist or parent node's encoding method is
+	 * unknown.
 	 * @return {int} MIME_ENC_XXX
 	 */
 	int parent_encoding() const;
 
 	/**
-	 * Get parent node's character set string. If return value is NULL, it means this node does not exist or parent
+	 * Get parent node's character set string. If return value is NULL, it means
+	 * this node does not exist or parent
 	 * node has no character set string.
 	 * @return {const char*}
 	 */
@@ -239,7 +254,8 @@ public:
 	off_t parent_bodyEnd() const;
 
 	/**
-	 * Get the value corresponding to a certain header field name in parent node, e.g.: Content-Type
+	 * Get the value corresponding to a certain header field name in parent node,
+	 * e.g.: Content-Type
 	 * @param name {const char*} Field name
 	 * @return {const char*} Field value. Returns empty if this node does not exist
 	 *  or parent node's header does not contain this field.

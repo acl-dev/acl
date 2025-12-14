@@ -39,7 +39,8 @@ public:
 	virtual ~redis_cluster();
 
 	/**
-	 * Batch add available hash slots. Must end with hash slot value < 0 to indicate end
+	 * Batch add available hash slots. Must end with hash slot value < 0 to
+	 * indicate end
 	 * add some hash-slots, the last slot value must be < 0 indicating
 	 * the end of the slots array
 	 * @param first {int} First hash slot. This value must be >= 0 to be effective
@@ -89,7 +90,8 @@ public:
 	int cluster_getkeysinslot(size_t slot, size_t max, std::list<string>& result);
 
 	/**
-	 * When building redis cluster, can use this command to let a redis node connect to another node
+	 * When building redis cluster, can use this command to let a redis node
+	 * connect to another node
 	 * let one redis node to link to the other redis node
 	 * when buiding the redis cluster
 	 * @param ip {const char*} IP address of another redis node to be connected
@@ -102,7 +104,8 @@ public:
 	bool cluster_meet(const char* ip, int port);
 
 	/**
-	 * Reset a redis node's state, making it leave cluster nodes, clear hash slot-node correspondence.
+	 * Reset a redis node's state, making it leave cluster nodes, clear hash
+	 * slot-node correspondence.
 	 * This method is equivalent to reset_soft
 	 * reset one redis node's status, escaping from the other nodes
 	 * of the redis cluster, and clearing slot-to-nodes mapping;
@@ -141,7 +144,8 @@ public:
 	bool cluster_setslot_migrating(size_t slot, const char* dst_node);
 
 	/**
-	 * After importing/migrating hash slot completes, use this operation to set hash slot to stable state
+	 * After importing/migrating hash slot completes, use this operation to set
+	 * hash slot to stable state
 	 * set the hash-slot stable after importing or migrating
 	 * @param slot {size_t} Hash slot value
 	 *  the hash-slot value
@@ -151,7 +155,8 @@ public:
 	bool cluster_setslot_stable(size_t slot);
 
 	/**
-	 * Set specified hash slot to a specified redis node. This command has relatively complex behavioral characteristics. For details,
+	 * Set specified hash slot to a specified redis node. This command has
+	 * relatively complex behavioral characteristics. For details,
 	 * please refer to official online documentation
 	 * set one hash-slot to one redis node, for more help see online doc
 	 * @param slot {size_t} Hash slot value
@@ -167,7 +172,8 @@ public:
 	 * Get number of error reports from a specified redis node
 	 * get the count of the failure resports by one redis node
 	 * @param node {const char*} A specified redis node
-	 * @return {int} Number of node error reports. Normally >= 0. If return value is -1, it indicates operation error
+	 * @return {int} Number of node error reports. Normally >= 0. If return value
+	 * is -1, it indicates operation error
 	 *  return the failure count reporting by the specified redis node,
 	 *  return value >= 0 if successful, or -1 for error happened
 	 */
@@ -175,7 +181,8 @@ public:
 
 	/**
 	 * This command operation can only be sent to a slave node for failover
-	 * of master node, making current slave become master. Needs to negotiate with its master node, and needs approval from other master nodes
+	 * of master node, making current slave become master. Needs to negotiate with
+	 * its master node, and needs approval from other master nodes
 	 * this command can only be sent to one slave node for failover
 	 * of the master node, make the current slave to be the master
 	 * @return {bool} Whether operation was successful
@@ -184,7 +191,8 @@ public:
 	bool cluster_failover();
 
 	/**
-	 * Forcefully change a slave node to master node. This operation does not need to negotiate with original master node, but still needs
+	 * Forcefully change a slave node to master node. This operation does not need
+	 * to negotiate with original master node, but still needs
 	 * approval from majority of master nodes in cluster
 	 * force a slave to be the master, not handshake with it's master,
 	 * but still need get agreement by majority of the masters in cluster
@@ -194,7 +202,8 @@ public:
 	bool cluster_failover_force();
 
 	/**
-	 * Forcefully change a slave node to master node. This operation does not need to negotiate with original master node and other master nodes
+	 * Forcefully change a slave node to master node. This operation does not need
+	 * to negotiate with original master node and other master nodes
 	 * in cluster
 	 * force a slave to be the master, not handshake with it's master,
 	 * and also no need get agreement by the other masters in cluster
@@ -246,13 +255,15 @@ public:
 	 * get the hash-slot wich the key belongs to
 	 * @param key {const char*} Key value
 	 *  the key string
-	 * @return {int} Hash slot value. >= 0 indicates success, -1 indicates operation failed
+	 * @return {int} Hash slot value. >= 0 indicates success, -1 indicates
+	 * operation failed
 	 *  return the key's hash-slot, >= 0 if successful, -1 on error
 	 */
 	int cluster_keyslot(const char* key);
 
 	/**
-	 * Set specified node as slave node. If this node was originally a slave node, will also return success
+	 * Set specified node as slave node. If this node was originally a slave node,
+	 * will also return success
 	 * set the specified node to be a slave node
 	 * @param node {const char*} Specified node identifier
 	 *  the specified node
@@ -266,7 +277,8 @@ public:
 	/**
 	 * Get distribution of all hash slots across various redis nodes in cluster
 	 * get all nodes with all slots
-	 * @return {const std::vector<redis_slot*>*} Returns collection of all master nodes storing hash slot information.
+	 * @return {const std::vector<redis_slot*>*} Returns collection of all master
+	 * nodes storing hash slot information.
 	 *  Returns NULL indicates error
 	 *  return all the master nodes with all hash-slots in them,
 	 *  and NULL will be returned if error happened, and the return
@@ -275,7 +287,8 @@ public:
 	const std::vector<redis_slot*>* cluster_slots();
 	
 	/**
-	 * Get all master nodes in current cluster. All slave nodes of master nodes can be obtained through
+	 * Get all master nodes in current cluster. All slave nodes of master nodes can
+	 * be obtained through
 	 * redis_node::get_slaves
 	 * get all the masters of the cluster, and master's slave nodes
 	 * can be got by redis_node::get_slaves
@@ -288,8 +301,9 @@ public:
 	/**
 	 * Get all slave nodes of specified master node
 	 * get all slave nodes of the specified master node
-	 * @return node {const char*} Master node identifier. Returns NULL indicates error. This
-	 *  return result does not need to be freed, internally automatically maintained
+	 * @return node {const char*} Master node identifier. Returns NULL indicates
+	 * error. This
+	 * return result does not need to be freed, internally automatically maintained
 	 *  one of the master node, NULL if error, and the return value
 	 *  needn't be freed because it can be freed internal
 	 */

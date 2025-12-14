@@ -28,44 +28,60 @@ public:
 	// Functions related to mail parsing and saving
 
 	/**
-	 * When reusing the same MIME object to parse multiple emails, you need to call this function to clear previously
-	 * parsed data in memory. Otherwise, calling this function multiple times will have no effect. To avoid affecting
-	 * performance, it is recommended to call this function before parsing each email.
+	 * When reusing the same MIME object to parse multiple emails, you need to call
+	 * this function to clear previously
+	 * parsed data in memory. Otherwise, calling this function multiple times will
+	 * have no effect. To avoid affecting
+	 * performance, it is recommended to call this function before parsing each
+	 * email.
 	 */
 	mime& reset();
 
 	/**
-	 * When users can determine mail header completion, they can call this function to mark primary mail header completion.
+	 * When users can determine mail header completion, they can call this function
+	 * to mark primary mail header completion.
 	 */
 	void primary_head_finish();
 
 	/**
-	 * When streaming parsing, call this function to determine whether mail header is complete.
+	 * When streaming parsing, call this function to determine whether mail header
+	 * is complete.
 	 * @return {bool} Whether mail header is complete.
 	 */
 	bool primary_head_ok() const;
 
 	/**
-	 * Initialize streaming parsing process. This function internally automatically calls reset() to reset object
+	 * Initialize streaming parsing process. This function internally automatically
+	 * calls reset() to reset object
 	 * state.
-	 * @param path {const char*} Mail file path. When this parameter is empty, it means
-	 *  mail parsing is not from file, and you cannot call save_xxx related interfaces.
+	 * @param path {const char*} Mail file path. When this parameter is empty, it
+	 * means
+	 * mail parsing is not from file, and you cannot call save_xxx related
+	 * interfaces.
 	 */
 	void update_begin(const char* path);
 
 	/**
-	 * Call this function to parse mail data in streaming format. This function parses mail header first, then uses this
-	 * interface to parse mail body until update_end() interface ends. If you need to parse multiple emails,
-	 * you need to call this function continuously until it returns true, indicating multipart format
-	 * mail parsing is complete. For non-multipart format mail, this function may return true,
+	 * Call this function to parse mail data in streaming format. This function
+	 * parses mail header first, then uses this
+	 * interface to parse mail body until update_end() interface ends. If you need
+	 * to parse multiple emails,
+	 * you need to call this function continuously until it returns true,
+	 * indicating multipart format
+	 * mail parsing is complete. For non-multipart format mail, this function may
+	 * return true,
 	 * so you need to determine mail completion position yourself.
-	 * @param data {const char*} Mail data (can include mail header or mail body, but
+	 * @param data {const char*} Mail data (can include mail header or mail body,
+	 * but
 	 *  data must be continuous).
 	 * @param len {size_t} Data length of data.
-	 * @return {bool} For multipart mail, returning true indicates this mail parsing is complete;
-	 *  For non-multipart mail, this return value is always false, with no special meaning. You need to
+	 * @return {bool} For multipart mail, returning true indicates this mail
+	 * parsing is complete;
+	 * For non-multipart mail, this return value is always false, with no special
+	 * meaning. You need to
 	 *  determine mail completion position yourself.
-	 * Note: After calling this function, you must call update_end to notify parsing completion.
+	 * Note: After calling this function, you must call update_end to notify
+	 * parsing completion.
 	 */
 	bool update(const char* data, size_t len);
 
@@ -96,13 +112,16 @@ public:
 	bool save_as(const char* file_path);
 
 	/**
-	 * After mail parsing is complete, save in client display format to HTML file process,
+	 * After mail parsing is complete, save in client display format to HTML file
+	 * process,
 	 * users can use browser to open this HTML page.
 	 * @param path {const char*} Page save path.
 	 * @param filename {const char*} Target file name.
-	 * @param enableDecode {bool} Whether to automatically decode during conversion.
+	 * @param enableDecode {bool} Whether to automatically decode during
+	 * conversion.
 	 * @param toCharset {const char*} Target character set.
-	 * @param off {off_t} When parsing attachments, offset from start to attachment data.
+	 * @param off {off_t} When parsing attachments, offset from start to attachment
+	 * data.
 	 * @return {bool} Whether successful.
 	 */
 	bool save_mail(const char* path, const char* filename,
@@ -113,9 +132,11 @@ public:
 	 * Get mail body node.
 	 * @param htmlFirst {bool} Prefer HTML format text body. If not found, then
 	 *  plain text body. If only HTML text exists, convert HTML text to plain text.
-	 * @param enableDecode {bool} Whether to decode original encoding during conversion.
+	 * @param enableDecode {bool} Whether to decode original encoding during
+	 * conversion.
 	 * @param toCharset {const char*} Target character set.
-	 * @param off {off_t} When parsing attachments, offset from start to attachment data.
+	 * @param off {off_t} When parsing attachments, offset from start to attachment
+	 * data.
 	 * @return {mime_body*} Returns NULL if not found or error.
 	 */
 	mime_body* get_body_node(bool htmlFirst, bool enableDecode = true,
@@ -123,19 +144,24 @@ public:
 
 	/**
 	 * Get text/plain format body node.
-	 * @param enableDecode {bool} Whether to decode original encoding during conversion.
+	 * @param enableDecode {bool} Whether to decode original encoding during
+	 * conversion.
 	 * @param toCharset {const char*} Target character set.
-	 * @param off {off_t} When parsing attachments, offset from start to attachment data.
-	 * @return {mime_body*} Returns NULL if plain format body is not found or error.
+	 * @param off {off_t} When parsing attachments, offset from start to attachment
+	 * data.
+	 * @return {mime_body*} Returns NULL if plain format body is not found or
+	 * error.
 	 */
 	mime_body* get_plain_body(bool enableDecode = true,
 		const char* toCharset = "gb2312", off_t off = 0);
 
 	/**
 	 * Get text/html format body node.
-	 * @param enableDecode {bool} Whether to decode original encoding during conversion.
+	 * @param enableDecode {bool} Whether to decode original encoding during
+	 * conversion.
 	 * @param toCharset {const char*} Target character set.
-	 * @param off {off_t} When parsing attachments, offset from start to attachment data.
+	 * @param off {off_t} When parsing attachments, offset from start to attachment
+	 * data.
 	 * @return {mime_body*} Returns NULL if html format body is not found or error.
 	 */
 	mime_body* get_html_body(bool enableDecode = true,
@@ -143,9 +169,11 @@ public:
 
 	/**
 	 * Get all mime node list.
-	 * @param enableDecode {bool} Whether to automatically decode during conversion.
+	 * @param enableDecode {bool} Whether to automatically decode during
+	 * conversion.
 	 * @param toCharset {const char*} Target character set.
-	 * @param off {off_t} When parsing attachments, offset from start to attachment data.
+	 * @param off {off_t} When parsing attachments, offset from start to attachment
+	 * data.
 	 * @return {const std::list<mime_node*>&}
 	 */
 	const std::list<mime_node*>& get_mime_nodes(bool enableDecode = true,
@@ -153,10 +181,13 @@ public:
 
 	/**
 	 * Get attachment list.
-	 * @param enableDecode {bool} Whether to automatically decode during conversion.
+	 * @param enableDecode {bool} Whether to automatically decode during
+	 * conversion.
 	 * @param toCharset {const char*} Target character set.
-	 * @param off {off_t} When parsing attachments, offset from start to attachment data.
-	 * @param all {bool} Get all nodes including message/application/image type nodes.
+	 * @param off {off_t} When parsing attachments, offset from start to attachment
+	 * data.
+	 * @param all {bool} Get all nodes including message/application/image type
+	 * nodes.
 	 * @return {const std::list<mime_attach*>&}
 	 */
 	const std::list<mime_attach*>& get_attachments(bool enableDecode = true,
@@ -164,9 +195,11 @@ public:
 
 	/**
 	 * Get image list.
-	 * @param enableDecode {bool} Whether to automatically decode during conversion.
+	 * @param enableDecode {bool} Whether to automatically decode during
+	 * conversion.
 	 * @param toCharset {const char*} Target character set.
-	 * @param off {off_t} When parsing attachments, offset from start to attachment data.
+	 * @param off {off_t} When parsing attachments, offset from start to attachment
+	 * data.
 	 * @return {const std::list<mime_image*>&}
 	 */
 	const std::list<mime_image*>& get_images(bool enableDecode = true,

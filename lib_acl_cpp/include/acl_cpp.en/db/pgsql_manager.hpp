@@ -10,8 +10,7 @@ namespace acl {
 
 class pgsql_conf;
 
-class ACL_CPP_API pgsql_manager : public connect_manager
-{
+class ACL_CPP_API pgsql_manager : public connect_manager {
 public:
 	pgsql_manager(time_t idle_ttl = 120);
 	~pgsql_manager();
@@ -27,8 +26,10 @@ protected:
 	/**
 	 * Implementation of base class connect_manager virtual function
 	 * @param addr {const char*} Server listening address, format: ip:port
-	 * @param count {size_t} Connection pool size limit, when this value is 0 there is no limit
-	 * @param idx {size_t} Index position of this connection pool object in the collection (starting from 0)
+	 * @param count {size_t} Connection pool size limit, when this value is 0 there
+	 * is no limit
+	 * @param idx {size_t} Index position of this connection pool object in the
+	 * collection (starting from 0)
 	 * @return {connect_pool*} Returns the created connection pool object
 	 */
 	connect_pool* create_pool(const char* addr, size_t count, size_t idx);

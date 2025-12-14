@@ -69,7 +69,8 @@ protected:
 	friend class aio_handle;
 
 	/**
-	 * Subclasses must implement this callback function. Note: Subclasses or callers are prohibited from calling
+	 * Subclasses must implement this callback function. Note: Subclasses or
+	 * callers are prohibited from calling
 	 * aio_timer_callback's destructor function inside timer_callback,
 	 * otherwise it will cause major problems
 	 * @param id {unsigned int} ID number corresponding to a task
@@ -83,18 +84,22 @@ protected:
 	__int64 present_;
 
 	/**
-	 * Add new task ID number for this timer, so that multiple timer tasks can be started through one timer
+	 * Add new task ID number for this timer, so that multiple timer tasks can be
+	 * started through one timer
 	 * @param id {unsigned int} Timer task ID number
-	 * @param delay {__int64} How often to automatically trigger this timer, and pass back the corresponding timer task
+	 * @param delay {__int64} How often to automatically trigger this timer, and
+	 * pass back the corresponding timer task
 	 *  ID number (microseconds)
-	 * @return {__int64} How long until the first timer task ID of this timer will be triggered (microseconds)
+	 * @return {__int64} How long until the first timer task ID of this timer will
+	 * be triggered (microseconds)
 	 */
 	__int64 set_task(unsigned int id, __int64 delay);
 
 	/**
 	 * Delete timer task corresponding to a message ID in timer
 	 * @param {unsigned int} Timer task ID
-	 * @return {__int64} How long until the first timer task ID of this timer will be triggered (microseconds)
+	 * @return {__int64} How long until the first timer task ID of this timer will
+	 * be triggered (microseconds)
 	 */
 	__int64 del_task(unsigned int id);
 #else

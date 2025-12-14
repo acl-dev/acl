@@ -22,7 +22,8 @@ namespace acl
 {
 
 /**
- * This class inherits all redis command classes, so all redis commands can be used through this class object only.
+ * This class inherits all redis command classes, so all redis commands can be
+ * used through this class object only.
  * inherit all the redis command class, which include all the commands
  * of Key, String, Hash, List, Set, SortedSet, Hyperloglog, Pub/Sub,
  * Transaction, Script, Connection, Server.

@@ -9,16 +9,21 @@ namespace acl {
 class polarssl_conf;
 
 /**
- * Processing class for the underlying IO processing of stream/aio_stream stream objects. The read/write process in objects of this class will replace
- * the default underlying IO process in stream/aio_stream stream objects. Objects of this class must be dynamically created (i.e., heap objects).
- * stream/aio_stream stream objects release objects of this class by calling the destroy() method of this class object
+ * Processing class for the underlying IO processing of stream/aio_stream stream
+ * objects. The read/write process in objects of this class will replace
+ * the default underlying IO process in stream/aio_stream stream objects.
+ * Objects of this class must be dynamically created (i.e., heap objects).
+ * stream/aio_stream stream objects release objects of this class by calling the
+ * destroy() method of this class object
  */
 class ACL_CPP_API polarssl_io : public sslbase_io {
 public:
 	/**
 	 * Constructor
-	 * @param conf {polarssl_conf&} Class object for configuring each SSL connection
-	 * @param server_side {bool} Whether it is server mode, because the handshake methods differ between client mode and server
+	 * @param conf {polarssl_conf&} Class object for configuring each SSL
+	 * connection
+	 * @param server_side {bool} Whether it is server mode, because the handshake
+	 * methods differ between client mode and server
 	 *  mode, this parameter is used to distinguish them
 	 * @param nblock {bool} Whether it is non-blocking mode
 	 */
@@ -32,19 +37,22 @@ public:
 
 	/**
 	 * @override sslbase_io
-	 * Call this method to perform SSL handshake. In non-blocking IO mode, this function needs to be used together with handshake_ok()
+	 * Call this method to perform SSL handshake. In non-blocking IO mode, this
+	 * function needs to be used together with handshake_ok()
 	 * function to determine whether SSL handshake was successful
 	 * @return {bool}
 	 *  1. Returns false indicates handshake failed, connection needs to be closed;
 	 *  2. When returns true:
 	 *  2.1. If in blocking IO mode, it indicates SSL handshake was successful
-	 *  2.2. In non-blocking IO mode, it only means IO was successful in this handshake process, still need to call
-	 *       handshake_ok() function to determine whether SSL handshake was successful
+	 * 2.2. In non-blocking IO mode, it only means IO was successful in this
+	 * handshake process, still need to call
+	 * handshake_ok() function to determine whether SSL handshake was successful
 	 */
 	bool handshake();
 
 	/**
-	 * Check whether the peer certificate is valid (generally no need to call this function)
+	 * Check whether the peer certificate is valid (generally no need to call this
+	 * function)
 	 * @return {bool}
 	 */
 	bool check_peer();

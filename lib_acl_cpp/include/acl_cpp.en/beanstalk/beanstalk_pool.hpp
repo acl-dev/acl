@@ -11,12 +11,14 @@ class beanstalk;
 class locker;
 
 /**
- * Beanstalk client connection pool, can connect to different beanstalkd servers simultaneously.
- * Each beanstalkd has multiple connections, internally automatically locked; but does not control connection limit,
- * users should control the maximum connection limit of the connection pool themselves
+ * Beanstalk client connection pool, can connect to different beanstalkd servers
+ * simultaneously.
+ * Each beanstalkd has multiple connections, internally automatically locked;
+ * but does not control connection limit,
+ * users should control the maximum connection limit of the connection pool
+ * themselves
  */
-class ACL_CPP_API beanstalk_pool : public noncopyable
-{
+class ACL_CPP_API beanstalk_pool : public noncopyable {
 public:
 	beanstalk_pool();
 	~beanstalk_pool();

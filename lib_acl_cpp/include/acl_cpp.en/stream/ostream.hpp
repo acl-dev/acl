@@ -10,7 +10,8 @@ namespace acl {
 class string;
 
 /**
- * Output stream processing class. Callers who want to know exactly whether output stream has error or is closed,
+ * Output stream processing class. Callers who want to know exactly whether
+ * output stream has error or is closed,
  * should call stream->eof() to determine
  */
 
@@ -23,8 +24,10 @@ public:
 	 * Write data to output stream
 	 * @param data {const void*} Data pointer address
 	 * @param size {size_t} data data length (bytes)
-	 * @param loop {bool} Whether to ensure all data is output before returning. If true,
-	 *  this function will not return until all data is output or error occurs. Otherwise, only writes once then returns,
+	 * @param loop {bool} Whether to ensure all data is output before returning. If
+	 * true,
+	 * this function will not return until all data is output or error occurs.
+	 * Otherwise, only writes once then returns,
 	 *  but does not guarantee all data is written
 	 * @param buffed {bool} Whether to cache data to be written first
 	 * @return {int} Actual amount of data written. Returns -1 indicates error
@@ -33,23 +36,27 @@ public:
 		bool buffed = false);
 
 	/**
-	 * When sending data in datagram mode, can call this method to send data packet to target address
+	 * When sending data in datagram mode, can call this method to send data packet
+	 * to target address
 	 * @param data {const void*} Data address
 	 * @param size {size_t} Data length
 	 * @param dest_addr {const char*} Target address, format: ip|port
-	 * @param flags {int} Send flag bits. Please refer to flags description in system sendto() api
+	 * @param flags {int} Send flag bits. Please refer to flags description in
+	 * system sendto() api
 	 * @return {int} Returns -1 indicates send failed
 	 */
 	int sendto(const void* data, size_t size,
 		const char* dest_addr, int flags = 0);
 
 	/**
-	 * When sending data in datagram mode, can call this method to send data packet to target address
+	 * When sending data in datagram mode, can call this method to send data packet
+	 * to target address
 	 * @param data {const void*} Data address
 	 * @param size {size_t} Data length
 	 * @param dest_addr {const sockaddr*} Target address, format: ip|port
 	 * @param addrlen {int} dest_addr address length
-	 * @param flags {int} Send flag bits. Please refer to flags description in system sendto() api
+	 * @param flags {int} Send flag bits. Please refer to flags description in
+	 * system sendto() api
 	 * @return {int} Returns -1 indicates send failed
 	 */
 	int sendto(const void* data, size_t size,
@@ -58,8 +65,10 @@ public:
 	ssize_t send(const void* buf, size_t len, int flags);
 
 	/**
-	 * If write buffering mode is used, need to call this function at the end to flush buffer
-	 * @return {bool} Returns false indicates write failed, possibly connection closed
+	 * If write buffering mode is used, need to call this function at the end to
+	 * flush buffer
+	 * @return {bool} Returns false indicates write failed, possibly connection
+	 * closed
 	 */
 	bool fflush();
 
@@ -74,15 +83,18 @@ public:
 	 * Write data to output stream
 	 * @param v {const struct iovec*}
 	 * @param count {int} Number of elements in array v
-	 * @param loop {bool} Whether to ensure all data is output before returning. If true,
-	 *  this function will not return until all data is output or error occurs. Otherwise, only writes once then returns,
+	 * @param loop {bool} Whether to ensure all data is output before returning. If
+	 * true,
+	 * this function will not return until all data is output or error occurs.
+	 * Otherwise, only writes once then returns,
 	 *  but does not guarantee all data is written
 	 * @return {int} Actual amount of data written. Returns -1 indicates error
 	 */
 	int writev(const struct iovec *v, int count, bool loop = true);
 
 	/**
-	 * Write data in formatted way, similar to vfprintf, ensures all data is written
+	 * Write data in formatted way, similar to vfprintf, ensures all data is
+	 * written
 	 * @param fmt {const char*} Format string
 	 * @param ap {va_list} Variable argument list
 	 * @return {int} Actual length of data written. Returns -1 indicates error
@@ -131,7 +143,8 @@ public:
 	/**
 	 * Output data in buffer
 	 * @param s {const string&}
-	 * @param loop {bool} Whether to require all output to complete before returning
+	 * @param loop {bool} Whether to require all output to complete before
+	 * returning
 	 * @return {int} Length of output data. Returns -1 indicates error
 	 */
 	int write(const string& s, bool loop = true);
@@ -144,8 +157,10 @@ public:
 	int puts(const char* s);
 
 	/**
-	 * The following functions are output operator overload functions, and all are blocking output processes.
-	 * If want to determine whether output stream has error or is closed, should call stream->eof()
+	 * The following functions are output operator overload functions, and all are
+	 * blocking output processes.
+	 * If want to determine whether output stream has error or is closed, should
+	 * call stream->eof()
 	 * to determine
 	 */
 
@@ -173,7 +188,8 @@ public:
 
 public:
 	/**
-	 * Can call this method during process initialization to set internal write buffer size. Internal default is 512
+	 * Can call this method during process initialization to set internal write
+	 * buffer size. Internal default is 512
 	 * @param n {size_t}
 	 */
 	static void set_wbuf_size(size_t n);
