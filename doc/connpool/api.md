@@ -446,7 +446,7 @@ void bind_thread(bool yes);
 **参数**：
 - `yes` - `true` 启用，`false` 禁用
 
-**说明**：协程环境建议启用
+**说明**：当连接池用于协程环境必须启用
 
 #### init
 
@@ -498,10 +498,10 @@ void set(const char* addr, size_t max, int conn_timeout = 30,
 void remove(const char* addr);
 ```
 
-移除服务器。
+移除与指定服务器地址的连接池。
 
 **参数**：
-- `addr` - 服务器地址
+- `addr` - 服务器地址，格式：ip:port
 
 #### set_retry_inter
 
@@ -563,7 +563,7 @@ connect_pool* get(const char* addr, bool exclusive = true,
 根据地址获取连接池。
 
 **参数**：
-- `addr` - 服务器地址
+- `addr` - 服务器地址，格式：port:port
 - `exclusive` - 是否需要加锁
 - `restore` - 故障时是否自动恢复
 
@@ -636,7 +636,7 @@ size_t check_conns(size_t step, bool check_idle, bool kick_dead,
 - `check_idle` - 是否检查空闲
 - `kick_dead` - 是否踢除死连接
 - `keep_conns` - 是否保持最小连接数
-- `threads` - 线程池（可选）
+- `threads` - 线程池用于并发操作（可选）
 - `left` - 输出剩余数量
 
 ### 监控管理
@@ -675,13 +675,13 @@ connect_monitor* stop_monitor(bool graceful = true);
 
 ```cpp
 virtual connect_pool* create_pool(const char* addr,
-                                  size_t count, size_t idx) = 0;
+            size_t count, size_t idx) = 0;
 ```
 
 创建连接池。工厂方法。
 
 **参数**：
-- `addr` - 服务器地址
+- `addr` - 服务器地址，格式：port:port
 - `count` - 最大连接数
 - `idx` - 连接池索引
 
@@ -703,7 +703,7 @@ connect_monitor(connect_manager& manager, bool check_server = false);
 
 **参数**：
 - `manager` - 连接池管理器引用
-- `check_server` - 是否主动检测服务器
+- `check_server` - 是否主动检测服务器可用性
 
 ### 配置方法
 
@@ -742,7 +742,7 @@ connect_monitor& set_check_conns(bool check_idle, bool kick_dead,
 - `check_idle` - 是否检查空闲连接
 - `kick_dead` - 是否踢除死连接
 - `keep_conns` - 是否保持最小连接数
-- `threads` - 线程池（可选）
+- `threads` - 线程池用于并发操作（可选）
 - `step` - 每次检查数量
 
 ### 控制方法
@@ -847,7 +847,7 @@ struct conns_pools {
 
 ```cpp
 struct conn_config {
-    string addr;           // 服务器地址
+    string addr;           // 服务器地址，格式：port:port
     size_t max;            // 最大连接数
     size_t min;            // 最小连接数
     int conn_timeout;      // 连接超时

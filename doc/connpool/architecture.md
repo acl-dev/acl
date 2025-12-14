@@ -98,13 +98,12 @@ public:
 // TCP 客户端实现
 class tcp_client : public connect_client {
 private:
-    socket_stream* conn_;  // TCP 连接
+    socket_stream conn_;  // TCP 连接
     char* addr_;           // 服务器地址
     
 public:
     virtual bool open() {
-        conn_ = new socket_stream();
-        return conn_->open(addr_, conn_timeout_, rw_timeout_);
+        return conn_.open(addr_, conn_timeout_, rw_timeout_);
     }
 };
 
@@ -218,15 +217,22 @@ connect_client* connect_pool::peek(bool on) {
         
         // 创建新连接
         conn = create_connect();  // 调用子类工厂方法
+        if (conn == NULL) {
+            return NULL;
+        }
         conn->set_pool(this);
         conn->set_timeout(conn_timeout_, rw_timeout_);
+        lock_.lock();
         count_++;
+        lock_.unlock();
     }
     
     // 4. 建立连接
     if (conn && !conn->open()) {
         delete conn;
+        lock_.lock();
         count_--;
+        lock_.unlock();
         set_alive(false);  // 标记连接池为故障状态
         return NULL;
     }
@@ -234,8 +240,10 @@ connect_client* connect_pool::peek(bool on) {
     // 5. 更新使用时间和统计
     if (conn) {
         conn->set_when(time(NULL));
+        lock_.lock();
         total_used_++;
         current_used_++;
+        lock_.unlock();
     }
     
     return conn;
@@ -246,7 +254,7 @@ connect_client* connect_pool::peek(bool on) {
 
 ```cpp
 void connect_pool::put(connect_client* conn, bool keep,
-                        cpool_put_oper_t oper) {
+        cpool_put_oper_t oper) {
     if (conn == NULL) return;
     
     // 1. 更新最后使用时间
@@ -359,7 +367,7 @@ public:
 protected:
     // 工厂方法
     virtual connect_pool* create_pool(const char* addr,
-                                      size_t count, size_t idx) = 0;
+                size_t count, size_t idx) = 0;
 };
 ```
 

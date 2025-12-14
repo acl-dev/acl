@@ -14,10 +14,10 @@ class thread_pool;
  * 该类型定义了当调用 connect_pool::put() 时oper的行为
  */
 typedef enum {
-	cpool_put_oper_none  = 0,		// 不做任何操作
-	cpool_put_check_idle = 1,		// 检测并关闭超时空闲连接
-	cpool_put_check_dead = (1 << 1),	// 检测并关闭异常连接
-	cpool_put_keep_conns = (1 << 2),	// 尽量操持最小连接数
+	cpool_put_oper_none  = 0x00,	// 不做任何操作
+	cpool_put_check_idle = 0x01,	// 检测并关闭超时空闲连接
+	cpool_put_check_dead = 0x02,	// 检测并关闭异常连接
+	cpool_put_keep_conns = 0x04,	// 尽量操持最小连接数
 } cpool_put_oper_t;
 
 /**

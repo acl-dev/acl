@@ -324,6 +324,10 @@ void connect_pool::bind_one(connect_client* conn)
 void connect_pool::put(connect_client* conn, bool keep /* = true */,
        cpool_put_oper_t oper /* cpool_put_check_idle */)
 {
+	if (conn == NULL) {
+		return;
+	}
+
 	time_t now = time(NULL);
 
 	lock_.lock();
