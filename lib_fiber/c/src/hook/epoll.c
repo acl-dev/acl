@@ -24,7 +24,7 @@ struct EPOLL_CTX {
 };
 
 /**
- * All EPOLL_EVENT owned by its fiber are assosiate with the same one epoll fd.
+ * All EPOLL_EVENT owned by its fiber are associate with the same one epoll fd.
  * one epoll fd -|- one EPOLL -|- fiber EPOLL_EVENT
  *                             |- fiber EPOLL_EVENT
  *                             |- ...
@@ -218,7 +218,7 @@ static EPOLL *epoll_alloc(int epfd)
 	ep = (EPOLL*) mem_malloc(sizeof(EPOLL));
 	array_append(__epfds, ep);
 
-	/* Duplicate the current thread's epoll fd, so we can assosiate the
+	/* Duplicate the current thread's epoll fd, so we can associate the
 	 * connection handles with one epoll fd for the current thread, and
 	 * use one epoll fd for each thread to handle all fds.
 	 * Or if epfd < 0, we should create one socket fd as the epoll handle.
@@ -342,7 +342,7 @@ int epoll_close(int epfd)
 	assert(sys_epfd >= 0);
 
 	// We can't close the epfd same as the internal fiber event's fd.
-	// Because we've alloced a new fd as a duplication of internal epfd
+	// Because we've created a new fd as a duplication of internal epfd
 	// in epoll_alloc by calling sys API dup(), the epfd here shouldn't
 	// be same as the internal epfd.
 
@@ -487,9 +487,9 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	assert(ee->epoll);
 
 	// If the ready count exceeds the maxevents been set which limits the
-	// the buffer space to hold the the ready fds, we just return to let
-	// the left ready fds keeped in system buffer, and hope they'll be
-	// handled in the next epoll_wait().
+	// buffer space to hold the ready fds, we just return to let the left
+	// ready fds kept in system buffer, and hope they'll be handled in the
+	// next epoll_wait().
 	if (ee->nready >= ee->maxevents) {
 		return;
 	}
