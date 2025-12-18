@@ -441,6 +441,3 @@ If you have some questions when using Acl, please see [FAQ.md](FAQ.md).
 ## 5.6. Thanks
 
 Thanks <a href=https://jb.gg/OpenSourceSupport target=_blank><img widith=100 height=50 src=res/logo/clion_icon.png /> </a>.
-
-[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
-

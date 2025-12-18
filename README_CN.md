@@ -318,4 +318,3 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 ## 六、Thanks
 
 Thanks <a href=https://jb.gg/OpenSourceSupport target=_blank><img widith=100 height=50 src=res/logo/clion_icon.png /> </a>.
-[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
