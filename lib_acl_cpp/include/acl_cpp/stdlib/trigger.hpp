@@ -11,7 +11,7 @@
 namespace acl {
 
 /**
- * 具有相同时间截的定时任务的集合
+ * Collection of timer tasks with the same timestamp
  */
 template <typename T>
 class trigger_item : public noncopyable {
@@ -22,7 +22,7 @@ public:
 	~trigger_item() {}
 
 	/**
-	 * 添加一个定时任务
+	 * Add a timer task
 	 * @pararm o {T*}
 	 */
 	void add(T* o) {
@@ -30,10 +30,11 @@ public:
 	}
 
 	/**
-	 * 删除一个具有相同时间截的定时任务
+	 * Delete a timer task with the same timestamp
 	 * @pararm o {T*}
-	 * @return {int} 返回值 >= 0 表示剩余的具有相同时间截的定时任务数，
-	 *  返回 -1 表示该定时任务不存在
+	 * @return {int} Return value >= 0 indicates remaining number of timer tasks
+	 * with the same timestamp,
+	 *  returns -1 indicates this timer task does not exist
 	 */
 	int del(T* o) {
 		for (typename std::vector<T*>::iterator it = objs_.begin();
@@ -48,7 +49,7 @@ public:
 	}
 
 	/**
-	 * 获取具有相同时间截的所有定时任务集合
+	 * Get all timer task collection with the same timestamp
 	 * @return {std::vector<T*>&}
 	 */
 	std::vector<T*>& get_objs() {
@@ -61,16 +62,20 @@ private:
 };
 
 /**
- * 定时任务触发管理器，通过本类添加定时任务，该类会将到期的任务进行触发
- * 每个定时任务对象 T 需要实现以下方法，以便于由该触发器触发
+ * Timer task trigger manager. Add timer tasks through this class, and this
+ * class will trigger expired tasks.
+ * Each timer task object T needs to implement the following methods so that it
+ * can be triggered by this trigger:
  *
- * bool on_trigger();		// 定时时间到期时的回调方法，返回值表示
- * 					// 是否需要再次触发该定时任务
- * int get_ttl() const;		// 定时任务到达时的时间间隔（毫秒）
- * void set_key(long long key);		// 触发器设置与该定时任务关联的键
- * long long get_key() const;	// 获得由 set_key 设置的键
+ * bool on_trigger();              // Callback method when timer expires. Return
+ * value indicates
+ * 					// whether this timer task needs to be triggered again
+ * int get_ttl() const;		// Time interval (milliseconds) when timer task arrives
+ * void set_key(long long key);            // Trigger sets key associated with
+ * this timer task
+ * long long get_key() const;	// Get key set by set_key
  *
- * 如一个 T 的实例类声明如下：
+ * Example of a T instance class declaration:
  * class mytask
  * {
  * public:
@@ -111,7 +116,7 @@ public:
 	~timer_trigger() {}
 
 	/**
-	 * 添加一个任务对象
+	 * Add a task object
 	 * @pararm o {T*}
 	 */
 	void add(T* o) {
@@ -130,9 +135,11 @@ public:
 	}
 
 	/**
-	 * 删除一个任务对象，内部调用 o->get_key() 方法获得该任务对象的键
-	 * @pararm o {T*} 指定将被删除的任务对象
-	 * @return {int} >= 0 时表示剩余的任务对象，-1 表示该任务对象不存在
+	 * Delete a task object. Internally calls o->get_key() method to get the key of
+	 * this task object
+	 * @pararm o {T*} Specified task object to be deleted
+	 * @return {int} >= 0 indicates remaining task objects, -1 indicates this task
+	 * object does not exist
 	 */
 	int del(T* o) {
 		long long key     = o->get_key();
@@ -149,9 +156,10 @@ public:
 	}
 
 	/**
-	 * 触发所有到期的定时任务
-	 * @return {long long} 返回下一个将被触发的定时任务的时间截，返回 -1
-	 *  表示没有定时任务
+	 * Trigger all expired timer tasks
+	 * @return {long long} Returns timestamp of the next timer task to be
+	 * triggered. Returns -1
+	 *  indicates there are no timer tasks
 	 */
 	long long trigger() {
 		long long key = get_curr_stamp();
@@ -184,7 +192,7 @@ private:
 	trigger_items_t items_;
 
 	/**
-	 * 触发具有相同定时时间截的所有任务
+	 * Trigger all tasks with the same timer timestamp
 	 * @pararm item {trigger_item<T>*}
 	 */
 	void trigger(trigger_item<T>* item) {
@@ -214,22 +222,23 @@ private:
 };
 
 /**
- * 定时器管理线程，该线程从 mbox 中获得定时任务，并加入定时任务触发器中，然后
- * 定时从触发器中提取到期的任务并触发
+ * Timer management thread. This thread gets timer tasks from mbox, adds them to
+ * timer task trigger, then
+ * periodically extracts expired tasks from trigger and triggers them
  */
 template <typename T>
 class thread_trigger : public thread {
 public:
 	thread_trigger()
-	: delay_(100)  // 初始化时的超时等待时间（毫秒）
-	, stop_(false) // 是否停止线程
+	: delay_(100)  // Timeout wait time during initialization (milliseconds)
+	, stop_(false) // Whether to stop thread
 	{
 	}
 
 	virtual ~thread_trigger() {}
 
 	/**
-	 * 添加一个定时任务对象
+	 * Add a timer task object
 	 * @pararm o {T*}
 	 */
 	void add(T* o) {
@@ -237,7 +246,8 @@ public:
 	}
 
 	/**
-	 * 添加要删除的定时任务对象到临时队列中，然后从定时器中删除之
+	 * Add timer task object to be deleted to temporary queue, then delete it from
+	 * timer
 	 * @pararm o {T*}
 	 */
 	void del(T* o) {
@@ -293,3 +303,4 @@ private:
 };
 
 } // namespace acl
+

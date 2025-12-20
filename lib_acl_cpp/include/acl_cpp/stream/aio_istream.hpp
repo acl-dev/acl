@@ -10,16 +10,24 @@ namespace acl {
 class aio_istream;
 
 /**
- * 延迟异步读数据类，基类为 aio_timer_callback (see aio_handle.hpp)，
- * 所谓延迟异步读，就是把异步读流(aio_istream)放在定时器中，将该异
- * 步流的异步读操作解除绑定(即从 aio_handle 的监控中解除)，当指定
- * 时间到达后再启动异步读操作(在 timer_callback 回调中再重新将异步
- * 流的异步读操作绑定)，同时该定时器自动销毁(调用 destroy 方法)，
- * 所以如果用户继承了 aio_timer_reader 类，且子类不是在堆上分配的，
- * 则必须重载 destroy方法，同时在子类的 destroy 中执行与资源释放的
- * 相关操作，如果子类未重载 destroy，则当定时器结束后内部会自动调用
- * 基类 aio_timer_reader 的 destroy--该类调用了 delete this，此时就
- * 会导致非法内存释放操作)
+ * Delayed asynchronous read data class, base class is aio_timer_callback (see
+ * aio_handle.hpp).
+ * The so-called delayed asynchronous read is to put the asynchronous read
+ * stream (aio_istream) into a timer,
+ * unbind the asynchronous read operation of the asynchronous stream (i.e.,
+ * remove it from aio_handle's monitoring),
+ * and then start the asynchronous read operation when the specified time
+ * arrives (re-bind the asynchronous read operation
+ * of the asynchronous stream in the timer_callback callback). At the same time,
+ * the timer automatically destroys itself
+ * (calls the destroy method). Therefore, if the user inherits the
+ * aio_timer_reader class and the subclass is not allocated
+ * on the heap, the destroy method must be overridden, and resource release
+ * operations should be performed in the subclass's
+ * destroy. If the subclass does not override destroy, the base class
+ * aio_timer_reader's destroy will be automatically called
+ * when the timer ends - this class calls delete this, which will cause an
+ * illegal memory release operation.
  * 
  */
 class ACL_CPP_API aio_timer_reader : public aio_timer_callback {
@@ -32,7 +40,8 @@ public:
 	, delay_count_(0) {}
 
 	/**
-	 * 在 aio_istream 中调用此函数以释放类对象，子类应该实现该函数
+	 * Called in aio_istream to release the class object. Subclasses should
+	 * implement this function.
 	 */
 	virtual void destroy() {
 		delete this;
@@ -41,12 +50,13 @@ public:
 protected:
 	virtual ~aio_timer_reader() {}
 	/**
-	 * 延迟读数据时的回调函数，从 aio_timer_callback 类中继承而来
+	 * Callback function when reading data with delay, inherited from
+	 * aio_timer_callback class.
 	 */
 	virtual void timer_callback(unsigned int id);
 
 private:
-	// 允许 aio_istream 可以直接修改本类的私有成员变量
+	// Allow aio_istream to directly modify private member variables of this class
 	friend class aio_istream;
 
 	aio_istream* in_;
@@ -58,21 +68,24 @@ private:
 };
 
 /**
- * 异步读数据流类定义，该类只能在堆上被实例化，在析构时需要调用 close
- * 函数以释放该类对象
+ * Asynchronous read data stream class definition. This class can only be
+ * instantiated on the heap.
+ * When destructing, the close function must be called to release this class
+ * object.
  */
 class ACL_CPP_API aio_istream : virtual public aio_stream {
 public:
 	/**
-	 * 构造函数
-	 * @param handle {aio_handle*} 异步事件引擎句柄
+	 * Constructor
+	 * @param handle {aio_handle*} Asynchronous event engine handle
 	 */
 	explicit aio_istream(aio_handle* handle);
 
 	/**
-	 * 构造函数，创建异步读流对象，并 hook 读过程及关闭/超时过程
-	 * @param handle {aio_handle*} 异步事件引擎句柄
-	 * @param fd {int} 连接套接口句柄
+	 * Constructor, creates an asynchronous read stream object and hooks the read
+	 * process and close/timeout process.
+	 * @param handle {aio_handle*} Asynchronous event engine handle
+	 * @param fd {int} Connection socket handle
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	aio_istream(aio_handle* handle, SOCKET fd);
@@ -81,56 +94,71 @@ public:
 #endif
 
 	/**
-	 * 添加异可读时的回调类对象指针，如果该回调类对象已经存在，则只是
-	 * 使该对象处于打开可用状态
-	 * @param callback {aio_callback*} 继承 aio_callback 的子类回调类对象，
-	 *  当异步流有数据时会先调用此回调类对象中的 read_callback 接口
+	 * Add a callback class object pointer for when data is readable. If the
+	 * callback class object already exists,
+	 * it will only make the object in an open and available state.
+	 * @param callback {aio_callback*} Subclass callback class object inheriting
+	 * from aio_callback.
+	 * When the asynchronous stream has data, the read_callback interface in this
+	 * callback class object will be called first.
 	 */
 	void add_read_callback(aio_callback* callback);
 
 	/**
-	 * 从读回调对象集合中删除
-	 * @param callback {aio_read_callback*} 被删除的回调对象，
-	 * 若该值为空，则删除所有的回调对象
-	 * @return {int} 返回被从回调对象集合中删除的回调对象的个数
+	 * Delete from the read callback object collection
+	 * @param callback {aio_read_callback*} Callback object to be deleted.
+	 * If this value is empty, all callback objects will be deleted.
+	 * @return {int} Returns the number of callback objects deleted from the
+	 * callback object collection.
 	 */
 
 	/**
-	 * 从读回调对象集合中删除回调对象
-	 * @param callback {aio_callback*} 从 aio_callback 继承的子类对象指针，
-	 *  若该值为空，则删除所有的读回调对象
-	 * @return {int} 返回被从回调对象集合中删除的回调对象的个数
+	 * Delete callback object from the read callback object collection.
+	 * @param callback {aio_callback*} Subclass object pointer inheriting from
+	 * aio_callback.
+	 *  If this value is empty, all read callback objects will be deleted.
+	 * @return {int} Returns the number of callback objects deleted from the
+	 * callback object collection.
 	 */
 	int del_read_callback(aio_callback* callback = NULL);
 
 	/**
-	 * 禁止回调对象类集合中的某个回调类对象，但并不从回调类对象
-	 * 集合中删除，只是不被调用而已
-	 * @param callback {aio_callback*} 从 aio_callback 继承的子类对象指针，
-	 *  若该值为空，则禁止所有的读回调对象
-	 * @return {int} 返回被从回调对象集合中禁用的回调对象的个数
+	 * Disable a callback class object in the callback object collection, but do
+	 * not delete it from the callback
+	 * object collection, it just won't be called.
+	 * @param callback {aio_callback*} Subclass object pointer inheriting from
+	 * aio_callback.
+	 *  If this value is empty, all read callback objects will be disabled.
+	 * @return {int} Returns the number of callback objects disabled in the
+	 * callback object collection.
 	 */
 	int disable_read_callback(aio_callback* callback = NULL);
 
 	/**
-	 * 启用所有的回调对象被调用
-	 * @param callback {aio_callback*} 从 aio_callback 继承的子类对象指针，
-	 *  若该值为空，则启用所有的读回调对象
-	 * @return {int} 返回被启用的回调对象的个数
+	 * Enable all callback objects to be called.
+	 * @param callback {aio_callback*} Subclass object pointer inheriting from
+	 * aio_callback.
+	 *  If this value is empty, all read callback objects will be enabled.
+	 * @return {int} Returns the number of enabled callback objects.
 	 */
 	int enable_read_callback(aio_callback* callback = NULL);
 
 	/**
-	 * 异步读取一行数据，当延迟异步读时，如果连续调用此过程，
-	 * 则只有最后一个延迟读操作生效
-	 * @param timeout {int} 读超时时间(秒)，若为 0 则表示
-	 *  永远等待直到读到完整一行数据或出错
-	 * @param nonl {bool} 是否自动去掉尾部的回车换行符
-	 * @param delay {long long int} 如果对方发送数据比较快时，此参数
-	 *  大于 0 时可以延迟接收对方的数据，该值控制延迟读数据
-	 *  的时间(单位为微秒)
-	 * @param callback {aio_timer_reader*} 定时器到达时的回调函数类对象，
-	 *  当 delay > 0，如果该值为空，则采用缺省的对象
+	 * Asynchronously read a line of data. When delayed asynchronous read is used,
+	 * if this process is called continuously,
+	 * only the last delayed read operation will take effect.
+	 * @param timeout {int} Read timeout time (seconds). If 0, it means
+	 *  wait forever until a complete line of data is read or an error occurs.
+	 * @param nonl {bool} Whether to automatically remove trailing carriage return
+	 * and line feed characters.
+	 * @param delay {long long int} If the peer sends data relatively quickly, when
+	 * this parameter
+	 * is greater than 0, the peer's data can be received with delay. This value
+	 * controls the delay time
+	 *  for reading data (unit: microseconds).
+	 * @param callback {aio_timer_reader*} Callback function class object when the
+	 * timer expires.
+	 *  When delay > 0, if this value is empty, the default object will be used.
 	 */
 	void gets_await(int timeout = 0, bool nonl = true,
 		long long int delay = 0, aio_timer_reader* callback = NULL);
@@ -144,17 +172,23 @@ public:
 	}
 
 	/**
-	 * 异步读取数据，当延迟异步读时，如果连续调用此过程，
-	 * 则只有最后一个延迟读操作生效
-	 * @param count {int} 所要求读到的数据量，如果为 0 则只要有数据
-	 *  可读就返回，否则直到读超时或读出错或读满足所要求的字节数
-	 * @param timeout {int} 读超时时间(秒)，若为 0 则表示
-	 *  永远等待直到读到所要求的数据或出错
-	 * @param delay {long long int} 如果对方发送数据比较快时，此参数
-	 *  大于 0 时可以延迟接收对方的数据，该值控制延迟读数据
-	 *  的时间(单位为微秒)
-	 * @param callback {aio_timer_reader*} 定时器到达时的回调函数类对象，
-	 *  如果该值为空，则采用缺省的对象
+	 * Asynchronously read data. When delayed asynchronous read is used, if this
+	 * process is called continuously,
+	 * only the last delayed read operation will take effect.
+	 * @param count {int} The amount of data required to be read. If 0, it will
+	 * return as long as there is data
+	 * available to read. Otherwise, it will continue until read timeout, read
+	 * error, or the required number of bytes is read.
+	 * @param timeout {int} Read timeout time (seconds). If 0, it means
+	 *  wait forever until the required data is read or an error occurs.
+	 * @param delay {long long int} If the peer sends data relatively quickly, when
+	 * this parameter
+	 * is greater than 0, the peer's data can be received with delay. This value
+	 * controls the delay time
+	 *  for reading data (unit: microseconds).
+	 * @param callback {aio_timer_reader*} Callback function class object when the
+	 * timer expires.
+	 *  If this value is empty, the default object will be used.
 	 */
 	void read_await(int count = 0, int timeout = 0,
 		long long int delay = 0, aio_timer_reader* callback = NULL);
@@ -168,9 +202,12 @@ public:
 	}
 
 	/**
-	 * 异步等待连接流可读，该函数设置异步流的读监听状态，当有数据可读
-	 * 时，回调函数被触发，由用户自己负责数据的读取
-	 * @param timeout {int} 读超时时间(秒)，当该值为 0 时，则没有读超时
+	 * Asynchronously wait for the connection stream to be readable. This function
+	 * sets the read monitoring state of the asynchronous stream.
+	 * When data is readable, the callback function is triggered, and the user is
+	 * responsible for reading the data.
+	 * @param timeout {int} Read timeout time (seconds). When this value is 0,
+	 * there is no read timeout.
 	 */
 	void readable_await(int timeout = 0);
 
@@ -182,42 +219,50 @@ public:
 	}
 
 	/**
-	 * 禁止异步流的异步读状态，将该异步流从异步引擎的监控中
-	 * 移除，直到用户调用任何一个异步读操作(此时，异步引擎会
-	 * 自动重新监控该流的可读状态)
+	 * Disable the asynchronous read state of the asynchronous stream, remove the
+	 * asynchronous stream from the asynchronous engine's
+	 * monitoring until the user calls any asynchronous read operation (at this
+	 * time, the asynchronous engine will
+	 * automatically re-monitor the readable state of the stream).
 	 */
 	void disable_read();
 
 	/**
-	 * 设置流是否采用连接读功能
+	 * Set whether the stream uses continuous read functionality.
 	 * @param onoff {bool}
 	 */
 	void keep_read(bool onoff);
 
 	/**
-	 * 获得流是否是设置了连续读功能
+	 * Get whether the stream has continuous read functionality set.
 	 * @return {bool}
 	 */
 	bool keep_read() const;
 
 	/**
-	 * 设置接收缓冲区的最大长度，以避免缓冲区溢出，默认值为 0 表示不限制
+	 * Set the maximum length of the receive buffer to avoid buffer overflow.
+	 * Default value is 0, meaning no limit.
 	 * @param max {int}
 	 * @return {aio_istream&}
 	 */
 	aio_istream& set_buf_max(int max);
 
 	/**
-	 * 获得当前接收缓冲区的最大长度限制
-	 * @return {int} 返回值  <= 0 表示没有限制
+	 * Get the current maximum length limit of the receive buffer.
+	 * @return {int} Return value <= 0 means no limit.
 	 */
 	int get_buf_max() const;
 
 	/**
-	 * 清除内部的 read_ready flag 位，当 IO 引擎检测到 IO 可读时，会设置
-	 * read_ready 标志位，而且还会定期检测该标志位是否设置，以决定是否需
-	 * 要再次触发读回调过程，通过本方法清理掉该标志位后，IO 引擎就不会在
-	 * 应用层检测该句柄是否可读，而是交由 OS 去判断是否可读
+	 * Clear the internal read_ready flag bit. When the IO engine detects that IO
+	 * is readable, it will set
+	 * the read_ready flag bit, and will also periodically check whether this flag
+	 * bit is set to decide whether
+	 * to trigger the read callback process again. After clearing this flag bit
+	 * through this method, the IO engine
+	 * will not check at the application layer whether the handle is readable, but
+	 * will leave it to the OS to determine
+	 * whether it is readable.
 	 */
 	void clear_read_ready();
 
@@ -225,12 +270,12 @@ protected:
 	virtual ~aio_istream();
 
 	/**
-	 * 释放动态类对象的虚函数
+	 * Virtual function to release dynamic class objects.
 	 */
 	virtual void destroy();
 
 	/**
-	 * 注册可读的回调函数
+	 * Register readable callback function.
 	 */
 	void enable_read();
 
@@ -244,3 +289,4 @@ private:
 };
 
 }  // namespace acl
+

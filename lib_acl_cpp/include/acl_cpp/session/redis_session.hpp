@@ -19,33 +19,35 @@ public:
 		time_t ttl = 0, const char* sid = NULL);
 	~redis_session();
 
-	// 基类虚函数，向 redis 服务端设置哈希属性值
+	// Base class virtual function, set hash attribute value to redis server
 	bool set(const char* name, const char* value);
 
-	// 基类虚函数，向 redis 服务端设置哈希属性值
+	// Base class virtual function, set hash attribute value to redis server
 	bool set(const char* name, const void* value, size_t len);
 
-	// 基类虚函数，从 redis 服务端的哈希对象中获得对应属性的值
+	// Base class virtual function, get corresponding attribute value from hash
+	// object on redis server
 	const session_string* get_buf(const char* name);
 
-	// 基类虚函数，从 redis 服务端的哈希对象中删除某个属性值
+	// Base class virtual function, delete an attribute value from hash object on
+	// redis server
 	bool del(const char* name);
 
-	// 基类纯虚函数，从 redis 中删除数据
+	// Base class pure virtual function, delete data from redis
 	bool remove();
 
-	// 基类纯虚函数，从 redis 中获得数据
+	// Base class pure virtual function, get data from redis
 	bool get_attrs(std::map<string, session_string>& attrs);
 
-	// 基类虚函数，从 redis 中获得数据
+	// Base class virtual function, get data from redis
 	bool get_attrs(const std::vector<string>& names,
 		std::vector<session_string>& values);
 
-	// 基类纯虚函数，向 redis 中添加或修改数据
+	// Base class pure virtual function, add or modify data in redis
 	bool set_attrs(const std::map<string, session_string>& attrs);
 
 protected:
-	//重新设置 session 在 redis 上的缓存时间
+	// Reset the cache time of session on redis
 	bool set_timeout(time_t ttl);
 
 private:

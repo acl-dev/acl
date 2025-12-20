@@ -8,8 +8,9 @@ extern "C" {
 #include "acl_define.h"
 
 /**
- * 设置内存分配、释放的注册函数，当ACL内部分配释放内存时便调用这些注册的函数
- * 在调用此函数进行注册时必须保证这几个函数指针参数均非空
+ * Register hook functions for memory allocation and deallocation. When ACL internally
+ * allocates or deallocates memory, it will call the registered functions.
+ * When registering these functions, you must ensure that these function pointers are valid.
  * @param malloc_hook {void *(*)(const char* fname, int lineno, size_t)}
  * @param calloc_hook {void *(*)(const char* fname, int lineno, size_t, size_t)}
  * @param realloc_hook {void *(*)(const char* fname, int lineno, void *, size_t)}
@@ -27,7 +28,7 @@ ACL_API void acl_mem_hook(void *(*malloc_hook)(const char*, int, size_t),
 		void  (*free_hook)(const char*, int, void*));
 
 /**
- * 取消之前设置的内存勾子函数，恢复为缺省状态
+ * Remove previously set memory hook functions and restore to default state.
  */
 ACL_API void acl_mem_unhook(void);
 

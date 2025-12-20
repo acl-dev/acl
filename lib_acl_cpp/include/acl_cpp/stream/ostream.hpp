@@ -10,8 +10,9 @@ namespace acl {
 class string;
 
 /**
- * 输入流处理过程类，调用者想确切知道输出流是否出错或是否关闭，
- * 应该调用 stream->eof() 来进行判断
+ * Output stream processing class. Callers who want to know exactly whether
+ * output stream has error or is closed,
+ * should call stream->eof() to determine
  */
 
 class ACL_CPP_API ostream : virtual public stream , public pipe_stream {
@@ -20,37 +21,43 @@ public:
 	virtual ~ostream() {}
 
 	/**
-	 * 写数据至输出流中
-	 * @param data {const void*} 数据指针地址
-	 * @param size {size_t} data 数据长度(字节)
-	 * @param loop {bool} 是否保证数据全部输出才返回，如果为 true,
-	 *  则该函数直至数据全部输出或出错才会返回；否则仅写一次便返回，
-	 *  但并不保证数据全部写完
-	 * @param buffed {bool} 是否先缓存待写的数据
-	 * @return {int} 真实写入的数据量, 返回 -1 表示出错
+	 * Write data to output stream
+	 * @param data {const void*} Data pointer address
+	 * @param size {size_t} data data length (bytes)
+	 * @param loop {bool} Whether to ensure all data is output before returning. If
+	 * true,
+	 * this function will not return until all data is output or error occurs.
+	 * Otherwise, only writes once then returns,
+	 *  but does not guarantee all data is written
+	 * @param buffed {bool} Whether to cache data to be written first
+	 * @return {int} Actual amount of data written. Returns -1 indicates error
 	 */
 	int write(const void* data, size_t size, bool loop = true,
 		bool buffed = false);
 
 	/**
-	 * 当采用报文方式发送数据时，可调用本方法向目标地址发送数据包
-	 * @param data {const void*} 数据地址
-	 * @param size {size_t} 数据长度
-	 * @param dest_addr {const char*} 目标地址，格式：ip|port
-	 * @param flags {int} 发送标志位，请参考系统 sendto() api 中 flags 说明
-	 * @return {int} 返回 -1 表示发送失败
+	 * When sending data in datagram mode, can call this method to send data packet
+	 * to target address
+	 * @param data {const void*} Data address
+	 * @param size {size_t} Data length
+	 * @param dest_addr {const char*} Target address, format: ip|port
+	 * @param flags {int} Send flag bits. Please refer to flags description in
+	 * system sendto() api
+	 * @return {int} Returns -1 indicates send failed
 	 */
 	int sendto(const void* data, size_t size,
 		const char* dest_addr, int flags = 0);
 
 	/**
-	 * 当采用报文方式发送数据时，可调用本方法向目标地址发送数据包
-	 * @param data {const void*} 数据地址
-	 * @param size {size_t} 数据长度
-	 * @param dest_addr {const sockaddr*} 目标地址，格式：ip|port
-	 * @param addrlen {int} dest_addr 地址长度
-	 * @param flags {int} 发送标志位，请参考系统 sendto() api 中 flags 说明
-	 * @return {int} 返回 -1 表示发送失败
+	 * When sending data in datagram mode, can call this method to send data packet
+	 * to target address
+	 * @param data {const void*} Data address
+	 * @param size {size_t} Data length
+	 * @param dest_addr {const sockaddr*} Target address, format: ip|port
+	 * @param addrlen {int} dest_addr address length
+	 * @param flags {int} Send flag bits. Please refer to flags description in
+	 * system sendto() api
+	 * @return {int} Returns -1 indicates send failed
 	 */
 	int sendto(const void* data, size_t size,
 		const struct sockaddr* dest_addr, int addrlen, int flags = 0);
@@ -58,48 +65,53 @@ public:
 	ssize_t send(const void* buf, size_t len, int flags);
 
 	/**
-	 * 如果采用写缓冲方式，则最后需要调用本函数刷写缓冲区
-	 * @return {bool} 返回 false 表示写失败，有可能是连接关闭
+	 * If write buffering mode is used, need to call this function at the end to
+	 * flush buffer
+	 * @return {bool} Returns false indicates write failed, possibly connection
+	 * closed
 	 */
 	bool fflush();
 
 	/**
-	 * 判断当前连接是否可写
-	 * @param timeo {int} 可写超时时间（毫秒）
+	 * Determine whether current connection is writable
+	 * @param timeo {int} Writable timeout (milliseconds)
 	 * @return {bool}
 	 */
 	bool write_wait(int timeo) const;
 
 	/**
-	 * 写数据至输出流中
+	 * Write data to output stream
 	 * @param v {const struct iovec*}
-	 * @param count {int} 数组 v 的元素个数
-	 * @param loop {bool} 是否保证数据全部输出才返回，如果为 true，
-	 *  则该函数直至数据全部输出或出错才会返回；否则仅写一次便返回，
-	 *  但并不保证数据全部写完
-	 * @return {int} 真实写入的数据量, 返回 -1 表示出错
+	 * @param count {int} Number of elements in array v
+	 * @param loop {bool} Whether to ensure all data is output before returning. If
+	 * true,
+	 * this function will not return until all data is output or error occurs.
+	 * Otherwise, only writes once then returns,
+	 *  but does not guarantee all data is written
+	 * @return {int} Actual amount of data written. Returns -1 indicates error
 	 */
 	int writev(const struct iovec *v, int count, bool loop = true);
 
 	/**
-	 * 带格式方式写数据，类似于 vfprintf，保证数据全部写入
-	 * @param fmt {const char*} 格式字符串
-	 * @param ap {va_list} 变参列表
-	 * @return {int} 真实写入的数据长度，返回 -1 表示出错
+	 * Write data in formatted way, similar to vfprintf, ensures all data is
+	 * written
+	 * @param fmt {const char*} Format string
+	 * @param ap {va_list} Variable argument list
+	 * @return {int} Actual length of data written. Returns -1 indicates error
 	 */
 	int vformat(const char* fmt, va_list ap);
 
 	/**
-	 * 带格式方式写数据，类似于 fprintf，保证数据全部写入
-	 * @param fmt {const char*} 变参格式字符串
-	 * @return {int} 真实写入的数据长度，返回 -1 表示出错
+	 * Write data in formatted way, similar to fprintf, ensures all data is written
+	 * @param fmt {const char*} Variable argument format string
+	 * @return {int} Actual length of data written. Returns -1 indicates error
 	 */
 	int format(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
-	 * 写入一个 64 位整数
-	 * @param n {acl_int64} 64 位数据
-	 * @return {int} 写入的数据长度，返回 -1 表示出错
+	 * Write a 64-bit integer
+	 * @param n {acl_int64} 64-bit data
+	 * @return {int} Length of data written. Returns -1 indicates error
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	int write(__int64 n);
@@ -108,45 +120,48 @@ public:
 #endif
 
 	/**
-	 * 写入一个 32 位整数
-	 * @param n {int} 32 位整数
-	 * @return {int} 写入的数据长度，返回 -1 表示出错
+	 * Write a 32-bit integer
+	 * @param n {int} 32-bit integer
+	 * @return {int} Length of data written. Returns -1 indicates error
 	 */
 	int write(int n);
 
 	/**
-	 * 写入一个 16 位短整数
-	 * @param n {int} 16 位整数
-	 * @return {int} 写入的数据长度，返回 -1 表示出错
+	 * Write a 16-bit short integer
+	 * @param n {int} 16-bit integer
+	 * @return {int} Length of data written. Returns -1 indicates error
 	 */
 	int write(short n);
 
 	/**
-	 * 写一个字节
+	 * Write a byte
 	 * @param ch {char}
-	 * @return {int} 写入的数据长度，返回 -1 表示出错
+	 * @return {int} Length of data written. Returns -1 indicates error
 	 */
 	int write(char ch);
 
 	/**
-	 * 输出缓冲区中的数据
+	 * Output data in buffer
 	 * @param s {const string&}
-	 * @param loop {bool} 是否要求全部输出完才返回
-	 * @return {int} 输出数据的长度，返回 -1 表示出错
+	 * @param loop {bool} Whether to require all output to complete before
+	 * returning
+	 * @return {int} Length of output data. Returns -1 indicates error
 	 */
 	int write(const string& s, bool loop = true);
 
 	/**
-	 * 输出一行字符串数据，在所给字符串后添加 "\r\n"
-	 * @param s {const char*} 字符串指针，必须以 '\0' 结尾
-	 * @return {int} 输出数据的长度，返回 -1 表示出错
+	 * Output a line of string data, adding "\r\n" after given string
+	 * @param s {const char*} String pointer, must end with '\0'
+	 * @return {int} Length of output data. Returns -1 indicates error
 	 */
 	int puts(const char* s);
 
 	/**
-	 * 以下几个函数为输出操作符重载函数，且都是阻塞输出过程，
-	 * 如果想判断输出流是否出错或关闭应该调用 stream->eof()
-	 * 来进行判断
+	 * The following functions are output operator overload functions, and all are
+	 * blocking output processes.
+	 * If want to determine whether output stream has error or is closed, should
+	 * call stream->eof()
+	 * to determine
 	 */
 
 	ostream& operator<<(const string& s);
@@ -160,8 +175,8 @@ public:
 	ostream& operator<<(short n);
 	ostream& operator<<(char ch);
 
-	// pipe_stream 几个虚函数
-	// 因为是输出流，所以仅实现一个
+	// pipe_stream several virtual functions
+	// Because it is output stream, only implements one
 	virtual int push_pop(const char* in, size_t len,
 		string* out, size_t max);
 
@@ -173,10 +188,12 @@ public:
 
 public:
 	/**
-	 * 进程初始化时可以调用此方法设置内部写缓存区的大小，内部缺省为 512
+	 * Can call this method during process initialization to set internal write
+	 * buffer size. Internal default is 512
 	 * @param n {size_t}
 	 */
 	static void set_wbuf_size(size_t n);
 };
 
 } // namespace acl
+

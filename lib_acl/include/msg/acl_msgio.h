@@ -17,15 +17,15 @@ typedef int (*ACL_MSGIO_NOTIFY_FN)(int msg_type, ACL_MSGIO *peer,
 				   const ACL_MSGIO_INFO *info, void *arg);
 
 /**
- * 消息类型定义
+ * Message type definitions.
  */
 #define ACL_MSGIO_OK				0
-#define ACL_MSGIO_TIMEOUT			1	/* 超时消息 */
-#define ACL_MSGIO_EXCEPT			2	/* 异常消息 */
-#define ACL_MSGIO_CONNECT			3	/* 连接成功消息 */
-#define ACL_MSGIO_CONNECT_TIMEOUT		4	/* 连接超时消息 */
-#define ACL_MSGIO_QUIT				5	/* 退出消息 */
-#define	ACL_MSGIO_OPEN				6	/* 数据流打开消息 */
+#define ACL_MSGIO_TIMEOUT			1	/* Timeout message */
+#define ACL_MSGIO_EXCEPT			2	/* Exception message */
+#define ACL_MSGIO_CONNECT			3	/* Connection success message */
+#define ACL_MSGIO_CONNECT_TIMEOUT		4	/* Connection timeout message */
+#define ACL_MSGIO_QUIT				5	/* Quit message */
+#define	ACL_MSGIO_OPEN				6	/* Open stream message */
 
 #define ACL_MSGIO_USER				1000
 
@@ -56,7 +56,8 @@ ACL_API ACL_MSGIO *acl_msgio_connect(ACL_AIO *aio, const char *addr, int timeout
 ACL_API void acl_msgio_set_noblock(ACL_AIO *aio, ACL_MSGIO *mio);
 
 ACL_API int acl_msgio_send(ACL_MSGIO *mio, int type, void *data, int dlen);
-/* void acl_msgio_timer(ACL_MSGIO *mio, ACL_MSGIO_NOTIFY_FN callback, void *arg); */
+/* void acl_msgio_timer(ACL_MSGIO *mio,
+ *  ACL_MSGIO_NOTIFY_FN callback, void *arg); */
 
 ACL_API void acl_msgio_addr(const ACL_MSGIO *mio, char *buf, size_t size);
 ACL_API ACL_AIO *acl_msgio_aio(ACL_MSGIO *mio);

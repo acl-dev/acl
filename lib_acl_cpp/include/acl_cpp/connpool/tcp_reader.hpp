@@ -7,7 +7,8 @@ class socket_stream;
 class string;
 
 /**
- * tcp ipc 通信接收类，内部会自动读取完事的数据包
+ * tcp ipc communication reader class. Internally automatically reads new data
+ * packets.
  */
 class ACL_CPP_API tcp_reader : public noncopyable {
 public:
@@ -15,13 +16,14 @@ public:
 	~tcp_reader() {}
 
 	/**
-	 * 从对端读取数据，每次只读一个数据包
-	 * @param out {string&} 存储数据包，内部采用追加方式往 out 添加数据
+	 * Read data from peer. Each call reads only one data packet.
+	 * @param out {string&} Buffer to store data packet. Internally uses append
+	 * method, and automatically clears out buffer.
 	 */
 	bool read(string& out);
 
 	/**
-	 * 获得连接流对象
+	 * Get connection object.
 	 * @return {acl::socket_stream&}
 	 */
 	acl::socket_stream& get_conn() const {

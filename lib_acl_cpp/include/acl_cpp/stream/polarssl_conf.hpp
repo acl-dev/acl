@@ -7,28 +7,33 @@
 namespace acl {
 
 /**
- * SSL 证书校验级别类型定义
+ * SSL certificate verification level type definition
  */
 typedef enum {
-	POLARSSL_VERIFY_NONE,	// 不校验证书
-	POLARSSL_VERIFY_OPT,	// 选择性校验，可以在握手时或握手后校验
-	POLARSSL_VERIFY_REQ	// 要求在握手时校验
+	POLARSSL_VERIFY_NONE,	// Don't verify certificate
+	POLARSSL_VERIFY_OPT,	// Optional verification, can verify during or after handshake
+	POLARSSL_VERIFY_REQ	// Require verification during handshake
 } polarssl_verify_t;
 
 class polarssl_io;
 
 /**
- * SSL 连接对象的配置类，该类对象一般可以声明为全局对象，用来对每一个 SSL
- * 连接对象进行证书配置；该类加载了全局性的证书、密钥等信息；每一个 SSL 对象
- * (polarssl_io) 调用本对象的setup_certs 方法来初始化自身的证书、密钥等信息
+ * Configuration class for SSL connection objects. Objects of this class can
+ * generally be declared as global objects, used to configure certificates for
+ * each SSL
+ * connection object. This class loads global certificate, key and other
+ * information; each SSL object
+ * (polarssl_io) calls setup_certs method of this object to initialize its own
+ * certificate, key and other information
  */
 class ACL_CPP_API polarssl_conf : public sslbase_conf {
 public:
 	/**
-	 * 构造函数
-	 * @param server_side {bool} 用来指定是服务端还是客户端，当为 true 时
-	 *  为服务端模式，否则为客户端模式
-	 * @param verify_mode {polarssl_verify_t} SSL 证书校验级别
+	 * Constructor
+	 * @param server_side {bool} Used to specify whether it is server or client.
+	 * When true,
+	 *  it is server mode, otherwise client mode
+	 * @param verify_mode {polarssl_verify_t} SSL certificate verification level
 	 */
 	polarssl_conf(bool server_side = false,
 		polarssl_verify_t verify_mode = POLARSSL_VERIFY_NONE);
@@ -62,37 +67,39 @@ public:
 
 public:
 	/**
-	 * 设置 SSL 证书校验方式，内部缺省为不校验证书
+	 * Set SSL certificate verification method, internal default is not to verify
+	 * certificate
 	 * @param verify_mode {polarssl_verify_t}
 	 */
 	void set_authmode(polarssl_verify_t verify_mode);
 
 	/**
-	 * 获得随机数生成器的熵对象
-	 * @return {void*}，返回值为 entropy_context 类型
+	 * Get entropy object of random number generator
+	 * @return {void*}, return value is entropy_context type
 	 */
 	void* get_entropy() {
 		return entropy_;
 	}
 
 	/**
-	 * stream_hook::open 内部会调用本方法用来安装当前 SSL 连接对象的证书
-	 * @param ssl {void*} SSL 连接对象，为 ssl_context 类型
-	 * @param server_side {bool} 是服务端还是客户端
-	 * @return {bool} 配置 SSL 对象是否成功
+	 * stream_hook::open internally will call this method to install certificate
+	 * for current SSL connection object
+	 * @param ssl {void*} SSL connection object, is ssl_context type
+	 * @param server_side {bool} Whether it is server or client
+	 * @return {bool} Whether configuring SSL object was successful
 	 */
 	bool setup_certs(void* ssl, bool server_side);
 
 public:
 	/**
-	 * 必须首先调用此函数设置 libpolarssl.so 的全路径
-	 * @param path {const char*} libpolarssl.so 的全路径
+	 * Must first call this function to set full path of libpolarssl.so
+	 * @param path {const char*} Full path of libpolarssl.so
 	 */
 	static void set_libpath(const char* path);
 
 	/**
-	 * 可以显式调用本方法，动态加载 polarssl 动态库
-	 * @return {bool} 加载是否成功
+	 * Can explicitly call this method to dynamically load polarssl dynamic library
+	 * @return {bool} Whether loading was successful
 	 */
 	static bool load();
 
@@ -120,3 +127,4 @@ private:
 };
 
 } // namespace acl
+

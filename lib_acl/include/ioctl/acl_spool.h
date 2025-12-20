@@ -7,7 +7,7 @@ extern "C" {
 
 #include "acl_ioctl.h"
 
-/* 为了保持向后兼容 */
+/* Simple aliases for backward compatibility */
 
 #define	ACL_SPOOL			ACL_IOCTL
 #define	ACL_SPOOL_NOTIFY_FN		ACL_IOCTL_NOTIFY_FN

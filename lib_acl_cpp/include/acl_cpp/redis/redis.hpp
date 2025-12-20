@@ -22,7 +22,8 @@ namespace acl
 {
 
 /**
- * 该类继承了所有 redis 命令类，因此可以只通过此类对象使用所有的 redis 命令。
+ * This class inherits all redis command classes, so all redis commands can be
+ * used through this class object only.
  * inherit all the redis command class, which include all the commands
  * of Key, String, Hash, List, Set, SortedSet, Hyperloglog, Pub/Sub,
  * Transaction, Script, Connection, Server.
@@ -46,25 +47,25 @@ class ACL_CPP_API redis
 {
 public:
 	/**
-	 * 非集群方式的构造函数
+	 * Constructor for non-cluster mode
 	 * the constructor with no redis cluster
-	 * @param conn {redis_client*} 一个 redis 节点的连接对象
+	 * @param conn {redis_client*} A connection object for one redis node
 	 *  one redis node's connection
 	 */
 	redis(redis_client* conn = NULL);
 
 	/**
-	 * 集群方式的构造函数
+	 * Constructor for cluster mode
 	 * the constructor in redis cluster mode
-	 * @param cluster {redis_client_cluster*} 集群对象
+	 * @param cluster {redis_client_cluster*} Cluster object
 	 *  the redis cluster object
 	 */
 	redis(redis_client_cluster* cluster);
 
 	/**
-	 * pipeline 方式的构造函数
+	 * Constructor for pipeline mode
 	 * the constructor in redis pipeline mode
-	 * @param pipeline {redis_client_pipeline*} pipeline 对象
+	 * @param pipeline {redis_client_pipeline*} Pipeline object
 	 *  the redis pipeline object
 	 */
 	redis(redis_client_pipeline* pipeline);

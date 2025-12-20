@@ -14,11 +14,11 @@ class connect_pool;
 class connect_monitor;
 class thread_pool;
 
-// 内部使用数据结构
+// Internal data structure
 struct conns_pools {
 	std::vector<connect_pool*> pools;
-	size_t  check_next;			// 连接检测时的检测点下标
-	size_t  conns_next;			// 下一个要访问的的下标值
+	size_t  check_next;			// Index for connection check
+	size_t  conns_next;			// Next index value to access
 	conns_pools() {
 		check_next = 0;
 		conns_next = 0;
@@ -27,8 +27,8 @@ struct conns_pools {
 
 struct conn_config {
 	string addr;
-	size_t max;				// 最大连接数
-	size_t min;				// 最小连接数
+	size_t max;				// Maximum connections
+	size_t min;				// Minimum connections
 	int    conn_timeout;
 	int    rw_timeout;
 	bool   sockopt_timeo;
@@ -43,7 +43,8 @@ struct conn_config {
 };
 
 /**
- * connect pool 服务管理器，有获取连接池等功能
+ * Connection pool manager class, responsible for managing and obtaining
+ * connection pools.
  */
 class ACL_CPP_API connect_manager : public noncopyable {
 public:
@@ -51,219 +52,254 @@ public:
 	virtual ~connect_manager();
 
 	/**
-	 * 是否将连接池与线程自动绑定，主要用于协程环境中，内部缺省值为 false，
-	 * 该方法在本对象创建后仅能调用一次
+	 * Whether connection pools are automatically bound to threads. Mainly used in
+	 * coroutine environments. Internal default value is false.
+	 * This method should be called before creating connection pools.
 	 * @param yes {bool}
 	 */
 	void bind_thread(bool yes);
 
 	/**
-	 * 初始化所有服务器的连接池，该函数调用 set 过程添加每个服务的连接池
-	 * @param default_addr {const char*} 缺省的服务器地址，如果非空，
-	 *  则在查询时优先使用此服务器
-	 * @param addr_list {const char*} 所有服务器列表，可以为空
-	 *  格式: IP:PORT:COUNT;IP:PORT:COUNT;IP:PORT;IP:PORT ...
-	 *    或  IP:PORT:COUNT,IP:PORT:COUNT,IP:PORT;IP:PORT ...
-	 *  如：127.0.0.1:7777:50;192.168.1.1:7777:10;127.0.0.1:7778
-	 * @param count {size_t} 当 addr_list 中分隔的某个服务没有
-	 *  COUNT 信息时便用此值，当此值为 0 时，则不限制连接数上限
-	 * @param conn_timeout {int} 网络连接时间(秒)
-	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
-	 * @param sockopt_timeo {bool} 是否使用 setsockopt 设置网络读写超时
-	 *  注：default_addr 和 addr_list 不能同时为空
+	 * Initialize all server connection pools. This function calls set function to
+	 * set each server connection pool.
+	 * @param default_addr {const char*} Default server address. When not empty,
+	 *  this address will be used when querying internally.
+	 * @param addr_list {const char*} List of all servers. When not empty,
+	 *  format: IP:PORT:COUNT;IP:PORT:COUNT;IP:PORT;IP:PORT ...
+	 *    or  IP:PORT:COUNT,IP:PORT:COUNT,IP:PORT;IP:PORT ...
+	 *  e.g.: 127.0.0.1:7777:50;192.168.1.1:7777:10;127.0.0.1:7778
+	 * @param count {size_t} When a certain address in addr_list does not have
+	 * COUNT information, use this value. When this value is 0, it means no limit
+	 * on connection pool size.
+	 * @param conn_timeout {int} Connection timeout time (seconds)
+	 * @param rw_timeout {int} Network IO timeout time (seconds)
+	 * @param sockopt_timeo {bool} Whether to use setsockopt to set read/write
+	 * timeout.
+	 *  Note: default_addr and addr_list cannot both be empty.
 	 */
 	void init(const char* default_addr, const char* addr_list,
 		size_t count, int conn_timeout = 30, int rw_timeout = 30,
 		bool sockopt_timeo = false);
 
 	/**
-	* 添加服务器的客户端连接池，该函数可以在程序运行时被调用，内部自动加锁
-	 * @param addr {const char*} 服务器地址，格式：ip:port
-	 *  注意：调用本函数时每次仅能添加一个服务器地址，可以循环调用本方法
-	 * @param max {size_t} 连接池数量限制, 如果该值设为 0，则不设置
-	 *  连接池的连接上限
-	 * @param conn_timeout {int} 网络连接时间(秒)
-	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
-	 * @param sockopt_timeo {bool} 是否使用 setsockopt 设置网络读写超时
-	 * @param min {size_t} 设置连接池的最小连接数
+	* Add client connection pool for a server. This function is called when
+	* creating objects. Internal automatic management.
+	 * @param addr {const char*} Server address, format: ip:port
+	 * Note: When calling this function multiple times, each time a new server
+	 * address is added, and it is called in a loop.
+	 * @param max {size_t} Connection pool maximum size. When this value is 0, it
+	 * means no limit on connection pool size.
+	 * @param conn_timeout {int} Connection timeout time (seconds)
+	 * @param rw_timeout {int} Network IO timeout time (seconds)
+	 * @param sockopt_timeo {bool} Whether to use setsockopt to set read/write
+	 * timeout.
+	 * @param min {size_t} Minimum connections for this connection pool.
 	 */
 	void set(const char* addr, size_t max, int conn_timeout = 30,
 		int rw_timeout = 30, bool sockopt_timeo = false, size_t min = 0);
 
 	/**
-	 * 根据指定地址获取该地址对应的连接池配置对象
-	 * @param addr {const char*} 目标连接池地址
-	 * @param use_first {bool} 如果目标地址的配置对象不存在，是否允许使用
-	 *  第一个地址配置对象
-	 * @return {const conn_config*} 返回 NULL 表示不存在
+	 * Get connection pool configuration object corresponding to the specified
+	 * address.
+	 * @param addr {const char*} Target connection pool address.
+	 * @param use_first {bool} If target address configuration object does not
+	 * exist, whether to use
+	 *  the first address configuration object.
+	 * @return {const conn_config*} Returns NULL to indicate not found.
 	 */
 	const conn_config* get_config(const char* addr, bool use_first = false);
 
 	/**
-	 * 设置连接池失败后重试的时间时间隔（秒），该函数可以在程序运行时被
-	 * 调用，内部自动加锁
-	 * @param n {int} 当该值 <= 0 时，若连接池出现问题则会立即被重试
+	 * Set retry interval (seconds) after connection pool fails. This function is
+	 * called when creating objects.
+	 * Internal automatic management.
+	 * @param n {int} When value <= 0, connection pool will not retry after
+	 * failure.
 	 */
 	void set_retry_inter(int n);
 
 	/**
-	 * 设置连接池中空闲连接的空闲生存周期
-	 * @param ttl {time_t} 空闲连接的生存周期，当该值 < 0 则表示空闲连接
-	 *  不过期，== 0 时表示立刻过期，> 0 表示空闲该时间段后将被释放
+	 * Set idle timeout for connections in connection pool.
+	 * @param ttl {time_t} Idle timeout for connections. When value < 0, it means
+	 * no timeout limit. When == 0, it means immediate timeout. When > 0, it means
+	 * connections will be released after this timeout period.
 	 */
 	void set_idle_ttl(time_t ttl);
 
 	/**
-	 * 设置自动检查空闲连接的时间间隔，缺省值为 30 秒
-	 * @param n {int} 时间间隔
+	 * Set interval for automatically checking connections. Default value is 30
+	 * seconds.
+	 * @param n {int} Interval time.
 	 */
 	void set_check_inter(int n);
 
 	/**
-	 * 从连接池集群中删除某个地址的连接池，该函数可以在程序运行过程中
-	 * 被调用，因为内部会自动加锁
-	 * @param addr {const char*} 服务器地址(ip:port)
+	 * Remove a connection pool for a certain address from connection pool cluster.
+	 * This function is called during object lifecycle management. Generally, it
+	 * does not need to be called, because internal automatic management.
+	 * @param addr {const char*} Server address (ip:port)
 	 */
 	void remove(const char* addr);
 
 	/**
-	 * 根据服务端地址获得该服务器的连接池
-	 * @param addr {const char*} redis 服务器地址(ip:port)
-	 * @param exclusive {bool} 是否需要互斥访问连接池数组，当需要动态
-	 *  管理连接池集群时，该值应为 true
-	 * @param restore {bool} 当该服务结点被置为不可用时，该参数决定是否
-	 *  自动将之恢复为可用状态
-	 * @return {connect_pool*} 返回空表示没有此服务
+	 * Get connection pool for this server based on server address.
+	 * @param addr {const char*} redis server address (ip:port)
+	 * @param exclusive {bool} Whether to lock connection pool group. When
+	 * dynamically managing connection pool cluster, this value should be true.
+	 * @param restore {bool} When this method is marked as dead, this parameter
+	 * indicates whether to automatically restore it to alive state.
+	 * @return {connect_pool*} Returns empty to indicate no such server.
 	 */
 	connect_pool* get(const char* addr, bool exclusive = true,
 		bool restore = false);
 
 	/**
-	 * 从连接池集群中获得一个连接池，该函数采用轮循方式从连接池集合中获取
-	 * 一个后端服务器的连接池，从而保证了完全的均匀性；该函数内部会自动对
-	 * 连接池管理队列加锁
-	 * 此外，该函数为虚接口，允许子类实现自己的轮循方式
-	 * @return {connect_pool*} 返回一个连接池，返回指针永远非空
+	 * Get a connection pool from connection pool cluster. This function uses
+	 * round-robin method to get a server connection pool from connection pool
+	 * cluster, thereby ensuring load balancing. This function internally
+	 * automatically locks connection pool management.
+	 * Additionally, this function is a virtual interface, and subclasses can
+	 * implement their own round-robin method.
+	 * @return {connect_pool*} Returns a connection pool. Return value will never
+	 * be empty.
 	 */
 	virtual connect_pool* peek();
 
 	/**
-	 * 从连接池集群中获得一个连接池，该函数采用哈希定位方式从集合中获取一个
-	 * 后端服务器的连接池；子类可以重载此虚函数，采用自己的集群获取方式
-	 * 该虚函数内部缺省采用 CRC32 的哈希算法；
-	 * @param key {const char*} 键值字符串，如果该值为 NULL，则内部
-	 *  自动切换到轮循方式
-	 * @param exclusive {bool} 是否需要互斥访问连接池数组，当需要动态
-	 *  管理连接池集群时，该值应为 true
-	 * @return {connect_pool*} 返回一个可用的连接池，返回指针永远非空
+	 * Get a connection pool from connection pool cluster. This function uses hash
+	 * positioning method to get a server connection pool from cluster.
+	 * Subclasses can override this virtual function to implement their own
+	 * cluster access method.
+	 * This virtual function internally defaults to CRC32 hash algorithm.
+	 * @param key {const char*} Key value string. When this value is NULL,
+	 * internally automatically switches to round-robin method.
+	 * @param exclusive {bool} Whether to lock connection pool group. When
+	 * dynamically managing connection pool cluster, this value should be true.
+	 * @return {connect_pool*} Returns a connection pool. Return value will never
+	 * be empty.
 	 */
 	virtual connect_pool* peek(const char* key, bool exclusive);
 
 	/**
-	 * 当用户重载了 peek 函数时，可以调用此函数对连接池管理过程加锁
+	 * When users override peek function, they can call this function to lock
+	 * connection pool management process.
 	 */
 	void lock();
 
 	/**
-	 * 当用户重载了 peek 函数时，可以调用此函数对连接池管理过程加锁
+	 * When users override peek function, they can call this function to unlock
+	 * connection pool management process.
 	 */
 	void unlock();
 
 	/**
-	 * 获得所有的服务器的连接池，该连接池中包含缺省的服务连接池
+	 * Get all server connection pools, including default server connection pool.
 	 * @return {std::vector<connect_pool*>&}
 	 */
 	std::vector<connect_pool*>& get_pools();
 
 	/**
-	 * 检测连接池中的空闲连接，将过期的连接释放掉
-	 * @param step {size_t} 每次检测连接池的个数
-	 * @param left {size_t*} 非空时，将存储所有剩余连接个数总和
-	 * @return {size_t} 被释放的空闲连接数
+	 * Check idle connections in connection pools and release them when timeout.
+	 * @param step {size_t} Number of connection pools to check each time.
+	 * @param left {size_t*} When not empty, stores total number of remaining
+	 * connections.
+	 * @return {size_t} Number of idle connections released.
 	 */
 	size_t check_idle_conns(size_t step, size_t* left = NULL);
 
 	/**
-	 * 检测连接池中的异常连接并关闭
-	 * @param step {size_t} 每次检测连接池的个数
-	 * @param left {size_t*} 非空时，将存储所有剩余连接个数总和
-	 * @return {size_t} 被释放的连接数
+	 * Check abnormal connections in connection pools and close them.
+	 * @param step {size_t} Number of connection pools to check each time.
+	 * @param left {size_t*} When not empty, stores total number of remaining
+	 * connections.
+	 * @return {size_t} Number of connections closed.
 	 */
 	size_t check_dead_conns(size_t step, size_t* left = NULL);
 
 	/**
-	 * 尽量保持连接池中最小连接数
-	 * @param step {size_t} 每次检测连接池的个数
-	 * @return {size_t} 所有剩余连接总和
+	 * Maintain minimum connections for all connection pools.
+	 * @param step {size_t} Number of connection pools to check each time.
+	 * @return {size_t} Total number of remaining connections.
 	 */
 	size_t keep_min_conns(size_t step);
 
 	/**
-	 * 检测连接池中的空闲连接，将过期的连接释放掉，并保持每个连接池中的最小连接数
-	 * @param step {size_t} 每次检测连接池的个数
-	 * @param check_idle {bool} 是否检测并释放过期空闲连接
-	 * @param kick_dead {bool} 是否释放过期空闲连接
-	 * @param keep_conns {bool} 是否尽量保持每个连接池中的最小连接数
-	 * @param threads {thread_pool*} 非NULL将使用该线程池处理 kick_dead 过程
-	 * @param left {size_t*} 非空时，将存储所有剩余连接个数总和
-	 * @return {size_t} 被释放的空闲连接数
+	 * Check idle connections in connection pools, release them when timeout, and
+	 * maintain minimum connections for each connection pool.
+	 * @param step {size_t} Number of connection pools to check each time.
+	 * @param check_idle {bool} Whether to release idle connections when timeout.
+	 * @param kick_dead {bool} Whether to release dead connections.
+	 * @param keep_conns {bool} Whether to maintain minimum connections for each
+	 * connection pool.
+	 * @param threads {thread_pool*} When not NULL, use this thread pool to handle
+	 * kick_dead operation.
+	 * @param left {size_t*} When not empty, stores total number of remaining
+	 * connections.
+	 * @return {size_t} Number of idle connections released.
 	 */
 	size_t check_conns(size_t step, bool check_idle, bool kick_dead,
 		bool keep_conns, thread_pool* threads, size_t* left = NULL);
 
 	/**
-	 * 获得连接池集合中连接池对象的个数
+	 * Get number of connection pool objects in connection pool cluster.
 	 * @return {size_t}
 	 */
 	size_t size() const;
 
 	/**
-	 * 获得缺省的服务器连接池
-	 * @return {connect_pool*} 当调用 init 函数的 default_addr 为空时
-	 *  该函数返回 NULL
+	 * Get default server connection pool.
+	 * @return {connect_pool*} When init function's default_addr is empty,
+	 *  this function returns NULL.
 	 */
 	connect_pool* get_default_pool() const {
 		return default_pool_;
 	}
 
 	/**
-	 * 打印当前所有 redis 连接池的访问量
+	 * Print statistics of current redis connection pools.
 	 */
 	void statistics();
 
 	/**
-	 * 启动后台非阻塞检测线程检测所有连接池连接状态
-	 * @param monitor {connect_monitor*} 连接检测对象
-	 * @return {bool} 是否正常启动了连接检测器，当返回 false 说明当前还有
-	 *  正在运行的连接检测器，当想再次启动检测器时需要先调用 stop_monitor
+	 * Start background monitoring thread to monitor connection pool cluster
+	 * status.
+	 * @param monitor {connect_monitor*} Connection monitor.
+	 * @return {bool} Whether monitoring thread was started successfully.
+	 * Returning false indicates current process already has a monitoring thread
+	 * running. If you need to start again, you need to call stop_monitor first.
 	 */
 	bool start_monitor(connect_monitor* monitor);
 
 	/**
-	 * 停止后台检测线程
-	 * @param graceful {bool} 是否在关闭检测线程时需要等待所有的检测连接
-	 *  关闭后才返回，当连接池集群对象为进程空间内不会多次分配与释放时，
-	 *  则该值可以设为 false 从而使检测线程快速退出，否则应该等待所有检测
-	 *  连接关闭后再使检测线程退出
-	 * @return {connect_monitor*} 返回 start_monitor 设置的检测器，同时
-	 *  内部的 monitor_ 成员自动置 NULL
+	 * Stop background monitoring thread.
+	 * @param graceful {bool} Whether to wait for all monitoring operations to
+	 * close before returning when closing monitoring thread. When connection pool
+	 * cluster is destroyed as process space internal cleanup and release,
+	 * this value should be set to false so that monitoring thread can exit, and
+	 * applications wait for all monitoring connections to close before allowing
+	 * monitoring thread to exit.
+	 * @return {connect_monitor*} Returns monitor object passed to start_monitor,
+	 * and simultaneously internally sets monitor_ member to NULL.
 	 */
 	connect_monitor* stop_monitor(bool graceful = true);
 
 	/**
-	 * 设置某个连接池服务的存活状态，内部会自动加锁
-	 * @param addr {const char*} 服务器地址，格式：ip:port
-	 * @param alive {bool} 该服务器是否正常
+	 * Set alive status of a connection pool server. Internal automatic management.
+	 * @param addr {const char*} Server address, format: ip:port
+	 * @param alive {bool} Whether this server is alive.
 	 */
 	void set_pools_status(const char* addr, bool alive);
 
 protected:
 	/**
-	 * 纯虚函数，子类必须实现此函数用来创建连接池对象
-	 * @param addr {const char*} 服务器监听地址，格式：ip:port
-	 * @param count {size_t} 连接池的大小限制，为 0 时，则连接池没有限制
-	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
-	 * @return {connect_pool*} 返回创建的连接池对象
+	 * Virtual function. Subclasses must implement this function to create
+	 * connection pool objects.
+	 * @param addr {const char*} Server listening address, format: ip:port
+	 * @param count {size_t} Connection pool size limit. When 0, connection pool
+	 * has no limit.
+	 * @param idx {size_t} Index position of connection pool object in cluster
+	 * (starting from 0)
+	 * @return {connect_pool*} Returns created connection pool object.
 	 */
 	virtual connect_pool* create_pool(const char* addr,
 		size_t count, size_t idx) = 0;
@@ -278,19 +314,19 @@ protected:
 	typedef manager_t::iterator                   manager_it;
 	typedef manager_t::const_iterator             manager_cit;
 
-	bool thread_binding_;			// 用于协程环境中与每个线程绑定
-	string default_addr_;			// 缺省的服务地址
-	connect_pool* default_pool_;		// 缺省的服务连接池
+	bool thread_binding_;			// Coroutine environment, each thread binding
+	string default_addr_;			// Default server address
+	connect_pool* default_pool_;	// Default server connection pool
 
-	std::map<string, conn_config> addrs_;	// 所有的服务端地址
+	std::map<string, conn_config> addrs_;	// All server addresses
 	manager_t  manager_;
 
-	locker lock_;				// 访问 pools_ 时的互斥锁
-	int  stat_inter_;			// 统计访问量的定时器间隔
-	int  retry_inter_;			// 连接池失败后重试的时间间隔
-	time_t idle_ttl_;			// 空闲连接的生命周期
-	int  check_inter_;			// 检查空闲连接的时间间隔
-	connect_monitor* monitor_;		// 后台检测线程句柄
+	locker lock_;				// Lock when accessing pools_
+	int  stat_inter_;			// Statistics server timeout interval
+	int  retry_inter_;			// Retry interval after connection pool fails
+	time_t idle_ttl_;			// Idle timeout for connections
+	int  check_inter_;			// Interval for checking connections
+	connect_monitor* monitor_;	// Background monitoring thread handle
 
 	void pools_dump(size_t step, std::vector<connect_pool*>& out);
 	static size_t pools_release(std::vector<connect_pool*>& pools);
@@ -301,7 +337,7 @@ protected:
 	static void keep_min_conns(const std::vector<connect_pool*>& pools,
 		thread_pool* threads = NULL);
 
-	// 设置除缺省服务之外的服务器集群
+	// Set server cluster except default server
 	void set_service_list(const char* addr_list, int count,
 		int conn_timeout, int rw_timeout, bool sockopt_timeo = false);
 	conns_pools& get_pools_by_id(unsigned long id);
@@ -316,10 +352,12 @@ protected:
 	void get_addr(const char* key, string& addr);
 	//connect_pool* add_pool(const char* addr);
 
-	// 线程局部变量初始化时的回调方法
+	// Callback when thread local storage initializes.
 	static void thread_oninit();
-	// 线程退出前需要回调此方法，用来释放内部创建的线程局部变量
+	// Callback before thread exits. This function releases internal thread local
+	// storage.
 	static void thread_onexit(void* ctx);
 };
 
 } // namespace acl
+

@@ -13,28 +13,28 @@ typedef struct ICMP_HOST ICMP_HOST;
 typedef struct ICMP_PKT ICMP_PKT;
 typedef struct ICMP_PKT_STATUS ICMP_PKT_STATUS;
 
-/**< ICMP 通信过程中每个主机的 PING 响应状态信息汇总 */
+/* ICMP common communication process PING response status info for each host */
 struct ICMP_STAT {
-	double tmin;			/**< 最短时间 */
-	double tmax;			/**< 最长时间 */
-	double tsum;			/**< 总时间 */
-	double tave;			/**< 平均时间 */
-	size_t nsent;			/**< 已经发送的包个数 */
-	size_t nreceived;		/**< 已经收到的包个数 */
-	double loss;			/**< 丢失的包个数 */
+	double tmin;			/* Minimum time */
+	double tmax;			/* Maximum time */
+	double tsum;			/* Total time */
+	double tave;			/* Average time */
+	size_t nsent;			/* Number of packets sent */
+	size_t nreceived;		/* Number of packets received */
+	double loss;			/* Number of packets lost */
 };
 
 #define ICMP_MIN_PACKET		32
 #define ICMP_MAX_PACKET		1024
 
-/**< ICMP 所发送的每个 PING 包之后的主机状态应答 */
+/* ICMP: Status response for each PING packet sent */
 struct ICMP_PKT_STATUS {
-	size_t reply_len;		/**< 包回复的数据长度 */
-	char   from_ip[64];		/**< 源地址 */
+	size_t reply_len;		/* Response data length */
+	char   from_ip[64];		/* Source address */
 
-	double         rtt;		/**< 往返时间(毫秒)(Round Trip Time) */
-	unsigned short seq;		/**< 序列号(seq no) */
-	unsigned char  ttl;		/**< 生存时间(time to live) */
+	double         rtt;		/* Round Trip Time (milliseconds) */
+	unsigned short seq;		/* Sequence number (seq no) */
+	unsigned char  ttl;		/* Time to live */
 	unsigned int   gid;
 	char          *data;
 	size_t         dlen;
@@ -47,41 +47,42 @@ struct ICMP_PKT_STATUS {
 	ICMP_PKT      *pkt;
 };
 
-/**< 目的主机信息结构 */
+/* Target host information structure */
 struct ICMP_HOST {
-	ICMP_STAT icmp_stat;		/**< ICMP 通信过程中的状态 */
-	char dest_ip[32];		/**< 目的主机IP地址 */
-	char domain[64];		/**< 目的主机IP所对应的域名 */
-	struct sockaddr_in dest;	/**< 发送包时目的主机地址 */
-	struct sockaddr_in from;	/**< 接收时源主机地址 */
-	int   from_len;			/**< 接收时存储在 from 中的地址长度 */
-	int   delay;			/**< 发送 PING 的间隔，单位为毫秒 */
-	int   timeout;			/**< 超时时间(毫秒) */
-	size_t dlen;			/**< 每个发送包的大小(字节) */
-	size_t nsent;			/**< 已经发送给该目的主机包的个数 */
+	ICMP_STAT icmp_stat;		/* ICMP communication status */
+	char dest_ip[32];		/* Target host IP address */
+	char domain[64];		/* Domain corresponding to target host IP */
+	struct sockaddr_in dest;	/* Target host address when sending */
+	struct sockaddr_in from;	/* Source host address when receiving */
+	int   from_len;			/* Address length stored in from */
+	int   delay;			/* Interval between PINGs (milliseconds) */
+	int   timeout;			/* Timeout for probe response (milliseconds) */
+	size_t dlen;			/* Size of each packet sent (bytes) */
+	size_t nsent;			/* Number of packets sent to target host */
 
-	ICMP_PKT **pkts;		/**< 所有包的数组 */
-	size_t npkt;			/**< 设置的向该目的主机发送包的个数 */
-	size_t ipkt;			/**< 记录下一个要发送的包的下标 */
+	ICMP_PKT **pkts;		/* Array of all packets */
+	size_t npkt;			/* Number of packets sent to target host */
+	size_t ipkt;			/* Record next packet index to send */
 
-	ACL_RING   host_ring;		/**< 链入 ICMP_CHAT->host_head 链中 */
-	ICMP_CHAT *chat;		/**< 所属的通信对象 */
-	char  enable_log;		/**< 是否将响应包的信息记日志 */
+	ACL_RING   host_ring;		/* Linked to ICMP_CHAT->host_head list */
+	ICMP_CHAT *chat;		/* Communication object for this host */
+	char  enable_log;		/* Whether to report response info to log */
 
-	/**< 汇报发送包的响应包状态 */
+	/* Report packet response status */
 	void (*stat_respond)(ICMP_PKT_STATUS*, void*);
 
-	/**< 该发送包的响应包超时 */
+	/* Called when packet response times out */
 	void (*stat_timeout)(ICMP_PKT_STATUS*, void*);
 
-	/**< 该主机不可达 */
+	/* Called when host is unreachable */
 	void (*stat_unreach)(ICMP_PKT_STATUS*, void*);
 
-	/**< 当主机的包发完时的回调函数 */
+	/* Callback when all packets for host complete */
 	void (*stat_finish)(ICMP_HOST*, void*);
 
-	/**< 应用传递的私有参数地址 */
+	/* Private parameter address passed by application */
 	void *arg;
 };
 
 #endif
+

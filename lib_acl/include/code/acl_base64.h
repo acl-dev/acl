@@ -8,21 +8,23 @@ extern "C" {
 #include "../stdlib/acl_define.h"
 
 /**
- * BASE64 编码函数
- * @param plain_in {const char*} 输入的源内容数据
- * @param len {int} plain_in 的数据长度
- * @return {unsigned char*} BASE64编码后的数据，需用 acl_myfree 释放
+ * BASE64 encoding function.
+ * @param plain_in {const char*} Source plain text string
+ * @param len {int} plain_in data length
+ * @return {unsigned char*} BASE64 encoded data, must be freed with acl_myfree
  */
 ACL_API unsigned char *acl_base64_encode(const char *plain_in, int len);
 
 /**
- * BASE64 解码函数
- * @param code_in {const char*} 经BASE64编码后的数据
- * @param ppresult {char**} 如果解码成功，则存储解码结果，且不用时需用
- *  acl_myfree 来释放其内存空间
- * @return {int} -1: 表示解码失败且 *ppresult 指向NULL; >0: 表示解码后的数据内容
- *  长度，且 *ppresult 指向一新动态分配的内存区，内部存储解码结果，需用 acl_myfree
- *  释放 *ppresult 的动态内存
+ * BASE64 decoding function.
+ * @param code_in {const char*} BASE64 encoded string
+ * @param ppresult {char**} If decoding succeeds, stores decoded
+ *  result. Caller must free the memory space with acl_myfree.
+ * @return {int} -1: indicates decoding failed, *ppresult points
+ *  to NULL; >0: indicates decoded data length, and *ppresult
+ *  points to a dynamically allocated memory buffer storing
+ *  decoded data. Caller must free *ppresult's dynamic memory with
+ *  acl_myfree
  */
 ACL_API int acl_base64_decode(const char *code_in, char **ppresult);
 
@@ -32,4 +34,3 @@ ACL_API int acl_base64_decode(const char *code_in, char **ppresult);
 #endif
 
 #endif
-

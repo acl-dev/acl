@@ -6,91 +6,90 @@
 
 #if !defined(ACL_DB_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 /**
- * SQL 查询语句查询器，该类会自动对 sql 中的一些特殊字符进行转义，使用方式类似于
- * java hibernate 的 SQL 语句构建方式
+ * SQL query statement query builder. This class automatically escapes some
+ * special characters in sql. Usage is similar to
+ * java hibernate's SQL statement building method
  */
-class ACL_CPP_API query : public noncopyable
-{
+class ACL_CPP_API query : public noncopyable {
 public:
 	query();
 	~query();
 
 	/**
-	 * 创建 sql 语句，变参方式，用法和 printf 类似
-	 * @param sql_fmt {const char*} sql 语句，格式如：
+	 * Create sql statement, variable argument method, usage similar to printf
+	 * @param sql_fmt {const char*} sql statement, format:
 	 *  select * from xxx where name = :name and len >= %d
-	 *  其中的 :name, 将由 set_parameter 中的值进行替换, len 为整形值
+	 * where :name will be replaced by value in set_parameter, len is integer value
 	 * @return {query&}
 	 */
 	query& create_sql(const char* sql_fmt, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
-	 * 创建 sql 语句，非变参方式
-	 * @param sql {const char*}  sql 语句，格式如：
+	 * Create sql statement, non-variable argument method
+	 * @param sql {const char*}  sql statement, format:
 	 *  select * from xxx where name = :name and len >= :len
-	 *  其中的 :name, :len 将由 set_parameter 中的值进行替换
+	 *  where :name, :len will be replaced by values in set_parameter
 	 * @return {query&}
 	 */
 	query& create(const char* sql);
 
 	/**
-	 * 设置字符串类型的变量值
-	 * @param name {const char*} 变量名
-	 * @param value {const char*} 变量值
+	 * Set variable value of string type
+	 * @param name {const char*} Variable name
+	 * @param value {const char*} Variable value
 	 * @return {query&}
 	 */
 	query& set_parameter(const char* name, const char *value);
 
 	/**
-	 * 设置字符类型的变量值
-	 * @param name {const char*} 变量名
-	 * @param value {char} 变量值
+	 * Set variable value of char type
+	 * @param name {const char*} Variable name
+	 * @param value {char} Variable value
 	 * @return {query&}
 	 */
 	query& set_parameter(const char* name, char value);
 
 	/**
-	 * 设置 16 位短整类型的变量值
-	 * @param name {const char*} 变量名
-	 * @param value {short} 变量值
+	 * Set variable value of 16-bit short integer type
+	 * @param name {const char*} Variable name
+	 * @param value {short} Variable value
 	 * @return {query&}
 	 */
 	query& set_parameter(const char* name, short value);
 
 	/**
-	 * 设置 32 位短整类型的变量值
-	 * @param name {const char*} 变量名
-	 * @param value {int} 变量值
+	 * Set variable value of 32-bit short integer type
+	 * @param name {const char*} Variable name
+	 * @param value {int} Variable value
 	 * @return {query&}
 	 */
 	query& set_parameter(const char* name, int value);
 
 	/**
-	 * 设置单精度浮点类型的变量值
-	 * @param name {const char*} 变量名
-	 * @param value {float} 单精度浮点类型
-	 * @param precision {int} 尾数的精度值
+	 * Set variable value of single precision floating point type
+	 * @param name {const char*} Variable name
+	 * @param value {float} Single precision floating point type
+	 * @param precision {int} Mantissa precision value
 	 * @return {query&}
 	 */
 	query& set_parameter(const char* name, float value, int precision = 8);
 
 	/**
-	 * 设置双精度浮点类型的变量值
-	 * @param name {const char*} 变量名
-	 * @param value {double} 双精度浮点类型
-	 * @param precision {int} 尾数的精度值
+	 * Set variable value of double precision floating point type
+	 * @param name {const char*} Variable name
+	 * @param value {double} Double precision floating point type
+	 * @param precision {int} Mantissa precision value
 	 * @return {query&}
 	 */
 	query& set_parameter(const char* name, double value, int precision = 8);
 
 	/**
-	 * 设置 64 位短整类型的变量值
-	 * @param name {const char*} 变量名
-	 * @param value {long long int} 变量值
+	 * Set variable value of 64-bit short integer type
+	 * @param name {const char*} Variable name
+	 * @param value {long long int} Variable value
 	 * @return {query&}
 	 */
 #if defined(_WIN32) || defined(_WIN64)
@@ -100,61 +99,65 @@ public:
 #endif
 
 	/**
-	 * 设置日期(time_t)类型的变量值
-	 * @param name {const char*} 变量名
-	 * @param value {time_t} 变量值
-	 * @param fmt {const char*} 日期格式
+	 * Set variable value of date (time_t) type
+	 * @param name {const char*} Variable name
+	 * @param value {time_t} Variable value
+	 * @param fmt {const char*} Date format
 	 * @return {query&}
 	 */
 	query& set_date(const char* name, time_t value,
 		const char* fmt = "%Y-%m-%d %H:%M:%S");
 
 	/**
-	 * 以变参方式设置变量值
-	 * @param name {const char*} 变量名
-	 * @param fmt {const char*} 变参值格式
+	 * Set variable value in variable argument method
+	 * @param name {const char*} Variable name
+	 * @param fmt {const char*} Variable argument value format
 	 * @return {query&}
 	 */
 	query& set_format(const char* name, const char* fmt, ...)
 		ACL_CPP_PRINTF(3, 4);
 
 	/**
-	 * 以变参方式设置变量值
-	 * @param name {const char*} 变量名
-	 * @param fmt {const char*} 变参值格式
-	 * @param ap {va_list} 变参值列表
+	 * Set variable value in variable argument method
+	 * @param name {const char*} Variable name
+	 * @param fmt {const char*} Variable argument value format
+	 * @param ap {va_list} Variable argument value list
 	 * @return {query&}
 	 */
 	query& set_vformat(const char* name, const char* fmt, va_list ap);
 
 	/**
-	 * 对查询 sql 语句进行转义后返回给调用者
+	 * Return escaped query sql statement to caller
 	 * @return {const string&}
 	 */
 	const string& to_string();
 
 	/**
-	 * 清空查询器上一次的缓存数据，当该 SQL 查询器对象被多次使用时，应该提前调用
-	 * 本函数清除之前的 SQL 查询器状态
+	 * Clear cached data from previous query. When this SQL query builder object is
+	 * used multiple times, should call
+	 * this function in advance to clear previous SQL query builder state
 	 */
 	void reset();
 
 	/**
-	 * 对 sql 中的一些特殊字符进行转义处理，以防止 SQL 注入问题
-	 * @param in {const char*} 变量值
-	 * @param len {size_t} in 数据长度
-	 * @param out {string&} 存储转换后的结果的缓冲区，该参数输入后会先被清空
-	 * @return {const string&} 转义处理后的结果(其实是 out 的地址引用)
+	 * Escape some special characters in sql to prevent SQL injection problems
+	 * @param in {const char*} Variable value
+	 * @param len {size_t} in data length
+	 * @param out {string&} Buffer for storing converted result. This parameter
+	 * will be cleared first after input
+	 * @return {const string&} Escaped result (actually reference to out address)
 	 */
 	static const string& escape(const char* in, size_t len, string& out);
 
 	/**
-	 * 将时间转换成 DateTime 格式的字符串(YYYY-MM-DD HH:MM:SS)
-	 * @param t {time_t} 时间截
-	 * @param out {string&} 存储转换结果的缓冲区
-	 * @param fmt {const char*} 日期格式，在 _WIN32 下必须保证该格式的正确性，
-	 *  否则 _WIN32 API 会产生断言，格式如："%Y-%m-%d %H:%M:%S"
-	 * @return {const char*} 转换后缓冲区地址，若返回 NULL 则表示转换失败
+	 * Convert time to DateTime format string (YYYY-MM-DD HH:MM:SS)
+	 * @param t {time_t} Timestamp
+	 * @param out {string&} Buffer for storing conversion result
+	 * @param fmt {const char*} Date format. On _WIN32, must ensure correctness of
+	 * this format,
+	 *  otherwise _WIN32 API will generate assertion. Format: "%Y-%m-%d %H:%M:%S"
+	 * @return {const char*} Converted buffer address. Returns NULL indicates
+	 * conversion failed
 	 */
 	static const char* to_date(time_t t, string& out,
 		const char* fmt = "%Y-%m-%d %H:%M:%S");
@@ -197,3 +200,4 @@ private:
 } // namespace acl
 
 #endif // !defined(ACL_DB_DISABLE)
+

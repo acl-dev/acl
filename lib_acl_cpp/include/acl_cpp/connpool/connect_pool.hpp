@@ -11,155 +11,184 @@ class connect_client;
 class thread_pool;
 
 /**
- * 该类型定义了当调用 connect_pool::put() 时oper的行为
+ * When calling connect_pool::put(), the oper parameter can be:
  */
 typedef enum {
-	cpool_put_oper_none  = 0x00,	// 不做任何操作
-	cpool_put_check_idle = 0x01,	// 检测并关闭超时空闲连接
-	cpool_put_check_dead = 0x02,	// 检测并关闭异常连接
-	cpool_put_keep_conns = 0x04,	// 尽量操持最小连接数
+	cpool_put_oper_none  = 0x00,	// No operation
+	cpool_put_check_idle = 0x01,	// Check and close timeout connections
+	cpool_put_check_dead = 0x02,	// Check and close abnormal connections
+	cpool_put_keep_conns = 0x04,	// Maintain minimum number of connections
 } cpool_put_oper_t;
 
 /**
- * 客户端连接池类，实现对连接池的动态管理，该类为纯虚类，需要子类实现
- * 纯虚函数 create_connect 用于创建与服务端的一个连接，当允许该类
- * 对象允许通过 set_delay_destroy() 设置延迟销毁时，该类的子类实例
- * 必须是动态对象
+ * Client connection pool class, implements dynamic management of connection
+ * pool. This is a base class and needs to implement the virtual function
+ * create_connect to create a connection for the server. This class object can
+ * be dynamically allocated through set_delay_destroy() to delay destruction
+ * time, which is actually dynamic allocation.
  */
 class ACL_CPP_API connect_pool : public noncopyable {
 public:
 	/**
-	 * 构造函数
-	 * @param addr {const char*} 服务器监听地址，格式：ip:port(domain:port)
-	 * @param max {size_t} 连接池最大连接个数限制，如果该值设为 0，则不设置
-	 *  连接池的连接上限
-	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
+	 * Constructor
+	 * @param addr {const char*} Server listening address, format:
+	 * ip:port(domain:port)
+	 * @param max {size_t} Maximum number of connections in connection pool limit.
+	 * When this value is 0, there is no limit on the connection pool's connection
+	 * count.
+	 * @param idx {size_t} Index position of this connection pool object in the
+	 * collection (starting from 0)
 	 */
 	connect_pool(const char* addr, size_t max, size_t idx = 0);
 
 	/**
-	 * 该类当允许自行销毁时，类实例应为动态对象
+	 * Destructor. When destroying, it should be dynamically allocated.
 	 */
 	virtual ~connect_pool();
 
 	/**
-	 * 此接口用来设置超时时间
-	 * @param conn_timeout {int} 网络连接超时时间(秒)
-	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
-	 * @param sockopt_timo {bool} 是否使用 setsockopt 设置读写超时
+	 * This interface is used to set timeout time.
+	 * @param conn_timeout {int} Network connection timeout time (seconds)
+	 * @param rw_timeout {int} Network I/O timeout time (seconds)
+	 * @param sockopt_timo {bool} Whether to use setsockopt to set read/write
+	 * timeout
 	 */
 	connect_pool& set_timeout(int conn_timeout, int rw_timeout,
 		bool sockopt_timo = false);
 
 	/**
-	 * 设置连接池最小连接数，在check_idle/check_dead后可以用来保持最小连接数
-	 * @param min {size_t} > 0 时将自动尽量保持最小连接数
+	 * Set connection pool minimum connection count. When check_idle/check_dead
+	 * operations are performed, maintain minimum connections.
+	 * @param min {size_t} When > 0, automatically maintain minimum connections.
 	 * @return {connect_pool&}
 	 */
 	connect_pool& set_conns_min(size_t min);
 
 	/**
-	 * 设置连接池异常的重新设为可用状态的时间间隔
-	 * @param retry_inter {int} 当连接断开后，重新再次打开连接的时间间隔(秒)，
-	 *  当该值 <= 0 时表示允许连接断开后可以立即重连，否则必须超过该时间间隔
-	 *  后才允许断开重连；未调用本函数时，内部缺省值为 1 秒
+	 * Set connection pool abnormal connection retry interval time.
+	 * @param retry_inter {int} Retry interval time (seconds) after connection is
+	 * disconnected before reconnecting.
+	 * When this value <= 0, it means do not retry after connection is
+	 * disconnected. When connection pool is in abnormal state and timeout time
+	 * expires, it will retry to connect. When this parameter is not set, the
+	 * internal default value is 1 second.
 	 * @return {connect_pool&}
 	 */
 	connect_pool& set_retry_inter(int retry_inter);
 
 	/**
-	 * 设置连接池中空闲连接的空闲生存周期
-	 * @param ttl {time_t} 空闲连接生存周期，当该值 < 0 表示空闲连接不过期，
-	 *  == 0 时表示立刻过期，> 0 表示空闲该时间段后将被释放
+	 * Set idle connection survival period in connection pool.
+	 * @param ttl {time_t} Idle connection survival period. When return value < 0,
+	 * it means idle connections never expire;
+	 *  == 0 means never expire; > 0 means will be released after this time period.
 	 * @return {connect_pool&}
 	 */
 	connect_pool& set_idle_ttl(time_t ttl);
 
 	/**
-	 * 设置自动检查空闲连接的时间间隔，只影响每次调用 put 连接时的检测时间间隔
-	 * @param n {int} 时间间隔，缺省值为 30 秒；如果想关掉在 put 时的空闲连接检测，
-	 *  则可以将参数设为 -1；如果设成 0 则每次都检测所有连接
+	 * Set automatic connection check time interval. This only affects the check
+	 * time when calling put function each time.
+	 * @param n {int} Time interval, default value is 30 seconds. When calling put
+	 * function, idle connection check, the larger the value, the less frequent.
+	 * the larger the value, the less frequent. Set to -1 to disable, set to 0 to
+	 * check every time.
 	 * @return {connect_pool&}
 	 */
 	connect_pool& set_check_inter(int n);
 
 	/**
-	 * 从连接池中尝试性获取一个连接，当服务器不可用、距上次服务端连接异常
-	 * 时间间隔未过期或连接池连接个数达到连接上限则将返回 NULL；当创建一个
-	 * 新的与服务器的连接时失败，则该连接池会被置为不可用状态
-	 * @param on {bool} 该参数决定当连接池没有可用连接时是否创建新的连接，
-	 *  如果为 false，则不会创建新连接
-	 * @param tc {double*} 非空时存储总耗时时间，单位：ms
-	 * @param old {bool*} 非空时指定所取得的连接是否复用连接池中的旧连接，
-	 *  如果 *old 为true表示复用了旧连接，否则为新建连接
-	 * @return {connect_client*} 如果为空则表示该服务器连接池对象不可用
+	 * Get a connection from the connection pool. If there are no available
+	 * connections, the last returned connection is abnormal and has not been
+	 * closed, or the connection pool connection count reaches the maximum limit,
+	 * NULL will be returned. Otherwise, a new connection will be created. If
+	 * connection creation times out, the connection pool will be marked as
+	 * abnormal state.
+	 * @param on {bool} This parameter controls whether to create a new connection
+	 * when the connection pool has no available connections.
+	 *  If false, no new connection will be created.
+	 * @param tc {double*} When not empty, stores total timeout time, unit is ms.
+	 * @param old {bool*} When not empty, indicates whether the obtained connection
+	 * is an old connection in the connection pool.
+	 * If *old is true, it means an old connection was used; otherwise, it's a new
+	 * connection.
+	 * @return {connect_client*} Returns NULL to indicate this connection pool
+	 * object is not available.
 	 */
 	connect_client* peek(bool on = true, double* tc = NULL, bool* old = NULL);
 
 	/**
-	 * 将一个不属于当前连接池的连接对象与当前连接池对象绑定，使之从属于当前
-	 * 连接池对象
-	 * @param conn {redis_client*}
+	 * Bind a connection object in the current connection pool to the current
+	 * connection pool object, making it belong to the current connection pool
+	 * object.
+	 * @param conn {connect_client*}
 	 */
 	void bind_one(connect_client* conn);
 
 	/**
-	 * 释放一个连接至连接池中，当该连接池对应的服务器不可用或调用者希望关闭
-	 * 该连接时，则该连接将会被直接释放
-	 * @param conn {redis_client*}
-	 * @param keep {bool} 是否针对该连接保持长连接
-	 * @param oper {cpool_put_oper_t} 自动操作连接池标志位，含义参见上面
-	 *  cpool_put_oper_t 类型定义
+	 * Release a connection back to the connection pool. If the connection pool
+	 * corresponding server is not available, or the user does not want to keep
+	 * the connection, the connection will be directly released.
+	 * @param conn {connect_client*}
+	 * @param keep {bool} Whether to keep this connection alive.
+	 * @param oper {cpool_put_oper_t} Automatic connection pool flag bit combination,
+	 * see the cpool_put_oper_t type definition above.
 	 */
 	void put(connect_client* conn, bool keep = true,
 		 cpool_put_oper_t oper = cpool_put_check_idle);
 
 	/**
-	 * 检查连接池中空闲的连接，释放过期连接
-	 * @param ttl {time_t} 该值 >= 0 时，过期时间大于此值的连接将被关闭
-	 * @param exclusive {bool} 内部是否需要加锁
-	 * @return {size_t} 返回被释放空闲连接个数
+	 * Check idle connections in the connection pool and release expired ones.
+	 * @param ttl {time_t} When value >= 0, connections exceeding this time period
+	 * will be closed.
+	 * @param exclusive {bool} Whether internal lock is needed.
+	 * @return {size_t} Returns the number of idle connections released.
 	 */
 	size_t check_idle(time_t ttl, bool exclusive = true);
 	size_t check_idle(bool exclusive = true);
 
 	/**
-	 * 检测连接状态，并关闭断开连接，内部自动加锁保护
-	 * @param threads {thread_pool*} 非空时将使用该线程池检测连接状态以提升效率
-	 * @return {size_t} 被关闭的连接个数
+	 * Check connection status and close disconnected connections. Internal
+	 * automatic locking.
+	 * @param threads {thread_pool*} When not empty, use this thread pool to check
+	 * connection status for better efficiency.
+	 * @return {size_t} Number of connections closed.
 	 */
 	size_t check_dead(thread_pool* threads = NULL);
 
 	/**
-	 * 尽量保持由 set_conns_min() 设置的最小连接数
-	 * @param threads {thread_pool*} 非空时将使用该线程池创建新连接以提升效率
+	 * Maintain minimum connections set by set_conns_min().
+	 * @param threads {thread_pool*} When not empty, use this thread pool to
+	 * maintain minimum connections for better efficiency.
 	 */
 	void keep_conns(thread_pool* threads = NULL);
 
 	/**
-	 * 设置连接池的存活状态
-	 * @param ok {bool} 设置该连接是否正常
+	 * Set connection pool's alive state.
+	 * @param ok {bool} Set whether this connection pool is alive.
 	 */
 	void set_alive(bool ok /* true | false */);
 
 	/**
-	 * 检查连接池是否正常，当连接池有问题时，该函数还会检测该连接池是否应该
-	 * 自动恢复，如果允许恢复，则将该连接池又置为可用状态
-	 * @return {bool} 返回 true 表示当前连接池处于正常状态，否则表示当前
-	 *  连接池不可用
+	 * Check whether the connection pool is alive. When the connection pool is in
+	 * abnormal state, call this function to check whether the connection pool
+	 * should automatically recover. If recovery is indicated, this connection
+	 * pool will be set to alive state.
+	 * @return {bool} Returns true to indicate the current connection pool is in
+	 * alive state, false indicates the current connection pool is not alive.
 	 */
 	bool aliving();
 
 	/**
-	 * 获取连接池的服务器地址
-	 * @return {const char*} 返回非空地址
+	 * Get connection pool's server address.
+	 * @return {const char*} Returns non-empty address.
 	 */
 	const char* get_addr() const {
 		return addr_;
 	}
 
 	/**
-	 * 获取连接池最大连接数限制，如果返回值为 0 则表示没有最大连接数限制
+	 * Get connection pool's maximum connection limit. When this value is 0, it
+	 * means there is no maximum connection limit.
 	 * @return {size_t}
 	 */
 	size_t get_max() const {
@@ -167,7 +196,7 @@ public:
 	}
 
 	/**
-	 * 获取连接池当前连接数个数
+	 * Get connection pool's current connection count.
 	 * @return {size_t}
 	 */
 	size_t get_count() const {
@@ -175,7 +204,8 @@ public:
 	}
 
 	/**
-	 * 获得该连接池对象在连接池集合中的下标位置
+	 * Get this connection pool object's index position in the connection pool
+	 * collection.
 	 * @return {size_t}
 	 */
 	size_t get_idx() const {
@@ -183,21 +213,22 @@ public:
 	}
 
 	/**
-	 * 重置统计计数器
-	 * @param inter {int} 统计的时间间隔
+	 * Reset statistics counter.
+	 * @param inter {int} Statistics time interval.
 	 */
 	void reset_statistics(int inter);
 
 	/**
-	 * 获取该连接池总共被使用过的次数
+	 * Get total number of times this connection pool has been used.
 	 */
 	unsigned long long get_total_used() const {
 		return total_used_;
 	}
 
 	/**
-	 * 获取该连接池当前的使用次数累加值，当调用reset_statistics时会重置该值，
-	 * 这是与get_total_used()的区别所在
+	 * Get current usage count accumulation value of this connection pool. This
+	 * value will be reset when reset_statistics is called.
+	 * Different from get_total_used(), this value will be reset.
 	 * @return {unsigned long long}
 	 */
 	unsigned long long get_current_used() const {
@@ -210,15 +241,15 @@ public:
 		return key_;
 	}
 
-	// 增加本对象引用计数
+	// Increase reference count.
 	void refer();
 
-	// 减少本对象引用计数
+	// Decrease reference count.
 	void unrefer();
 
 protected:
 	/**
-	 * 纯虚函数，需要子类实现
+	 * Pure virtual function, needs to be implemented.
 	 * @return {connect_client*}
 	 */
 	virtual connect_client* create_connect() = 0;
@@ -226,48 +257,50 @@ protected:
 	friend class connect_manager;
 
 	/**
-	 * 设置该连接池对象为延迟自销毁，当内部发现引用计数为 0 时会自行销毁
+	 * Set this connection pool object to delay destruction. When internal
+	 * reference count is 0, it will be destroyed.
 	 */
 	void set_delay_destroy();
 
 protected:
-	bool  alive_;				// 是否属正常
-	ssize_t refers_;			// 当前连接池对象的引用计数
-	bool  delay_destroy_;			// 是否设置了延迟自销毁
-	// 有问题的服务器的可以重试的时间间隔，不可用连接池对象再次被启用的时间间隔
+	bool  alive_;				// Whether alive
+	ssize_t refers_;			// Current connection pool object reference count
+	bool  delay_destroy_;		// Whether to delay connection pool destruction
+	// When the server corresponding to this connection pool is unavailable, the
+	// connection pool object will be retried after this time interval.
 	int   retry_inter_;
-	time_t last_dead_;			// 该连接池对象上次不可用时的时间截
+	time_t last_dead_;			// Timestamp when connection pool object was last detected as dead.
 
-	char  key_[256];			// 与该连接池相关的 key
-	char  addr_[256];			// 连接池对应的服务器地址，IP:PORT
-	int   conn_timeout_;			// 网络连接超时时间(秒)
-	int   rw_timeout_;			// 网络 IO 超时时间(秒)
-	bool  sockopt_timo_;			// 是否使用s setsockopt 设置超时
-	size_t idx_;				// 该连接池对象在集合中的下标位置
-	size_t max_;				// 最大连接数
-	size_t min_;				// 最小连接数
-	size_t count_;				// 当前的连接数
-	time_t idle_ttl_;			// 空闲连接的生命周期
-	time_t last_check_;			// 上次检查空闲连接的时间截
-	int   check_inter_;			// 检查空闲连接的时间间隔
+	char  key_[256];			// Key for this connection pool cache
+	char  addr_[256];			// Server address corresponding to connection pool, IP:PORT
+	int   conn_timeout_;		// Network connection timeout time (seconds)
+	int   rw_timeout_;			// Network I/O timeout time (seconds)
+	bool  sockopt_timo_;		// Whether to use setsockopt to set timeout
+	size_t idx_;				// Index position of this connection pool object in the collection
+	size_t max_;				// Maximum connections
+	size_t min_;				// Minimum connections
+	size_t count_;				// Current connection count
+	time_t idle_ttl_;			// Idle connection survival period
+	time_t last_check_;			// Timestamp of last check for idle connections
+	int   check_inter_;			// Time interval for checking idle connections
 
-	locker lock_;				// 访问 pool_ 时的互斥锁
-	unsigned long long total_used_;		// 该连接池的所有访问量
-	unsigned long long current_used_;	// 某时间段内的访问量
-	time_t last_;				// 上次记录的时间截
-	std::list<connect_client*> pool_;	// 连接池集合
+	locker lock_;				// Lock when operating pool_
+	unsigned long long total_used_;		// Total usage count of this connection pool
+	unsigned long long current_used_;	// Usage count within a certain time period
+	time_t last_;				// Timestamp of last record
+	std::list<connect_client*> pool_;	// Connection pool collection
 
 	size_t check_dead(size_t count);
 	size_t check_dead(size_t count, thread_pool& threads);
 	void keep_conns(size_t min);
 	void keep_conns(size_t min, thread_pool& threads);
 
-	size_t kick_idle_conns(time_t ttl);	// 关闭过期的连接
-	connect_client* peek_back();		// 从尾部 Peek 连接
-	void put_front(connect_client* conn);	// 向头部 Put 连接
+	size_t kick_idle_conns(time_t ttl);	// Close expired connections
+	connect_client* peek_back();		// Peek from tail
+	void put_front(connect_client* conn);	// Put at head
 
-	void count_inc(bool exclusive);		// 增加连接数及对象引用计数
-	void count_dec(bool exclusive);		// 减少连接数及对象引用计数
+	void count_inc(bool exclusive);		// Increase connection count and reference count
+	void count_dec(bool exclusive);		// Decrease connection count and reference count
 };
 
 class ACL_CPP_API connect_guard : public noncopyable {
@@ -299,3 +332,4 @@ protected:
 };
 
 } // namespace acl
+

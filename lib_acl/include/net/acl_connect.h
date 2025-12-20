@@ -14,25 +14,25 @@ extern "C" {
 #include <sys/socket.h>
 #endif
 
-#define ACL_CONNECT_F_NONE		0		/* Nonthing */
-#define ACL_CONNECT_F_SYS_ERR		(1 << 0)	/* 需查系统 errno */
-#define ACL_CONNECT_F_CREATE_SOCKET_ERR	(1 << 1)	/* 创建 socket 出错 */
-#define ACL_CONNECT_F_REUSE_ADDR_ERR	(1 << 2)	/* 重复使用绑定地址出错 */
-#define ACL_CONNECT_F_BIND_IP_OK	(1 << 3)	/* 绑定本机 IP 成功 */
-#define ACL_CONNECT_F_BIND_IP_ERR	(1 << 4)	/* 绑定本机 IP 失败 */
-#define ACL_CONNECT_F_BIND_IFACE_OK	(1 << 5)	/* 绑定本机网卡成功 */
-#define ACL_CONNECT_F_BIND_IFACE_ERR	(1 << 6)	/* 绑定本机网卡失败 */
-#define ACL_CONNECT_F_SO_ERROR		(1 << 7)	/* socket 出错 */
-#define ACL_CONNECT_F_INPROGRESS	(1 << 8);	/* 正在连接过程中 */
-#define ACL_CONNECT_F_WAIT_ERR		(1 << 9)	/* 等待连接建连失败 */
+#define ACL_CONNECT_F_NONE		0		/* Nothing */
+#define ACL_CONNECT_F_SYS_ERR		(1 << 0)	/* System errno occurred */
+#define ACL_CONNECT_F_CREATE_SOCKET_ERR	(1 << 1)	/* Failed to create socket */
+#define ACL_CONNECT_F_REUSE_ADDR_ERR	(1 << 2)	/* Failed to set SO_REUSEADDR */
+#define ACL_CONNECT_F_BIND_IP_OK	(1 << 3)	/* Bind to local IP succeeded */
+#define ACL_CONNECT_F_BIND_IP_ERR	(1 << 4)	/* Bind to local IP failed */
+#define ACL_CONNECT_F_BIND_IFACE_OK	(1 << 5)	/* Bind to local interface succeeded */
+#define ACL_CONNECT_F_BIND_IFACE_ERR	(1 << 6)	/* Bind to local interface failed */
+#define ACL_CONNECT_F_SO_ERROR		(1 << 7)	/* Socket error via getsockopt(SO_ERROR) */
+#define ACL_CONNECT_F_INPROGRESS	(1 << 8);	/* Connection is in progress */
+#define ACL_CONNECT_F_WAIT_ERR		(1 << 9)	/* Waiting for connection completion failed */
 
 /* in acl_sane_connect.c */
 /**
- * 远程连接服务器
- * @param sock {ACL_SOCKET} 套接字，在UNIX平台下还可以是域套接字
- * @param sa {const struct sockaddr*} 服务器监听地址
- * @param len {socklen_t} sa 的地址长度
- * @return {int} 0: 连接成功; -1: 连接失败
+ * Connect to a remote server in a "sane" (well-defined) way.
+ * @param sock {ACL_SOCKET} Socket descriptor; on UNIX this is a regular socket
+ * @param sa {const struct sockaddr*} Remote socket address
+ * @param len {socklen_t} Length of the address structure sa
+ * @return {int} 0 on success; -1 on error
  */
 ACL_API int acl_sane_connect(ACL_SOCKET sock, const struct sockaddr * sa,
 		socklen_t len);
@@ -40,24 +40,25 @@ ACL_API int acl_sane_connect(ACL_SOCKET sock, const struct sockaddr * sa,
 /* in acl_timed_connect.c */
 
 /**
- * 带超时时间地远程连接服务器
- * @param fd {ACL_SOCKET} 套接字，在UNIX平台下还可以是域套接字
- * @param sa {const struct sockaddr*} 服务器监听地址
- * @param len {socklen_t} sa 的地址长度
- * @param timeout {int} 连接超时时间(秒级)
- * @return {int} 0: 连接成功; -1: 连接失败
+ * Connect to a remote server with a timeout.
+ * @param fd {ACL_SOCKET} Socket descriptor; on UNIX this is a regular socket
+ * @param sa {const struct sockaddr*} Remote socket address
+ * @param len {socklen_t} Length of the address structure sa
+ * @param timeout {int} Connection timeout in seconds
+ * @return {int} 0 on success; -1 on error
  */
 ACL_API int acl_timed_connect(ACL_SOCKET fd, const struct sockaddr * sa,
 		socklen_t len, int timeout);
 
 /**
- * 带超时时间地远程连接服务器
- * @param fd {ACL_SOCKET} 套接字，在UNIX平台下还可以是域套接字
- * @param sa {const struct sockaddr*} 服务器监听地址
- * @param len {socklen_t} sa 的地址长度
- * @param timeout {int} 连接超时时间(毫秒级)
- * @param flags {unsigned*} 非空时用来存放连接失败的错误信息或连接的其它标记位
- * @return {int} 0: 连接成功; -1: 连接失败
+ * Connect to a remote server with a timeout (millisecond granularity).
+ * @param fd {ACL_SOCKET} Socket descriptor; on UNIX this is a regular socket
+ * @param sa {const struct sockaddr*} Remote socket address
+ * @param len {socklen_t} Length of the address structure sa
+ * @param timeout {int} Connection timeout in milliseconds
+ * @param flags {unsigned*} Optional bit mask used to receive
+ *  detailed error information on failure
+ * @return {int} 0 on success; -1 on error
  */
 ACL_API int acl_timed_connect_ms2(ACL_SOCKET fd, const struct sockaddr * sa,
 		socklen_t len, int timeout, unsigned *flags);
@@ -67,42 +68,51 @@ ACL_API int acl_timed_connect_ms(ACL_SOCKET fd, const struct sockaddr * sa,
 /* in acl_inet_connect.c */
 
 /**
- * 远程连接网络服务器地址
- * @param addr {const char*} 远程服务器的监听地址，如：192.168.0.1|80, 如果需
- *  要绑定本地的地址，则格式为: remote_addr@local_ip,
- *  如: www.sina.com|80@60.28.250.199
- * @param blocking {int} 阻塞模式还是非阻塞模式, ACL_BLOCKING 或 ACL_NON_BLOCKING
- * @param timeout {int} 连接超时时间，如果 blocking 为 ACL_NON_BLOCKING 则该值将被忽略
- * @return {ACL_SOCKET} 如果返回 ACL_SOCKET_INVALID 表示连接失败 
+ * Connect to a remote host using an "ip|port" style address string.
+ * @param addr {const char*} Remote address string, for example: "192.168.0.1|80".
+ *        If you want to bind a local address as well, use the form: "remote_addr@local_ip",
+ *        for example: "www.sina.com|80@60.28.250.199".
+ * @param blocking {int} Blocking mode: ACL_BLOCKING or ACL_NON_BLOCKING
+ * @param timeout {int} Connection timeout; when blocking is
+ *  ACL_NON_BLOCKING this value is ignored
+ * @return {ACL_SOCKET} Valid socket descriptor on success;
+ *  ACL_SOCKET_INVALID on failure
  */
 ACL_API ACL_SOCKET acl_inet_connect(const char *addr, int blocking, int timeout);
 
 /**
- * 远程连接网络服务器地址
- * @param addr {const char*} 远程服务器的监听地址，如：192.168.0.1|80，
- *  当本机有多个网卡地址且想通过某个指定网卡连接服务器时的地址格式：
- *  remote_ip|remote_port@local_ip，如：211.150.111.12|80@192.168.1.1
- * @param blocking {int} 阻塞模式还是非阻塞模式, ACL_BLOCKING 或 ACL_NON_BLOCKING
- * @param timeout {int} 连接超时时间(秒级)，如果 blocking 为 ACL_NON_BLOCKING 则该值将被忽略
- * @param flags {unsigned*} 非空时用来存放连接失败的错误信息或连接的其它标记位
- * @return {ACL_SOCKET} 如果返回 ACL_SOCKET_INVALID 表示连接失败
+ * Connect to a remote host using an "ip|port" style address string.
+ * @param addr {const char*} Remote address string, for example: "192.168.0.1|80".
+ *        When multiple local addresses exist, you can specify the local address to use
+ *        via the form: "remote_ip|remote_port@local_ip", for
+ *        example: "211.150.111.12|80@192.168.1.1".
+ * @param blocking {int} Blocking mode: ACL_BLOCKING or ACL_NON_BLOCKING
+ * @param timeout {int} Connection timeout in seconds; when blocking is
+ *  ACL_NON_BLOCKING this value is ignored
+ * @param flags {unsigned*} Optional bit mask used to receive
+ *  detailed error information on failure
+ * @return {ACL_SOCKET} Valid socket descriptor on success;
+ *  ACL_SOCKET_INVALID on failure
  */
 ACL_API ACL_SOCKET acl_inet_connect2(const char *addr, int blocking,
 		int timeout, unsigned *flags);
 #define acl_inet_connect_ex	acl_inet_connect2
 
 /**
- * 远程连接网络服务器地址
- * @param addr {const char*} 远程服务器的监听地址，如：192.168.0.1|80，
- *  当本机有多个网卡地址且想通过某个指定网卡连接服务器时的地址格式：
- *  remote_ip|remote_port@local_ip 或 remote_ip|remote_port#local_interface，
- *  如：
- *    211.150.111.12|80@192.168.1.1
- *    211.150.111.12|80#interface
- * @param blocking {int} 阻塞模式还是非阻塞模式, ACL_BLOCKING 或 ACL_NON_BLOCKING
- * @param timeout {int} 连接超时时间(毫秒级)，如果 blocking 为 ACL_NON_BLOCKING 则该值将被忽略
- * @param flags {unsigned*} 非空时用来存放连接失败的错误信息或连接的其它标记位
- * @return {ACL_SOCKET} 如果返回 ACL_SOCKET_INVALID 表示连接失败
+ * Connect to a remote host using an "ip|port" style address string, with timeout support.
+ * @param addr {const char*} Remote address string, for example: "192.168.0.1|80".
+ *        When multiple local addresses or interfaces exist, you can specify which one
+ *        to use with either "remote_ip|remote_port@local_ip" or
+ *        "remote_ip|remote_port#local_interface", e.g.:
+ *          "211.150.111.12|80@192.168.1.1"
+ *          "211.150.111.12|80#interface"
+ * @param blocking {int} Blocking mode: ACL_BLOCKING or ACL_NON_BLOCKING
+ * @param timeout {int} Connection timeout in seconds; when blocking is
+ *  ACL_NON_BLOCKING this value is ignored
+ * @param flags {unsigned*} Optional bit mask used to receive
+ *  detailed error information on failure
+ * @return {ACL_SOCKET} Valid socket descriptor on success;
+ *  ACL_SOCKET_INVALID on failure
  */
 ACL_API ACL_SOCKET acl_inet_timed_connect(const char *addr, int blocking,
 		int timeout, unsigned *flags);
@@ -112,12 +122,15 @@ ACL_API ACL_SOCKET acl_inet_timed_connect(const char *addr, int blocking,
 /* in acl_unix_connect.c */
 
 /**
- * 连接监听域套接字服务器
- * @param addr {const char*} 服务器监听的域套接字全路径, 如: /tmp/test.sock，
- *  针对 Linux 平台，如果首字母为 @ 则内部自动采用抽象 UNIX 域套接口进行连接
- * @param blocking {int} 阻塞模式还是非阻塞模式, ACL_BLOCKING 或 ACL_NON_BLOCKING
- * @param timeout {int} 连接超时时间，如果 blocking 为 ACL_NON_BLOCKING 则该值将被忽略
- * @return {ACL_SOCKET} 如果返回 ACL_SOCKET_INVALID 表示连接失败 
+ * Connect to a UNIX domain socket.
+ * @param addr {const char*} Full path of the UNIX domain socket, e.g.: "/tmp/test.sock".
+ *        On Linux, when the first character is '@', an abstract UNIX domain socket
+ *        (not bound to the filesystem namespace) will be used.
+ * @param blocking {int} Blocking mode: ACL_BLOCKING or ACL_NON_BLOCKING
+ * @param timeout {int} Connection timeout; when blocking is
+ *  ACL_NON_BLOCKING this value is ignored
+ * @return {ACL_SOCKET} Valid socket descriptor on success;
+ *  ACL_SOCKET_INVALID on failure
  */
 ACL_API ACL_SOCKET acl_unix_connect(const char *addr, int blocking, int timeout);
 

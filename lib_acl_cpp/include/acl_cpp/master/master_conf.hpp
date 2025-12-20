@@ -55,46 +55,49 @@ public:
 	~master_conf();
 
 	/**
-	 * 设置 bool 类型的配置项
+	 * Set bool type configuration item
 	 * @param table {master_bool_tbl*}
 	 */
 	void set_cfg_bool(master_bool_tbl* table);
 
 	/**
-	 * 设置 int 类型的配置项
+	 * Set int type configuration item
 	 * @param table {master_int_tbl*}
 	 */
 	void set_cfg_int(master_int_tbl* table);
 
 	/**
-	 * 设置 int64 类型的配置项
+	 * Set int64 type configuration item
 	 * @param table {master_int64_tbl*}
 	 */
 	void set_cfg_int64(master_int64_tbl* table);
 
 	/**
-	 * 设置 字符串 类型的配置项
+	 * Set string type configuration item
 	 * @param table {master_str_tbl*}
 	 */
 	void set_cfg_str(master_str_tbl* table);
 
 	/**
-	 * 加载配置文件
-	 * @param path {const char*} 配置文件全路径
+	 * Load configuration file
+	 * @param path {const char*} Full path of configuration file
 	 */
 	void load(const char* path);
 
 	/**
-	 * 获得由 load 设置的配置文件路径
-	 * @return {const char*} 返回 NULL 表示没有设置配置文件路径
+	 * Get the configuration file path set by load
+	 * @return {const char*} Returns NULL if configuration file path was not set
 	 */
 	const char* get_path() const;
 
 	/**
-	 * 重置配置解析器状态，释放之前分配的资源，调用此函数后，
-	 * 之前获得的字符串配置项的内存将会被释放，所以禁止再用；
-	 * 调用该函数后，则该配置解析器对象可以再次使用解析其它
-	 * 配置文件
+	 * Reset configuration parser state, release previously allocated resources.
+	 * After calling this function,
+	 * the memory of string configuration items obtained previously will be
+	 * released, so they are forbidden to use;
+	 * After calling this function, the configuration parser object can be used
+	 * again to parse other
+	 * configuration files
 	 */
 	void reset();
 
@@ -127,3 +130,4 @@ private:
 } // namespace acl
 
 #endif // ACL_CLIENT_ONLY
+

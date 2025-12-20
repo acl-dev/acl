@@ -7,25 +7,24 @@
 
 struct sqlite3_stmt;
 
-namespace acl
-{
+namespace acl {
 
 class db_row;
 class db_sqlite;
 class dbuf_guard;
 
-class sqlite_cursor : public db_cursor
-{
+class sqlite_cursor : public db_cursor {
 public:
 	/**
-	 * 构造方法
-	 * @param q {query&} SQL 查询对象，在构造方法内会首先将其转为 Sql 字符串
+	 * Constructor
+	 * @param q {query&} SQL query object, will be converted to SQL string in the
+	 * constructor
 	 */
 	sqlite_cursor(query& q);
 	~sqlite_cursor(void);
 
 	/**
-	 * 获得查询 SQL 语句
+	 * Get query SQL statement
 	 * @return {const string&}
 	 */
 	const string& get_sql(void) const {
@@ -33,7 +32,8 @@ public:
 	}
 
 	/**
-	 * 在遍历查询结构集时，每次查询后可通过本方法获得结果行
+	 * When traversing query result set, can get result row after each query
+	 * through this method
 	 * @return {db_row*}
 	 */
 	db_row* get_row(void) const {
@@ -41,36 +41,37 @@ public:
 	}
 
 	/**
-	 * 由 db_sqlite 类调用来初始化 names_ 字段名
-	 * @param name {const char*} 数据表列名
+	 * Called by db_sqlite class to initialize names_ field names
+	 * @param name {const char*} Database table column name
 	 */
 	void add_column_name(const char* name);
 	
 	/**
-	 * 添加列值
+	 * Add column value
 	 * @param n {long long}
 	 */
 	void add_column_value(long long n);
 
 	/**
-	 * 添加列值
+	 * Add column value
 	 * @param n {double}
 	 */
 	void add_column_value(double n);
 
 	/**
-	 * 添加列值
-	 * @param s {cont char*} 该参数的生命周期由 stmt_ 决定
+	 * Add column value
+	 * @param s {cont char*} The lifetime of this parameter is determined by stmt_
 	 */
 	void add_column_value(const char* s);
 
 	/**
-	 * 创建行记录对象，用来存放查询结果行
+	 * Create row record object to store query result rows
 	 */
 	void create_row(void);
 
 	/**
-	 * 在遍历过程中，db_sqlite::next 方法会首先调用本方法清除上次的查询结果
+	 * During traversal, db_sqlite::next method will first call this method to
+	 * clear previous query results
 	 */
 	void clear(void);
 
@@ -83,13 +84,14 @@ private:
 	sqlite3_stmt* stmt_;
 	free_sqlite3_stmt_fn free_callback;
 
-	// 数据表字段名
+	// Database table field names
 	std::vector<const char*> names_;
 
-	dbuf_guard* dbuf_;	// 内存分配器
-	db_row* row_;		// 对于查询语句而言，用来存储结果
+	dbuf_guard* dbuf_;	// Memory allocator
+	db_row* row_;		// For query statements, used to store results
 };
 
 }
 
 #endif // !defined(ACL_DB_DISABLE)
+

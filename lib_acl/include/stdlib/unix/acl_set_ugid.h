@@ -12,17 +12,17 @@ extern "C" {
 #include <unistd.h>
 
 /**
- * 调用程序的用户 ID 及组 ID
- * @param uid {uid_t} 用户 ID
- * @param gid {gid_t} 组 ID
- * @return {int} 设置是否成功，0 表示成功，-1 表示失败
+ * Set process user ID and group ID.
+ * @param uid {uid_t} User ID
+ * @param gid {gid_t} Group ID
+ * @return {int} Whether operation succeeded, 0 indicates success, -1 indicates failure
  */
 int acl_set_ugid(uid_t uid, gid_t gid);
 
 /**
- * 修改程序的用户 ID 为指定用户的 ID
- * @param user {char* } 系统用户账号名
- * @return {int} 设置是否成功，0 表示成功，-1 表示失败
+ * Change process user ID to specified user's ID.
+ * @param user {char* } System user account name
+ * @return {int} Whether operation succeeded, 0 indicates success, -1 indicates failure
  */
 int acl_change_uid(const char *user);
 
@@ -34,4 +34,3 @@ int acl_change_uid(const char *user);
 
 
 #endif
-

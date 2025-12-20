@@ -8,18 +8,22 @@ extern "C" {
 #include "acl_define.h"
 
 /**
- * 从字符串左边开始将包含给定分隔符在内的右边截断
- * @param string {char*} 源字符串
- * @param delimiter {int} 分隔符
- * @return {char*} 分隔符以右的字符串，当为NULL时表明未找到指定分隔符
+ * Search from the left of the string, find the specified delimiter,
+ * and truncate to the right of the delimiter.
+ * @param string {char*} Source string
+ * @param delimiter {int} Delimiter
+ * @return {char*} String to the right of the delimiter found, if NULL,
+ *  indicates delimiter not found
  */
 ACL_API char *acl_split_at(char *string, int delimiter);
 
 /**
- * 从字符串右边开始将包含给定分隔符在内的右边截断
- * @param string {char*} 源字符串
- * @param delimiter {int} 分隔符
- * @return {char*} 分隔符以右的字符串，当为NULL时表明未找到指定分隔符
+ * Search from the right of the string, find the specified delimiter,
+ * and truncate to the right of the delimiter.
+ * @param string {char*} Source string
+ * @param delimiter {int} Delimiter
+ * @return {char*} String to the right of the delimiter found, if NULL,
+ *  indicates delimiter not found
  */
 ACL_API char *acl_split_at_right(char *string, int delimiter);
 
@@ -28,4 +32,3 @@ ACL_API char *acl_split_at_right(char *string, int delimiter);
 #endif
 
 #endif
-

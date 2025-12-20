@@ -6,8 +6,7 @@
 
 namespace acl {
 
-class ACL_CPP_API hstable : public noncopyable
-{
+class ACL_CPP_API hstable : public noncopyable {
 public:
 	hstable(int id, const char* dbn, const char* tbl,
 		const char* idx, const char* flds);

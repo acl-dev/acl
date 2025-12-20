@@ -11,18 +11,18 @@ extern "C" {
 #endif
 
 /**
- * 定时器类型定义
+ * Timer information object.
  */
 typedef struct ACL_TIMER_INFO {               
 	/* public */
-	void *obj;              /**< 用户的数据对象指针 */
-	acl_int64 when;         /**< 被触发的时间截(微妙级) */
+	void *obj;              /**< Pointer to user data object */
+	acl_int64 when;         /**< Expiration time (microseconds) */
 
 	/* private */
-	ACL_RING entry;         /**< 内部用的定时链 */
+	ACL_RING entry;         /**< Internal timer list entry */
 } ACL_TIMER_INFO;
 
-/* 定时器句柄结构 */
+/* Timer container structure */
 typedef struct ACL_TIMER ACL_TIMER;
 
 struct ACL_TIMER {
@@ -36,75 +36,75 @@ struct ACL_TIMER {
 
 	/* for acl_iterator */
 
-	/* 取迭代器头函数 */
+	/* Get iterator at the head of the timer list */
 	const void *(*iter_head)(ACL_ITER*, struct ACL_TIMER*);
-	/* 取迭代器下一个函数 */
+	/* Get next iterator position */
 	const void *(*iter_next)(ACL_ITER*, struct ACL_TIMER*);
-	/* 取迭代器尾函数 */
+	/* Get iterator at the tail of the timer list */
 	const void *(*iter_tail)(ACL_ITER*, struct ACL_TIMER*);
-	/* 取迭代器上一个函数 */
+	/* Get previous iterator position */
 	const void *(*iter_prev)(ACL_ITER*, struct ACL_TIMER*);
 
-	/* 获得与当前迭代指针相关联的 ACL_TIMER_INFO 对象 */
+	/* Get the ACL_TIMER_INFO associated with the current iterator position */
 	const ACL_TIMER_INFO *(*iter_info)(ACL_ITER*, struct ACL_TIMER*);
 };
 
 /**
- * 添加定时任务
- * @param timer {ACL_TIMER*}，定时器句柄
- * @param obj {void*}，用户级动态变量
- * @param delay {acl_int64}，被触发的时间间隔(微秒级)
- * @return {acl_int64} 新的定时任务的解决时间截(微秒级)
+ * Add a timer request.
+ * @param timer {ACL_TIMER*} Timer container
+ * @param obj {void*} User-defined context data
+ * @param delay {acl_int64} Delay until expiration (microseconds)
+ * @return {acl_int64} Absolute expiration time (microseconds)
  */
 ACL_API acl_int64 acl_timer_request(ACL_TIMER* timer, void *obj, acl_int64 delay);
 
 /**
- * 取消定时任务
- * @param timer {ACL_TIMER*}，定时器句柄
- * @param obj {void*}，用户级动态变量
- * @return {acl_int64}，距离下一个定时任务被触发的时间间隔(微秒级)
+ * Cancel a timer request.
+ * @param timer {ACL_TIMER*} Timer container
+ * @param obj {void*} User-defined context data
+ * @return {acl_int64} Time when the next timer will fire (microseconds)
  */
 ACL_API acl_int64 acl_timer_cancel(ACL_TIMER* timer, void *obj);
 
 /**
- * 从定时器中获取到时的定时任务
- * @param timer {ACL_TIMER*}，定时器句柄
- * @return {void*}，用户级动态变量
+ * Pop the next expired timer from the container.
+ * @param timer {ACL_TIMER*} Timer container
+ * @return {void*} User-defined context data for the expired timer
  */
 ACL_API void *acl_timer_popup(ACL_TIMER* timer);
 
 /**
- * 距离下一个定时任务被触发的时间间隔
- * @param timer {ACL_TIMER*}，定时器句柄
- * @return {acl_int64} 返回值单位为微秒
+ * Get the remaining time until the next timer fires.
+ * @param timer {ACL_TIMER*} Timer container
+ * @return {acl_int64} Remaining time in microseconds
  */
 ACL_API acl_int64 acl_timer_left(ACL_TIMER* timer);
 
 /**
- * 遍历定时器里的所有定时任务项
- * @param timer {ACL_TIMER*}，定时器句柄
- * @param action {void (*)(ACL_TIMER_INFO*, void*)} 用户的遍历回调函数
- * @param arg {void*} action 中的第二个参数
+ * Walk through all timers in the container and perform a user-defined action.
+ * @param timer {ACL_TIMER*} Timer container
+ * @param action {void (*)(ACL_TIMER_INFO*, void*)} User callback invoked for each timer
+ * @param arg {void*} Second argument passed to the action callback
  */
 ACL_API void acl_timer_walk(ACL_TIMER *timer, void (*action)(ACL_TIMER_INFO *, void *), void *arg);
 
 /**
- * 创建定时器句柄
- * @return {ACL_TIMER*}
+ * Create a new timer container.
+ * @return {ACL_TIMER*} Newly allocated timer container
  */
 ACL_API ACL_TIMER *acl_timer_new(void);
 
 /**
- * 释放定时器句柄
- * @param timer {ACL_TIMER*}
- * @param free_fn {void (*)(void*)} 释放定时器里的用户对象的回调释放函数
+ * Free a timer container.
+ * @param timer {ACL_TIMER*} Timer container
+ * @param free_fn {void (*)(void*)} Callback used to free user data objects
  */
 ACL_API void acl_timer_free(ACL_TIMER* timer, void (*free_fn)(void*));
 
 /**
- * 获得定时器里定时任务的数量
+ * Get the number of timers stored in the container.
  * @param timer {ACL_TIMER*}
- * @return {int} >= 0
+ * @return {int} Number of timers (>= 0)
  */
 ACL_API int acl_timer_size(ACL_TIMER *timer);
 

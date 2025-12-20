@@ -17,42 +17,48 @@ class thread_pool;
 class ACL_CPP_API connect_monitor : public thread {
 public:
 	/**
-	 * 构造函数
+	 * Constructor
 	 * @param manager {connect_manager&}
-	 * @param check_server {bool} 是否检查服务端服务可用性并将不用的服务地址置入黑名单中
+	 * @param check_server {bool} Whether to check server service availability and
+	 * put unused service addresses into blacklist
 	 */
 	connect_monitor(connect_manager& manager, bool check_server = false);
 
 	virtual ~connect_monitor();
 
 	/**
-	 * 当希望采用阻塞式检测服务端连接时，需要先调用本函数打开
-	 * acl::rpc_service 阻塞接口处理服务；如果在初始化时不调用本函数，
-	 * 则采用非阻塞方式进行 IO 检测
-	 * @param max_threads {int} rpc_service 服务线程池中运行的最大线程数
-	 * @param addr {const char*} 希望 rpc_service 服务监听的本机地址，可以
-	 *  为本机的回地址或在 UNIX 平台下使用域套接口地址
+	 * When want to use blocking detection for server connections, need to call
+	 * this function first to open acl::rpc_service blocking interface processing
+	 * service. If this function is not called during initialization, it will use
+	 * non-blocking method for IO detection.
+	 * uses non-blocking method for IO detection
+	 * @param max_threads {int} Maximum number of threads running in rpc_service
+	 * service thread pool
+	 * @param addr {const char*} Local address where rpc_service service is
+	 * expected to listen, can be local loopback address or use domain socket
+	 * address on UNIX platform
 	 * @return {connect_monitor&}
 	 */
 	connect_monitor& open_rpc_service(int max_threads,
 		const char* addr = NULL);
 
 	/**
-	 * 设置检测定时器启动的时间间隔
-	 * @param n {int} 时间间隔（秒）
+	 * Set time interval for starting detection timer
+	 * @param n {int} Time interval (seconds)
 	 * @return {connect_mointor&}
 	 */
 	connect_monitor& set_check_inter(int n);
 
 	/**
-	 * 设置连接被检测服务器的超时时间
-	 * @param n {int} 超时时间（秒）
+	 * Set timeout for connecting to detected server
+	 * @param n {int} Timeout (seconds)
 	 * @return {connect_monitor&}
 	 */
 	connect_monitor& set_conn_timeout(int n);
 
 	/**
-	 * 是否检查服务端服务可用性并将不用的服务地址置入黑名单中
+	 * Whether to check server service availability and put unused service
+	 * addresses into blacklist
 	 * @return {bool}
 	 */
 	bool check_server_on() const {
@@ -60,20 +66,26 @@ public:
 	}
 
 	/**
-	 * 设置是否在连接检测器启动后自动关闭过期的空闲连接
-	 * @param check_idle {bool} 是否自动关闭过期的空闲连接
-	 * @param kick_dead {bool} 是否检查所有连接的存活状态并关闭异常连接，当该参数
-	 *  为 true 时，connect_client 的子类必须重载 alive() 虚方法，返回连接是否存活
-	 * @param keep_conns {bool} 是否尽量操持每个连接池中最小连接数
-	 * @param threads {thread_pool*} 线程池非空时将会被使用来提升并发处理能力
-	 * @param step {bool} 每次检测连接池个数
+	 * Set whether to automatically close expired idle connections after connection
+	 * monitor starts
+	 * @param check_idle {bool} Whether to automatically close expired idle
+	 * connections
+	 * @param kick_dead {bool} Whether to check liveness status of all connections
+	 * and close abnormal connections. When this parameter is true, connect_client
+	 * subclasses must override alive() virtual method, returning whether
+	 * connection is alive.
+	 * @param keep_conns {bool} Whether to try to maintain minimum number of
+	 * connections in each connection pool
+	 * @param threads {thread_pool*} When thread pool is not empty, will be used to
+	 * improve concurrent processing capability
+	 * @param step {bool} Number of connection pools to check each time
 	 * @return {connect_monitor&}
 	 */
 	connect_monitor& set_check_conns(bool check_idle, bool kick_dead,
 		bool keep_conns, thread_pool* threads = NULL, size_t step = 0);
 
 	/**
-	 * 是否自动检测并关闭过期空闲连接
+	 * Whether to automatically detect and close expired idle connections
 	 * @return {bool}
 	 */
 	bool check_idle_on() const {
@@ -81,7 +93,7 @@ public:
 	}
 
 	/**
-	 * 是否需要检查异常连接并关闭
+	 * Whether to check abnormal connections and close them
 	 * @return {bool}
 	 */
 	bool kick_dead_on() const {
@@ -89,7 +101,7 @@ public:
 	}
 
 	/**
-	 * 是否需要尽量保持每个连接池的最小连接数
+	 * Whether to try to maintain minimum number of connections in each connection pool
 	 * @return {bool}
 	 */
 	bool keep_conns_on() const {
@@ -97,7 +109,8 @@ public:
 	}
 
 	/**
-	 * 当 check_idle_on() 返回 true 时，返回每次检测的连接数量限制
+	 * When check_idle_on() returns true, returns connection count limit checked
+	 * each time
 	 * @return {size_t}
 	 */
 	size_t get_check_step() const {
@@ -105,7 +118,7 @@ public:
 	}
 
 	/**
-	 * 获得前面所设置的线程池对象
+	 * Get thread pool object set earlier
 	 * @return {thread_pool*}
 	 */
 	thread_pool* get_threads() const {
@@ -113,17 +126,20 @@ public:
 	}
 
 	/**
-	 * 停止检测线程
-	 * @param graceful {bool} 是否文明地关闭检测过程，如果为 true
-	 *  则会等所有的检测连接关闭后检测线程才返回；否则，则直接检测线程
-	 *  直接返回，可能会造成一些正在检测的连接未被释放。正因如此，如果
-	 *  连接池集群管理对象是进程内全局的，可以将此参数设为 false，如果
-	 *  连接池集群管理对象在运行过程中需要被多次创建与释放，则应该设为 true
+	 * Stop detection thread
+	 * @param graceful {bool} Whether to gracefully close detection process. If
+	 * true, will wait for all detection connections to close before detection
+	 * thread returns. Otherwise, detection thread directly returns, may cause
+	 * some connections being detected to not be released. Because of this, if
+	 * connection pool cluster management object is process-wide global, can set
+	 * this parameter to false. If connection pool cluster management object
+	 * needs to be created and released multiple times during runtime, should
+	 * set this parameter to true.
 	 */
 	void stop(bool graceful);
 
 	/**
-	 * 获得 connect_manager 引用对象
+	 * Get connect_manager reference object
 	 * @return {connect_manager&}
 	 */
 	connect_manager& get_manager() const {
@@ -131,44 +147,52 @@ public:
 	}
 
 	/**
-	 * 虚函数，子类可以重载本函数用来进一步判断该连接是否是存活的，该回调
-	 * 函数的运行空间为当前非阻塞检测线程的运行空间，因此在该回调函数中不
-	 * 得有阻塞过程，否则将会阻塞整个非阻塞检测线程
-	 * @param checker {check_client&} 服务端连接的检查对象，可以通过
-	 *  check_client 类中的方法如下：
-	 *  1) get_conn 获得非阻塞连接句柄
-	 *  2) get_addr 获得服务端地址
-	 *  3) set_alive 设置连接是否存活
-	 *  4) close 关闭连接
+	 * Virtual function. Subclasses can override this function to further determine
+	 * whether connection is alive. This callback function runs in current
+	 * non-blocking detection thread's running space, so there must not be
+	 * blocking processes in this callback function, otherwise will block entire
+	 * non-blocking detection thread.
+	 * @param checker {check_client&} Check object for server connection. Can use
+	 * methods in
+	 *  check_client class as follows:
+	 *  1) get_conn to get non-blocking connection handle
+	 *  2) get_addr to get server address
+	 *  3) set_alive to set whether connection is alive
+	 *  4) close to close connection
 	 */
 	virtual void nio_check(check_client& checker, aio_socket_stream& conn);
 
 	/**
-	 * 同步 IO 检测虚函数，该函数在线程池的某个子线程空间中运行，子类可以
-	 * 重载本函数以检测实际应用的网络连接存活状态，可以在本函数内有阻塞
-	 * IO 过程
-	 * @param checker {check_client&} 服务端连接的检查对象
-	 *  check_client 类中允许调用的方法如下：
-	 *  1) get_addr 获得服务端地址
-	 *  2) set_alive 设置连接是否存活
-	 *  check_client 类中禁止调用的方法如下：
-	 *  1) get_conn 获得非阻塞连接句柄
-	 *  2) close 关闭连接
+	 * Synchronous IO detection virtual function. This function runs in a child
+	 * thread's space in thread pool. Subclasses can override this function to
+	 * detect actual application's network connection liveness status. Can have
+	 * blocking IO processes in this function
+	 * @param checker {check_client&} Check object for server connection
+	 *  Methods allowed to call in check_client class:
+	 *  1) get_addr to get server address
+	 *  2) set_alive to set whether connection is alive
+	 *  Methods prohibited to call in check_client class:
+	 *  1) get_conn to get non-blocking connection handle
+	 *  2) close to close connection
 	 */
 	virtual void sio_check(check_client& checker, socket_stream& conn);
 
 	/**
-	 * 当连接成功时的回调方法，子类可以实现本方法
-	 * @param cost {double} 从发起连接请求到超时的时间间隔（秒）
+	 * Callback method when connection succeeds. Subclasses can implement this
+	 * method
+	 * @param cost {double} Time interval from initiating connection request to
+	 * timeout (seconds)
 	 */
 	virtual void on_connected(const check_client&, double cost) {
 		(void) cost;
 	}
 
 	/**
-	 * 当连接超时时的回调方法，子类可以实现本方法
-	 * @param addr {const char*} 被检测的服务器地址，格式: ip:port
-	 * @param cost {double} 从发起连接请求到超时的时间间隔（秒）
+	 * Callback method when connection times out. Subclasses can implement this
+	 * method
+	 * @param addr {const char*} Detected server address, format: ip:port
+	 * @param cost {double} Time interval from initiating connection request to
+	 * timeout (seconds)
 	 */
 	virtual void on_timeout(const char* addr, double cost) {
 		(void) addr;
@@ -176,9 +200,11 @@ public:
 	}
 
 	/**
-	 * 当连接服务器时被拒绝时的回调方法，子类可实现本方法
-	 * @param addr {const char*} 被检测的服务器地址，格式: ip:port
-	 * @param cost {double} 从发起连接请求到被断开的时间间隔（秒）
+	 * Callback method when connection to server is refused. Subclasses can
+	 * implement this method
+	 * @param addr {const char*} Detected server address, format: ip:port
+	 * @param cost {double} Time interval from initiating connection request to
+	 * disconnection (seconds)
 	 */
 	virtual void on_refused(const char* addr, double cost) {
 		(void) addr;
@@ -186,31 +212,32 @@ public:
 	}
 
 public:
-	// 虽然下面的函数是 public 的，但只供内部使用
+	// Although following functions are public, they are only for internal use
 	/**
-	 * 当与服务端建立连接后调用此函数
+	 * Called when connection with server is established
 	 * @param checker {check_client&}
 	 */
 	void on_open(check_client& checker);
 
 protected:
-	// 基类纯虚函数
+	// Base class pure virtual function
 	virtual void* run();
 
 private:
 	bool stop_;
 	bool stop_graceful_;
-	aio_handle handle_;			// 后台检测线程的非阻塞句柄
-	connect_manager& manager_;		// 连接池集合管理对象
-	bool check_server_;			// 是否检查服务端可用性
-	int   check_inter_;			// 检测连接池状态的时间间隔(秒)
-	int   conn_timeout_;			// 连接服务器的超时时间
-	bool  check_idle_;			// 是否检测并关闭过期空闲连接
-	bool  kick_dead_;			// 是否删除异常连接
-	bool  keep_conns_;			// 是否保持每个连接池最小连接数
-	size_t check_step_;			// 每次检测连接池个数限制
-	thread_pool* threads_;			// 线程池非空将会并发执行任务
-	rpc_service* rpc_service_;		// 异步 RPC 通信服务句柄
+	aio_handle handle_;			// Non-blocking handle of background detection thread
+	connect_manager& manager_;	// Connection pool collection management object
+	bool check_server_;			// Whether to check server availability
+	int   check_inter_;			// Time interval for checking connection pool status (seconds)
+	int   conn_timeout_;		// Timeout for connecting to server
+	bool  check_idle_;			// Whether to detect and close expired idle connections
+	bool  kick_dead_;			// Whether to delete abnormal connections
+	bool  keep_conns_;			// Whether to maintain minimum number of connections in each connection pool
+	size_t check_step_;			// Limit on number of connection pools checked each time
+	thread_pool* threads_;		// When thread pool is not empty, will concurrently execute tasks
+	rpc_service* rpc_service_;	// Asynchronous RPC communication service handle
 };
 
 } // namespace acl
+

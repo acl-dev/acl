@@ -7,21 +7,21 @@ namespace acl {
 class diff_string : public diff_object {
 public:
 	/**
-	 * 构造函数
+	 * Constructor
 	 * @param manager {diff_manager&}
-	 * @param key {const char*} 以字符串方式表示的键，非空字符串
-	 * @param val {const char*} 以字符串方式表示的值，非空字符串
+	 * @param key {const char*} Key represented as string, non-empty string
+	 * @param val {const char*} Value represented as string, non-empty string
 	 */
 	diff_string(diff_manager& manager, const char* key, const char* val);
 
 	/**
-	 * 设置本对象所在的区间值
+	 * Set the range value for this object
 	 * @param range {long long}
 	 */
 	void set_range(long long range);
 
 	/**
-	 * 获得本对象所在的区间值
+	 * Get the range value for this object
 	 * @return {long long}
 	 */
 	long long get_range() const {
@@ -29,13 +29,13 @@ public:
 	}
 
 public:
-	// override: 基类纯虚函数的实现
+	// override: Implementation of base class pure virtual function
 	const char* get_key() const;
 
-	// override: 基类纯虚函数的实现
+	// override: Implementation of base class pure virtual function
 	const char* get_val() const;
 
-	// override: 基类纯函数的实现
+	// override: Implementation of base class pure function
 	bool operator== (const diff_object& obj) const;
 
 	// @override
@@ -46,7 +46,8 @@ private:
 	const char* val_;
 	long long range_;
 
-	// 析构函数声明为私有的，从而要求动态创建本类对象
+	// Destructor declared as private, requiring dynamic creation of objects of
+	// this class
 	~diff_string();
 };
 

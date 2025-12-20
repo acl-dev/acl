@@ -40,162 +40,181 @@ typedef struct SMTP_CLIENT {
 } SMTP_CLIENT;
 
 /**
- * 远程连接 SMTP 服务器
- * @param addr {const char*} SMTP 服务器地址，格式：domain:port
- * @param conn_timeout {int} 连接超时时间
- * @param rw_timeout {int} IO读写超时时间
- * @param line_limit {int} SMTP 会话过程中每行的最大长度限制
- * @return {SMTP_CLIENT*} 连接成功返回非空值，否则返回 NULL
+ * Connect to remote SMTP server
+ * @param addr {const char*} SMTP server address, format: domain:port
+ * @param conn_timeout {int} Connection timeout
+ * @param rw_timeout {int} IO read/write timeout
+ * @param line_limit {int} Max line length in SMTP session communication
+ * @return {SMTP_CLIENT*} Returns non-NULL on success, NULL on failure
  */
 SMTP_API SMTP_CLIENT *smtp_open(const char *addr, int conn_timeout,
 	int rw_timeout, int line_limit);
 
 /**
- * 关闭由 smtp_open 打开的 SMTP 连接并释放对象
- * @param client {SMTP_CLIENT*} SMTP 连接对象
+ * Close SMTP connection opened by smtp_open and free object
+ * @param client {SMTP_CLIENT*} SMTP connection object
  */
 SMTP_API void smtp_close(SMTP_CLIENT *client);
 
 /**
- * 获得 SMTP 服务器的欢迎信息
- * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
- *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
+ * Read welcome message from SMTP server
+ * @param client {SMTP_CLIENT*} SMTP connection object
+ * @return {int} 0 indicates success (SMTP_CLIENT::smtp_code indicates
+ *  server code, SMTP_CLIENT::buf stores response data), otherwise indicates
+ *  error and connection should be closed
  */
 SMTP_API int smtp_get_banner(SMTP_CLIENT *client);
 
 /**
- * 向 SMTP 服务器发送 HELO/EHLO 命令
- * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @param name {const char*} 握手信息，一般用域名
- * @param ehlo {int} 非 0 时使用 EHLO，否则使用 HELO
- * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
- *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
+ * Send HELO/EHLO command to SMTP server
+ * @param client {SMTP_CLIENT*} SMTP connection object
+ * @param name {const char*} Greeting info, usually hostname
+ * @param ehlo {int} When non-zero, use EHLO; otherwise use HELO
+ * @return {int} 0 indicates success (SMTP_CLIENT::smtp_code indicates
+ *  server code, SMTP_CLIENT::buf stores response data), otherwise indicates
+ *  error and connection should be closed
  */
 
 SMTP_API int smtp_greet(SMTP_CLIENT *client, const char* name, int ehlo);
 
 /**
- * 向 SMTP 服务器发送 HELO 命令
- * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @param helo {const char*} 握手信息，一般用域名
- * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
- *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
+ * Send HELO command to SMTP server
+ * @param client {SMTP_CLIENT*} SMTP connection object
+ * @param helo {const char*} Greeting info, usually hostname
+ * @return {int} 0 indicates success (SMTP_CLIENT::smtp_code indicates
+ *  server code, SMTP_CLIENT::buf stores response data), otherwise indicates
+ *  error and connection should be closed
  */
 SMTP_API int smtp_helo(SMTP_CLIENT *client, const char *helo);
 
 /**
- * 向 SMTP 服务器发送 EHLO 命令
- * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @param ehlo {const char*} 握手信息，一般用域名
- * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
- *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
+ * Send EHLO command to SMTP server
+ * @param client {SMTP_CLIENT*} SMTP connection object
+ * @param ehlo {const char*} Greeting info, usually hostname
+ * @return {int} 0 indicates success (SMTP_CLIENT::smtp_code indicates
+ *  server code, SMTP_CLIENT::buf stores response data), otherwise indicates
+ *  error and connection should be closed
  */
 SMTP_API int smtp_ehlo(SMTP_CLIENT *client, const char *ehlo);
 
 /**
- * 向 SMTP 服务器发送验证信息
- * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @param user {const char*} SMTP 邮件账号
- * @param pass {const char*} SMTP 邮件账号密码
- * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
- *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
+ * Send authentication info to SMTP server
+ * @param client {SMTP_CLIENT*} SMTP connection object
+ * @param user {const char*} SMTP email account
+ * @param pass {const char*} SMTP email account password
+ * @return {int} 0 indicates success (SMTP_CLIENT::smtp_code indicates
+ *  server code, SMTP_CLIENT::buf stores response data), otherwise indicates
+ *  error and connection should be closed
  */
 SMTP_API int smtp_auth(SMTP_CLIENT *client, const char *user, const char *pass);
 
 /**
- * 向 SMTP 服务器发送 MAIL FROM 命令
- * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @param from {const char*} 发送者邮箱
- * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
- *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
+ * Send MAIL FROM command to SMTP server
+ * @param client {SMTP_CLIENT*} SMTP connection object
+ * @param from {const char*} Sender address
+ * @return {int} 0 indicates success (SMTP_CLIENT::smtp_code indicates
+ *  server code, SMTP_CLIENT::buf stores response data), otherwise indicates
+ *  error and connection should be closed
  */
 SMTP_API int smtp_mail(SMTP_CLIENT *client, const char *from);
 
 /**
- * 向 SMTP 服务器发送 RCPT TO 命令
- * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @param to {const char*} 接收者邮箱
- * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
- *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
+ * Send RCPT TO command to SMTP server
+ * @param client {SMTP_CLIENT*} SMTP connection object
+ * @param to {const char*} Recipient address
+ * @return {int} 0 indicates success (SMTP_CLIENT::smtp_code indicates
+ *  server code, SMTP_CLIENT::buf stores response data), otherwise indicates
+ *  error and connection should be closed
  */
 SMTP_API int smtp_rcpt(SMTP_CLIENT *client, const char *to);
 
 /**
- * 向 SMTP 服务器发送 DATA 命令
- * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
- *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
+ * Send DATA command to SMTP server
+ * @param client {SMTP_CLIENT*} SMTP connection object
+ * @return {int} 0 indicates success (SMTP_CLIENT::smtp_code indicates
+ *  server code, SMTP_CLIENT::buf stores response data), otherwise indicates
+ *  error and connection should be closed
  */
 SMTP_API int smtp_data(SMTP_CLIENT *client);
 
 /**
- * 向 SMTP 服务器发送邮件体内容，可以循环调用本函数直至数据发送完毕
- * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @param src {const char*} 遵守邮件 MIME 编码格式的邮件体内容
- * @param len {size_t} src 数据长度
- * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
- *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
+ * Send email body data to SMTP server. Loop calling this function until
+ * all data sent
+ * @param client {SMTP_CLIENT*} SMTP connection object
+ * @param src {const char*} Email data in MIME format
+ * @param len {size_t} src data length
+ * @return {int} 0 indicates success (SMTP_CLIENT::smtp_code indicates
+ *  server code, SMTP_CLIENT::buf stores response data), otherwise indicates
+ *  error and connection should be closed
  */
 SMTP_API int smtp_send(SMTP_CLIENT *client, const char* src, size_t len);
 
 /**
- * 向 SMTP 服务器发送邮件体内容，可以循环调用本函数直至数据发送完毕
- * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @param fmt {const char*} 格式字符串
- * @param ... 变参
- * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
- *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
+ * Send email body data to SMTP server. Loop calling this function until
+ * all data sent
+ * @param client {SMTP_CLIENT*} SMTP connection object
+ * @param fmt {const char*} Format string
+ * @param ... Parameters
+ * @return {int} 0 indicates success (SMTP_CLIENT::smtp_code indicates
+ *  server code, SMTP_CLIENT::buf stores response data), otherwise indicates
+ *  error and connection should be closed
  */
 SMTP_API int smtp_printf(SMTP_CLIENT *client, const char* fmt, ...);
 
 /**
- * 发送完邮件内容后调用本函数告诉 SMTP 服务器邮件数据完毕
- * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
- *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
+ * After sending all email data, call this to notify SMTP server that
+ * email sending is complete
+ * @param client {SMTP_CLIENT*} SMTP connection object
+ * @return {int} 0 indicates success (SMTP_CLIENT::smtp_code indicates
+ *  server code, SMTP_CLIENT::buf stores response data), otherwise indicates
+ *  error and connection should be closed
  */
 SMTP_API int smtp_data_end(SMTP_CLIENT *client);
 
 /**
- * 向 SMTP 服务器发送指定件路径的邮件文件
- * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @param filepath {const char*} 邮件文件路径
- * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
- *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
+ * Send email file at specified path to SMTP server
+ * @param client {SMTP_CLIENT*} SMTP connection object
+ * @param filepath {const char*} Email file path
+ * @return {int} 0 indicates success (SMTP_CLIENT::smtp_code indicates
+ *  server code, SMTP_CLIENT::buf stores response data), otherwise indicates
+ *  error and connection should be closed
  */
 SMTP_API int smtp_send_file(SMTP_CLIENT *client, const char *filepath);
 
 /**
- * 向 SMTP 服务器发送给定文件流的邮件内容
- * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @param in {ACL_VSTREAM*} 邮件文件输入流
- * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
- *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
+ * Send email content from stream to SMTP server
+ * @param client {SMTP_CLIENT*} SMTP connection object
+ * @param in {ACL_VSTREAM*} Email file stream
+ * @return {int} 0 indicates success (SMTP_CLIENT::smtp_code indicates
+ *  server code, SMTP_CLIENT::buf stores response data), otherwise indicates
+ *  error and connection should be closed
  */
 SMTP_API int smtp_send_stream(SMTP_CLIENT *client, ACL_VSTREAM *in);
 
 /**
- * 向 SMTP 服务器发送退出(QUIT)命令
- * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
- *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
+ * Send quit (QUIT) command to SMTP server
+ * @param client {SMTP_CLIENT*} SMTP connection object
+ * @return {int} 0 indicates success (SMTP_CLIENT::smtp_code indicates
+ *  server code, SMTP_CLIENT::buf stores response data), otherwise indicates
+ *  error and connection should be closed
  */
 SMTP_API int smtp_quit(SMTP_CLIENT *client);
 
 /**
- * 向 SMTP 服务器发送 NOOP 命令
- * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
- *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
+ * Send NOOP command to SMTP server
+ * @param client {SMTP_CLIENT*} SMTP connection object
+ * @return {int} 0 indicates success (SMTP_CLIENT::smtp_code indicates
+ *  server code, SMTP_CLIENT::buf stores response data), otherwise indicates
+ *  error and connection should be closed
  */
 SMTP_API int smtp_noop(SMTP_CLIENT *client);
 
 /**
- * 向 SMTP 服务器发送 RSET 命令
- * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
- *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
+ * Send RSET command to SMTP server
+ * @param client {SMTP_CLIENT*} SMTP connection object
+ * @return {int} 0 indicates success (SMTP_CLIENT::smtp_code indicates
+ *  server code, SMTP_CLIENT::buf stores response data), otherwise indicates
+ *  error and connection should be closed
  */
 SMTP_API int smtp_rset(SMTP_CLIENT *client);
 
@@ -204,3 +223,4 @@ SMTP_API int smtp_rset(SMTP_CLIENT *client);
 #endif
 
 #endif
+

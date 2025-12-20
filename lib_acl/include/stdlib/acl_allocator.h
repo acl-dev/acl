@@ -39,50 +39,57 @@ typedef struct ACL_ALLOCATOR ACL_ALLOCATOR;
 
 /* in acl_mpool.c */
 /**
- * 创建一个内存分配池对象
- * @param mem_limit {size_t} 内存池的最大内存，单位为字节
- * @return {ACL_ALLOCATOR *} 内存分配池对象指针
+ * Create a memory allocator object.
+ * @param mem_limit {size_t} Memory pool's maximum memory, unit is bytes
+ * @return {ACL_ALLOCATOR *} Memory allocator object pointer
  */
 ACL_API ACL_ALLOCATOR *acl_allocator_create(size_t mem_limit);
 
 /**
- * 控制内存分配池的一些参数
- * @param name {int} 参数列表的第一个参数
- * 调用方式如下：
+ * Set some parameters for memory allocator.
+ * @param name {int} First parameter in parameter list
+ * Usage:
  * acl_allocator_ctl(ACL_ALLOCATOR_CTL_MIN_SIZE, 128,
  *		ACL_ALLOCATOR_CTL_MAX_SIZE, 1024,
  *		ACL_ALLOCATOR_CTL_END);
  */
 ACL_API void acl_allocator_ctl(int name, ...);
 
-#define ACL_ALLOCATOR_CTL_END		0    /**< 结束标记 */
-#define ACL_ALLOCATOR_CTL_MIN_SIZE	1    /**< 设置最小字节数 */
-#define ACL_ALLOCATOR_CTL_MAX_SIZE	2    /**< 设置最大字节数 */
+#define ACL_ALLOCATOR_CTL_END		0    /**< Control end flag */
+#define ACL_ALLOCATOR_CTL_MIN_SIZE	1    /**< Minimum byte size */
+#define ACL_ALLOCATOR_CTL_MAX_SIZE	2    /**< Maximum byte size */
 
 /**
- * 配置内存分配池的容量大小
+ * Set memory allocator's maximum size.
  * @param allocator {ACL_ALLOCATOR*}
- * @param mem_limit {size_t} 内存池的最大值，单位为字节
+ * @param mem_limit {size_t} Memory pool's maximum value, unit is bytes
  */
 ACL_API void acl_allocator_config(ACL_ALLOCATOR *allocator, size_t mem_limit);
 
 /**
- * 释放内存分配池对象及其所管理的内存
+ * Free memory allocator object and all allocated memory.
  * @param allocator {ACL_ALLOCATOR*}
  */
 ACL_API void acl_allocator_free(ACL_ALLOCATOR *allocator);
 
 /**
- * 添加一个新的内存分配类型
+ * Add a new memory pool to memory allocator.
  * @param allocator {ACL_ALLOCATOR*}
- * @param label {const char*} 该内存分配类型的描述信息
- * @param obj_size {size_t} 每个该内存类型的大小，单位为字节
- * @param type {acl_mem_type} 内存类型
- * @param after_alloc_fn {void (*)(void*, void*)} 分配内存成功后调用的函数，可以为空
- * @param before_free_fn {void (*)(void*, void*)} 释放内存前回调的函数，可以为空
- * @param pool_ctx {void*} 应用自己的私有对象，如果 after_alloc_fn 或 before_free_fn
- *        不为空，则回调时将此参数直接传递给应用
- * @return {ACL_MEM_POOL*} 该内存分配类型所对应的对象
+ * @param label {const char*} Descriptive information for this memory pool type
+ * @param obj_size {size_t} Size of each object in this
+ *  memory pool type, unit is bytes
+ * @param type {acl_mem_type} Memory type
+ * @param after_alloc_fn {void (*)(void*, void*)} Callback
+ *  function called after memory allocation succeeds, can be
+ *  NULL
+ * @param before_free_fn {void (*)(void*, void*)} Callback
+ *  function called before freeing memory, can be NULL
+ * @param pool_ctx {void*} Application's own private context
+ *  object, when after_alloc_fn and before_free_fn are not
+ *  NULL, this parameter will be directly passed to
+ *  application
+ * @return {ACL_MEM_POOL*} Memory pool object corresponding
+ *  to this memory pool type
  */
 ACL_API ACL_MEM_POOL *acl_allocator_pool_add(ACL_ALLOCATOR *allocator,
 					const char *label,
@@ -93,97 +100,104 @@ ACL_API ACL_MEM_POOL *acl_allocator_pool_add(ACL_ALLOCATOR *allocator,
 					void *pool_ctx);
 
 /**
- * 从内存分配池中移除某种内存分配类型
+ * Remove a memory pool from memory allocator.
  * @param allocator {ACL_ALLOCATOR*}
- * @param pool {ACL_MEM_POOL*} 由 acl_allocatore_pool_add 返回的对象
+ * @param pool {ACL_MEM_POOL*} Object returned by acl_allocatore_pool_add
  */
 ACL_API void acl_allocator_pool_remove(ACL_ALLOCATOR *allocator, ACL_MEM_POOL *pool);
 
 /**
- * 探测某种分配类型是否存在于内存分配池的内存分配类型中
+ * Probe whether a certain memory type has corresponding
+ * memory pool in memory allocator.
  * @param allocator {ACL_ALLOCATOR*}
- * @param type {acl_mem_type} 内存类型
- * @return {int}, 0: 否，!= 0: 是
+ * @param type {acl_mem_type} Memory type
+ * @return {int}, 0: no; != 0: yes
  */
 ACL_API int acl_allocator_pool_ifused(ACL_ALLOCATOR *allocator, acl_mem_type type);
 
 /**
- * 某种分配类型的内存对象当前被使用的个数
+ * Number of memory objects currently in use for a certain memory type.
  * @param allocator {ACL_ALLOCATOR*}
- * @param type {acl_mem_type} 内存类型
- * @return {int} 当前正在被使用的某种内存分配类型的内存对象个数
+ * @param type {acl_mem_type} Memory type
+ * @return {int} Number of memory objects currently in use
+ *  for a certain memory pool type
  */
 ACL_API int acl_allocator_pool_inuse_count(ACL_ALLOCATOR *allocator, acl_mem_type type);
 
 /**
- * 某种分配类型所分配的内存中当前正在被使用的内存大小
+ * Total size of memory currently in use for a certain
+ * memory type in memory pool.
  * @param allocator {ACL_ALLOCATOR*}
- * @param type {acl_mem_type} 内存类型
- * @return {int} 某种分配类型所分配的内存中当前正在被使用的内存大小，单位为字节
+ * @param type {acl_mem_type} Memory type
+ * @return {int} Total size of memory currently in use for
+ *  a certain memory type in memory pool, unit is bytes
  */
 ACL_API int acl_allocator_pool_inuse_size(ACL_ALLOCATOR *allocator, acl_mem_type type);
 
 /**
- * 内存分配池总共分配的且正在被使用的内存的大小
+ * Total size of memory currently in use in memory allocator.
  * @param allocator {ACL_ALLOCATOR*}
- * @return {int} 内存大小，单位：字节
+ * @return {int} Memory size, unit is bytes
  */
 ACL_API int acl_allocator_pool_total_allocated(ACL_ALLOCATOR *allocator);
 
 /**
- * 分配某种内存类型的内存
+ * Allocate memory for a certain memory type.
  * @param filename {const char*}
  * @param line {int}
  * @param allocator {ACL_ALLOCATOR*}
- * @param type {acl_mem_type} 内存类型
- * @return {void*} 新分配的内存的地址
+ * @param type {acl_mem_type} Memory type
+ * @return {void*} Newly allocated memory address
  */
 ACL_API void *acl_allocator_mem_alloc(const char *filename, int line,
 	ACL_ALLOCATOR *allocator, acl_mem_type type);
 
 /**
- * 释放某种内存类型的内存空间
+ * Free memory space for a certain memory type.
  * @param filename {const char*}
  * @param line {int}
  * @param allocator {ACL_ALLOCATOR*}
- * @param type {acl_mem_type} 内存类型
- * @param obj {void*} 被释放的内存对象，不能为空
+ * @param type {acl_mem_type} Memory type
+ * @param obj {void*} Memory object to free, must not be NULL
  */
 ACL_API void acl_allocator_mem_free(const char *filename, int line,
 	ACL_ALLOCATOR *allocator, acl_mem_type type, void *obj);
 
 /**
- * 根据所要求的内存大小，自动进行内存分配类型匹配，若找到所匹配的类型，则采用内存池
- * 的内存分配策略，否则直接调用 acl_mymalloc 进行内存分配
- * @param filename {const char*} 调用本函数的当前文件名
- * @param line {int} 调用本函数的当前文件行号
+ * Automatically match memory pool type based on required
+ * memory size, find matching type, and allocate memory.
+ * If no memory pool matches, directly call acl_mymalloc to allocate memory.
+ * @param filename {const char*} Current file name where macro is defined
+ * @param line {int} Current file line number where macro is defined
  * @param allocator {ACL_ALLOCATOR*}
- * @param size {size_t} 调用者所申请的内存大小
- * @return {void*} 新分配的内存的地址
+ * @param size {size_t} Required memory size to allocate
+ * @return {void*} Newly allocated memory address
  */
 ACL_API void *acl_allocator_membuf_alloc(const char *filename, int line,
 	ACL_ALLOCATOR *allocator, size_t size);
 
 /**
- * 根据所申请的内存大小，重新分配内存空间，若找到所匹配的类型，则采用内存池
- * 内存分配策略，否则直播调用 acl_mymalloc 进行内存分配
- * @param filename {const char*} 调用本函数的当前文件名
- * @param line {int} 调用本函数的当前文件行号
+ * Reallocate memory space based on required memory size,
+ * find matching type, and allocate memory.
+ * If no memory pool matches, directly call acl_mymalloc to allocate memory.
+ * @param filename {const char*} Current file name where macro is defined
+ * @param line {int} Current file line number where macro is defined
  * @param allocator {ACL_ALLOCATOR*}
- * @param oldbuf {void*} 原来分配的内存
- * @param size {size_t} 本次申请的内存大小
- * @return {void*} 新分配的内存的地址
+ * @param oldbuf {void*} Originally allocated memory
+ * @param size {size_t} Required memory size
+ * @return {void*} Newly allocated memory address
  */
 ACL_API void *acl_allocator_membuf_realloc(const char *filename, int line,
 	ACL_ALLOCATOR *allocator, void *oldbuf, size_t size);
 
 /**
- * 释放内存, 如果能找到该大小的内存所属的内存分配类型，则进行缓冲，否则直播调用
- * acl_myfree 进行释放
- * @param filename {const char*} 调用本函数的当前文件名
- * @param line {int} 调用本函数的当前文件行号
+ * Free memory, automatically find matching size memory pool
+ * memory type, and free it. Otherwise, directly call
+ * acl_myfree to free.
+ * @param filename {const char*} Current file name where macro is defined
+ * @param line {int} Current file line number where macro is defined
  * @param allocator {ACL_ALLOCATOR*}
- * @param buf {void*} 内存地址
+ * @param buf {void*} Memory address
  */
 ACL_API void acl_allocator_membuf_free(const char *filename, int line,
 	ACL_ALLOCATOR *allocator, void *buf);

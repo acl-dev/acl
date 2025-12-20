@@ -3,98 +3,97 @@
 #include "../stdlib/noncopyable.hpp"
 #include <list>
 
-namespace acl
-{
+namespace acl {
 
 class event_task;
 
-class ACL_CPP_API event_timer : public noncopyable
-{
+class ACL_CPP_API event_timer : public noncopyable {
 public:
 	/**
-	 * 构造函数
-	 * @param keep {bool} 该定时器是否允许自动重启
+	 * Constructor
+	 * @param keep {bool} Whether this timer allows automatic restart
 	 */
 	event_timer(bool keep = false);
 	virtual ~event_timer();
 
 	/**
-	 * 当定时器里的任务数为空时的回调函数，
-	 * 子类可以在其中释放，一旦该函数被调用，
-	 * 则意味着该定时器及其中的所有定时任务都从
-	 * 定时器集合中被删除
-	 * 该函数被触发的条件有三个：
-	 * 1) 定时器所有的任务数为 0 时
-	 * 2) 当没有设置重复定时器且该定时器中有一个定时任务被触发后
-	 * 3) 当 del_timer(event_timer*) 被调用后
+	 * Callback function when number of tasks in timer is empty.
+	 * Subclasses can release in it. Once this function is called,
+	 * it means this timer and all timer tasks in it are deleted from
+	 * timer collection
+	 * This function is triggered under three conditions:
+	 * 1) When number of all tasks in timer is 0
+	 * 2) When repeat timer is not set and a timer task in this timer is triggered
+	 * 3) When del_timer(event_timer*) is called
 	 */
 	virtual void destroy(void) {}
 
 	/**
-	 * 定时器里的任务是否为空
+	 * Whether tasks in timer are empty
 	 * @return {bool}
 	 */
-	bool empty(void) const
-	{
+	bool empty(void) const {
 		return tasks_.empty();
 	}
 
 	/**
-	 * 定时器里的任务个数
+	 * Number of tasks in timer
 	 * @return {size_t}
 	 */
-	size_t length(void) const
-	{
+	size_t length(void) const {
 		return length_;
 	}
 
 	/**
-	 * 该定时器是否是自动重启的
+	 * Whether this timer is auto-restart
 	 * @param on {bool}
 	 */
 	void keep_timer(bool on);
 
 	/**
-	 * 判断该定时器是否是自动重启的
+	 * Determine whether this timer is auto-restart
 	 * @return {bool}
 	 */
-	bool keep_timer(void) const
-	{
+	bool keep_timer(void) const {
 		return keep_;
 	}
 
 	/**
-	 * 清空定时器里的定时任务
-	 * @return {int} 被清除的定时任务的个数
+	 * Clear timer tasks in timer
+	 * @return {int} Number of cleared timer tasks
 	 */
 	int clear(void);
 
 	/**
-	 * 子类必须实现此回调函数，注：子类或调用者禁止在
-	 * timer_callback 内部调用 event_timer 的析构
-	 * 函数，否则将会酿成大祸
-	 * @param id {unsigned int} 对应某个任务的 ID 号
+	 * Subclasses must implement this callback function. Note: Subclasses or
+	 * callers are prohibited from calling
+	 * event_timer's destructor function inside timer_callback,
+	 * otherwise it will cause major problems
+	 * @param id {unsigned int} ID number corresponding to a task
 	 */
 	virtual void timer_callback(unsigned int id) = 0;
 
 	/****************************************************************/
-	/*        子类可以调用如下函数添加一些新的定时器任务 ID 号      */
+	/*        Subclasses can call the following functions to add some new timer task ID numbers      */
 	/****************************************************************/
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * 针对本定时器增加新的任务ID号，这样便可以通过一个定时器启动
-	 * 多个定时任务
-	 * @param id {unsigned int} 定时器定时任务ID号
-	 * @param delay {__int64} 每隔多久自动触发该定时器，同时将对应的定时器定时
-	 *  任务ID号传回(微秒级)
-	 * @return {__int64} 距离本定时器的第一个将会触发的定时任务ID还多久(微秒级)
+	 * Add new task ID number for this timer, so that multiple timer tasks can be
+	 * started through one timer
+	 * @param id {unsigned int} Timer task ID number
+	 * @param delay {__int64} How often to automatically trigger this timer, and
+	 * pass back the corresponding timer task
+	 *  ID number (microseconds)
+	 * @return {__int64} How long until the first timer task ID of this timer will
+	 * be triggered (microseconds)
 	 */
 	__int64 set_task(unsigned int id, __int64 delay);
 
 	/**
-	 * 删除定时器中某个消息ID对应的定时任务
-	 * @param {unsigned int} 定时任务ID
-	 * @return {__int64} 距离本定时器的第一个将会触发的定时任务ID还多久(微秒级)
+	 * Delete timer task corresponding to a message ID in timer
+	 * @param {unsigned int} Timer task ID
+	 * @return {__int64} How long until the first timer task ID of this timer will
+	 * be triggered (microseconds)
 	 */
 	__int64 del_task(unsigned int id);
 #else
@@ -105,19 +104,17 @@ public:
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 触发所有到时的定时任务
-	 * @return {long lont int} 下一个将要到时的任务
+	 * Trigger all expired timer tasks
+	 * @return {long lont int} Next task that will expire
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 trigger(void);
-	__int64 min_delay(void) const
-	{
+	__int64 min_delay(void) const {
 		return min_delay_;
 	}
 #else
 	long long int trigger(void);
-	long long int min_delay(void) const
-	{
+	long long int min_delay(void) const {
 		return min_delay_;
 	}
 #endif
@@ -134,7 +131,7 @@ protected:
 private:
 	size_t length_;
 	std::list<event_task*> tasks_;
-	bool keep_;  // 该定时器是否允许自动重启
+	bool keep_;  // Whether this timer allows automatic restart
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 set_task(event_task* task);
 #else
@@ -142,9 +139,10 @@ private:
 #endif
 
 	/**
-	 * 设置当前定时器的时间截
+	 * Set current timer timestamp
 	 */
 	void set_time(void);
 };
 
 }  // namespace acl
+

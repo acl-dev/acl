@@ -10,7 +10,7 @@ extern "C" {
 #include "acl_iterator.h"
 
 /**
- * 二分块数据链元素类型定义
+ * Block range element type definition.
  */
 typedef	struct {
 	acl_int64 begin;
@@ -19,7 +19,7 @@ typedef	struct {
 } ACL_DITEM;
 
 /**
- * 二分块数据链类型定义
+ * Block range container type definition.
  */
 typedef	struct ACL_DLINK {
 	ACL_ARRAY *parray;
@@ -27,160 +27,160 @@ typedef	struct ACL_DLINK {
 
 	/* for acl_iterator */
 
-	/* 取迭代器头函数 */
+	/* Get iterator head pointer */
 	void *(*iter_head)(ACL_ITER*, struct ACL_DLINK*);
-	/* 取迭代器下一个函数 */
+	/* Get next iterator pointer */
 	void *(*iter_next)(ACL_ITER*, struct ACL_DLINK*);
-	/* 取迭代器尾函数 */
+	/* Get iterator tail pointer */
 	void *(*iter_tail)(ACL_ITER*, struct ACL_DLINK*);
-	/* 取迭代器上一个函数 */
+	/* Get previous iterator pointer */
 	void *(*iter_prev)(ACL_ITER*, struct ACL_DLINK*);
 } ACL_DLINK;
 
 /**
- * 创建一个二分块数据链对象
- * @param nsize {int} 初始数组大小
- * @return {ACL_DLINK*} 二分块数据链对象
+ * Create a block range container object.
+ * @param nsize {int} Initial array size
+ * @return {ACL_DLINK*} Block range container object
  */
 ACL_API ACL_DLINK *acl_dlink_create(int nsize);
 
 /**
- * 释放一个二分块数据链对象
- * @param plink {ACL_DLINK*} 二分块数据链对象指针
+ * Free a block range container object.
+ * @param plink {ACL_DLINK*} Block range container object pointer
  */
 ACL_API void acl_dlink_free(ACL_DLINK *plink);
 
 /**
- * 根据二分块数据元素查找其是否正在于二分块数据链中
- * @param plink {ACL_DLINK*} 二分块数据链对象指针
- * @param pitem {ACL_DITEM*} 数据块元素
- * @return {ACL_DITEM*} 数据块元素
+ * Check whether block range element exists in block range container based on block range element.
+ * @param plink {ACL_DLINK*} Block range container object pointer
+ * @param pitem {ACL_DITEM*} Block element
+ * @return {ACL_DITEM*} Block element
  */
 ACL_API ACL_DITEM *acl_dlink_lookup_by_item(const ACL_DLINK *plink,
 	ACL_DITEM *pitem);
 
 /**
- * 根据数据元素查找二分块数据链中的数据元素
- * @param plink {const ACL_DLINK*} 二分块数据链对象指针
- * @param pitem {ACL_DITEM*} 数据块元素
- * @param pidx {int*} 存储查询数据元素结果在二分数据链中的下标位置
- * @return {ACL_DITEM*} 数据块元素
+ * Search for block element in block range container based on block element.
+ * @param plink {const ACL_DLINK*} Block range container object pointer
+ * @param pitem {ACL_DITEM*} Block element
+ * @param pidx {int*} Storage for index position of queried element result in container array
+ * @return {ACL_DITEM*} Block element
  */
 ACL_API ACL_DITEM *acl_dlink_lookup2_by_item(const ACL_DLINK *plink,
 	ACL_DITEM *pitem, int *pidx);
 
 /**
- * 从二分块数据链中查询某个值所对应的数据块元素地址
- * @param plink {const ACL_DLINK*} 二分块数据链对象指针
- * @param n {acl_int64} 查询值
- * @return {ACL_DITEM*} 数据块元素
+ * Query address of block element corresponding to a certain value from block range container.
+ * @param plink {const ACL_DLINK*} Block range container object pointer
+ * @param n {acl_int64} Query value
+ * @return {ACL_DITEM*} Block element
  */
 ACL_API ACL_DITEM *acl_dlink_lookup(const ACL_DLINK *plink, acl_int64 n);
 
 /**
- * 从二分块数据链中查询某个值所对应的数据块元素地址并记录其下标位置
- * @param plink {const ACL_DLINK*} 二分块数据链对象指针
- * @param n {acl_int64} 查询值
- * @param pidx {int*} 存储查询数据元素结果在二分数据链中的下标位置
- * @return {ACL_DITEM*} 数据块元素
+ * Query address of block element corresponding to a certain value from block range container and record index position.
+ * @param plink {const ACL_DLINK*} Block range container object pointer
+ * @param n {acl_int64} Query value
+ * @param pidx {int*} Storage for index position of queried element result in container array
+ * @return {ACL_DITEM*} Block element
  */
 ACL_API ACL_DITEM *acl_dlink_lookup2(const ACL_DLINK *plink,
 	acl_int64 n, int *pidx);
 
 /**
- * 从二分块数据链中查询某个范围的数据块元素地址并记录其下标位置
- * @param plink {const ACL_DLINK*} 二分块数据链对象指针
- * @param begin {acl_int64} 查询范围的起始位置值
- * @param end {acl_int64} 查询范围的结束位置值
- * @param pidx {int*} 存储查询数据元素结果在二分数据链中的下标位置
- * @return {ACL_DITEM*} 数据块元素
+ * Query address of block element corresponding to a certain range from block range container and record index position.
+ * @param plink {const ACL_DLINK*} Block range container object pointer
+ * @param begin {acl_int64} Query range start position value
+ * @param end {acl_int64} Query range end position value
+ * @param pidx {int*} Storage for index position of queried element result in container array
+ * @return {ACL_DITEM*} Block element
  */
 ACL_API ACL_DITEM *acl_dlink_lookup_range(const ACL_DLINK *plink,
 	acl_int64 begin, acl_int64 end, int *pidx);
 
 /**
- * 从二分块数据链中查询第一个大于某个给定值的数据块元素并记录下标位置
- * @param plink {const ACL_DLINK*} 二分块数据链对象指针
- * @param off {acl_int64} 给定比较值
- * @param pidx {int*} 存储查询数据元素结果在二分数据链中的下标位置
- * @return {ACL_DITEM*} 数据块元素
+ * Query block element larger than a certain value from block range container and record index position.
+ * @param plink {const ACL_DLINK*} Block range container object pointer
+ * @param off {acl_int64} Comparison value
+ * @param pidx {int*} Storage for index position of queried element result in container array
+ * @return {ACL_DITEM*} Block element
  */
 ACL_API ACL_DITEM *acl_dlink_lookup_larger(const ACL_DLINK *plink,
 	acl_int64 off, int *pidx);
 
 /**
- * 从二分块数据链中查询第一个小于某个给定值的数据块元素并记录下标位置
- * @param plink {const ACL_DLINK*} 二分块数据链对象指针
- * @param off {acl_int64} 给定比较值
- * @param pidx {int*} 存储查询数据元素结果在二分数据链中的下标位置
- * @return {ACL_DITEM*} 数据块元素
+ * Query block element smaller than a certain value from block range container and record index position.
+ * @param plink {const ACL_DLINK*} Block range container object pointer
+ * @param off {acl_int64} Comparison value
+ * @param pidx {int*} Storage for index position of queried element result in container array
+ * @return {ACL_DITEM*} Block element
  */
 ACL_API ACL_DITEM *acl_dlink_lookup_lower(const ACL_DLINK *plink,
 	acl_int64 off, int *pidx);
 
 /**
- * 向二分块数据链中添加起始、结束数据块
- * @param plink {ACL_DLINK*} 二分块数据链对象指针
- * @param begin {acl_int64} 给定起始位置值
- * @param end {acl_int64} 给定结束位置值
- * @return {ACL_DITEM*} 新创建的数据块元素
+ * Insert block range into container starting from specified position to create block.
+ * @param plink {ACL_DLINK*} Block range container object pointer
+ * @param begin {acl_int64} Block start position value
+ * @param end {acl_int64} Block end position value
+ * @return {ACL_DITEM*} Newly created block element
  */
 ACL_API ACL_DITEM *acl_dlink_insert(ACL_DLINK *plink,
 	acl_int64 begin, acl_int64 end);
 
 /**
- * 从二分块数据链中删除包含某个给定值的数据块元素
- * @param plink {ACL_DLINK*} 二分块数据链对象指针
- * @param n {acl_int64} 给定位置值
- * @return {int} 0：表示OK，-1: 表示输入参数非法或不存在
+ * Delete block element corresponding to a certain position value from block range container.
+ * @param plink {ACL_DLINK*} Block range container object pointer
+ * @param n {acl_int64} Position value
+ * @return {int} 0 indicates OK; -1: indicates error or block does not exist
  */
 ACL_API int acl_dlink_delete(ACL_DLINK *plink, acl_int64 n);
 
 /**
- * 根据数据块元素从二分块数据链中删除该数据块元素
- * @param plink {ACL_DLINK*} 二分块数据链对象指针
- * @param pitem {ACL_DITEM*} 数据块元素
- * @return {int} 0：表示OK，-1: 表示输入参数非法
+ * Delete block element from block range container based on block element.
+ * @param plink {ACL_DLINK*} Block range container object pointer
+ * @param pitem {ACL_DITEM*} Block element
+ * @return {int} 0 indicates OK; -1: indicates error
  */
 ACL_API int acl_dlink_delete_by_item(ACL_DLINK *plink, ACL_DITEM *pitem);
 
 /**
- * 功能同 acl_dlink_insert
- * @DEPRECATED 此函数将来也许不再提供
+ * Same as acl_dlink_insert
+ * @DEPRECATED This function may not be provided in the future
  */
 ACL_API ACL_DITEM *acl_dlink_modify(ACL_DLINK *plink,
 	acl_int64 begin, acl_int64 end);
 
 /**
- * 从二分数据链中删除某个数值范围的数据块集合, 
- * 删除后有可能会在内部增加新的数据块元素
- * @param plink {ACL_DLINK*} 二分块数据链对象指针
- * @param begin {acl_int64} 需要删除范围的起始位置
- * @param end {acl_int64} 需要删除范围的结束位置
- * @return {int} 0：表示OK，-1: 表示输入参数非法
+ * Delete block set for a certain value range from block range container,
+ * deletion may internally create new block elements.
+ * @param plink {ACL_DLINK*} Block range container object pointer
+ * @param begin {acl_int64} Start position of range to delete
+ * @param end {acl_int64} End position of range to delete
+ * @return {int} 0 indicates OK; -1: indicates error
  */
 ACL_API int acl_dlink_delete_range(ACL_DLINK *plink,
 	acl_int64 begin, acl_int64 end);
 
 /**
- * 返回某下标位置的数据块元素地址
- * @param plink {const ACL_DLINK*} 二分块数据链对象指针
- * @param idx {int} 下标位置
- * @return {ACL_DITEM*} NULL: 下标越界; != NULL: 数据块元素地址
+ * Get address of block element at a certain index position.
+ * @param plink {const ACL_DLINK*} Block range container object pointer
+ * @param idx {int} Index position
+ * @return {ACL_DITEM*} NULL: index out of bounds; != NULL: block element address
  */
 ACL_API ACL_DITEM *acl_dlink_index(const ACL_DLINK *plink, int idx);
 
 /**
- * 获得当前二分数据链中所有数据块的个数总和
- * @param plink {const ACL_DLINK*} 二分块数据链对象指针
- * @return {int} 数据块的个数
+ * Get total number of blocks in current container.
+ * @param plink {const ACL_DLINK*} Block range container object pointer
+ * @return {int} Number of blocks
  */
 ACL_API int acl_dlink_size(const ACL_DLINK *plink);
 
 /**
- * (调试用)打印二分数据链中所有数据块的起始、结束位置等信息
- * @param plink {const ACL_DLINK*} 二分块数据链对象指针
- * @return {int} 0：表示OK，-1: 表示输入参数非法
+ * (Debug) Print information about start and end positions of all blocks in container.
+ * @param plink {const ACL_DLINK*} Block range container object pointer
+ * @return {int} 0 indicates OK; -1: indicates error
  */
 ACL_API int acl_dlink_list(const ACL_DLINK *plink);
 

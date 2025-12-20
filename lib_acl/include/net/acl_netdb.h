@@ -11,7 +11,7 @@
 #include "acl_sane_inet.h"
 
 /**
- * 主机地址结构
+ * Host address structure.
  */
 typedef struct ACL_HOSTNAME ACL_HOST_INFO;
 typedef struct ACL_HOSTNAME {
@@ -32,7 +32,7 @@ typedef struct ACL_HOSTNAME {
 } ACL_HOSTNAME;
 
 /**
- * DNS查询结果集
+ * DNS query result structure.
  */
 typedef struct ACL_DNS_DB {
 	ACL_ARRAY *h_db;
@@ -43,172 +43,180 @@ typedef struct ACL_DNS_DB {
 
 	/* for acl_iterator */
 
-	/* 取迭代器头函数 */
+	/* Get iterator head pointer */
 	const ACL_HOSTNAME *(*iter_head)(ACL_ITER*, struct ACL_DNS_DB*);
-	/* 取迭代器下一个函数 */
+	/* Get next iterator pointer */
 	const ACL_HOSTNAME *(*iter_next)(ACL_ITER*, struct ACL_DNS_DB*);
-	/* 取迭代器尾函数 */
+	/* Get iterator tail pointer */
 	const ACL_HOSTNAME *(*iter_tail)(ACL_ITER*, struct ACL_DNS_DB*);
-	/* 取迭代器上一个函数 */
+	/* Get previous iterator pointer */
 	const ACL_HOSTNAME *(*iter_prev)(ACL_ITER*, struct ACL_DNS_DB*);
-	/* 取迭代器关联的当前容器成员结构对象 */
+	/* Get the current iterator's member structure object */
 	const ACL_HOSTNAME *(*iter_info)(ACL_ITER*, struct ACL_DNS_DB*);
 } ACL_DNS_DB;
 
 /* in acl_netdb.c */
 
 /**
- * 从结果集中取得某个下标位置的主机地址结构
- * @param h_dns_db {const ACL_DNS_DB*} DNS结果集
- * @param i {int} 下标位置
- * @return {const ACL_HOSTNAME*} 返回相应下标的主机地址结构
+ * Get host address structure at a certain index position from result structure.
+ * @param h_dns_db {const ACL_DNS_DB*} DNS result structure
+ * @param i {int} Index position
+ * @return {const ACL_HOSTNAME*} Host address structure
+ *  corresponding to the index
  */
 ACL_API const ACL_HOSTNAME *acl_netdb_index(const ACL_DNS_DB *h_dns_db, int i);
 
 /**
- * 从结果集中取得某个下标位置的主机IP地址
- * @param h_dns_db {const ACL_DNS_DB*} DNS结果集
- * @param i {int} 下标位置
- * @return {const ACL_SOCKADDR*} IP地址结构, NULL表示失败
+ * Get IP address at a certain index position from result structure.
+ * @param h_dns_db {const ACL_DNS_DB*} DNS result structure
+ * @param i {int} Index position
+ * @return {const ACL_SOCKADDR*} IP address structure, NULL indicates failure
  */
 ACL_API const ACL_SOCKADDR *acl_netdb_index_saddr(ACL_DNS_DB *h_dns_db, int i);
 
 /**
- * 将结果集中的对应某个下标的主机地址引用增加
- * @param h_dns_db {const ACL_DNS_DB*} DNS结果集
- * @param i {int} 下标位置
- * @param n {int} 需要增加的引用值
+ * Operate on reference count of host address structure
+ * corresponding to a certain index in result structure.
+ * @param h_dns_db {const ACL_DNS_DB*} DNS result structure
+ * @param i {int} Index position
+ * @param n {int} Reference value to add
  */
 ACL_API void acl_netdb_refer_oper(ACL_DNS_DB *h_dns_db, int i, int n);
 
 /**
- * 将结果集中的对应某个下标的主机地址引用加1
- * @param h_dns_db {const ACL_DNS_DB*} DNS结果集
- * @param i {int} 下标位置
+ * Increment reference count of host address structure
+ * corresponding to a certain index in result structure by 1.
+ * @param h_dns_db {const ACL_DNS_DB*} DNS result structure
+ * @param i {int} Index position
  */
 ACL_API void acl_netdb_refer(ACL_DNS_DB *h_dns_db, int i);
 
 /**
- * 将结果集中的对应某个下标的主机地址引用减1
- * @param h_dns_db {const ACL_DNS_DB*} DNS结果集
- * @param i {int} 下标位置
+ * Decrement reference count of host address structure
+ * corresponding to a certain index in result structure by 1.
+ * @param h_dns_db {const ACL_DNS_DB*} DNS result structure
+ * @param i {int} Index position
  */
 ACL_API void acl_netdb_unrefer(ACL_DNS_DB *h_dns_db, int i);
 
 /**
- * 将结果集中的对应某个下标的IP地址，以字符串表示
- * @param h_dns_db {const ACL_DNS_DB*} DNS结果集
- * @param i {int} 下标位置
- * @return {const char*} 查得的结果，NULL 表示失败
+ * Get IP address string corresponding to a certain index in result structure.
+ * @param h_dns_db {const ACL_DNS_DB*} DNS result structure
+ * @param i {int} Index position
+ * @return {const char*} Obtained result, NULL indicates failure
  */
 ACL_API const char *acl_netdb_index_ip(const ACL_DNS_DB *h_dns_db, int i);
 
 /**
- * 取得结果集中主机地址的个数
- * @param h_dns_db {const ACL_DNS_DB*} DNS结果集
- * @return {int} 主机地址个数 > 0, -1 表示参数输入有误
+ * Get the number of host addresses in result structure.
+ * @param h_dns_db {const ACL_DNS_DB*} DNS result structure
+ * @return {int} Number of host addresses > 0, -1 indicates invalid result structure
  */
 ACL_API int acl_netdb_size(const ACL_DNS_DB *h_dns_db);
 
 /**
- *  释放结果集内存资源
- * @param h_dns_db {ACL_DNS_DB*} DNS结果集
+ *  Free result structure memory resources.
+ * @param h_dns_db {ACL_DNS_DB*} DNS result structure
  */
 ACL_API void acl_netdb_free(ACL_DNS_DB *h_dns_db);
 
 /**
- * 根据域名创建一个查询结果集的结构，但并不进行DNS查询
- * @param domain {const char*} 要查询的域名
- * @return {ACL_DNS_DB*} 创建的结果集对象
+ * Create a new query result structure, used for DNS queries.
+ * @param domain {const char*} Domain name to query
+ * @return {ACL_DNS_DB*} Created result structure
  */
 ACL_API ACL_DNS_DB *acl_netdb_new(const char *domain);
 
 /**
- * 设置该 DNS 查询对象所绑定的 DNS 服务器地址
- * @param db {ACL_DNS_DB*} 由 acl_netdb_new 或 acl_netdb_clone 创建
- * @param sa {ACL_SOCKADDR*} DNS 服务器地址
+ * Set DNS query result structure's bound DNS server address.
+ * @param db {ACL_DNS_DB*} From acl_netdb_new or acl_netdb_clone
+ * @param sa {ACL_SOCKADDR*} DNS server address
  */
 ACL_API void acl_netdb_set_ns(ACL_DNS_DB *db, ACL_SOCKADDR *sa);
 
 /**
- * 向结果集中添加IP地址
- * @param h_dns_db {ACL_DNS_DB*} 查询结果集对象
- * @param ip {const char*} 要添加的IP地址
+ * Add an IP address to result structure.
+ * @param h_dns_db {ACL_DNS_DB*} Query result structure
+ * @param ip {const char*} IP address to add
  */
 ACL_API void acl_netdb_addip(ACL_DNS_DB *h_dns_db, const char *ip);
 
 /**
- * 向结果集中添加IP地址及端口号
- * @param h_dns_db {ACL_DNS_DB*} 查询结果集对象
- * @param ip {const char*} 要添加的IP地址
- * @param port {int} 要添加的端口号
+ * Add an IP address and port to result structure.
+ * @param h_dns_db {ACL_DNS_DB*} Query result structure
+ * @param ip {const char*} IP address to add
+ * @param port {int} Port to add
  */
 ACL_API void acl_netdb_add_addr(ACL_DNS_DB *h_dns_db, const char *ip, int port);
 
 /**
- * 克隆一个查询结果集对象
- * @param h_dns_db {const ACL_DNS_DB*} 源结果集对象
- * @return {ACL_DNS_DB*} 新克隆的结果集对象
+ * Clone a query result structure.
+ * @param h_dns_db {const ACL_DNS_DB*} Source result structure
+ * @return {ACL_DNS_DB*} Newly cloned result structure
  */
 ACL_API ACL_DNS_DB *acl_netdb_clone(const ACL_DNS_DB *h_dns_db);
 
 /**
- * 查询某个域名的IP地址集
- * @param name {const char*} 域名
- * @param h_error {int*} 如果查询失败存储出错原因
- * @return {ACL_DNS_DB*} 查询结果集, 如果为NULL则查询失败, 另外，即使返回不为空，
- *  也得需要通过 acl_netdb_size()/1 获得结果集的数组长度
+ * Query IP address list for a certain domain name.
+ * @param name {const char*} Domain name
+ * @param h_error {int*} If query fails, stores error reason
+ * @return {ACL_DNS_DB*} Query result, if NULL, query failed.
+ *  Additionally, even if return is not empty, you still need to
+ *  get the result array length via acl_netdb_size()
  */
 ACL_API ACL_DNS_DB *acl_gethostbyname(const char *name, int *h_error);
 
 /**
- * 查询某个域名的IP地址集
- * @param name {const char*} 域名
- * @param socktype {int} 查询域名服务器所采用的 socket 类型：
- *  SOCK_DGRAM -- UDP 方式, SOCK_STREAM -- TCP 方式
- * @param family {int} IP 地址簇类型：PF_INET -- IPV4, PF_INET6 -- IPV6,
- *   PF_UNSPEC -- 由系统自动选择
- * @param h_error {int*} 如果查询失败存储出错原因
- * @return {ACL_DNS_DB*} 查询结果集, 如果为NULL则查询失败, 另外，即使返回不为空，
- *  也得需要通过 acl_netdb_size()/1 获得结果集的数组长度
+ * Query IP address list for a certain domain name.
+ * @param name {const char*} Domain name
+ * @param socktype {int} Socket type used for query connection:
+ *  SOCK_DGRAM -- UDP mode, SOCK_STREAM -- TCP mode
+ * @param family {int} IP address family type: PF_INET -- IPV4,
+ *  PF_INET6 -- IPV6, PF_UNSPEC -- let system automatically select
+ * @param h_error {int*} If query fails, stores error reason
+ * @return {ACL_DNS_DB*} Query result, if NULL, query failed.
+ *  Additionally, even if return is not empty, you still need to
+ *  get the result array length via acl_netdb_size()
  */
 ACL_API ACL_DNS_DB *acl_gethostbyname2(const char *name, int socktype,
 		int family, int *h_error);
 
 /**
- * 根据错误号获得出错提示信息
- * @param errnum {int} 错误号
- * @return {const char*} 出错信息
+ * Get error message string based on error number.
+ * @param errnum {int} Error number
+ * @return {const char*} Error message
  */ 
 ACL_API const char *acl_netdb_strerror(int errnum);
 
 /* in acl_netdb_cache.c */
 /**
- * 向DNS缓存中添加缓存数据
- * @param h_dns_db {const ACL_DNS_DB*} DNS查询结果集
- * @param timeout {int} 该结果集被缓存的超时时间，如果 <= 0, 则采用默认的值，
- *  该默认值是在 acl_netdb_cache_init()/2 中的设置值, 单位为秒
+ * Push DNS query result structure to cache.
+ * @param h_dns_db {const ACL_DNS_DB*} DNS query result structure
+ * @param timeout {int} Timeout for this result structure in
+ *  cache, if <= 0, uses default value. Default value is the
+ *  timeout value in acl_netdb_cache_init(), unit is seconds
  */
 ACL_API void acl_netdb_cache_push(const ACL_DNS_DB *h_dns_db, int timeout);
 
 /**
- * 从DNS缓存中取得DNS查询结果集
- * @param name {const char*} 域名
- * @return {ACL_DNS_DB*} DNS查询结果集
+ * Get DNS query result structure from DNS cache.
+ * @param name {const char*} Domain name
+ * @return {ACL_DNS_DB*} DNS query result structure
  */
 ACL_API ACL_DNS_DB *acl_netdb_cache_lookup(const char *name);
 
 /**
- * 从DNS缓存中删除某个DNS查询结果集
- * @param name {const char*} 域名
+ * Delete a DNS query result structure from DNS cache.
+ * @param name {const char*} Domain name
  */
 ACL_API void acl_netdb_cache_del_host(const char *name);
 
 /**
- * 初始化DNS缓存区
- * @param timeout {int} DNS结果集的默认缓存时间(秒)
- * @param thread_safe {int} 是否需要DNS缓存区线程安全, 0: 表示不需要,
- *  1: 表示需要线程安全
+ * Initialize DNS cache.
+ * @param timeout {int} Default cache timeout for DNS cache (seconds)
+ * @param thread_safe {int} Whether DNS cache needs to be
+ *  thread-safe, 0: indicates not needed, 1: indicates
+ *  thread-safe needed
  */
 ACL_API void acl_netdb_cache_init(int timeout, int thread_safe);
 

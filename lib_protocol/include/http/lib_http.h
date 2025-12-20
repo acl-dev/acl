@@ -8,68 +8,73 @@
 extern "C" {
 #endif
 
-/*---------------------------- 通用 HTTP 头操作函数 --------------------------*/
+/*-------------------------- Common HTTP header functions -------------------*/
 /* in http_hdr.c */
 
 /**
- * 生成一个通用HTTP协议头的结构对象
- * @param size {size_t} 所需分配内存大小, 等于 HTTP_HDR_REQ 或 HTTP_HDR_RES 的尺寸
- * @return {HTTP_HDR*} !NULL: 返回一个HTTP_HDR结构指针; NULL: 出错.
+ * Create a common HTTP protocol header structure
+ * @param size {size_t} Pre-allocated memory size, for HTTP_HDR_REQ or
+ *  HTTP_HDR_RES size
+ * @return {HTTP_HDR*} !NULL: pointer to HTTP_HDR structure; NULL: error.
  */
 HTTP_API HTTP_HDR *http_hdr_new(size_t size);
 
 /**
- * 从源HTTP通用头拷贝内部成员变量至一个新的HTTP通用头结构中
- * @param src {const HTTP_HDR*} 源HTTP通用头对象，不能为空
- * @param dst {HTTP_HDR*} 目的HTTP通用头对象，不能为空
+ * Clone internal members from source HTTP common header, creating a new
+ * HTTP common header structure
+ * @param src {const HTTP_HDR*} Source HTTP common header, not NULL
+ * @param dst {HTTP_HDR*} Destination HTTP common header, not NULL
  */
 HTTP_API void http_hdr_clone(const HTTP_HDR *src, HTTP_HDR *dst);
 
 /**
- * 释放一个HTTP_HDR结构内存
- * @param hh {HTTP_HDR*} 类型的数据指针，不能为空
+ * Free an HTTP_HDR structure memory
+ * @param hh {HTTP_HDR*} Passed pointer, not NULL
  */
 HTTP_API void http_hdr_free(HTTP_HDR *hh);
 
 /**
- * 重置一个HTTP通用头的状态，释放内部成员变量，主要用于keep-alive的长连接多次请求
- * @param hh {HTTP_HDR*} HTTP通用头类型的数据指针，不能为空
+ * Reset an HTTP common header to initial state and free internal members.
+ * Mainly for reusing long-lived keep-alive connections
+ * @param hh {HTTP_HDR*} HTTP common header pointer, not NULL
  */
 HTTP_API void http_hdr_reset(HTTP_HDR *hh);
 
 /**
- * 向 HTTP_HDR 头中增加一个条目
- * @param hh {HTTP_HDR*} 通用头类型的数据指针，不能为空
- * @param entry {HTTP_HDR_ENTRY*} HTTP头条目结构指针, 不能为空
+ * Append an entry to HTTP_HDR header
+ * @param hh {HTTP_HDR*} Common header pointer, not NULL
+ * @param entry {HTTP_HDR_ENTRY*} HTTP header entry pointer, not NULL
  */
 HTTP_API void http_hdr_append_entry(HTTP_HDR *hh, HTTP_HDR_ENTRY *entry);
 
 /**
- * 分析所给数据, 解析出协议, 主/次版本号，并将结果存在通用HTTP头结构内
- * @param hh {HTTP_HDR*} 类型的数据指针，不能为空
- * @param data {const char*} 数据格式须为: HTTP/1.0
+ * Parse protocol, major/minor version from data and store in common
+ * HTTP header structure
+ * @param hh {HTTP_HDR*} Passed pointer, not NULL
+ * @param data {const char*} Data format: HTTP/1.0
  * @return {int} 0: OK; < 0: error.
  */
 HTTP_API int http_hdr_parse_version(HTTP_HDR *hh, const char *data);
 
 /**
- * 分析所有的通用HTTP协议头并存储在 hh 结构中
- * @param hh {HTTP_HDR*} 通用HTTP头类型的数据指针，不能为空
+ * Parse common HTTP protocol header from stream and store in hh structure
+ * @param hh {HTTP_HDR*} Common HTTP header pointer, not NULL
  * @return {int} 0: ok; < 0: error
  */
 HTTP_API int http_hdr_parse(HTTP_HDR *hh);
 
 /**
- * 由传入的 name, value 对产生一个 HTTP_HDR_ENTRY 对象
- * @param name {const char*} 变量名
- * @param value {const char*} 变量值
- * @return {HTTP_HDR_ENTRY*} 如果为空则是因为输入参数有误
+ * Build an HTTP_HDR_ENTRY object from name and value strings
+ * @param name {const char*} Entry name
+ * @param value {const char*} Entry value
+ * @return {HTTP_HDR_ENTRY*} Not NULL on success, NULL on error
  */
 HTTP_API HTTP_HDR_ENTRY *http_hdr_entry_build(const char *name, const char *value);
 
 /**
- * 根据传入的一行数据进行分析, 生成一个 HTTP_HDR_ENTRY
- * @param data {const char*} HTTP 协议头中的一行数据, 如: Content-Length: 200
+ * Parse a data line to create an HTTP_HDR_ENTRY
+ * @param data {const char*} One line in HTTP protocol header,
+ *  e.g.: Content-Length: 200
  * @return {HTTP_HDR_ENTRY*} !NULL: ok; NULL: err.
  */
 HTTP_API HTTP_HDR_ENTRY *http_hdr_entry_new(const char *data);
@@ -77,264 +82,290 @@ HTTP_API HTTP_HDR_ENTRY *http_hdr_entry_head(char *data);
 HTTP_API HTTP_HDR_ENTRY *http_hdr_entry_new2(char *data);
 
 /**
- * 获取一个 HTTP_HDR_ENTRY 条目
- * @param hh {HTTP_HDR*} 通用HTTP头类型的数据指针，不能为空
- * @param name {const char*} 该 HTTP_HDR_ENTRY 条目的标识名, 不能为空. 如: Content-Length.
- * @return ret {HTTP_HDR_ENTRY *} ret != NULL: ok; ret == NULL: 出错或不存在.
+ * Get an HTTP_HDR_ENTRY entry
+ * @param hh {HTTP_HDR*} Common HTTP header pointer, not NULL
+ * @param name {const char*} HTTP_HDR_ENTRY entry identifier, not NULL.
+ *  e.g.: Content-Length.
+ * @return ret {HTTP_HDR_ENTRY *} ret != NULL: ok; ret == NULL: not found.
  */
 HTTP_API HTTP_HDR_ENTRY *http_hdr_entry(const HTTP_HDR *hh, const char *name);
 
 /**
- * 获取HTTP协议头里某个实体头的变量值，如某个实体头为：Host: www.test.com
- * 要获得 Host 变量的值，调用该函数后便可以取得 www.test.com
- * @param hh {HTTP_HDR*} 通用HTTP头类型的数据指针，不能为空
- * @param name {const char*} 该 HTTP_HDR_ENTRY 条目的标识名, 不能为空. 如: Content-Length
- * @return ret {char*} ret != NULL: ok; ret == NULL: 出错或不存在.
+ * Get field value from HTTP protocol header. For example, if a field is
+ * Host: www.test.com, to get value of Host field, call this function
+ * to retrieve www.test.com
+ * @param hh {HTTP_HDR*} Common HTTP header pointer, not NULL
+ * @param name {const char*} HTTP_HDR_ENTRY entry identifier, not NULL.
+ *  e.g.: Content-Length
+ * @return ret {char*} ret != NULL: ok; ret == NULL: not found.
  */
 HTTP_API char *http_hdr_entry_value(const HTTP_HDR *hh, const char *name);
 
 /**
- * 将 HTTP 头中的某个字段进行替换, 该功能起初主要是为了实现 keep-alive 字段的替换
- * @param hh {HTTP_HDR*} 通用HTTP头类型的数据指针，不能为空
- * @param name {const char*} 该 HTTP_HDR_ENTRY 条目的标识名, 不能为空. 如: Content-Length
- * @param value {const char*} 该 name 字段所对应的新的值
- * @param force {int} 如果所替换的字段在原始HTTP请求里不存在, 则强行产生新的 entry 字段并
- *  填至该请求头, 当该值为非0值时进行强行添加, 否则若该name在请求里不存在则不添加.
- * @return {int} 0 表示替换成功; < 0 表示输入参数出错或该 name 字段在该HTTP请求头里不存在
+ * Replace a field in HTTP header. This function is mainly used for
+ * replacing keep-alive field
+ * @param hh {HTTP_HDR*} Common HTTP header pointer, not NULL
+ * @param name {const char*} HTTP_HDR_ENTRY entry identifier, not NULL.
+ *  e.g.: Content-Length
+ * @param value {const char*} New value corresponding to name field
+ * @param force {int} If field doesn't exist in original HTTP header,
+ *  force insert new entry field and add to header. When value is non-zero,
+ *  force insert. If name field doesn't exist, return error.
+ * @return {int} 0 indicates successful replacement; < 0 indicates name
+ *  field doesn't exist in HTTP request header
  */
 HTTP_API int http_hdr_entry_replace(HTTP_HDR *hh, const char *name, const char *value, int force);
 
 /**
- * 将 HTTP 头中的某个字段中包含某个字符串的源字符串进行替换, 可以支持多次匹配替换
- * @param hh {HTTP_HDR*} 通用HTTP头类型的数据指针，不能为空
- * @param name {const char*} 该 HTTP_HDR_ENTRY 条目的标识名, 不能为空. 如: Cookie
- * @param from {const char*} 替换时的源字符串
- * @param to {const char*} 替换时的目标字符串
- * @param ignore_case {int} 在查找替换时是否忽略源字符串的大小写
- * @return {int} 0: 表示未做任何替换, > 0: 表示替换的次数
+ * Replace source string with target string in HTTP header field,
+ * supports multiple matches and replacements
+ * @param hh {HTTP_HDR*} Common HTTP header pointer, not NULL
+ * @param name {const char*} HTTP_HDR_ENTRY entry identifier, not NULL.
+ *  e.g.: Cookie
+ * @param from {const char*} Source string for replacement
+ * @param to {const char*} Target string for replacement
+ * @param ignore_case {int} Whether to ignore case when finding source string
+ * @return {int} 0: no replacement made, > 0: number of replacements
  */
 HTTP_API int http_hdr_entry_replace2(HTTP_HDR *hh, const char *name,
         const char *from, const char *to, int ignore_case);
 
 /**
- * 禁止HTTP协议头中的某项
- * @param hh {HTTP_HDR* } 通用HTTP头类型的数据指针，不能为空
- * @param name {const char*} 该 HTTP_HDR_ENTRY 条目的标识名, 不能为空. 如: Content-Length
+ * Disable a field in HTTP protocol header
+ * @param hh {HTTP_HDR* } Common HTTP header pointer, not NULL
+ * @param name {const char*} HTTP_HDR_ENTRY entry identifier, not NULL.
+ *  e.g.: Content-Length
  */
 HTTP_API void http_hdr_entry_off(HTTP_HDR *hh, const char *name);
 
 /**
- * 调试输出HTTP协议头部数据，调试类接口
- * @param hh {HTTP_HDR*} 通用HTTP头类型的数据指针，不能为空
- * @param msg {const char*} 用户希望与头部信息一起输出的自定义信息, 可以为空
+ * Print HTTP protocol header data, debugging interface
+ * @param hh {HTTP_HDR*} Common HTTP header pointer, not NULL
+ * @param msg {const char*} User message to print before custom message,
+ *  may be NULL
  */
 HTTP_API void http_hdr_print(const HTTP_HDR *hh, const char *msg);
 
 /**
- * 调试输出HTTP协议头部数据，调试类接口
- * @param fp {ACL_VSTREAM*} 某个流指针，输出结果将会定向至该数据流(可以为网络流或文件流)
- * @param hh {HTTP_HDR*} 通用HTTP头类型的数据指针，不能为空
- * @param msg {const char*} 用户希望与头部信息一起输出的自定义信息, 可以为空
+ * Print HTTP protocol header data, debugging interface
+ * @param fp {ACL_VSTREAM*} Stream pointer, output will be bound to this
+ *  stream (can also be a file stream)
+ * @param hh {HTTP_HDR*} Common HTTP header pointer, not NULL
+ * @param msg {const char*} User message to print before custom message,
+ *  may be NULL
 */
 HTTP_API void http_hdr_fprint(ACL_VSTREAM *fp, const HTTP_HDR *hh, const char *msg);
 
 /**
- * 调试输出HTTP协议头部数据，调试类接口
- * @param bf {ACL_VSTRING*} 输出结果将会定向至该缓冲区
- * @param hh {HTTP_HDR*} 通用HTTP头类型的数据指针，不能为空
- * @param msg {const char*} 用户希望与头部信息一起输出的自定义信息, 可以为空
+ * Print HTTP protocol header data, debugging interface
+ * @param bf {ACL_VSTRING*} Buffer to store output data
+ * @param hh {HTTP_HDR*} Common HTTP header pointer, not NULL
+ * @param msg {const char*} User message to print before custom message,
+ *  may be NULL
 */
 HTTP_API void http_hdr_sprint(ACL_VSTRING *bf, const HTTP_HDR *hh, const char *msg);
 
-/*-------------------------------- HTTP 请求头操作函数 -----------------------*/
+/*------------------------ HTTP request header functions --------------------*/
 /* in http_hdr_req.c */
 
 /**
- * 设置标志位，针对 HTTP 请求的 URI 中的 ? 问号被转义(即被转成 %3F)的请求是否做兼容性处理
- * @param onoff {int} 为非 0 值时表示做兼容性处理，内部缺省值为 1
+ * Set flag to disable converting question mark '?' in HTTP request URI
+ * (avoid converting to %3F), whether to enable automatic correction
+ * @param onoff {int} When 0, disable automatic correction. Default is 1
  */
 HTTP_API void http_uri_correct(int onoff);
 
 /**
- * 分配一个请求的HTTP协议头对象
- * @return {HTTP_HDR_REQ*} HTTP请求头对象
+ * Create a request HTTP protocol header object
+ * @return {HTTP_HDR_REQ*} HTTP request header object
  */
 HTTP_API HTTP_HDR_REQ *http_hdr_req_new(void);
 
 /**
- * 根据请求的URL，请求的方法，HTTP版本创建一个HTTP请求头对象
- * @param url {const char*} 请求的URL，必须是完整的URL，如：
+ * Create an HTTP request header object from URL, method, and HTTP version
+ * @param url {const char*} Request URL, complete URL format, e.g.:
  *  http://www.test.com/path/proc?name=value
  *  http://www.test.com/path/proc
  *  http://www.test.com/
- * @param method {const char*} HTTP请求方法，必须为如下之一：
- *  GET, POST, CONNECT, HEAD, 且要注意必须都为大写
- * @param version {const char *} HTTP版本，必须为如下之一：
+ * @param method {const char*} HTTP request method, one of:
+ *  GET, POST, CONNECT, HEAD, all uppercase
+ * @param version {const char *} HTTP version, one of:
  *  HTTP/1.0, HTTP/1.1
- * @return {HTTP_HDR_REQ*} HTTP请求头对象
+ * @return {HTTP_HDR_REQ*} HTTP request header object
  */
 HTTP_API HTTP_HDR_REQ *http_hdr_req_create(const char *url,
 		const char *method, const char *version);
 
 /**
- * 克隆一个HTTP请求头对象，但不复制其中的 chat_ctx, chat_free_ctx_fn
- * 两个成员变量
- * @param hdr_req {const HTTP_HDR_REQ*} HTTP请求头对象
- * @return {HTTP_HDR_REQ*} 克隆的HTTP请求头对象
+ * Clone an HTTP request header object, but internal chat_ctx,
+ * chat_free_ctx_fn members are not copied
+ * @param hdr_req {const HTTP_HDR_REQ*} HTTP request header object
+ * @return {HTTP_HDR_REQ*} Cloned HTTP request header object
  */
 HTTP_API HTTP_HDR_REQ *http_hdr_req_clone(const HTTP_HDR_REQ* hdr_req);
 
 /**
- * 根据上次HTTP请求头内容及重定向的URL产生一个新的HTTP请求头
- * @param hh {const HTTP_HDR_REQ*} 上次的HTTP请求头对象
- * @param url {const char *} 重定向的URL，如果有 http[s]:// 前缀，则认为
- *  是完整的URL，新的 Host 字段将由该URL中提取，否则则继承源HTTP请求头中
- *  的 Host 字段
- * @return {HTTP_HDR_REQ*} 新产生的重定向的HTTP请求头
+ * Based on previous HTTP request header data and redirect URL,
+ * create a new HTTP request header
+ * @param hh {const HTTP_HDR_REQ*} Previous HTTP request header object
+ * @param url {const char *} Redirect URL, may not have http[s]:// prefix,
+ *  can be relative. New Host field in URL will be extracted from this URL,
+ *  otherwise inherits Host field from source HTTP request header
+ * @return {HTTP_HDR_REQ*} Newly created redirect HTTP request header
  */
 HTTP_API HTTP_HDR_REQ *http_hdr_req_rewrite(const HTTP_HDR_REQ *hh, const char *url);
 
 /**
- * 根据HTTP请求头内容及重定向的URL重新设置该HTTP请求头的信息
- * @param hh {const HTTP_HDR_REQ*} 上次的HTTP请求头对象
- * @param url {const char *} 重定向的URL，如果有 http[s]:// 前缀，则认为
- *  是完整的URL，新的 Host 字段将由该URL中提取，否则则继承源HTTP请求头中
- *  的 Host 字段
+ * Reset HTTP request header data based on redirect URL, updating
+ * the HTTP request header info
+ * @param hh {const HTTP_HDR_REQ*} Previous HTTP request header object
+ * @param url {const char *} Redirect URL, may not have http[s]:// prefix,
+ *  can be relative. New Host field in URL will be extracted from this URL,
+ *  otherwise inherits Host field from source HTTP request header
  * @return {int} 0: ok; < 0: error
  */
 HTTP_API int http_hdr_req_rewrite2(HTTP_HDR_REQ *hh, const char *url);
 
 /**
- * 释放HTTP请求头对象
- * @param hh {HTTP_HDR_REQ*} HTTP请求头对象
+ * Free HTTP request header object
+ * @param hh {HTTP_HDR_REQ*} HTTP request header object
  */
 HTTP_API void http_hdr_req_free(HTTP_HDR_REQ *hh);
 
 /**
- * 将HTTP请求头对象的成员变量释放并重新初始化
- * @param hh {HTTP_HDR_REQ*} HTTP请求头对象
+ * Reset and reinitialize members of HTTP request header object
+ * @param hh {HTTP_HDR_REQ*} HTTP request header object
  */
 HTTP_API void http_hdr_req_reset(HTTP_HDR_REQ *hh);
 
 /**
- * 分析HTTP协议头的cookies
- * @param hh {HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
+ * Parse cookies in HTTP protocol header
+ * @param hh {HTTP_HDR_REQ*} HTTP request header pointer, not NULL
  * @return {int} 0: ok;  -1: err.
  */
 HTTP_API int http_hdr_req_cookies_parse(HTTP_HDR_REQ *hh);
 
 /**
- * 分析HTTP请求首行数据(如: GET /cgi-bin/test.cgi?name=value&name2=value2 HTTP/1.0)
- * 请求的方法(GET)-->hdr_request_method
- * URL数据分析结果(name=value)-->hdr_request_table
- * HTTP协议版本号(HTTP/1.0)-->hdr_request_proto
- * URL数据中的路径部分(/cgi-bin/test.cgi)-->hdr_request_url
- * @param hh {HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
+ * Parse HTTP request first line (e.g.:
+ * GET /cgi-bin/test.cgi?name=value&name2=value2 HTTP/1.0)
+ * Request method (GET) --> hdr_request_method
+ * URL data fields (name=value) --> hdr_request_table
+ * HTTP protocol version (HTTP/1.0) --> hdr_request_proto
+ * URL path (/cgi-bin/test.cgi) --> hdr_request_url
+ * @param hh {HTTP_HDR_REQ*} HTTP request header pointer, not NULL
  * @return {int} 0: ok;  -1: err.
  */
 HTTP_API int http_hdr_req_line_parse(HTTP_HDR_REQ *hh);
 
 /**
- * 分析HTTP请求头协议数据, 其内部会调用 http_hdr_req_line_parse, http_hdr_req_cookies_parse
- * @param hh {HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
+ * Parse HTTP request header protocol data, calls http_hdr_req_line_parse,
+ * http_hdr_req_cookies_parse internally
+ * @param hh {HTTP_HDR_REQ*} HTTP request header pointer, not NULL
  * @return {int} 0: ok;  -1: err.
  */
 HTTP_API int http_hdr_req_parse(HTTP_HDR_REQ *hh);
 
 /**
- * 分析HTTP请求头协议数据, 其内部会调用 http_hdr_req_line_parse, http_hdr_req_cookies_parse
- * 如果 parse_params 非 0 则分析HTTP请求 url 中的参数部分; 如果 parse_cookie 非 0 则分析
- * HTTP请求中的 cookie 内容
- * @param hh {HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
- * @param parse_params {int} 是否分析请求 url 中的参数部分
- * @param parse_cookie {int} 是否分析请求中的 cookie 内容
+ * Parse HTTP request header protocol data, calls http_hdr_req_line_parse,
+ * http_hdr_req_cookies_parse internally. If parse_params is 0, doesn't
+ * parse parameters in HTTP request url; if parse_cookie is 0, doesn't
+ * parse cookie data in HTTP request
+ * @param hh {HTTP_HDR_REQ*} HTTP request header pointer, not NULL
+ * @param parse_params {int} Whether to parse parameters in url
+ * @param parse_cookie {int} Whether to parse cookie data in request
  * @return {int} 0: ok;  -1: err.
  */
 HTTP_API int http_hdr_req_parse3(HTTP_HDR_REQ *hh, int parse_params, int parse_cookie);
 
 /**
- * 从HTTP请求头中获得某个cookie值
- * @param hh {HTTP_HDR_REQ*) HTTP请求头类型的数据指针，不能为空
- * @param name {const char*} 某个cookie的变量名, 不能为空
- * @return {const char*} !NULL: 该返回值即为所要求的cookie; NULL: 出错或所要求的cookie不存在
+ * Get a cookie value from HTTP request header
+ * @param hh {HTTP_HDR_REQ*) HTTP request header pointer, not NULL
+ * @param name {const char*} Cookie identifier, not NULL
+ * @return {const char*} !NULL: return value is the required cookie;
+ *  NULL: specified cookie doesn't exist
  */
 HTTP_API const char *http_hdr_req_cookie_get(HTTP_HDR_REQ *hh, const char *name);
 
 /**
- * 从HTTP请求头中取得HTTP请求的方法, 如: POST, GET, CONNECT
- * @param hh {const HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
- * @return {const char*} 返回请示方法. NULL: error; !NULL: OK.
+ * Get HTTP request method from HTTP request header, e.g.: POST, GET, CONNECT
+ * @param hh {const HTTP_HDR_REQ*} HTTP request header pointer, not NULL
+ * @return {const char*} Method string. NULL: error; !NULL: OK.
  */
 HTTP_API const char *http_hdr_req_method(const HTTP_HDR_REQ *hh);
 
 /**
- * 从HTTP请求头中获取请求URL中某个请求字段的数据, 
- * 如取: /cgi-bin/test.cgi?n1=v1&n2=v2 中的 n2的值v2
- * @param hh {const HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
- * @param name {const char*} 请求参数中的变量名
- * @return {const char*} !NULL: ok, 返回变量值的内存指针;  NULL: 出错，或请求的变量名不存在.
+ * Get a parameter field value from request URL in HTTP request header,
+ * e.g.: get value v2 of n2 from: /cgi-bin/test.cgi?n1=v1&n2=v2
+ * @param hh {const HTTP_HDR_REQ*} HTTP request header pointer, not NULL
+ * @param name {const char*} Parameter identifier in request
+ * @return {const char*} !NULL: ok, returns parameter value memory pointer;
+ *  NULL: parameter with specified identifier doesn't exist.
  */
 HTTP_API const char *http_hdr_req_param(const HTTP_HDR_REQ *hh, const char *name);
 
 /**
- * 从HTTP请求头中获取请求行中的访问路径部分, 不包含主机名但包含参数.
- * 如原请求行数据为:
+ * Get request path and parameters from HTTP request header, including
+ * parameters, without domain and port.
+ * If original request line is:
  *   GET /cgi-bin/test.cgi?n1=v1&n2=v2 HTTP/1.1
  *  or
  *   GET http://www.test.com[:80]/cgi-bin/test.cgi?n1=v1&n2=v2 HTTP/1.1
- * 则分析后的结果数据为:
+ * Then return result is:
  *   /cgi-bin/test.cgi?n1=v1&n2=v2
- * @param hh {const HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
- * @return {const char*} 请示的URL. !NULL: OK; NULL: error.
+ * @param hh {const HTTP_HDR_REQ*} HTTP request header pointer, not NULL
+ * @return {const char*} URL string. !NULL: OK; NULL: error.
  */
 HTTP_API const char *http_hdr_req_url_part(const HTTP_HDR_REQ *hh);
 
 /**
- * 从HTTP请求头中获取请求行中的访问路径部分, 不包含主机名及参数.
- * 如原请求行数据为:
+ * Get request path from HTTP request header, without parameters.
+ * If original request line is:
  *   GET /cgi-bin/test.cgi?n1=v1&n2=v2 HTTP/1.1
  *  or
  *   GET http://www.test.com[:80]/cgi-bin/test.cgi?n1=v1&n2=v2 HTTP/1.1
- * 则分析后的结果数据为:
+ * Then return result is:
  *   /cgi-bin/test.cgi
- * @param hh {const HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
- * @return {const char*} 请示的URL. !NULL: OK; NULL: error.
+ * @param hh {const HTTP_HDR_REQ*} HTTP request header pointer, not NULL
+ * @return {const char*} URL string. !NULL: OK; NULL: error.
  */
 HTTP_API const char *http_hdr_req_url_path(const HTTP_HDR_REQ *hh);
 
 /**
- * 从HTTP请求协议头中获得服务器的主机IP或域名，格式为：IP|domain[:PORT]
- * 如: 192.168.0.22:80, or www.test.com:8088
- * @param hh {const HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
- * @return {const char*} 返回用户请示的主机名. !NULL: ok; NULL: error.
+ * Get server IP address from HTTP request protocol header,
+ * format is: IP|domain[:PORT]
+ * e.g.: 192.168.0.22:80, or www.test.com:8088
+ * @param hh {const HTTP_HDR_REQ*} HTTP request header pointer, not NULL
+ * @return {const char*} String indicating server address. !NULL: ok;
+ *  NULL: error.
  */
 HTTP_API const char *http_hdr_req_host(const HTTP_HDR_REQ *hh);
 
 /**
- * 从HTTP请求头协议中获得完整的URL请求字符串
- * 如原HTTP请求头为:
+ * Get complete URL string from HTTP request header protocol
+ * If original HTTP request header is:
  * GET /cgi-bin/test.cgi?n1=v1&n2=v2 HTTP/1.1
  * HOST: www.test.com
- * 则经该函数后则返回:
+ * Then this function returns:
  * http://www.test.com/cgi-bin/test.cgi?n1=v1&n2=v2
- * @param hh {const HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
- * @return {const char*} 请示的URL. !NULL: OK; NULL: error.
+ * @param hh {const HTTP_HDR_REQ*} HTTP request header pointer, not NULL
+ * @return {const char*} URL string. !NULL: OK; NULL: error.
  * @example:
  *  void test(HTTP_HDR_REQ *hh)
  *  {
  *    const char *url = http_hdr_req_url(hh);
  *    printf(">>> url: %s\r\n", url ? url : "null");
  *  }
- *  注意, 因为 http_hdr_req_url 内部使用到了一个线程局部静态变量内存区, 所以
- *  不可如下使用，否则会使返回的数据发生重叠.
+ *  Note: http_hdr_req_url internally uses a local thread-specific
+ *  static memory buffer, so cannot use like this, returned data will
+ *  be overwritten:
  *  void test(HTTP_HDR_REQ *hh1, HTTP_HDR_REQ *hh2)
  *  {
  *    const char *url1 = http_hdr_req_url(hh1);
  *    const char *url2 = http_hdr_req_url(hh2);
  *    printf(">>> url1: %s, url2: %s\n", url1, url2);
  *  }
- *  因为 url1, url2 实际上都是指向的同一内存区, 所以最终的结果将是 url1, url2
- *  内容相同. 如遇此类情形, 应该如下操作:
+ *  Because url1, url2 actually point to same memory buffer, final result
+ *  is url1, url2 are identical. To avoid this, use following approach:
  *  void test(HTTP_HDR_REQ *hh1, HTTP_HDR_REQ *hh2)
  *  {
  *    const char *ptr;
@@ -356,68 +387,68 @@ HTTP_API const char *http_hdr_req_host(const HTTP_HDR_REQ *hh);
 HTTP_API const char *http_hdr_req_url(const HTTP_HDR_REQ *hh);
 
 /**
- * 分析HTTP请求头中的 Range 字段
- * @param hdr_req {HTTP_HDR_REQ*} 请求HTTP协议头, 不能为空
- * @param range_from {http_off_t*} 存储偏移起始位置
- * @param range_to {http_off_t*} 存储偏移结束位置
- * 注： * {range_from}, {range_to} 下标从0开始
- * 请求的 Range 格式:
+ * Parse Range field in HTTP request header
+ * @param hdr_req {HTTP_HDR_REQ*} Request HTTP protocol header, not NULL
+ * @param range_from {http_off_t*} Store offset start position
+ * @param range_to {http_off_t*} Store offset end position
+ * Note: {range_from}, {range_to} index starts from 0
+ * Range format:
  *   Range: bytes={range_from}-, bytes={range_from}-{range_to}
  */
 HTTP_API int http_hdr_req_range(const HTTP_HDR_REQ *hdr_req,
 	http_off_t *range_from, http_off_t *range_to);
 
-/*---------------------------- HTTP 响应头操作函数 ---------------------------*/
+/*----------------------- HTTP response header functions --------------------*/
 /* in http_hdr_res.c */
 
 /**
- * 分析HTTP响应头中的状态行
- *@param hh {HTTP_HDR_RES*} HTTP响应头类型的数据指针，不能为空
- *@param dbuf {const char*} 状态行数据, 如: HTTP/1.0 200 OK，不能为空
- *@return {int} 0: ok;  < 0: error，分析结果存储在 hh 结构中
+ * Parse status line in HTTP response header
+ *@param hh {HTTP_HDR_RES*} HTTP response header pointer, not NULL
+ *@param dbuf {const char*} Status line data, e.g.: HTTP/1.0 200 OK, not NULL
+ *@return {int} 0: ok;  < 0: error. Results stored in hh structure
  */
 HTTP_API int http_hdr_res_status_parse(HTTP_HDR_RES *hh, const char *dbuf);
 
 /**
- * 创建一个新的HTTP响应头
+ * Create a new HTTP response header
  * @return {HTTP_HDR_RES*}
  */
 HTTP_API HTTP_HDR_RES *http_hdr_res_new(void);
 
 /**
- * 克隆一个HTTP响应头
- * @param hdr_res {const HTTP_HDR_RES*} 源HTTP响应头
- * @return {HTTP_HDR_RES *} 新产生的HTTP响应头
+ * Clone an HTTP response header
+ * @param hdr_res {const HTTP_HDR_RES*} Source HTTP response header
+ * @return {HTTP_HDR_RES *} Newly created HTTP response header
  */
 HTTP_API HTTP_HDR_RES *http_hdr_res_clone(const HTTP_HDR_RES *hdr_res);
 
 /**
- * 释放一个HTTP响应头
- * @param hh {HTTP_HDR_RES*} HTTP响应头
+ * Free an HTTP response header
+ * @param hh {HTTP_HDR_RES*} HTTP response header
  */
 HTTP_API void http_hdr_res_free(HTTP_HDR_RES *hh);
 
 /**
- * 向HTTP响应头重新初始化并释放其中的成员变量
- * @param hh {HTTP_HDR_RES*} HTTP响应头
+ * Reinitialize HTTP response header, freeing internal members
+ * @param hh {HTTP_HDR_RES*} HTTP response header
  */
 HTTP_API void http_hdr_res_reset(HTTP_HDR_RES *hh);
 
 /**
- * 分析HTTP响应头里的数据，并存储分析结果
- * @param hdr_res {HTTP_HDR_RES*} HTTP响应头
+ * Parse HTTP response header protocol data and store in structure
+ * @param hdr_res {HTTP_HDR_RES*} HTTP response header
  */
 HTTP_API int http_hdr_res_parse(HTTP_HDR_RES *hdr_res);
 
 /**
- * 分析HTTP响应头中的 Range 字段
- * @param hdr_res {HTTP_HDR_RES*} 响应HTTP协议头, 不能为空
- * @param range_from {http_off_t*} 存储偏移起始位置, 不能为空
- * @param range_to {http_off_t*} 存储偏移结束位置, 不能为空
- * @param total_length {http_off_t*} 整个数据文件的总长度, 可为空
- * @return {int} 返回 0 表示成功，-1 表示失败
- * 注： * {range_from}, {range_to} 下标从0开始
- * 响应的 Range 格式:
+ * Parse Range field in HTTP response header
+ * @param hdr_res {HTTP_HDR_RES*} Response HTTP protocol header, not NULL
+ * @param range_from {http_off_t*} Store offset start position, not NULL
+ * @param range_to {http_off_t*} Store offset end position, not NULL
+ * @param total_length {http_off_t*} Store total file length, may be NULL
+ * @return {int} Returns 0 on success, -1 on failure
+ * Note: {range_from}, {range_to} index starts from 0
+ * Response Range format:
  *   Content-Range: bytes {range_from}-{range_to}/{total_length}
  */
 HTTP_API int http_hdr_res_range(const HTTP_HDR_RES *hdr_res,
@@ -426,192 +457,212 @@ HTTP_API int http_hdr_res_range(const HTTP_HDR_RES *hdr_res,
 /* in http_rfc1123.c */
 
 /**
- * 将时间值转换成RFC1123所要求的格式
- * @param buf {char*} 存储空间
- * @param size {size_t} buf 的空间大小
- * @param t {time_t} 时间值
+ * Convert time value to RFC1123 required format
+ * @param buf {char*} Storage space
+ * @param size {size_t} buf space size
+ * @param t {time_t} Time value
  */
 HTTP_API const char *http_mkrfc1123(char *buf, size_t size, time_t t);
 
-/*----------------------- HTTP 异步读操作函数 --------------------------------*/
+/*---------------------- HTTP async request functions -----------------------*/
 /* in http_chat_async.c */
 
 /**
- * 异步获取一个HTTP REQUEST协议头，数据结果存储在hdr中, 当取得一个完整的HTTP头或
- * 出错时调用用户的注册函数 notify
- * @param hdr {HTTP_HDR_REQ*} HTTP请求头类型结构指针，不能为空
- * @param astream {ACL_ASTREAM*} 与客户端连接的数据流, 不能为空
- * @param notify {HTTP_HDR_NOTIFY} 当HTTP协议头读完或出错时调用的用户的注册函数
- * @param arg {void*} notify 调用时的一个参数
- * @param timeout {int} 接收数据过程中的读超时时间
+ * Asynchronously read an HTTP REQUEST protocol header, store data in hdr.
+ * After reading complete HTTP header successfully, call user-registered
+ * callback notify
+ * @param hdr {HTTP_HDR_REQ*} HTTP request header structure pointer, not NULL
+ * @param astream {ACL_ASTREAM*} Stream from client connection, not NULL
+ * @param notify {HTTP_HDR_NOTIFY} Callback called when HTTP protocol header
+ *  read completes
+ * @param arg {void*} Parameter passed to notify
+ * @param timeout {int} Timeout during data read process
  */
 HTTP_API void http_hdr_req_get_async(HTTP_HDR_REQ *hdr, ACL_ASTREAM *astream,
 		HTTP_HDR_NOTIFY notify, void *arg, int timeout);
 
 /**
- * 异步获取一个HTTP RESPOND协议头，数据结果存储在hdr中, 当取得一个完整的HTTP头或
- * 出错时调用用户的注册函数 notify
- * @param hdr {HTTP_HDR_REQ*} HTTP响应头类型结构指针，不能为空
- * @param astream {ACL_ASTREAM*} 与服务端连接的数据流, 不能为空
- * @param notify {HTTP_HDR_NOTIFY} 当HTTP协议头读完或出错时调用的用户的注册函数
- * @param arg {void*} notify 调用时的一个参数
- * @param timeout {int} 接收数据过程中的读超时时间
+ * Asynchronously read an HTTP RESPOND protocol header, store data in hdr.
+ * After reading complete HTTP header successfully, call user-registered
+ * callback notify
+ * @param hdr {HTTP_HDR_REQ*} HTTP response header structure pointer, not NULL
+ * @param astream {ACL_ASTREAM*} Stream from server connection, not NULL
+ * @param notify {HTTP_HDR_NOTIFY} Callback called when HTTP protocol header
+ *  read completes
+ * @param arg {void*} Parameter passed to notify
+ * @param timeout {int} Timeout during data read process
  */
 HTTP_API void http_hdr_res_get_async(HTTP_HDR_RES *hdr, ACL_ASTREAM *astream,
 		HTTP_HDR_NOTIFY notify, void *arg, int timeout);
 
 /**
- * 异步从客户端读取请求的BODY协议体, 在接收过程中边接收连回调用户的 notify
- * 回调函数, 如果 notify 返回小于 0 的值, 则认为出错且不再继续接收数据
- * @param request {HTTP_REQ*} HTTP请求体类型指针, 不能为空, 且 request->hdr 为空
- * @param astream {ACL_ASTREAM*} 与客户端连接的数据流, 不能为空
- * @param notify {HTTP_BODY_NOTIFY} 接收客户端数据过程中回调的用户的注册函数
- * @param arg {void*} notify 调用时的一个参数
- * @param timeout {int} 接收数据过程中的读超时时间
+ * Asynchronously read request BODY protocol data from client. During
+ * receive process, call user notify callback at boundaries. If notify
+ * returns < 0, read stops and won't call the callback again
+ * @param request {HTTP_REQ*} HTTP request object pointer, not NULL,
+ *  and request->hdr not NULL
+ * @param astream {ACL_ASTREAM*} Stream from client connection, not NULL
+ * @param notify {HTTP_BODY_NOTIFY} User-registered callback for receiving
+ *  client data
+ * @param arg {void*} Parameter passed to notify
+ * @param timeout {int} Timeout during data read process
  */
 HTTP_API void http_req_body_get_async(HTTP_REQ *request, ACL_ASTREAM *astream,
 		 HTTP_BODY_NOTIFY notify, void *arg, int timeout);
 /*
- * 异步从服务器端读取响应数据的BODY协议体, 在接收过程中连接收连回调用户的
- * notify 回调函数, 如果 notify 返回小于 0 的值, 则认为出错且不再继续接收数据
- * @param respond {HTTP_RES*} HTTP响应体类型指针, 不能为空,且 respond->hdr 不为空
- * @param astream {ACL_ASTREAM*} 与服务端连接的数据流, 不能为空
- * @param notify {HTTP_BODY_NOTIFY} 接收服务端数据过程中回调的用户的注册函数
- * @param arg {void*} notify 调用时的一个参数
- * @param timeout {int} 接收数据过程中的读超时时间
+ * Asynchronously read response BODY protocol data from server. During
+ * receive process, call user notify callback. If notify returns < 0,
+ * read stops and won't call the callback again
+ * @param respond {HTTP_RES*} HTTP response object pointer, not NULL,
+ *  and respond->hdr not NULL
+ * @param astream {ACL_ASTREAM*} Stream from server connection, not NULL
+ * @param notify {HTTP_BODY_NOTIFY} User-registered callback for receiving
+ *  server data
+ * @param arg {void*} Parameter passed to notify
+ * @param timeout {int} Timeout during data read process
  */
 HTTP_API void http_res_body_get_async(HTTP_RES *respond, ACL_ASTREAM *astream,
 		HTTP_BODY_NOTIFY notify, void *arg, int timeout);
 
-/*----------------------- HTTP 同步读操作函数 --------------------------------*/
+/*---------------------- HTTP sync request functions ------------------------*/
 /* in http_chat_sync.c */
 
 /**
-* 同步获取一个HTTP REQUEST协议头，数据结果存储在hdr中, 当取得一个完整的HTTP头或
-* 出错时调用用户的注册函数 notify
-* @param hdr {HTTP_HDR_REQ*} HTTP请求头类型结构指针，不能为空
-* @param stream {ACL_VSTREAM*} 与客户端连接的数据流, 不能为空
-* @param timeout {int} 接收数据过程中的读超时时间
-* @return {int} 0: 成功; < 0: 失败
+* Synchronously read an HTTP REQUEST protocol header, store data in hdr.
+* After reading complete HTTP header successfully, call user-registered
+* callback notify
+* @param hdr {HTTP_HDR_REQ*} HTTP request header structure pointer, not NULL
+* @param stream {ACL_VSTREAM*} Stream from client connection, not NULL
+* @param timeout {int} Timeout during data read process
+* @return {int} 0: success; < 0: failure
 */
 HTTP_API int http_hdr_req_get_sync(HTTP_HDR_REQ *hdr,
 		 ACL_VSTREAM *stream, int timeout);
 
 /**
- * 同步获取一个HTTP RESPOND协议头，数据结果存储在hdr中, 当取得一个完整的HTTP头或
- * 出错时调用用户的注册函数 notify
- * @param hdr {HTTP_HDR_REQ*} HTTP响应头类型结构指针，不能为空
- * @param stream {ACL_VSTREAM*} 与服务端连接的数据流, 不能为空
- * @param timeout {int} 接收数据过程中的读超时时间
- * @return {int} 0: 成功; < 0: 失败
+ * Synchronously read an HTTP RESPOND protocol header, store data in hdr.
+ * After reading complete HTTP header successfully, call user-registered
+ * callback notify
+ * @param hdr {HTTP_HDR_REQ*} HTTP response header structure pointer, not NULL
+ * @param stream {ACL_VSTREAM*} Stream from server connection, not NULL
+ * @param timeout {int} Timeout during data read process
+ * @return {int} 0: success; < 0: failure
  */
 HTTP_API int http_hdr_res_get_sync(HTTP_HDR_RES *hdr,
 		ACL_VSTREAM *stream, int timeout);
 
 /**
- * 同步从客户端读取请求的BODY协议体
- * @param request {HTTP_REQ*} HTTP请求体类型指针, 不能为空, 且 request->hdr 为空
- * @param stream {ACL_VSTREAM*} 与客户端连接的数据流, 不能为空
- * @param buf {void *} 存储结果的内容空间
- * @param size {int} buf 的空间大小
- * @return ret {http_off_t} 本次读到的HTTP请求体的内容
- *             0: 表示读完了HTTP数据体内容，但并不代表数据流已经关闭;
- *             < 0: 表示读出错，流关闭或出错;
- *             > 0: 表示未读完，目前读到ret 个字节的数据
+ * Synchronously read request BODY protocol data from client
+ * @param request {HTTP_REQ*} HTTP request object pointer, not NULL,
+ *  and request->hdr not NULL
+ * @param stream {ACL_VSTREAM*} Stream from client connection, not NULL
+ * @param buf {void *} Storage space for received data
+ * @param size {int} Size of buf space
+ * @return ret {http_off_t} Number of bytes read from HTTP request body:
+ *             0: All HTTP request body data read, possibly remote closed;
+ *             < 0: Remote connection closed or other error;
+ *             > 0: Not finished, currently read ret bytes
  */
 HTTP_API http_off_t http_req_body_get_sync(HTTP_REQ *request, ACL_VSTREAM *stream,
 		void *buf, int size);
 #define http_req_body_get_sync2	http_req_body_get_sync
 
 /**
- * 同步从服务端读取响应的BODY协议体
- * @param respond {HTTP_RES*} HTTP响应体类型指针, 不能为空, 且 respond->hdr 为空
- * @param stream {ACL_VSTREAM*} 与客户端连接的数据流, 不能为空
- * @param buf {void *} 存储结果的内容空间
- * @param size {int} buf 的空间大小
- * @return ret {http_off_t} 本次读到的HTTP响应体的内容
- *             0: 表示读完了HTTP数据体内容，但并不代表数据流已经关闭;
- *             < 0: 表示读出错，流关闭或出错;
- *             > 0: 表示未读完，目前读到ret 个字节的数据
+ * Synchronously read response BODY protocol data from server
+ * @param respond {HTTP_RES*} HTTP response object pointer, not NULL,
+ *  and respond->hdr not NULL
+ * @param stream {ACL_VSTREAM*} Stream from client connection, not NULL
+ * @param buf {void *} Storage space for received data
+ * @param size {int} Size of buf space
+ * @return ret {http_off_t} Number of bytes read from HTTP response body:
+ *             0: All HTTP response data read, possibly remote closed;
+ *             < 0: Remote connection closed or other error;
+ *             > 0: Not finished, currently read ret bytes
  */
 HTTP_API http_off_t http_res_body_get_sync(HTTP_RES *respond, ACL_VSTREAM *stream,
 		void *buf, int size);
 #define http_res_body_get_sync2	http_res_body_get_sync
 
 /**
- * 设置请求协议的控制标志位
- * @param request {HTTP_REQ*} HTTP请求体类型指针, 不能为空, 且 request->hdr 为空
- * @param name {int} 第一个标志位，当最后一个标志位为 HTTP_CHAT_SYNC_CTL_END 时
- *  表示结束
+ * Set control flag bits for request protocol
+ * @param request {HTTP_REQ*} HTTP request object pointer, not NULL,
+ *  and request->hdr not NULL
+ * @param name {int} First flag bit, when last flag bit is
+ *  HTTP_CHAT_SYNC_CTL_END, indicates end
  */
 HTTP_API void http_chat_sync_reqctl(HTTP_REQ *request, int name, ...);
 
 /**
- * 设置响应协议的控制标志位
- * @param respond {HTTP_RES*} HTTP响应体类型指针, 不能为空, 且 respond->hdr 为空
- * @param name {int} 第一个标志位，当最后一个标志位为 HTTP_CHAT_SYNC_CTL_END 时
- *  表示结束
+ * Set control flag bits for response protocol
+ * @param respond {HTTP_RES*} HTTP response object pointer, not NULL,
+ *  and respond->hdr not NULL
+ * @param name {int} First flag bit, when last flag bit is
+ *  HTTP_CHAT_SYNC_CTL_END, indicates end
  */
 HTTP_API void http_chat_sync_resctl(HTTP_RES *respond, int name, ...);
-#define	HTTP_CHAT_SYNC_CTL_END      0  /**< 结束标志位 */
-#define	HTTP_CHAT_CTL_BUFF_ONOFF    1  /**< 是否打开数据接收时的预缓冲策略 */
+#define	HTTP_CHAT_SYNC_CTL_END      0  /* End flag bit */
+#define	HTTP_CHAT_CTL_BUFF_ONOFF    1  /* Pre-buffer during data reception */
 
-/*------------------------ HTTP 请求体构造及释放函数  ------------------------*/
+/*---------------- HTTP request object creation/free functions --------------*/
 /* in http_req.c */
 
 /**
- * 根据HTTP请求头分配一个请求体对象
- * @param hdr_req {HTTP_HDR_REQ*} 请求头对象
- * @return {HTTP_REQ*} 请求体对象
+ * Create a request object based on HTTP request header
+ * @param hdr_req {HTTP_HDR_REQ*} Request header object
+ * @return {HTTP_REQ*} Request object
  */
 HTTP_API HTTP_REQ *http_req_new(HTTP_HDR_REQ *hdr_req);
 
 /**
- * 释放请求体对象
- * @param request {HTTP_REQ*} 请求体对象
+ * Free request object
+ * @param request {HTTP_REQ*} Request object
  */
 HTTP_API void http_req_free(HTTP_REQ *request);
 
-/*------------------------ HTTP 响应体构造及释放函数  ------------------------*/
+/*--------------- HTTP response object creation/free functions --------------*/
 /* in http_res.c */
 
 /**
-* 根据HTTP响应头分配一个响应体对象
-* @param hdr_res {HTTP_HDR_RES*} 响应头对象
-* @return {HTTP_RES*} 响应体对象
+* Create a response object based on HTTP response header
+* @param hdr_res {HTTP_HDR_RES*} Response header object
+* @return {HTTP_RES*} Response object
 */
 HTTP_API HTTP_RES *http_res_new(HTTP_HDR_RES *hdr_res);
 
 /**
- * 释放响应体对象
- * @param respond {HTTP_RES*} 响应体对象
+ * Free response object
+ * @param respond {HTTP_RES*} Response object
  */
 HTTP_API void http_res_free(HTTP_RES *respond);
 
-/*------------------------------ HTTP 头构造函数 -----------------------------*/
+/*------------------------- HTTP header build functions ---------------------*/
 /* in http_hdr_build.c */
 
 /**
- * 向通用HTTP头中添加数据
- * @param hdr {HTTP_HDR*} 通用HTTP头对象
- * @param name {const char*} 变量名，如 Accept-Encoding: deflate, gzip 中的 Accept-Encoding
- * @param value {const char*} 变量值，如 Accept-Encoding: deflate, gzip 中的 deflate, gzip
+ * Add string entry to common HTTP header
+ * @param hdr {HTTP_HDR*} Common HTTP header object
+ * @param name {const char*} Entry name, e.g. Accept-Encoding in:
+ *  Accept-Encoding: deflate, gzip
+ * @param value {const char*} Entry value, e.g. deflate, gzip in:
+ *  Accept-Encoding: deflate, gzip
  */
 HTTP_API void http_hdr_put_str(HTTP_HDR *hdr, const char *name, const char *value);
 
 /**
- * 向通用HTTP头中添加数据
- * @param hdr {HTTP_HDR*} 通用HTTP头对象
- * @param name {const char*} 变量名，如 Content-Length: 1024 中的 Conteng-Length
- * @param value {const int} 变量值，如 Content-Length: 1024 中的 1024
+ * Add integer entry to common HTTP header
+ * @param hdr {HTTP_HDR*} Common HTTP header object
+ * @param name {const char*} Entry name, e.g. Content-Length in:
+ *  Content-Length: 1024
+ * @param value {const int} Entry value, e.g. 1024 in: Content-Length: 1024
  */
 HTTP_API void http_hdr_put_int(HTTP_HDR *hdr, const char *name, int value);
 
 /**
- * 向通用HTTP头中添加数据
- * @param hdr {HTTP_HDR*} 通用HTTP头对象
- * @param name {const char*} 变量名，如 Accept-Encoding: deflate, gzip 中的 Accept-Encoding
- * @param fmt {const char*} 变参格式字符串
+ * Add formatted string entry to common HTTP header
+ * @param hdr {HTTP_HDR*} Common HTTP header object
+ * @param name {const char*} Entry name, e.g. Accept-Encoding in:
+ *  Accept-Encoding: deflate, gzip
+ * @param fmt {const char*} Format string
  */
 # if defined(WIN32) || defined(WIN64)
 HTTP_API void http_hdr_put_fmt(HTTP_HDR *hdr, const char *name, const char *fmt, ...);
@@ -621,120 +672,123 @@ HTTP_API void __attribute__((format(printf,3,4)))
 #endif
 
 /**
- * 向通用HTTP头中添加时间数据
- * @param hdr {HTTP_HDR*} 通用HTTP头对象
- * @param name {const char*} 变量名
- * @param t {time_t} 时间值
+ * Add time entry to common HTTP header
+ * @param hdr {HTTP_HDR*} Common HTTP header object
+ * @param name {const char*} Entry name
+ * @param t {time_t} Time value
  */
 HTTP_API void http_hdr_put_time(HTTP_HDR *hdr, const char *name, time_t t);
 
 /**
- * 根据HTTP请求头的字段来设置是否与服务端保持长连接, 结果存储于HTTP响应头中
- * @param req {const HTTP_HDR_REQ*} HTTP请求头
- * @param res {HTTP_HDR_RES*} HTTP响应头，存储分析结果
+ * Check if keep-alive is set in HTTP request header fields and store
+ * result in HTTP response header
+ * @param req {const HTTP_HDR_REQ*} HTTP request header
+ * @param res {HTTP_HDR_RES*} HTTP response header to store result
  */
 HTTP_API int http_hdr_set_keepalive(const HTTP_HDR_REQ *req, HTTP_HDR_RES *res);
 
 /**
- * 用返回状态(1xx, 2xx, 3xx, 4xx, 5xx) 初始化一个HTTP响应头
- * @param hdr_res {HTTP_HDR_RES*} HTTP响应头，存储分析结果
- * @param status {int} 状态号，nxx(1xx, 2xx, 3xx, 4xx, 5xx)
+ * Initialize an HTTP response header with status code (1xx, 2xx, 3xx,
+ * 4xx, 5xx)
+ * @param hdr_res {HTTP_HDR_RES*} HTTP response header to store result
+ * @param status {int} Status code: nxx(1xx, 2xx, 3xx, 4xx, 5xx)
  */
 HTTP_API void http_hdr_res_init(HTTP_HDR_RES *hdr_res, int status);
 
 /**
- * 用返回状态(nxx)生成一个HTTP响应头
- * @param status {int} 状态号，nxx(1xx, 2xx, 3xx, 4xx, 5xx)
- * @return {HTTP_HDR_RES*} 生成的HTTP响应头
+ * Create an HTTP response header with status code (nxx)
+ * @param status {int} Status code: nxx(1xx, 2xx, 3xx, 4xx, 5xx)
+ * @return {HTTP_HDR_RES*} Generated HTTP response header
  */
 HTTP_API HTTP_HDR_RES *http_hdr_res_static(int status);
 
 /**
-* 用返回状态(nxx)生成一个HTTP响应头
-* @param status {int} 状态号，nxx(4xx, 5xx)
-* @return {HTTP_HDR_RES*} 生成的HTTP响应头
+* Create an HTTP response header with status code (nxx)
+* @param status {int} Status code: nxx(4xx, 5xx)
+* @return {HTTP_HDR_RES*} Generated HTTP response header
 */
 HTTP_API HTTP_HDR_RES *http_hdr_res_error(int status);
 
 /**
- * 根据HTTP通用头生成头的完整内容于BUF中
- * @param hdr {const HTTP_HDR*} 通用HTTP头
- * @param strbuf {ACL_VSTRING*} 存储结果的缓冲区
+ * Build HTTP common header data and store header data in BUF
+ * @param hdr {const HTTP_HDR*} Common HTTP header
+ * @param strbuf {ACL_VSTRING*} Buffer to store results
  */
 HTTP_API void http_hdr_build(const HTTP_HDR *hdr, ACL_VSTRING *strbuf);
 
 /**
- * 根据HTTP请求头生成请求头内容于BUF中
- * @param hdr_req {const HTTP_HDR_REQ*} HTTP请求头
- * @param strbuf {ACL_VSTRING*} 存储结果的缓冲区
+ * Build HTTP request header and store header data in BUF
+ * @param hdr_req {const HTTP_HDR_REQ*} HTTP request header
+ * @param strbuf {ACL_VSTRING*} Buffer to store results
  */
 HTTP_API void http_hdr_build_request(const HTTP_HDR_REQ *hdr_req, ACL_VSTRING *strbuf);
 
-/*----------------------------- HTTP 响应状态信息函数 ------------------------*/
+/*---------------------- HTTP response status info functions ----------------*/
 /* in http_status.c */
 
 /**
- * 根据HTTP响应号(nxx)返回该值所代表的字符串
- * @param status {int} 状态号，nxx(1xx, 2xx, 3xx, 4xx, 5xx)
- * @return {const char*} 响应号所对应的字符串表示
+ * Get string representation of HTTP response code (nxx)
+ * @param status {int} Status code: nxx(1xx, 2xx, 3xx, 4xx, 5xx)
+ * @return {const char*} String representation corresponding to response code
  */
 HTTP_API const char *http_status_line(int status);
 
-/*---------------------------- HTTP HTML 模板操作函数 ------------------------*/
+/*---------------------- HTTP HTML template functions -----------------------*/
 /* in http_tmpl.c */
 
 /**
- * 装载HTTP响应代码的HTML模板
- * @param tmpl_path {const char*} HTML模板文件所在的路径
+ * Load HTTP response default HTML template
+ * @param tmpl_path {const char*} Path where HTML template file is located
  */
 HTTP_API void http_tmpl_load(const char *tmpl_path);
 
 /**
- * 读取对应HTTP响应状态码的模板信息
- * @param status {int} HTTP 状态响应码
- * @return {const ACL_VSTRING*} 对应HTTP响应状态码的模板信息
+ * Get template info corresponding to HTTP response status
+ * @param status {int} HTTP status response code
+ * @return {const ACL_VSTRING*} Template info corresponding to HTTP response
  */
 HTTP_API const ACL_VSTRING *http_tmpl_get(int status);
 
 /**
- * 读取对应HTTP响应状态码的标题提示信息
- * @param status {int} HTTP 状态响应码
- * @return {const char*} 对应HTTP响应状态码的标题提示信息
+ * Get title display info corresponding to HTTP response status
+ * @param status {int} HTTP status response code
+ * @return {const char*} Title display info corresponding to HTTP response
  */
 HTTP_API const char *http_tmpl_title(int status);
 
 /**
- * 获得相应HTTP响应状态码的模板提示信息的长度大小
- * @param status {int} HTTP 状态响应码
- * @return {int} 模板提示信息的长度大小
+ * Get length of template display info corresponding to HTTP response status
+ * @param status {int} HTTP status response code
+ * @return {int} Length of template display info
  */
 HTTP_API int http_tmpl_size(int status);
 
-/*---------------------------- HTTP HTML 模板初始化函数 ----------------------*/
+/*-------------------- HTTP HTML template init functions --------------------*/
 /* in http_init.c */
 
 /**
- * 初始化HTTP应用协议
- * @param tmpl_path {const char*} 模板信息文件的存放路径
+ * Initialize HTTP application protocol
+ * @param tmpl_path {const char*} Storage path for template info file
  */
 HTTP_API void http_init(const char *tmpl_path);
 
 /**
- * 是否自动缓冲被释放的 HTTP 头对象，从而使其内存可以重复使用, 该函数在程序初始化
- * 时只能被调用一次
- * @param max {int} 当该值 > 0 时便自动启用 HTTP 头对象缓冲功能
+ * Whether to automatically cache and reuse freed HTTP header objects,
+ * enabling memory buffer reuse. This function should only be called once
+ * during program initialization
+ * @param max {int} When value > 0, enable HTTP header object cache function
  */
 HTTP_API void http_hdr_cache(int max);
 
 /**
- * 设置在进行 HTTP 协议体数据传输时的缓冲区大小
- * @param size {http_off_t} 缓冲区大小
+ * Set buffer size during HTTP protocol data transfer
+ * @param size {http_off_t} Buffer size
  */
 HTTP_API void http_buf_size_set(http_off_t size);
 
 /**
- * 获得进行 HTTP 协议体数据传输时的缓冲区大小
- * @return {http_off_t} 缓冲区大小
+ * Get buffer size during HTTP protocol data transfer
+ * @return {http_off_t} Buffer size
  */
 HTTP_API http_off_t http_buf_size_get(void);
 
@@ -743,3 +797,4 @@ HTTP_API http_off_t http_buf_size_get(void);
 #endif
 
 #endif
+

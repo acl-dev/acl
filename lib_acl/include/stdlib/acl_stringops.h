@@ -8,52 +8,54 @@ extern "C" {
 #include "acl_define.h"
 
 /**
- * 判断给定字符串是否全为数字
- * @param str {const char*} 字符串
- * @return {int} 0: 否; 1: 是
+ * Check whether the given string is all digits.
+ * @param str {const char*} String
+ * @return {int} 0: no; 1: yes
  */
 ACL_API int acl_alldig(const char *str);
 
 /**
- * 判断给定字符串是否为浮点数
- * @param s {const char*} 字符串
- * @return {int} 0: 否; 1: 是
+ * Check whether the given string is a floating point number.
+ * @param s {const char*} String
+ * @return {int} 0: no; 1: yes
  */
 ACL_API int acl_is_double(const char *s);
 
 /**
- * 将多个字符串拼接成一个字符串
- * @param arg0 {const char*} 第一个非空字符串
- * @param ... 后续的字符串集合，结束符是 NULL
- * @return {char*} 结果字符串，不为空, 该字符串需要调用 acl_myfree 释放
+ * Concatenate multiple strings into one string.
+ * @param arg0 {const char*} First non-empty string
+ * @param ... Variable number of strings, must end with NULL
+ * @return {char*} Concatenated string, must not be NULL, string needs
+ *  to be freed with acl_myfree
  */
 ACL_API char *acl_concatenate(const char *arg0,...);
 
 /**
- * 从一个全路径的文件名中取得文件名部分，如：
- * 从 "/tmp/test.txt" 或 "\\tmp\\test.txt" 中取得 test.txt
- * @param path {const char*} 带有路径的文件名，如："/tmp/test.txt"
- *  或 "\\tmp\\test.txt"
- * @return {const char*} 文件名，该返回值不需要释放，如果返回的地址
- *  为空串(即第一个字节为 '\0') 则说明所给路径不含文件名
+ * Extract file name from a full path file name, e.g.:
+ * Extract "test.txt" from "/tmp/test.txt" or "\\tmp\\test.txt"
+ * @param path {const char*} Full path file name, e.g., "/tmp/test.txt"
+ *  or "\\tmp\\test.txt"
+ * @return {const char*} File name, return value does not need to be freed,
+ *  if returned address is empty (first byte is '\0'), it means path does not
+ *  contain file name
  */
 ACL_API const char *acl_safe_basename(const char *path);
 
 /**
- * 将所给的字符串进行分隔，分别取出 name, value 地址, 输入字符串可以为
- * {sp}{name}{sp}={sp}{value}{sp}, 如果分析成功，则将结果分别进行存储,
- * 其中 {sp} 字符可以为: 空格, "\t", "\r", "\n"
- * @param buf {char*} 输入的字符串, 不能为空
- * @param name {char**} 存储结果的地址指针，不能为空
- * @param value {char**} 存储结果的地址指针，不能为空
- * @param sep {char} 分隔符
- * @return {const char*} 出错原因，如果为空则表示解析成功，否则表示解析失败并返回
- *  失败原因
+ * Parse a string with separator, extract name and value addresses. String format
+ * should be {sp}{name}{sp}={sp}{value}{sp}. If parsing succeeds, results are
+ * stored directly, where {sp} characters can be: space, "\t", "\r", "\n"
+ * @param buf {char*} Source string, must not be NULL
+ * @param name {char**} Storage address pointer for name, must not be NULL
+ * @param value {char**} Storage address pointer for value, must not be NULL
+ * @param sep {char} Separator
+ * @return {const char*} If return value is NULL, indicates parsing succeeded;
+ *  if non-NULL, indicates parsing failed and return value is failure reason
  */
 ACL_API const char *acl_split_nameval2(char *buf, char **name, char **value, char sep);
 
 /**
- * 功能同 acl_split_nameval2，只是限定了分隔符为 '='
+ * Same as acl_split_nameval2, only separator is fixed as '='
  * @param buf {char*}
  * @param name {char**}
  * @param value {char**}
@@ -66,4 +68,3 @@ ACL_API const char *acl_split_nameval(char *buf, char **name, char **value);
 #endif
 
 #endif
-

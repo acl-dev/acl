@@ -7,11 +7,12 @@
 #define	ACL_COUNTER_INIT(thread_safe)                                         \
 	acl::class_counter::get_instance().init(thread_safe)
 
-// 某个字符标记增加一次, flagName 为自己定义的唯一字符对象
+// Increment a certain character flag once. flagName is a unique character
+// object defined by yourself.
 #define ACL_COUNTER_INC(flagName)                                             \
 	acl::class_counter::get_instance().inc(#flagName)
 
-// 某个字符标记减少一次
+// Decrement a certain character flag once.
 #define ACL_COUNTER_DEC(flagName)                                             \
 	acl::class_counter::get_instance().dec(#flagName)
 
@@ -28,36 +29,40 @@ class thread_mutex;
 class ACL_CPP_API class_counter : public singleton<class_counter> {
 public:
 	/**
-	 * 构造方法
-	 * @param clean {bool} 是否自动清除计数为 0 的计数对象.
+	 * Constructor.
+	 * @param clean {bool} Whether to automatically clear counter objects with
+	 * count 0.
 	 */
 	class_counter(bool clean = true);
 	~class_counter();
 
 	/**
-	 * 可以在进程初始化时调用本方法(非必须)进行初始化,指定内部是否需要加锁,
-	 * 如果不调用本方法,内部自动加线程锁.
+	 * Can call this method during process initialization (not required) to
+	 * initialize, specifying whether internal locking is needed.
+	 * If this method is not called, internal automatically adds thread lock.
 	 */
 	void init(bool thread_safe = true);
 
 	/**
-	 * @brief 将name对应的计数加1,当没有name时设置为1
+	 * @brief Increment count corresponding to name by 1. When name does not exist,
+	 * set to 1.
 	 */
 	void inc(const char *name);
 
 	/**
-	 * @brief 将name对应的计数减1,当没有name时将输出错误日志
+	 * @brief Decrement count corresponding to name by 1. When name does not exist,
+	 * output error log.
 	 */
 	void dec(const char *name);
 
 	/**
-	 * @brief 获取name对象的统计个数
+	 * @brief Get statistical count of name object.
 	 */
 	long long count(const char *name);
 
 	/**
-	 * @brief 输出计数统计
-	 * @param flag 调用者标记
+	 * @brief Output count statistics.
+	 * @param flag Caller flag.
 	 */
 	void print(const char *flag = NULL);
 

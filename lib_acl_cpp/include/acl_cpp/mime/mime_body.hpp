@@ -16,17 +16,22 @@ class string;
 class ACL_CPP_API mime_body : public mime_node {
 public:
 	/**
-	 * 构造函数
-	 * @param emailFile {const char*} 存储邮件内容的源文件，可以
-	 *  为空，但当为空时在调用 save_body 函数时，则不能指定源文件
-	 * @param node {const MIME_NODE*} 邮件中的某个结点对象
-	 * @param htmlFirst {bool} 是否在提取内容时优先提取 HTML 数据
-	 * @param enableDecode {bool} 当邮件内容为 base64/qp 等编译格式
-	 *  时是否需要自动进行解码
-	 * @param toCharset {const char*} 缺省的目标字符集，如果目标
-	 *  字符集与源字符集不同，则进行字符集转换
-	 * @param off {off_t} 邮件内容在整个数据中的起始位置中附加的
-	 *  相对偏移量，以便于用户可以在邮件内容前面加自己的私有数据
+	 * Constructor
+	 * @param emailFile {const char*} Source file storing email content. Can
+	 * be empty, but when empty, cannot specify source file when calling save_body
+	 * function
+	 * @param node {const MIME_NODE*} A node object in email
+	 * @param htmlFirst {bool} Whether to prioritize extracting HTML data when
+	 * extracting content
+	 * @param enableDecode {bool} When email content is base64/qp and other
+	 * encoding formats,
+	 *  whether to automatically decode
+	 * @param toCharset {const char*} Default target character set. If target
+	 * character set is different from source character set, performs character set
+	 * conversion
+	 * @param off {off_t} Relative offset added to starting position of email
+	 * content in entire data,
+	 *  so that users can add their own private data before email content
 	 */
 	mime_body(const char* emailFile, const MIME_NODE* node,
 		bool htmlFirst = true, bool enableDecode = true,
@@ -39,10 +44,12 @@ public:
 	~mime_body() {}
 
 	/**
-	 * 设置是否仅提取 HTML 数据, 如果为 true 则优先提取 HTML 数据,
-	 * 当不存在 HTML 数据时才会提取纯文本数据; 如果为 false 则优先
-	 * 提取纯文本数据, 如果仅有 HTML 数据时则会从该 HTML 数据中抽
-	 * 取出纯文本数据
+	 * Set whether to only extract HTML data. If true, prioritizes extracting HTML
+	 * data.
+	 * When HTML data does not exist, extracts plain text data. If false,
+	 * prioritizes
+	 * extracting plain text data. When only HTML data exists, extracts plain text
+	 * data from this HTML data
 	 * @param htmlFirst {bool}
 	 */
 	void set_status(bool htmlFirst) {
@@ -50,62 +57,72 @@ public:
 	}
 
 	/**
-	 * 转储邮件正文内容于管道流中
-	 * @param out {pipe_manager&} 管道流管理器
-	 * @param src {const char*} 邮件内容的起始地址，如果为空指针，
-	 *  则从构造函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @param len {int} 邮件内容的数据长度，如果为0，则从构造
-	 *  函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @return {bool} 是否成功
+	 * Dump email body content into pipe stream
+	 * @param out {pipe_manager&} Pipe stream manager
+	 * @param src {const char*} Starting address of email content. If it is NULL
+	 * pointer,
+	 *  extracts email content from emailFile file provided in constructor
+	 * @param len {int} Data length of email content. If 0, extracts email content
+	 * from
+	 *  emailFile file provided in constructor
+	 * @return {bool} Whether successful
 	 */
 	bool save_body(pipe_manager& out, const char* src = NULL, int len = 0);
 
 	/**
-	 * 转储邮件正文内容于输出流中
-	 * @param out {ostream&} 输出流
-	 * @param src {const char*} 邮件内容的起始地址，如果为空指针，
-	 *  则从构造函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @param len {int} 邮件内容的数据长度，如果为0，则从构造
-	 *  函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @return {bool} 是否成功
+	 * Dump email body content into output stream
+	 * @param out {ostream&} Output stream
+	 * @param src {const char*} Starting address of email content. If it is NULL
+	 * pointer,
+	 *  extracts email content from emailFile file provided in constructor
+	 * @param len {int} Data length of email content. If 0, extracts email content
+	 * from
+	 *  emailFile file provided in constructor
+	 * @return {bool} Whether successful
 	 */
 	bool save_body(ostream& out, const char* src = NULL, int len = 0);
 
 	/**
-	 * 转储邮件正文内容于目标文件中
-	 * @param file_path {const char*} 目标文件名
-	 * @param src {const char*} 邮件内容的起始地址，如果为空指针，
-	 *  则从构造函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @param len {int} 邮件内容的数据长度，如果为0，则从构造
-	 *  函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @return {bool} 是否成功
+	 * Dump email body content into target file
+	 * @param file_path {const char*} Target filename
+	 * @param src {const char*} Starting address of email content. If it is NULL
+	 * pointer,
+	 *  extracts email content from emailFile file provided in constructor
+	 * @param len {int} Data length of email content. If 0, extracts email content
+	 * from
+	 *  emailFile file provided in constructor
+	 * @return {bool} Whether successful
 	 */
 	bool save_body(const char* file_path, const char* src = NULL, int len = 0);
 
 	/**
-	 * 转储邮件正文内容于管道缓冲区内
-	 * @param out {pipe_string&} 管道缓冲区
-	 * @param src {const char*} 邮件内容的起始地址，如果为空指针，
-	 *  则从构造函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @param len {int} 邮件内容的数据长度，如果为0，则从构造
-	 *  函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @return {bool} 是否成功
+	 * Dump email body content into pipe buffer
+	 * @param out {pipe_string&} Pipe buffer
+	 * @param src {const char*} Starting address of email content. If it is NULL
+	 * pointer,
+	 *  extracts email content from emailFile file provided in constructor
+	 * @param len {int} Data length of email content. If 0, extracts email content
+	 * from
+	 *  emailFile file provided in constructor
+	 * @return {bool} Whether successful
 	 */
 	bool save_body(pipe_string& out, const char* src = NULL, int len = 0);
 
 	/**
-	 * 转储邮件正文内容于缓冲区中
-	 * @param out {string&} 缓冲区
-	 * @param src {const char*} 邮件内容的起始地址，如果为空指针，
-	 *  则从构造函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @param len {int} 邮件内容的数据长度，如果为0，则从构造
-	 *  函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @return {bool} 是否成功
+	 * Dump email body content into buffer
+	 * @param out {string&} Buffer
+	 * @param src {const char*} Starting address of email content. If it is NULL
+	 * pointer,
+	 *  extracts email content from emailFile file provided in constructor
+	 * @param len {int} Data length of email content. If 0, extracts email content
+	 * from
+	 *  emailFile file provided in constructor
+	 * @return {bool} Whether successful
 	 */
 	bool save_body(string& out, const char* src = NULL, int len = 0);
 
 	/**
-	 * 判断结点头部类型中的从类型是否 MIME_STYPE_HTML 类型
+	 * Determine whether subtype in node header type is MIME_STYPE_HTML type
 	 * @return {bool}
 	 */
 	bool html_stype() const;
@@ -117,3 +134,4 @@ private:
 } // namespace acl
 
 #endif // !defined(ACL_MIME_DISABLE)
+

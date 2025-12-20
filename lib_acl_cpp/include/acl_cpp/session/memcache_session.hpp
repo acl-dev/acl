@@ -9,53 +9,58 @@ namespace acl {
 class memcache;
 
 /**
- * session 类，该类使用 memcached 存储 session 数据
+ * Session class, this class uses memcached to store session data
  */
 class ACL_CPP_API memcache_session : public session
 {
 public:
 	/**
-	 * 构造函数
-	 * @param cache_addr {const char*} memcached 服务地址，格式：
-	 *  IP:PORT，不能为空
-	 * @param prefix {const char*} 在 memcached 存储的键值的前缀
-	 * @param conn_timeout {int} 连接 memcached 的超时时间(秒)
-	 * @param rw_timeout {int} 与 memcached 通讯的 IO 超时时间(秒)
-	 * @param ttl {time_t} 生存周期(秒)
-	 * @param sid {const char*} session 对应的 sid，当为空时，内部
-	 *  会自动生成一个，其它说明请参考基类 session 的说明
-	 * @param encode_key {bool} 是否对存储于 memcached 的键值进行编码
+	 * Constructor
+	 * @param cache_addr {const char*} memcached service address, format:
+	 *  IP:PORT, cannot be empty
+	 * @param prefix {const char*} Prefix for key values stored in memcached
+	 * @param conn_timeout {int} Timeout for connecting to memcached (seconds)
+	 * @param rw_timeout {int} IO timeout when communicating with memcached
+	 * (seconds)
+	 * @param ttl {time_t} Lifetime (seconds)
+	 * @param sid {const char*} sid corresponding to session. When empty,
+	 * internally
+	 * will automatically generate one. For other descriptions, please refer to
+	 * base class session description
+	 * @param encode_key {bool} Whether to encode key values stored in memcached
 	 */
 	memcache_session(const char* cache_addr, int conn_timeout = 180,
 		int rw_timeout = 300, const char* prefix = NULL,
 		time_t ttl = 0, const char* sid = NULL, bool encode_key = true);
 
 	/**
-	 * 以输入的 memcached 的连接对象为参数的构造函数
-	 * @param cache {memcache*} 输入的 memcached 连接对象
-	 * @param auto_free {bool} 当该参数为 true 时，则要求该
-	 *  memcached_session 对象析构函数中释放传入的 cache 对象；
-	 *  否则则禁止在 memcached_session 的析构函数中释放 cache 对象
-	 * @param ttl {time_t} 生存周期(秒)
-	 * @param sid {const char*} session 对应的 sid，当为空时，内部
-	 *  会自动生成一个，其它说明请参考基类 session 的说明
+	 * Constructor with memcached connection object as parameter
+	 * @param cache {memcache*} Input memcached connection object
+	 * @param auto_free {bool} When this parameter is true, then requires that
+	 *  memcached_session object's destructor releases the passed cache object;
+	 * otherwise prohibits releasing cache object in memcached_session's destructor
+	 * @param ttl {time_t} Lifetime (seconds)
+	 * @param sid {const char*} sid corresponding to session. When empty,
+	 * internally
+	 * will automatically generate one. For other descriptions, please refer to
+	 * base class session description
 	 */
 	memcache_session(memcache* cache, bool auto_free = false,
 		time_t ttl = 0, const char* sid = NULL);
 
 	~memcache_session(void);
 
-	// 基类纯虚函数，从 memcached 中获得数据
+	// Base class pure virtual function, get data from memcached
 	bool get_attrs(std::map<string, session_string>& attrs);
 
-	// 基类纯虚函数，向 memcached 中添加或修改数据
+	// Base class pure virtual function, add or modify data in memcached
 	bool set_attrs(const std::map<string, session_string>& attrs);
 
-	// 基类纯虚函数，从 memcached 中删除数据
+	// Base class pure virtual function, delete data from memcached
 	bool remove();
 
 protected:
-	//重新设置 session 在 memcached 上的缓存时间
+	// Reset cache time of session on memcached
 	bool set_timeout(time_t ttl);
 
 private:
@@ -66,3 +71,4 @@ private:
 } // namespace acl
 
 #endif // ACL_CLIENT_ONLY
+

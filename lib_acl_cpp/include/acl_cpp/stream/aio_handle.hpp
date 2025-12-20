@@ -8,16 +8,17 @@ struct ACL_EVENT;
 
 namespace acl {
 
-// 事件引擎类型
+// Event engine type
 typedef enum {
-	ENGINE_SELECT,  // select 模式(支持所有平台)
-	ENGINE_POLL,    // poll 模式(仅 UNIX 平台)
-	ENGINE_KERNEL,  // kernel 模式(win32: iocp, Linux: epoll, FreeBsd: kqueue, Solaris: devpoll
-	ENGINE_WINMSG   // win32 GUI 消息模式
+	ENGINE_SELECT,  // select mode (supports all platforms)
+	ENGINE_POLL,    // poll mode (UNIX platforms only)
+	ENGINE_KERNEL,  // kernel mode (win32: iocp, Linux: epoll, FreeBsd: kqueue, Solaris: devpoll
+	ENGINE_WINMSG   // win32 GUI message mode
 } aio_handle_type;
 
 /**
- * 非阻塞IO的事件引擎类，该类封装了系统的 select/poll/epoll/kqueue/devpoll/iocp,
+ * Non-blocking IO event engine class. This class encapsulates system's
+ * select/poll/epoll/kqueue/devpoll/iocp,
  */
 
 class aio_timer_callback;
@@ -27,49 +28,54 @@ class aio_timer_delay_free;
 class ACL_CPP_API aio_handle : private noncopyable {
 public:
 	/**
-	 * 构造函数，会自动创建IO事件引擎，并且在析构函数中会自动释放
-	 * @param engine_type {aio_handle_type} 所采用的引擎类型
-	 *  ENGINE_SELECT: select 方式，支持 win32/unix 平台
-	 *  ENGINE_POLL: poll 方式，支持 unix 平台
-	 *  ENGINE_KERNEL: 自动根据各个系统平台所支持的高效内核引擎进行设置
-	 *  ENGINE_WINMSG: win32 界面消息方式，支持 win32 平台
-	 * @param nMsg {unsigned int} 若 engine_type 为 ENGINE_WINMSG，当该值
-	 *  大于 0 时，该异步句柄便与该消息绑定，否则与缺省消息绑定；
-	 *  当 engine_type 为非 ENGINE_WINMSG 时，该值对其它异步句柄不起作用
+	 * Constructor, automatically creates IO event engine, and automatically
+	 * releases in destructor
+	 * @param engine_type {aio_handle_type} Engine type to use
+	 *  ENGINE_SELECT: select method, supports win32/unix platforms
+	 *  ENGINE_POLL: poll method, supports unix platforms
+	 * ENGINE_KERNEL: Automatically sets based on efficient kernel engine supported
+	 * by each system platform
+	 *  ENGINE_WINMSG: win32 GUI message method, supports win32 platform
+	 * @param nMsg {unsigned int} If engine_type is ENGINE_WINMSG, when this value
+	 * is greater than 0, this asynchronous handle is bound to this message,
+	 * otherwise bound to default message.
+	 * When engine_type is not ENGINE_WINMSG, this value has no effect on other
+	 * asynchronous handles
 	 *  
 	 */
 	aio_handle(aio_handle_type engine_type = ENGINE_SELECT,
 		unsigned int nMsg = 0);
 
 	/**
-	 * 构造函数，调用者将 ACL_AIO 句柄传进，而在类的析构函数中并不会
-	 * 自动释放该 ACL_AIO 句柄
-	 * @param handle {ACL_AIO*} ACL_AIO 句柄
+	 * Constructor. Caller passes ACL_AIO handle, and class destructor will not
+	 * automatically release this ACL_AIO handle
+	 * @param handle {ACL_AIO*} ACL_AIO handle
 	 */
 	aio_handle(ACL_AIO* handle);
 
 	virtual ~aio_handle();
 
 	/**
-	 * 针对异步读流，设置是否是连续读，该配置项将会被所有的基于
-	 * 该异步引擎句柄的异步读流所继承，一般 aio_handle 类对象在缺省
-	 * 情况下是连续读的
-	 * @param onoff {bool} 设置是否是连续读
+	 * For asynchronous read streams, set whether to continuously read. This
+	 * configuration item will be inherited by all asynchronous read streams
+	 * based on this asynchronous engine handle. Generally aio_handle class objects
+	 * are continuously reading by default
+	 * @param onoff {bool} Set whether to continuously read
 	 */
 	void keep_read(bool onoff);
 
 	/**
-	 * 获得异步引擎句柄是否设置了持续读数据的功能
+	 * Get whether asynchronous engine handle has continuous read data function set
 	 * @return {bool}
 	 */
 	bool keep_read() const;
 
 	/**
-	 * 设置定时器
-	 * @param callback {aio_timer_callback*} 定时器回调函数类对象
-	 * @param delay {int64} 定时器时间间隔(微秒)
-	 * @param id {unsigned int} 定时器某个任务的 ID 号
-	 * @return {int64} 定时器生效时间(从1970.1.1以来的微秒数)
+	 * Set timer
+	 * @param callback {aio_timer_callback*} Timer callback function class object
+	 * @param delay {int64} Timer time interval (microseconds)
+	 * @param id {unsigned int} ID number of a timer task
+	 * @return {int64} Timer effective time (microseconds since 1970.1.1)
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 set_timer(aio_timer_callback* callback,
@@ -80,9 +86,9 @@ public:
 #endif
 
 	/**
-	 * 删除定时器的所有定时任务事件
-	 * @param callback {aio_timer_callback*} 定时器回调函数类对象
-	 * @return {time_t} 定时器生效时间(从1970.1.1以来的微秒数)
+	 * Delete all timer task events in timer
+	 * @param callback {aio_timer_callback*} Timer callback function class object
+	 * @return {time_t} Timer effective time (microseconds since 1970.1.1)
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 del_timer(aio_timer_callback* callback);
@@ -91,10 +97,10 @@ public:
 #endif
 
 	/**
-	 * 删除定时器中某个指定 ID 号的定时任务
-	 * @param callback {aio_timer_callback*} 定时器回调函数类对象
-	 * @param id {unsigned int} 定时器某个任务的 ID 号
-	 * @return {time_t} 定时器生效时间(从1970.1.1以来的微秒数)
+	 * Delete timer task with specified ID number in timer
+	 * @param callback {aio_timer_callback*} Timer callback function class object
+	 * @param id {unsigned int} ID number of a timer task
+	 * @return {time_t} Timer effective time (microseconds since 1970.1.1)
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 del_timer(aio_timer_callback* callback, unsigned int id);
@@ -103,116 +109,122 @@ public:
 #endif
 
 	/**
-	 * 当定时器处于锁定状态时，用户因为无法释放该定时器而造成内存泄露，
-	 * 通过此函数，可以将处于锁定状态的定时器当处于未锁定状态时被事件
-	 * 引擎延期释放(调用 aio_delay_free::destroy())，从而可以避免
-	 * 内存泄露问题
+	 * When timer is in locked state, users cannot release this timer causing
+	 * memory leak.
+	 * Through this function, timer in locked state can be deferred released by
+	 * event
+	 * engine when in unlocked state (calls aio_delay_free::destroy()), thereby
+	 * avoiding
+	 * memory leak problems
 	 * @param callback {aio_delay_free*}
 	 */
 	void delay_free(aio_delay_free* callback);
 
 	/**
-	 * 获得 ACL_AIO 句柄
+	 * Get ACL_AIO handle
 	 * @return {ACL_AIO*}
 	 */
 	ACL_AIO* get_handle() const;
 
 	/**
-	 * 获得异步引擎的类型
+	 * Get asynchronous engine type
 	 * @return {aio_handle_type}
 	 */
 	aio_handle_type get_engine_type() const;
 
 	/**
-	 * 获得当前处于监控的异步流的数量
+	 * Get number of asynchronous streams currently being monitored
 	 * @return {int}
 	 */
 	int length() const;
 
 	/**
-	 * 检查所有异步流的状态，并触发准备的异步流的处理过程
-	 * @return {bool} 是否应中止异步引擎
+	 * Check status of all asynchronous streams and trigger processing of ready
+	 * asynchronous streams
+	 * @return {bool} Whether asynchronous engine should be stopped
 	 */
 	bool check();
 
 	/**
-	 * 获得本次事件循环被触发的事件次数
+	 * Get number of events triggered in this event loop
 	 * @return {int}
 	 */
 	int last_nready() const;
 
 	/**
-	 * 通知异步流引擎中止
+	 * Notify asynchronous stream engine to stop
 	 */
 	void stop();
 
 	/**
-	 * 重置异步引擎的内部状态
+	 * Reset internal state of asynchronous engine
 	 */
 	void reset();
 
 	/**
-	 * 设置 DNS 服务器地址列表，格式：ip1:port1;ip2:port2...
-	 * @param addrs {const char*} DNS 服务器地址列表，如：8.8.8.8:53;1.1.1.1:53
-	 * @param timeout {int} DNS 查询超时时间（秒）
-	 *  注：set_dns 和 dns_add 执行相同的功能
+	 * Set DNS server address list, format: ip1:port1;ip2:port2...
+	 * @param addrs {const char*} DNS server address list, e.g.:
+	 * 8.8.8.8:53;1.1.1.1:53
+	 * @param timeout {int} DNS query timeout (seconds)
+	 *  Note: set_dns and dns_add perform same function
 	 */
 	void set_dns(const char* addrs, int timeout);
 	void dns_add(const char* addrs, int timeout);
 
 	/**
-	 * 删除指定的 DNS 服务器地址列表，格式：ip1:port1;ip2:port2...
-	 * @param addrs {const char*} DNS 服务器地址列表
+	 * Delete specified DNS server address list, format: ip1:port1;ip2:port2...
+	 * @param addrs {const char*} DNS server address list
 	 */
 	void dns_del(const char* addrs);
 
 	/**
-	 * 清除掉所设置的所有 DNS 服务器列表
+	 * Clear all set DNS server lists
 	 */
 	void dns_clear();
 
 	/**
-	 * DNS 服务器列表数量
+	 * Number of DNS server lists
 	 * @return {size_t}
 	 */
 	size_t dns_size() const;
 
 	/**
-	 * 判断 DNS 服务器列表是否为空
+	 * Determine whether DNS server list is empty
 	 * @return {bool}
 	 */
 	bool dns_empty() const;
 	
 	/**
-	 * 获得 DNS 服务器地址列表
+	 * Get DNS server address list
 	 * @param out {std::vector<std::pair<acl::string, unsigned short> >&}
 	 */
 	void dns_list(std::vector<std::pair<string, unsigned short> >& out);
 
 public:
 	/**
-	 * 设置异步引擎循环的等待时间中的秒级部分
-	 * @param n {int} 设置用 select/poll/epoll/kqueue/devpoll
-	 *  时的秒级等待时间
+	 * Set second-level part of asynchronous engine loop's wait time
+	 * @param n {int} Set second-level wait time when using
+	 * select/poll/epoll/kqueue/devpoll
 	 */
 	void set_delay_sec(int n);
 
 	/**
-	 * 设置异步引擎循环的等待时间中的微秒级部分
-	 * @param n {int} 设置用 select/poll/epoll/kqueue/devpoll
-	 *  时的微秒级等待时间
+	 * Set microsecond-level part of asynchronous engine loop's wait time
+	 * @param n {int} Set microsecond-level wait time when using
+	 * select/poll/epoll/kqueue/devpoll
 	 */
 	void set_delay_usec(int n);
 
 	/**
-	 * 设置事件循环过程中定时检查所有描述字状态的时间间隔，
-	 * 内部缺省值 100 ms
+	 * Set time interval for periodically checking all descriptor status during
+	 * event loop process.
+	 * Internal default value is 100 ms
 	 */
 	void set_check_inter(int n);
 
 	/**
-	 * 设置异步流的读缓存区大小
-	 * @param n {int} 读缓冲区大小
+	 * Set read buffer size of asynchronous stream
+	 * @param n {int} Read buffer size
 	 */
 	void set_rbuf_size(int n);
 
@@ -220,22 +232,22 @@ protected:
 	friend class aio_stream;
 
 	/**
-	 * 异步流个数加 1
+	 * Increment asynchronous stream count by 1
 	 */
 	void increase();
 
 	/**
-	 * 当异步流个数加 1 时的回调虚函数
+	 * Virtual callback function when asynchronous stream count increases by 1
 	 */
 	virtual void on_increase() {}
 
 	/**
-	 * 异步流个数减 1
+	 * Decrement asynchronous stream count by 1
 	 */
 	void decrease();
 
 	/**
-	 * 当异步流个数减 1 时的回调虚函数
+	 * Virtual callback function when asynchronous stream count decreases by 1
 	 */
 	virtual void on_decrease() {}
 
@@ -253,3 +265,4 @@ private:
 };
 
 } // namespace acl
+

@@ -9,73 +9,78 @@ namespace acl {
 class ACL_CPP_API mysql_conf {
 public:
 	/**
-	 * 构造函数
-	 * @param dbaddr {const char*} 数据库连接地址，可以为 TCP 套接口或
-	 *  UNIX 域套接口，当为 TCP 套接口时，地址格式为：ip:port, 当为 UNIX
-	 *  域套接口时，地址格式：/xxx/xxx/xxx.sock
-	 * @param dbname {const char*} 数据库名
+	 * Constructor
+	 * @param dbaddr {const char*} Database connection address, can be TCP socket
+	 * or UNIX domain socket. When it is TCP socket, address format: ip:port.
+	 * When it is UNIX domain socket, address format: /xxx/xxx/xxx.sock
+	 * @param dbname {const char*} Database name
 	 */
 	mysql_conf(const char* dbaddr, const char* dbname);
 
 	/**
-	 * 拷贝构造函数
-	 * @param conf {const mysql_conf&} 内部创建新对象同时拷贝输入对象内容
+	 * Copy constructor
+	 * @param conf {const mysql_conf&} Internally creates new object and copies
+	 * input object content
 	 */
 	mysql_conf(const mysql_conf& conf);
 
 	~mysql_conf();
 
 	/**
-	 * 设置连接数据库时的用户账号
-	 * @param dbuser {const char*} 当为非空字符串时指定用户账号
+	 * Set user account when connecting to database
+	 * @param dbuser {const char*} When it is a non-empty string, specifies user
+	 * account
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_dbuser(const char* dbuser);
 
 	/**
-	 * 设置连接数据库时的账号密码
-	 * @param dbpass {const char*} 当为非空字符串时指定账号密码
+	 * Set account password when connecting to database
+	 * @param dbpass {const char*} When it is a non-empty string, specifies account
+	 * password
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_dbpass(const char* dbpass);
 
 	/**
-	 * 设置数据库连接池最大连接上限
-	 * @param dblimit {size_t} 连接池最大连接数限制，当为 0 时则不限制
+	 * Set maximum connection limit for database connection pool
+	 * @param dblimit {size_t} Connection pool maximum connection limit, when 0
+	 * there is no limit
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_dblimit(size_t dblimit);
 
 	/**
-	 * 设置 mysql 数据库的一些特殊标志位
+	 * Set some special flag bits for mysql database
 	 * @param dbflags {unsigned long}
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_dbflags(unsigned long dbflags);
 
 	/**
-	 * 设置当修改数据库内容时是否允许自动提交，默认为自动提交
+	 * Set whether to allow auto commit when modifying database content, default is
+	 * auto commit
 	 * @param on {bool}
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_auto_commit(bool on);
 
 	/**
-	 * 设置连接数据库的超时时间
+	 * Set timeout for connecting to database
 	 * @param timeout {int}
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_conn_timeout(int timeout);
 
 	/**
-	 * 设置读取数据库结果的超时时间
+	 * Set timeout for reading database results
 	 * @param timeout {int}
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_rw_timeout(int timeout);
 
 	/**
-	 * 设置数据库连接的字符集
+	 * Set character set for database connection
 	 * @param charset {const char*}
 	 * @return {mysql_conf&}
 	 */
@@ -127,17 +132,17 @@ public:
 
 	//////////////////////////////////////////////////////////////////////
 
-	std::string dbaddr;     // 数据库监听地址
-	std::string dbname;     // 数据库名
+	std::string dbaddr;     // Database listening address
+	std::string dbname;     // Database name
 	std::string dbkey;      // dbname@dbaddr
-	std::string dbuser;     // 数据库账号
-	std::string dbpass;     // 数据库账号密码
-	std::string charset;    // 连接数据库时的字符集
-	size_t dblimit;         // 数据库连接池连接数上限
-	unsigned long dbflags;  // 打开数据库时的标志位
-	bool  auto_commit;      // 是否自动提交修改后的数据
-	int   conn_timeout;     // 连接数据库的超时时间
-	int   rw_timeout;       // 与数据库通信的超时时间
+	std::string dbuser;     // Database account
+	std::string dbpass;     // Database account password
+	std::string charset;    // Character set when connecting to database
+	size_t dblimit;         // Database connection pool connection limit
+	unsigned long dbflags;  // Flag bits when opening database
+	bool  auto_commit;      // Whether to auto commit modified data
+	int   conn_timeout;     // Timeout for connecting to database
+	int   rw_timeout;       // Timeout when communicating with database
 
 	std::string sslcrt;
 	std::string sslkey;
@@ -149,3 +154,4 @@ public:
 } // namespace acl
 
 #endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
+

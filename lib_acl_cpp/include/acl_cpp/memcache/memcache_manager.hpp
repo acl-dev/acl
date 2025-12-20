@@ -8,7 +8,7 @@ namespace acl
 {
 
 /**
- * memcache 客户端请求连接池管理类
+ * memcache client request connection pool management class
  */
 class ACL_CPP_API memcache_manager : public connect_manager
 {
@@ -18,10 +18,12 @@ public:
 
 protected:
 	/**
-	 * 基类纯虚函数，用来创建连接池对象
-	 * @param addr {const char*} 服务器监听地址，格式：ip:port
-	 * @param count {size_t} 连接池的大小限制，该值为 0 时没有限制
-	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
+	 * Base class pure virtual function, used to create connection pool objects
+	 * @param addr {const char*} Server listening address, format: ip:port
+	 * @param count {size_t} Connection pool size limit, when this value is 0 there
+	 * is no limit
+	 * @param idx {size_t} Index position of this connection pool object in the
+	 * collection (starting from 0)
 	 */
 	connect_pool* create_pool(const char* addr, size_t count, size_t idx);
 };
@@ -29,3 +31,4 @@ protected:
 } // namespace acl
 
 #endif // ACL_CLIENT_ONLY
+

@@ -16,30 +16,39 @@ public:
 	WebSocketServlet();
 
 	/**
-	 * 构造函数
-	 * @param stream {socket_stream*} 当在 acl_master 服务器框架控制下
-	 *  运行时，该参数必须非空；当在 apache 下以 CGI 方式运行时，该参数
-	 *  设为 NULL；另外，该函数内部不会关闭流连接，应用应自行处理流对象
-	 *  的关闭情况，这样可以方便与 acl_master 架构结合
-	 * @param session {session*} 每一个 HttpServlet 对象一个 session 对象
+	 * Constructor
+	 * @param stream {socket_stream*} When running under control of acl_master
+	 * server framework,
+	 * this parameter must be non-empty. When running in CGI mode under apache,
+	 * this parameter
+	 * is set to NULL. In addition, this function internally will not close stream
+	 * connection. Application should handle stream object
+	 *  closing itself, which facilitates integration with acl_master architecture
+	 * @param session {session*} One session object per HttpServlet object
 	 */
 	WebSocketServlet(socket_stream* stream, session* session);
 
 	/**
-	 * 构造函数
-	 * @param stream {socket_stream*} 当在 acl_master 服务器框架控制下
-	 *  运行时，该参数必须非空；当在 apache 下以 CGI 方式运行时，该参数
-	 *  设为 NULL；另外，该函数内部不会关闭流连接，应用应自行处理流对象
-	 *  的关闭情况，这样可以方便与 acl_master 架构结合
+	 * Constructor
+	 * @param stream {socket_stream*} When running under control of acl_master
+	 * server framework,
+	 * this parameter must be non-empty. When running in CGI mode under apache,
+	 * this parameter
+	 * is set to NULL. In addition, this function internally will not close stream
+	 * connection. Application should handle stream object
+	 *  closing itself, which facilitates integration with acl_master architecture
 	 * @param memcache_addr {const char*}
 	 */
 	WebSocketServlet(socket_stream* stream,
 		const char* memcache_addr = "127.0.0.1:11211");
 
 	/**
-	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数，
-	 * 该函数首先会调用 start 过程，然后根据 start 的返回结果及请求/响应
-	 * 对象是否要求保持长连接来决定是否需要与客户端保持长连接.
+	 * HttpServlet object starts running, receives HTTP requests, and calls
+	 * following doXXX virtual functions.
+	 * This function first calls start process, then decides whether to maintain
+	 * long connection with client based on start's return result and whether
+	 * request/response
+	 * objects require maintaining long connection.
 	 */
 
 	virtual ~WebSocketServlet();
@@ -54,79 +63,82 @@ public:
 	bool doRun(const char* memcached_addr, socket_stream* stream);
 
 	/**
-	 * 发送二进制数据.
-	 * @param buf {const char *} 发送的数据
-	 * @param len {int} buf 数据长度
-	 * @return {bool} 错误 false, 否则 true
+	 * Send binary data.
+	 * @param buf {const char *} Data to be sent
+	 * @param len {int} buf data length
+	 * @return {bool} false on error, otherwise true
 	 */
 	bool sendBinary(const char *buf, int len);
 
 	/**
-	 * 发送文本数据.
-	 * @param text {const char *} 发送的数据
-	 * @return {bool} 错误 false, 否则 true
+	 * Send text data.
+	 * @param text {const char *} Data to be sent
+	 * @return {bool} false on error, otherwise true
 	 */
 	bool sendText(const char *text);
 
 	/**
-	 * 发送pong 消息.
-	 * @param buffer {const char *} 发送的数据
-	 * @return {bool} 错误 false, 否则 true
+	 * Send pong message.
+	 * @param buffer {const char *} Data to be sent
+	 * @return {bool} false on error, otherwise true
 	 */
 	bool sendPong(const char *buffer = NULL);
 
 	/**
-	 * 发送pong 消息.
-	 * @param buffer {const char *} 发送的数据
-	 * @return {bool} 错误 false, 否则 true
+	 * Send pong message.
+	 * @param buffer {const char *} Data to be sent
+	 * @return {bool} false on error, otherwise true
 	 */
 	bool sendPing(const char *buffer = NULL);
 
 protected:
 	/**
-	 * websocket 关闭消息回调
+	 * websocket close message callback
 	 */
 	virtual void onClose() {}
 
 	/**
-	 * websocket ping 消息回调.
-	 * @param payload_len {unsigned long long} 消息数据总长度
-	 * @param finish {bool} 本数据包是否最后一个
-	 * @return {bool} false 断开连接。
+	 * websocket ping message callback.
+	 * @param payload_len {unsigned long long} Total length of message data
+	 * @param finish {bool} Whether this data packet is the last one
+	 * @return {bool} false to disconnect.
 	 */
 	virtual bool onPing(unsigned long long payload_len, bool finish) = 0;
 
 	/**
-	 * websocket pong 消息回调.
-	 * @param payload_len {unsigned long long} 消息数据总长度
-	 * @param finish {bool} 本数据包是否最后一个
-	 * @return {bool} false 断开连接。
+	 * websocket pong message callback.
+	 * @param payload_len {unsigned long long} Total length of message data
+	 * @param finish {bool} Whether this data packet is the last one
+	 * @return {bool} false to disconnect.
 	 */
 	virtual bool onPong(unsigned long long payload_len, bool finish) = 0;
 
 	/**
-	 * websocket ping 消息回调.
-	 * @param payload_len {unsigned long long} 消息数据总长度
-	 * @param text {bool } true 表示为文本数据, 否则是 二进制数据。
-	 * @param finish {bool} 本数据包是否最后一个
-	 * @return {bool} false 断开连接。
+	 * websocket ping message callback.
+	 * @param payload_len {unsigned long long} Total length of message data
+	 * @param text {bool } true indicates text data, otherwise binary data.
+	 * @param finish {bool} Whether this data packet is the last one
+	 * @return {bool} false to disconnect.
 	 */
 	virtual bool onMessage(unsigned long long payload_len,
 			bool text, bool finish) = 0;
 
 	/**
-	 * 子类可以循环调用此方法获得数据帧的数据体，直至返回 <= 0 为止
-	 * @param buf {size_t*} 数据缓冲区用来存放结果数据
-	 * @param size {size_t} buf 缓冲区大小
-	 * @return {int} 读到的数据长度，分以下三种情形：
-	 *   0: 表示数据帧正常读完
-	 *  -1: 表示读出错
-	 *  >0: 表示读到的数据，应再次调用本方法以便读余下的数据
+	 * Subclasses can call this method in a loop to get data frame body data until
+	 * return <= 0
+	 * @param buf {size_t*} Data buffer used to store result data
+	 * @param size {size_t} buf buffer size
+	 * @return {int} Length of data read, in the following three cases:
+	 *   0: Indicates data frame is normally read completely
+	 *  -1: Indicates read error
+	 * >0: Indicates data read, should call this method again to read remaining
+	 * data
 	 */
 	int readPayload(void* buf, size_t size);
 
 	/**
-	 * 返回 websocket 对象，如果返回 NULL 表示还未建立 websocket 连接
+	 * Return websocket object. If returns NULL, it indicates websocket connection
+	 * has not been established yet
 	 * @return {websocket*}
 	 */
 	websocket* get_websocket() const
@@ -146,3 +158,4 @@ private:
 } // namespace acl
 
 #endif // ACL_CLIENT_ONLY
+

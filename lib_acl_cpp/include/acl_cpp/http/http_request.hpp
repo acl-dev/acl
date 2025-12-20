@@ -16,36 +16,45 @@ class xml;
 class json;
 
 /**
- * HTTP 客户端请求类，该类对象支持长连接，同时当连接断时会自动重试
+ * HTTP client request class, supports connection reuse, and automatically
+ * reconnects when connection times out.
  */
 class ACL_CPP_API http_request : public connect_client {
 public:
 	/**
-	 * 构造函数：通过该构造函数传入的 socket_stream 流对象并
-	 * 不会被关闭，需要调用者自己关闭
-	 * @param client {socket_stream*} HTTP 连接流对象，可以是请求端的流，
-	 *  也可以是响应端的流；当本对象被销毁时，client 对象是否会被自动销毁，
-	 *  取决于参数 stream_fixed 的值
-	 * @param conn_timeout {int} 如果传入的流关闭，则内部会
-	 *  自动重试，此时需要该值表示连接服务器的超时时间(秒)，
-	 *  至于重连流的 IO 读写超时时间是从 输入的流中继承的
-	 * @param unzip {bool} 是否对服务器响应的数据自动进行解压
-	 * 注：当该类实例被多次使用时，用户应该在每次调用前调用
-	 * request_header::http_header::reset()
-	 * @param stream_fixed {bool} 当该值为 true 时，则当 http_client 对象
-	 *  被销毁时，传入的 client 流对象不会被销毁，需应用自行销毁；如果该
-	 *  值为 false 时，则当本对象销毁时，client 流对象也将被销毁
+	 * Constructor. When using this constructor, socket_stream object passed in
+	 * will not be closed, and you need to close it yourself.
+	 * @param client {socket_stream*} HTTP connection object, can be server-side
+	 * connection
+	 * or client-side connection. When object is destroyed, whether client object
+	 * will be automatically destroyed
+	 *  depends on stream_fixed value.
+	 * @param conn_timeout {int} When connection is not opened, internally
+	 * automatically opens. At this time, this value indicates connection server
+	 * timeout time (seconds).
+	 *  Network IO read/write timeout time is inherited from base class.
+	 * @param unzip {bool} Whether to automatically decompress server response
+	 * body.
+	 * Note: When actually reusing this object, users should call
+	 * request_header::http_header::reset() before each call.
+	 * @param stream_fixed {bool} When this value is true, when http_client object
+	 * is destroyed, passed client object will not be destroyed, and response
+	 * object will be destroyed. When
+	 * value is false, when this object is destroyed, client object will also be
+	 * destroyed.
 	 */
 	explicit http_request(socket_stream* client, int conn_timeout = 60,
 		bool unzip = true, bool stream_fixed = true);
 
 	/**
-	 * 构造函数：该构造函数内部创建的 socket_stream 流会自行关闭
-	 * @param addr {const char*} WEB 服务器地址，地址格式：domain:port，
-	 *  如：www.baidu.com:80, 或者 http://www.baidu.com, 或 www.baidu.com
-	 * @param conn_timeout {int} 远程连接服务器超时时间(秒)
-	 * @param rw_timeout {int} IO 读写超时时间(秒)
-	 * @param unzip {bool} 是否对服务器响应的数据自动进行解压
+	 * Constructor. This constructor internally creates socket_stream object and
+	 * closes it.
+	 * @param addr {const char*} WEB server address. Address format: domain:port,
+	 *  e.g.: www.baidu.com:80, or http://www.baidu.com, or www.baidu.com
+	 * @param conn_timeout {int} Remote connection server timeout time (seconds)
+	 * @param rw_timeout {int} IO read/write timeout time (seconds)
+	 * @param unzip {bool} Whether to automatically decompress server response
+	 * body.
 	 */
 	explicit http_request(const char* addr, int conn_timeout = 60,
 		int rw_timeout = 60, bool unzip = true);
@@ -53,125 +62,153 @@ public:
 	virtual ~http_request();
 
 	/**
-	 * 设置在读取服务响应数据时是否针对压缩数据进行解压
+	 * Set whether to decompress compressed data when reading server response body.
 	 * @param on {bool}
 	 * @return {http_request&}
 	 */
 	http_request& set_unzip(bool on);
 
 	/**
-	 * 设置客户端 SSL 通信方式，内部缺省为非 SSL 通信方式
-	 * @param conf {sslbase_conf*} 客户端 SSL 配置对象
+	 * Set client SSL communication mode. Internal default is non-SSL communication
+	 * mode.
+	 * @param conf {sslbase_conf*} Client SSL configuration object.
 	 * @return {http_request&}
 	 */
 	http_request& set_ssl(sslbase_conf* conf);
 
 	/**
-	 * 设置 SSL 握手时的 SNI 字段，调用此 API 设置 SSL SNI 字段后，在调用本类的
-	 * reset() API 时，不会自动清理本 API 设置的值，如果需要清理，则需要重新调用
-	 * 本方法并将相应参数置空，则相应字段自动清空
-	 * @param sni {const char*} 如果为 NULL，则自动将使用 HTTP 头中的 Host 字段
+	 * Set SNI field when SSL handshake. After calling this API to set SSL SNI
+	 * field, when calling this object's
+	 * reset() API, it will automatically restore this API's set value. If you need
+	 * to modify it, you need to call
+	 * this function again. When this parameter is empty, corresponding field will
+	 * be automatically set.
+	 * @param sni {const char*} When NULL, automatically uses Host field in HTTP
+	 * header.
 	 * @return {http_request&}
 	 */
 	http_request& set_ssl_sni(const char* sni);
 
 	/**
-	 * 设置 SSL 握手时的 SNI 字段前缀，调用此 API 设置 SSL SNI 字段前缀后，
-	 * 在调用本类的 reset() API 时，不会自动清理本 API 设置的值，如果需要清理，
-	 * 则需要重新调用并设置空值
-	 * @param prefix {const char*} SNI 前缀
+	 * Set SNI field prefix when SSL handshake. After calling this API to set SSL
+	 * SNI field prefix,
+	 * when calling this object's reset() API, it will automatically restore this
+	 * API's set value. If you need to modify it,
+	 * you need to call this function again. When this parameter is empty,
+	 * corresponding field will be automatically set.
+	 * @param prefix {const char*} SNI prefix.
 	 * @return {http_request&}
 	 */
 	http_request& set_ssl_sni_prefix(const char* prefix);
 
 	/**
-	 * 设置 SSL 握手时的 SNI 字段后缀，调用此 API 设置 SSL SNI 字段前缀后，
-	 * 在调用本类的 reset() API 时，不会自动清理本 API 设置的值，如果需要清理，
-	 * 则需要重新调用并设置空值
-	 * @param suffix {const char*} SNI 后缀
+	 * Set SNI field suffix when SSL handshake. After calling this API to set SSL
+	 * SNI field prefix,
+	 * when calling this object's reset() API, it will automatically restore this
+	 * API's set value. If you need to modify it,
+	 * you need to call this function again. When this parameter is empty,
+	 * corresponding field will be automatically set.
+	 * @param suffix {const char*} SNI suffix.
 	 * @return {http_request&}
 	 */
 	http_request& set_ssl_sni_suffix(const char* prefix);
 
 	/**
-	 * 获得 HTTP 请求头对象，然后在返回的 HTTP 请求头对象中添加
-	 * 自己的请求头字段或 http_header::reset()重置请求头状态，
-	 * 参考：http_header 类
+	 * Get HTTP request header, and then you can add fields to returned HTTP
+	 * request header object
+	 * or call http_header::reset() to reset header state.
+	 * See http_header class.
 	 * @return {http_header&}
 	 */
 	http_header& request_header();
 
 	/**
-	 * 设置本地字符集，当本地字符集非空时，则边接收数据边进行字符集转换
-	 * @param local_charset {const char*} 本地字符集
+	 * Set local character set. When local character set is not empty, boundary
+	 * data boundary string conversion.
+	 * @param local_charset {const char*} Local character set.
 	 * @return {http_header&}
 	 */
 	http_request& set_local_charset(const char* local_charset);
 
 	/**
-	 * 采用HTTP GET方法请求服务端
+	 * Send HTTP GET request and wait for response.
 	 * @return {bool}
 	 */
 	bool get();
 
 	/**
-	 * 采用HTTP POST方法请求服务端
-	 * @param data {const char*} 请求的数据体
-	 * @param len {size_t} 请求数据体长度
+	 * Send HTTP POST request and wait for response.
+	 * @param data {const char*} Request body data.
+	 * @param len {size_t} Request body buffer length.
 	 * @return {bool}
 	 */
 	bool post(const char* data, size_t len);
 
 	/**
-	 * 向 HTTP 服务器发送 HTTP 请求头及 HTTP 请求体，同时从
-	 * HTTP 服务器读取 HTTP 响应头，对于长连接，当连接中断时
-	 * 会再重试一次，在调用下面的几个 get_body 函数前必须先
-	 * 调用本函数(或调用 write_head/write_body)；
-	 * 正常情况下，该函数在发送完请求数据后会读 HTTP 响应头，
-	 * 所以用户在本函数返回 true 后可以调用：get_body() 或
+	 * Send HTTP request including HTTP request header and HTTP request body, and
+	 * simultaneously
+	 * read HTTP response header from HTTP server. For long connections, when
+	 * timeout occurs
+	 * you can call this function again. Before calling get_body function, you must
+	 * call this function (or write_head/write_body).
+	 * Generally, after this function sends request data and reads HTTP response
+	 * header,
+	 * if user needs to continue, you can call get_body() or
 	 * http_request::get_clinet()->read_body(char*, size_t)
-	 * 继续读 HTTP 响应的数据体
-	 * @param data {const void*} 发送的数据体地址，非空时自动按
-	 *  POST 方法发送，否则按 GET 方法发送
-	 * @param len {size_} data 非空时指定 data 数据长度
-	 * @return {bool} 发送请求数据及读 HTTP 响应头数据是否成功
+	 * to read HTTP response body data.
+	 * @param data {const void*} Data to be sent. When not empty, automatically
+	 * determines
+	 *  POST request type, otherwise GET request type.
+	 * @param len {size_} When data is not empty, indicates data length.
+	 * @return {bool} Whether sending request data and reading HTTP response header
+	 * was successful.
 	 */
 	bool request(const void* data, size_t len);
 
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 当采用流式写数据时，需要首先调用本函数发送 HTTP 请求头
-	 * @return {bool} 是否成功，如果成功才可以继续调用 write_body
+	 * When using streaming write mode, you need to call this function first to
+	 * send HTTP request header.
+	 * @return {bool} Whether successful. Only after success can you continue
+	 * calling write_body.
 	 */
 	bool write_head();
 
 	/**
-	 * 当采用流式写数据时，在调用 write_head 后，可以循环调用本函数
-	 * 发送 HTTP 请求体数据；当输入的两个参数为空值时则表示数据写完；
-	 * 当发送完数据后，该函数内部会自动读取 HTTP 响应头数据，用户可
-	 * 继续调用 get_body/read_body 获取 HTTP 响应体数据
-	 * @param data {const void*} 数据地址指针，当该值为空指针时表示
-	 *  数据发送完毕
-	 * @param len {size_t} data 非空指针时表示数据长度
-	 * @return {bool} 发送数据体是否成功
-	 *  注：当应用发送完数据后，必须再调用一次本函数，同时将两个参数都赋空
+	 * When using streaming write mode, after calling write_head, you can call this
+	 * function in a loop
+	 * to send HTTP request body data. When data parameter is empty pointer, it
+	 * indicates data sending is complete;
+	 * After sending request data, this function internally automatically reads
+	 * HTTP response header data. Users can
+	 * then call get_body/read_body to read HTTP response body.
+	 * @param data {const void*} Data address pointer. When parameter value is
+	 * empty pointer, it indicates
+	 *  data sending is complete.
+	 * @param len {size_t} When data is not empty pointer, indicates data length.
+	 * @return {bool} Whether sending request was successful.
+	 * Note: After application sends data, you must call this function once more,
+	 * and data parameter must be empty.
 	 */
 	bool write_body(const void* data, size_t len);
 
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 当发送完请求数据后，内部会自动调用读 HTTP 响应头过程，可以通过此函数
-	 * 获得服务端响应的 HTTP 状态字(2xx, 3xx, 4xx, 5xx)；
-	 * 其实该函数内部只是调用了 http_client::response_status 方法
+	 * After sending request data, internally automatically calls HTTP response
+	 * header reading process. You can get server response HTTP status code (2xx,
+	 * 3xx, 4xx, 5xx) through this function.
+	 * Actually, this function internally only calls http_client::response_status
+	 * function.
 	 * @return {int}
 	 */
 	int http_status() const;
 
 	/**
-	 * 获得 HTTP 响应的数据体长度
-	 * @return {int64) 返回值若为 -1 则表明 HTTP 头不存在或没有长度字段
+	 * Get HTTP response body length.
+	 * @return {int64) Return value is -1 when HTTP header does not exist or has no
+	 * Content-Length field.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 body_length(void) const;
@@ -179,132 +216,163 @@ public:
 	long long int body_length() const;
 #endif
 	/**
-	 * HTTP 数据流(响应流是否允许保持长连接)
+	 * HTTP keep-alive (whether response supports long connection).
 	 * @return {bool}
 	 */
 	bool keep_alive() const;
 
 	/**
-	 * 获得 HTTP 响应头中某个字段名的字段值
-	 * @param name {const char*} 字段名
-	 * @return {const char*} 字段值，为空时表示不存在
+	 * Get a certain field value in HTTP response header.
+	 * @param name {const char*} Field name.
+	 * @return {const char*} Field value. Returns empty when not found.
 	 */
 	const char* header_value(const char* name) const;
 
 	/**
-	 * 是否读完了数据体
+	 * Whether response body is finished.
 	 * @return {bool}
 	 */
 	bool body_finish() const;
 
 	/**
-	 * 当调用 request 成功后调用本函数，读取服务器响应体数据
-	 * 并将结果存储于规定的 xml 对象中
-	 * @param out {xml&} HTTP 响应体数据存储于该 xml 对象中
-	 * @param to_charset {const char*} 当该项非空，内部自动
-	 *  将数据转成该字符集存储于 xml 对象中
-	 * @return {bool} 读数据是否成功
-	 * 注：当响应数据体特别大时不应用此函数，以免内存耗光
+	 * After request succeeds, call this function to get complete server response
+	 * body
+	 * and store it in specified xml object.
+	 * @param out {xml&} HTTP response body data stored in this xml object.
+	 * @param to_charset {const char*} When not empty, internally automatically
+	 *  converts response data to this character set and stores it in xml object.
+	 * @return {bool} Whether reading was successful.
+	 * Note: When response body is very large, you should use this function to
+	 * avoid memory overflow.
 	 */
 	bool get_body(xml& out, const char* to_charset = NULL);
 
 	/**
-	 * 当调用 request 成功后调用本函数，读取服务器响应体数据
-	 * 并将结果存储于规定的 json 对象中
-	 * @param out {json&} HTTP 响应体数据存储于该 json 对象中
-	 * @param to_charset {const char*} 当该项非空，内部自动
-	 *  将数据转成该字符集存储于 json 对象中
-	 * @return {bool} 读数据是否成功
-	 * 注：当响应数据体特别大时不应用此函数，以免内存耗光
+	 * After request succeeds, call this function to get complete server response
+	 * body
+	 * and store it in specified json object.
+	 * @param out {json&} HTTP response body data stored in this json object.
+	 * @param to_charset {const char*} When not empty, internally automatically
+	 *  converts response data to this character set and stores it in json object.
+	 * @return {bool} Whether reading was successful.
+	 * Note: When response body is very large, you should use this function to
+	 * avoid memory overflow.
 	 */
 	bool get_body(json& out, const char* to_charset = NULL);
 
 	/**
-	 * 当调用 request 成功后调用本函数，读取服务器全部响应数据
-	 * 存储于输入的缓冲区中
-	 * @param out {string&} 存储响应数据体
-	 * @param to_charset {const char*} 当该项非空，内部自动
-	 *  将数据转成该字符集存储于 out 对象中
-	 * 注：当响应数据体特别大时不应用此函数，以免内存耗光
+	 * After request succeeds, call this function to get complete server response
+	 * body
+	 * and store it in user buffer.
+	 * @param out {string&} Store response body.
+	 * @param to_charset {const char*} When not empty, internally automatically
+	 *  converts response data to this character set and stores it in out buffer.
+	 * Note: When response body is very large, you should use this function to
+	 * avoid memory overflow.
 	 */
 	bool get_body(string& out, const char* to_charset = NULL);
 
 	/**
-	 * 当调用 request 成功后调用本函数，读取服务器响应数据并
-	 * 存储于输入的缓冲区中，可以循环调用本函数，直至数据读完了，
-	 * @param buf {char*} 存储部分响应数据体
-	 * @param size {size_t} buf 缓冲区大小
-	 * @return {int} 返回值 == 0 表示正常读完毕，< 0 表示服务器
-	 *  关闭连接，> 0 表示已经读到的数据，用户应该一直读数据直到
-	 *  返回值 <= 0 为止
-	 *  注：该函数读到的是原始 HTTP 数据体数据，不做解压和字符集
-	 *  解码，用户自己根据需要进行处理
+	 * After request succeeds, call this function to read server response body data
+	 * and store it in user buffer. Call this function in a loop until data is
+	 * finished.
+	 * @param buf {char*} Buffer to store server response body.
+	 * @param size {size_t} Buffer size.
+	 * @return {int} Return value == 0 indicates data finished, < 0 indicates error
+	 * or connection closed, > 0 indicates number of bytes read. Users should
+	 * continue calling until
+	 *  return value <= 0.
+	 * Note: This function returns original HTTP response body data, without
+	 * decompression or character
+	 *  encoding conversion. Users need to handle it themselves.
 	 */
 	int read_body(char* buf, size_t size);
 
 	/**
-	 * 当调用 request 成功后调用本函数读 HTTP 响应数据体，可以循环调用
-	 * 本函数，本函数内部自动对压缩数据进行解压，如果在调用本函数之前调用
-	 * set_charset 设置了本地字符集，则还同时对数据进行字符集转码操作
-	 * @param out {string&} 存储结果数据
-	 * @param clean {bool} 每次调用本函数时，是否要求先自动将缓冲区 out
-	 *  的数据清空
-	 * @param real_size {int*} 当该指针非空时，存储解压前读到的真正数据
-	 *  长度，如果在构造函数中指定了非自动解压模式且读到的数据 > 0，则该
-	 *  值存储的长度值应该与本函数返回值相同；当读出错或未读到任何数据时，
-	 *  该值存储的长度值为 0
-	 * @return {int} == 0 表示读完毕，可能连接并未关闭；>0 表示本次读操作
-	 *  读到的数据长度(当为解压后的数据时，则表示为解压之后的数据长度，
-	 *  与真实读到的数据不同，真实读到的数据长度应该通过参数 real_size 来
-	 *  获得); < 0 表示数据流关闭，此时若 real_size 非空，则 real_size 存
-	 *  储的值应该为 0
-	 *  当返回 0 时，可调用 body_finish 函数判断是否读完了所有数据体
+	 * After request succeeds, call this function to read HTTP response body. Call
+	 * in a loop
+	 * to read data. Internally automatically decompresses compressed data. If
+	 * set_charset function was called before calling this function
+	 * to set local character set, data will be converted to local character set.
+	 * @param out {string&} Store result.
+	 * @param clean {bool} Whether to internally automatically clear out buffer
+	 * each time this function is called.
+	 *  buffer.
+	 * @param real_size {int*} When pointer is not empty, stores uncompressed
+	 * response body
+	 * length. When constructor specified automatic decompression mode and response
+	 * body length > 0, this
+	 * value stores length value should be same as this function's return value.
+	 * When no data was read, this
+	 *  value stores length value is 0.
+	 * @return {int} == 0 indicates finished, but connection not closed. >0
+	 * indicates this time read
+	 * data length (when decompression is enabled, it indicates decompressed data
+	 * length,
+	 * which may differ from actual response data. Actual response data length
+	 * should be obtained through real_size
+	 * parameter); < 0 indicates error or connection closed. At this time, if
+	 * real_size is not empty, real_size
+	 *  stored value should be 0.
+	 * When return value is 0, you can call body_finish function to determine
+	 * whether response body is finished.
 	 */
 	int read_body(string& out, bool clean = false, int* real_size = NULL);
 
 	/**
-	 * 调用 request 成功后调用本函数来从 HTTP 服务端读一行数据，可循环调用
-	 * 本函数，直到返回 false 或 body_finish() 返回 true 为止；
-	 * 内部自动对压缩数据解压，如果在调用本函数之前调用 set_charset 设置了
-	 * 本地字符集，则还同时对数据进行字符集转码操作
-	 * @param out {string&} 存储结果数据
-	 * @param nonl {bool} 读到的一行数据是否自动去掉尾部的 "\r\n" 或 "\n"
-	 * @param size {size_t*} 该指针非空时存放读到的数据长度
-	 * @return {bool} 是否读到一行数据：返回 true 时表示读到了一行数据，
-	 *  可以通过 body_finish() 是否为 true 来判断是否读数据体已经结束，
-	 *  当读到一个空行 且 nonl = true 时，则 *size = 0；当返回 false 时
-	 *  表示未读完整行且读完毕，
-	 *  *size 中存放着读到的数据长度
+	 * After request succeeds, call this function to read one line of data from
+	 * HTTP server. Call in a loop
+	 * to read data until it returns false or body_finish() returns true.
+	 * Internally automatically decompresses compressed data. If set_charset
+	 * function was called before calling this function
+	 * to set local character set, data will be converted to local character set.
+	 * @param out {string&} Store result.
+	 * @param nonl {bool} Whether to automatically remove "\r\n" or "\n" at the end
+	 * of read line.
+	 * @param size {size_t*} When pointer is not empty, stores read data length.
+	 * @return {bool} Whether one line was read. When returns true, it means one
+	 * line was read.
+	 * You can determine whether response body is completely read by whether
+	 * body_finish() is true.
+	 *  When reading one line and nonl = true, if *size = 0, it means false when
+	 *  response body is not finished and reading is finished.
+	 *  *size stores read data length.
 	 */
 	bool body_gets(string& out, bool nonl = true, size_t* size = NULL);
 
 	/**
-	 * 当通过 http_request::request_header().set_range() 设置了
-	 * range 的请求时，此函数检查服务器返回的数据是否支持 range
+	 * When http_request::request_header().set_range() was called to set
+	 * range request, this function can determine whether server supports range.
 	 * @return {bool}
 	 */
 	bool support_range() const;
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * 当调用了 http_request::request_header().set_range() 且读取服务器
-	 * 返回的数据头后，此函数用来获得支持分段功能的起始偏移位置
-	 * @return {acl_int64} 若服务器不支持 range 方式，则返回值 < 0
+	 * When http_request::request_header().set_range() was called to read data,
+	 * after reading response header, this function can get start offset position
+	 * of range support function.
+	 * @return {acl_int64} When server does not support range format, returns value
+	 * < 0.
 	 */
 	__int64 get_range_from(void) const;
 
 	/**
-	 * 当调用了 http_request::request_header().set_range() 且读取服务器
-	 * 返回的数据头后，此函数用来获得支持分段功能结束偏移位置
-	 * @return {acl_int64} 若服务器不支持 range 方式，则返回值 < 0
+	 * When http_request::request_header().set_range() was called to read data,
+	 * after reading response header, this function can get end offset position of
+	 * range support function.
+	 * @return {acl_int64} When server does not support range format, returns value
+	 * < 0.
 	 */
 	__int64 get_range_to(void) const;
 
 	/**
-	 * 当调用了 http_request::request_header().set_range() 且读取服务器
-	 * 返回的数据头后，此函数用来获得支持分段功能的整个数据体大小，该值
-	 * 即代表 HTTP 响应数据体大小
-	 * @return {acl_int64} 若服务器不支持 range 方式，则返回值 < 0
+	 * When http_request::request_header().set_range() was called to read data,
+	 * after reading response header, this function can get total resource size of
+	 * range support function (this value
+	 * is total HTTP response body size).
+	 * @return {acl_int64} When server does not support range format, returns value
+	 * < 0.
 	 */
 	__int64 get_range_max(void) const;
 #else
@@ -314,18 +382,18 @@ public:
 #endif
 
 	/**
-	 * 获得服务器返回的 Set-Cookie 的集合
-	 * @return {const std::vector<HttpCookie*>*} 返回空表示
-	 *  没有 cookie 对象或连接流为空
+	 * Get Set-Cookie list returned by server.
+	 * @return {const std::vector<HttpCookie*>*} Returns empty to indicate
+	 *  no cookies or error occurred.
 	 */
 	const std::vector<HttpCookie*>* get_cookies() const;
 
 	/**
-	 * 获得服务器返回的 Set-Cookie 设置的某个 cookie 对象
-	 * @param name {const char*} cookie 名
-	 * @param case_insensitive {bool} 是否区分大小写，true 表示
-	 *  不区分大小写
-	 * @return {const HttpCookie*} 返回 NULL 表示不存在
+	 * Get a certain cookie name from Set-Cookie returned by server.
+	 * @param name {const char*} Cookie name.
+	 * @param case_insensitive {bool} Whether case-insensitive. true means
+	 *  case-insensitive.
+	 * @return {const HttpCookie*} Returns NULL to indicate not found.
 	 */
 	const HttpCookie* get_cookie(const char* name,
 		bool case_insensitive = true) const;
@@ -333,21 +401,24 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 获得 http_client HTTP 连接流，可以通过返回的对象获得
-	 * 服务器响应的头部分数据，参考：http_client 类
-	 * @return {http_client*} 当返回空时表示流出错了
+	 * Get http_client HTTP connection object used internally. You can use this
+	 * object to read
+	 * response header and data. See http_client class.
+	 * @return {http_client*} Returns empty to indicate not initialized.
 	 */
 	http_client* get_client() const;
 
 	/**
-	 * 重置请求状态，在同一个连接的多次请求时会调用此函数
+	 * Reset object state. When reusing the same connection object, call this
+	 * function.
 	 */
 	void reset();
 
 protected:
 	/**
-	 * 基类 connect_client 纯虚函数，显式调用本函数用来打开与服务端的连接
-	 * @return {bool} 连接是否成功
+	 * Override connect_client virtual function. Explicitly call this function to
+	 * open connection to server.
+	 * @return {bool} Whether opening was successful.
 	 */
 	virtual bool open();
 
@@ -373,7 +444,7 @@ private:
 	long long int range_to_;
 	long long int range_max_;
 #endif
-	// 在写 HTTP 请求数据体时，该标志位标识是否允许重试过
+	// Flag bit when writing HTTP request body to identify whether retry is needed.
 	bool need_retry_;
 
 	bool send_request(const void* data, size_t len);
@@ -386,3 +457,4 @@ private:
 };
 
 } // namespace acl
+

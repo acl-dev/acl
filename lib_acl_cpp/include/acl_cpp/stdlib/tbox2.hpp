@@ -9,9 +9,10 @@
 namespace acl {
 
 /**
- * 用于线程之间的消息通信，通过线程条件变量及线程锁实现
+ * Used for message communication between threads, implemented through thread
+ * condition variables and thread locks
  *
- * 示例：
+ * Example:
  *
  * class myobj {
  * public:
@@ -40,24 +41,25 @@ template<typename T>
 class tbox2  : public box2<T> {
 public:
 	/**
-	 * 构造方法
+	 * Constructor
 	 */
 	tbox2() : size_(0), cond_(&lock_) {}
 
 	~tbox2() {}
 
 	/**
-	 * 清理消息队列中未被消费的消息对象
+	 * Clear unconsumed message objects in the message queue
 	 */
 	void clear() {
 		box_.clear();
 	}
 
 	/**
-	 * 发送消息对象
-	 * @param t {T} 消息对象
-	 * @param notify_first {bool} 如果为 true，则先通知后解锁，否则先解锁
-	 *  后通知，注意二者的区别
+	 * Send message object
+	 * @param t {T} Message object
+	 * @param notify_first {bool} If true, notify first then unlock, otherwise
+	 * unlock first
+	 *  then notify. Note the difference between the two
 	 * @return {bool}
 	 * @override
 	 */
@@ -83,11 +85,11 @@ public:
 	}
 
 	/**
-	 * 接收消息对象
-	 * @param t {T&} 当函数 返回 true 时存放结果对象
-	 * @param ms {int} >= 0 时设置等待超时时间(毫秒级别)，
-	 *  否则永远等待直到读到消息对象或出错
-	 * @return {bool} 是否获得消息对象
+	 * Receive message object
+	 * @param t {T&} Store result object when function returns true
+	 * @param ms {int} When >= 0, set wait timeout (milliseconds),
+	 *  otherwise wait forever until message object is read or error occurs
+	 * @return {bool} Whether message object was obtained
 	 * @override
 	 */
 	bool pop(T& t, int ms = -1) {
@@ -99,7 +101,7 @@ public:
 				return true;
 			}
 
-			// 注意调用顺序，必须先调用 wait 再判断 wait_ms
+			// Note the call order, must call wait first then check wait_ms
 			if (!cond_.wait(us, true) && us >= 0) {
 				if (!lock_.unlock()) { abort(); }
 				return false;
@@ -134,7 +136,7 @@ public:
 	}
 
 	/**
-	 * 返回当前存在于消息队列中的消息数量
+	 * Return the number of messages currently in the message queue
 	 * @return {size_t}
 	 * @override
 	 */
@@ -182,3 +184,4 @@ private:
 };
 
 } // namespace acl
+

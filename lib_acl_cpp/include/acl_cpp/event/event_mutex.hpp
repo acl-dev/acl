@@ -3,11 +3,9 @@
 #include "../stdlib/atomic.hpp"
 #include "../stdlib/noncopyable.hpp"
 
-namespace acl
-{
+namespace acl {
 
-class ACL_CPP_API event_mutex : public noncopyable
-{
+class ACL_CPP_API event_mutex : public noncopyable {
 public:
 	event_mutex(bool recursive = true);
 	~event_mutex(void);

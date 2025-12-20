@@ -9,32 +9,34 @@ extern "C" {
 #include "acl_array.h"
 
 /**
- * 配置文件解析句柄类型定义
+ * Configuration file parser object type definition.
  */
 typedef struct ACL_XINETD_CFG_PARSER ACL_XINETD_CFG_PARSER;
 
 /**
- * 功能: 获得所需要的配置 项的内容
- * @param xcp 结构指针, 不能为空
- * @param name 配置项的变量名
- * @return 配置文件中配置项的内容
+ * Function: Get configuration item's value from configuration file parser.
+ * @param xcp Structure pointer, must not be NULL
+ * @param name Configuration item's name
+ * @return Configuration file parser's configuration item value
  */
 ACL_API const char *acl_xinetd_cfg_get(const ACL_XINETD_CFG_PARSER *xcp, const char *name);
 
 /**
- * 功能: 获得所需要的配置项的数组，对于一个变量名对应多个变量值时有用
- * @param xcp 结构指针, 不能为空
- * @param name 配置项的变量名
- * @return 配置文件中配置项的内容动态数组
+ * Function: Get configuration item's value array from configuration file parser.
+ * When a configuration item corresponds to multiple values, use this.
+ * @param xcp Structure pointer, must not be NULL
+ * @param name Configuration item's name
+ * @return Configuration file parser's configuration item data dynamic array
  */
 ACL_API const ACL_ARRAY *acl_xinetd_cfg_get_ex(const ACL_XINETD_CFG_PARSER *xcp, const char *name);
 
 /**
- * 功能: 从配置文件中获得对应在于某一个索引值位置的内容
- * @param xcp 结构指针, 不能为空
- * @param idx 索引位置值
- * @param ppname 指向指针的地址的变量
- * @param ppvalue 指向指针的地址的变量
+ * Function: Get configuration item's value at a certain index position from
+ * configuration file parser.
+ * @param xcp Structure pointer, must not be NULL
+ * @param idx Index position value
+ * @param ppname Pointer to pointer address's variable
+ * @param ppvalue Pointer to pointer address's variable
  * @return  0: OK, -1: ERR
  */
 ACL_API int acl_xinetd_cfg_index(const ACL_XINETD_CFG_PARSER *xcp,
@@ -43,27 +45,27 @@ ACL_API int acl_xinetd_cfg_index(const ACL_XINETD_CFG_PARSER *xcp,
 			char **ppvalue);
 
 /**
- * 功能: 配置文件中配置项的条数
- * @param xcp 结构指针, 不能为空
- * @return 配置文件中配置项的条数
+ * Function: Get configuration file parser's configuration item count.
+ * @param xcp Structure pointer, must not be NULL
+ * @return Configuration file parser's configuration item count
  */
 ACL_API int acl_xinetd_cfg_size(const ACL_XINETD_CFG_PARSER *xcp);
 
 /**
- * 功能: 释放由结构指针所指向的内存空间
- * @param xcp 结构指针
+ * Function: Free memory space pointed to by structure pointer.
+ * @param xcp Structure pointer
  */
 ACL_API void acl_xinetd_cfg_free(ACL_XINETD_CFG_PARSER *xcp);
 
 /**
- * 功能: 读取配置文件并进行解析
- * @param pathname 配置文件的文件名
- * @return 已经解析了配置文件的结构指针
+ * Function: Load and parse configuration file.
+ * @param pathname Configuration file's file name
+ * @return Already parsed configuration file's structure pointer
  */
 ACL_API ACL_XINETD_CFG_PARSER *acl_xinetd_cfg_load(const char *pathname);
 
 /**
- * 整数类配置项结构
+ * Integer type configuration table structure.
  */
 typedef struct ACL_CFG_INT_TABLE {
 	const char *name;
@@ -74,7 +76,7 @@ typedef struct ACL_CFG_INT_TABLE {
 } ACL_CFG_INT_TABLE;
 
 /**
- * 64 位整数类配置项结构
+ * 64-bit integer type configuration table structure.
  */
 typedef struct ACL_CFG_INT64_TABLE {
 	const char *name;
@@ -85,7 +87,7 @@ typedef struct ACL_CFG_INT64_TABLE {
 } ACL_CFG_INT64_TABLE;
 
 /**
- * 字符串类配置项结构
+ * String type configuration table structure.
  */
 typedef struct ACL_CFG_STR_TABLE {
 	const char *name;
@@ -94,7 +96,7 @@ typedef struct ACL_CFG_STR_TABLE {
 } ACL_CFG_STR_TABLE;
 
 /**
- * 布尔型类配置项结构
+ * Boolean type configuration table structure.
  */
 typedef struct ACL_CFG_BOOL_TABLE {
 	const char *name;
@@ -105,32 +107,32 @@ typedef struct ACL_CFG_BOOL_TABLE {
 /* in acl_xinetd_params.c */
 
 /**
- * 从配置文件解析器中读取整数类型的表
- * @param cfg {ACL_XINETD_CFG_PARSER*} 当为空时则用默认值进行赋值
+ * Read integer type table from configuration file parser.
+ * @param cfg {ACL_XINETD_CFG_PARSER*} When NULL, will assign default values
  * @param table {ACL_CFG_INT_TABLE*}
  */
 ACL_API void acl_xinetd_params_int_table(ACL_XINETD_CFG_PARSER *cfg,
 	ACL_CFG_INT_TABLE *table);
 
 /**
- * 从配置文件解析器中读取 64 位整数类型的表
- * @param cfg {ACL_XINETD_CFG_PARSER*} 当为空时则用默认值进行赋值
+ * Read 64-bit integer type table from configuration file parser.
+ * @param cfg {ACL_XINETD_CFG_PARSER*} When NULL, will assign default values
  * @param table {ACL_CFG_INT64_TABLE*}
  */
 ACL_API void acl_xinetd_params_int64_table(ACL_XINETD_CFG_PARSER *cfg,
 	ACL_CFG_INT64_TABLE *table);
 
 /**
-* 从配置文件解析器中读取字符串类型的表
-* @param cfg {ACL_XINETD_CFG_PARSER*} 当为空时则用默认值进行赋值
+* Read string type table from configuration file parser.
+* @param cfg {ACL_XINETD_CFG_PARSER*} When NULL, will assign default values
 * @param table {ACL_CFG_STR_TABLE*}
 */
 ACL_API void  acl_xinetd_params_str_table(ACL_XINETD_CFG_PARSER *cfg,
 	ACL_CFG_STR_TABLE *table);
 
 /**
-* 从配置文件解析器中读取BOOL类型的表
-* @param cfg {ACL_XINETD_CFG_PARSER*} 当为空时则用默认值进行赋值
+* Read BOOL type table from configuration file parser.
+* @param cfg {ACL_XINETD_CFG_PARSER*} When NULL, will assign default values
 * @param table {ACL_CFG_BOOL_TABLE*}
 */
 ACL_API void  acl_xinetd_params_bool_table(ACL_XINETD_CFG_PARSER *cfg,
@@ -141,4 +143,3 @@ ACL_API void  acl_xinetd_params_bool_table(ACL_XINETD_CFG_PARSER *cfg,
 #endif
 
 #endif
-

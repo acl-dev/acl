@@ -19,28 +19,33 @@ typedef struct MBEDTLS_CERT_KEY {
 } MBEDTLS_CERT_KEY;
 
 /**
- * SSL 证书校验级别类型定义
+ * SSL certificate verification level type definition
  */
 typedef enum {
-	MBEDTLS_VERIFY_NONE,	// 不校验证书
-	MBEDTLS_VERIFY_OPT,	// 选择性校验，可以在握手时或握手后校验
-	MBEDTLS_VERIFY_REQ	// 要求在握手时校验
+	MBEDTLS_VERIFY_NONE,	// Don't verify certificate
+	MBEDTLS_VERIFY_OPT,	// Optional verification, can verify during or after handshake
+	MBEDTLS_VERIFY_REQ	// Require verification during handshake
 } mbedtls_verify_t;
 
 class mbedtls_io;
 
 /**
- * SSL 连接对象的配置类，该类对象一般可以声明为全局对象，用来对每一个 SSL
- * 连接对象进行证书配置；该类加载了全局性的证书、密钥等信息；每一个 SSL 对象
- * (mbedtls_io) 调用本对象的setup_certs 方法来初始化自身的证书、密钥等信息
+ * Configuration class for SSL connection objects. Objects of this class can
+ * generally be declared as global objects, used to configure certificates for
+ * each SSL
+ * connection object. This class loads global certificate, key and other
+ * information. Each SSL object
+ * (mbedtls_io) calls setup_certs method of this object to initialize its own
+ * certificate, key and other information
  */
 class ACL_CPP_API mbedtls_conf : public sslbase_conf {
 public:
 	/**
-	 * 构造函数
-	 * @param server_side {bool} 用来指定是服务端还是客户端，当为 true 时
-	 *  为服务端模式，否则为客户端模式
-	 * @param verify_mode {mbedtls_verify_t} SSL 证书校验级别
+	 * Constructor
+	 * @param server_side {bool} Used to specify whether it is server or client.
+	 * When true,
+	 *  it is server mode, otherwise client mode
+	 * @param verify_mode {mbedtls_verify_t} SSL certificate verification level
 	 */
 	mbedtls_conf(bool server_side = false,
 		mbedtls_verify_t verify_mode = MBEDTLS_VERIFY_NONE);
@@ -59,13 +64,15 @@ public:
 
 	/**
 	 * @override
-	 * 注: 该方法在 mbedtls_conf 中将被废弃, 请直接使用上面方法
+	 * Note: This method will be deprecated in mbedtls_conf, please use the above
+	 * method directly
 	 */
 	bool add_cert(const char* /* crt_file */);
 
 	/**
 	 * @override
-	 * 注: 该方法在 mbedtls_conf 中将被废弃, 请直接使用上面方法
+	 * Note: This method will be deprecated in mbedtls_conf, please use the above
+	 * method directly
 	 */
 	bool set_key(const char* /*key_file*/, const char* /* key_pass */);
 
@@ -76,15 +83,16 @@ public:
 
 public:
 	/**
-	 * mbedtls_io::open 内部会调用本方法用来安装当前 SSL 连接对象的证书
-	 * @param ssl {void*} SSL 连接对象，为 ssl_context 类型
-	 * @return {bool} 配置 SSL 对象是否成功
+	 * mbedtls_io::open internally will call this method to install certificate for
+	 * current SSL connection object
+	 * @param ssl {void*} SSL connection object, is ssl_context type
+	 * @return {bool} Whether configuring SSL object was successful
 	 */
 	bool setup_certs(void* ssl);
 
 	/**
-	 * 获得随机数生成器的熵对象
-	 * @return {void*}，返回值为 entropy_context 类型
+	 * Get entropy object of random number generator
+	 * @return {void*}, return value is entropy_context type
 	 */
 	void* get_entropy() const {
 		return entropy_;
@@ -92,23 +100,26 @@ public:
 
 public:
 	/**
-	 * 如果 mbedtls 分成三个库，可以调用本函数设置三个动态库的全路径
-	 * @param libmbedcrypto {const char*} libmbedcrypto 动态库的全路径
-	 * @param libmbedx509 {const char*} libmbedx509 动态库的全路径
-	 * @param libmbedtls {const char*} libmbedtls 动态库的全路径
+	 * If mbedtls is split into three libraries, can call this function to set full
+	 * paths of three dynamic libraries
+	 * @param libmbedcrypto {const char*} Full path of libmbedcrypto dynamic
+	 * library
+	 * @param libmbedx509 {const char*} Full path of libmbedx509 dynamic library
+	 * @param libmbedtls {const char*} Full path of libmbedtls dynamic library
 	 */
 	static void set_libpath(const char* libmbedcrypto,
 		const char* libmbedx509, const char* libmbedtls);
 
 	/**
-	 * 如果 mbedtls 合成一个库，可以调用本函数设置一个动态库的全路径
-	 * @param libmbedtls {const char*} libmbedtls 动态库的全路径
+	 * If mbedtls is combined into one library, can call this function to set full
+	 * path of one dynamic library
+	 * @param libmbedtls {const char*} Full path of libmbedtls dynamic library
 	 */
 	static void set_libpath(const char* libmbedtls);
 
 	/**
-	 * 显式调用本方法，动态加载 mbedtls 动态库
-	 * @return {bool} 加载是否成功
+	 * Explicitly call this method to dynamically load mbedtls dynamic library
+	 * @return {bool} Whether loading was successful
 	 */
 	static bool load();
 
@@ -160,3 +171,4 @@ private:
 };
 
 } // namespace acl
+

@@ -16,7 +16,7 @@ typedef struct ACL_HTABLE	ACL_HTABLE;
 typedef struct ACL_HTABLE_INFO 	ACL_HTABLE_INFO;
 
 /**
- * 哈希表对象结构句柄
+ * Hash table structure definition.
  */
 struct ACL_HTABLE {
 	int     size;                   /* length of entries array */
@@ -32,25 +32,26 @@ struct ACL_HTABLE {
 
 	/* for acl_iterator */
 
-	/* 取迭代器头函数 */
+	/* Get iterator head pointer */
 	void *(*iter_head)(ACL_ITER*, struct ACL_HTABLE*);
-	/* 取迭代器下一个函数 */
+	/* Get next iterator pointer */
 	void *(*iter_next)(ACL_ITER*, struct ACL_HTABLE*);
-	/* 取迭代器尾函数 */
+	/* Get iterator tail pointer */
 	void *(*iter_tail)(ACL_ITER*, struct ACL_HTABLE*);
-	/* 取迭代器上一个函数 */
+	/* Get previous iterator pointer */
 	void *(*iter_prev)(ACL_ITER*, struct ACL_HTABLE*);
-	/* 取迭代器关联的当前容器成员结构对象 */
+	/* Get the current iterator's member structure object */
 	ACL_HTABLE_INFO *(*iter_info)(ACL_ITER*, struct ACL_HTABLE*);
 };
 
 /**
- * 哈希表中每一个哈希项的存储信息类型
+ * Storage information structure for each hash entry in hash table.
  */
 struct ACL_HTABLE_INFO {
 	/**
-	 * 哈希键, 只所以如此声明，是因为当创建哈希表的标志位为
-	 * ACL_BINHASH_FLAG_KEY_REUSE 时需要复用输入的键空间
+	 * Hash key, only needs to be freed when key is dynamically allocated.
+	 * When hash table's flag bit is ACL_BINHASH_FLAG_KEY_REUSE,
+	 * memory space needs to be freed manually.
 	 */
 	union {
 		char *key;
@@ -63,7 +64,7 @@ struct ACL_HTABLE_INFO {
 };
 
 /**
- * ACL_HTABLE 遍历用类型
+ * ACL_HTABLE iterator structure.
  */
 typedef struct ACL_HTABLE_ITER {
 	/* public */
@@ -76,54 +77,57 @@ typedef struct ACL_HTABLE_ITER {
 } ACL_HTABLE_ITER;
 
 /**
- * 建立哈希表
- * @param size 哈希表长度
- * @param flag {unsigned int} 哈希表属性标志位, ACL_BINHASH_FLAG_xxx
- * @return 所建哈希表的头指针或为空(这时表示出了严重的错误, 主要是内存分配问题)
+ * Create hash table.
+ * @param size Hash table size
+ * @param flag {unsigned int} Hash table property flag bits, ACL_BINHASH_FLAG_xxx
+ * @return Hash table head pointer, if NULL (indicates internal allocation error,
+ *  need to check memory allocation)
  */
 ACL_API ACL_HTABLE *acl_htable_create(int size, unsigned int flag);
-/* 添加新的对象时是否直接复用键地址 */
+/* Whether to directly use key address when creating new object */
 #define	ACL_HTABLE_FLAG_KEY_REUSE	(1 << 0)
 
-/* 是否针对启用多线程互斥方式 */
+/* Whether to use multi-threaded mutual exclusion mode */
 #define	ACL_HTABLE_FLAG_USE_LOCK	(1 << 1)
 
-/* 每次查询时是否将查询结果对象放在链头 */
+/* Whether to move queried entry to head each time query */
 #define	ACL_HTABLE_FLAG_MSLOOK		(1 << 2)
 
-/* 统一将键转换为小写，从而实现键查询不区分大小写的功能 */
+/* Convert key to lowercase uniformly to achieve case-insensitive
+ * query regardless of case */
 #define	ACL_HTABLE_FLAG_KEY_LOWER	(1 << 3)
 
 ACL_API ACL_HTABLE *acl_htable_create3(int size, unsigned int flag,
 		ACL_SLICE_POOL *slice);
 
 /**
- * 设置哈希表的控制参数
- * @param table 哈希表对象句柄
- * @param name 控制参数的变参初始值, name 及以后的控制参数如下定义
- *  ACL_HTABLE_CTL_END: 变参表结束标志
- *  ACL_HTABLE_CTL_RWLOCK: 是否启用读写锁机制
- *  ACL_HTABLE_CTL_HASH_FN: 用户自定义的哈希值计算函数
+ * Set hash table's control parameters.
+ * @param table Hash table object
+ * @param name Control parameter name initial value, name can be followed
+ *  by control parameters:
+ *  ACL_HTABLE_CTL_END: end parameter flag
+ *  ACL_HTABLE_CTL_RWLOCK: whether to use read-write lock
+ *  ACL_HTABLE_CTL_HASH_FN: user-defined hash value calculation function
  */
 ACL_API void acl_htable_ctl(ACL_HTABLE *table, int name, ...);
-#define	ACL_HTABLE_CTL_END      0  /**< 控制结束标志 */
-#define	ACL_HTABLE_CTL_RWLOCK   1  /**< 是否加锁 */
-#define	ACL_HTABLE_CTL_HASH_FN  2  /**< 设置私有哈希函数 */
+#define	ACL_HTABLE_CTL_END      0  /**< Control end flag */
+#define	ACL_HTABLE_CTL_RWLOCK   1  /**< Whether to lock */
+#define	ACL_HTABLE_CTL_HASH_FN  2  /**< Set private hash function */
 
 /**
- * 检查上一次哈希表操作后哈希表的状态
- * @param table 哈希表指针
- * @return {int} 操作哈希表后的状态, 参见如下的 ACL_HTABLE_STAT_XXX
+ * Get hash table's status after last hash table operation.
+ * @param table Hash table pointer
+ * @return Hash table operation status, see ACL_HTABLE_STAT_XXX below
  */
 ACL_API int acl_htable_errno(ACL_HTABLE *table);
-#define	ACL_HTABLE_STAT_OK          0  /**< 状态正常 */
-#define	ACL_HTABLE_STAT_INVAL       1  /**< 无效参数 */
-#define	ACL_HTABLE_STAT_DUPLEX_KEY  2  /**< 重复键 */
+#define	ACL_HTABLE_STAT_OK          0  /**< Status OK */
+#define	ACL_HTABLE_STAT_INVAL       1  /**< Invalid parameter */
+#define	ACL_HTABLE_STAT_DUPLEX_KEY  2  /**< Duplicate key */
 
 /**
- * 设置哈希表的当前状态, error 取值 ACL_HTABLE_STAT_XXX
- * @param table 哈希表指针
- * @param error 设置哈希表的错误状态
+ * Set hash table's current status, error value ACL_HTABLE_STAT_XXX
+ * @param table Hash table pointer
+ * @param error Error status to set for hash table
  */
 ACL_API void acl_htable_set_errno(ACL_HTABLE *table, int error);
 
@@ -132,29 +136,34 @@ ACL_API void acl_htable_lock_write(ACL_HTABLE *table);
 ACL_API void acl_htable_unlock(ACL_HTABLE *table);
 
 /**
- * 往哈希表里添加新的项
- * @param table 哈希表指针
- * @param key 键, 在函数内部会复制此 key 键
- * @param value 用户自己的特定数据项(可以由类型硬转化而来, 但是此数据项必须
- *  不能堆栈变量)
- * @return 所分配的哈希表项的指针, == NULL: 表示内部分配内存出错, 为严重的错误
- *  注：如果在添加时该哈希争键存在，则返回已经存在的哈希项，使用者应该通过调用
- *  acl_htable_errno() 来查看是否重复添加同一个键值(ACL_HTABLE_STAT_DUPLEX_KEY)
+ * Add new entry to hash table.
+ * @param table Hash table pointer
+ * @param key Key, internally copies key string
+ * @param value User's own object pointer (must be dynamically allocated,
+ *  cannot be stack variable or local variable)
+ * @return Created hash entry pointer, == NULL: indicates internal memory
+ *  allocation error Note: If hash entry already exists when adding, returns
+ *  existing hash entry. Application should check via acl_htable_errno()
+ *  to see if duplicate key exists (ACL_HTABLE_STAT_DUPLEX_KEY)
  */
 ACL_API ACL_HTABLE_INFO *acl_htable_enter(ACL_HTABLE *table,
 		const char *key, void *value);
 
 /**
- * 往哈希表里添加新的项，当多个线程同时进行此操作时，函数内部会自动保证互斥操作
- * @param table 哈希表指针
- * @param key 键, 在函数内部会复制此 key 键
- * @param value 用户自己的特定数据项(可以由类型硬转化而来, 但是此数据项必须
- *  不能堆栈变量)
- * @param old_holder {void**} 当 key 存在且本项非空时，则内部会自动用新值替换
- *  旧值，且用 old_holder 存放旧值地址以方便应用释放
- * @return 所分配的哈希表项的指针, == NULL: 表示内部分配内存出错, 为严重的错误
- *  注：如果在添加时该哈希争键存在，则返回已经存在的哈希项，使用者应该通过调用
- *  acl_htable_errno() 来查看是否重复添加同一个键值(ACL_HTABLE_STAT_DUPLEX_KEY)
+ * Add new entry to hash table, when multiple threads simultaneously perform
+ * this operation, internally automatically ensures thread safety.
+ * @param table Hash table pointer
+ * @param key Key, internally copies key string
+ * @param value User's own object pointer (must be dynamically allocated,
+ *  cannot be stack variable or local variable)
+ * @param old_holder {void**} If key exists and this is not NULL, internally
+ *  automatically replaces value and stores old value address in old_holder
+ *  for application to free
+ * @return Created hash entry pointer, == NULL: indicates internal memory
+ *  allocation error.
+ *  Note: If hash entry already exists when adding, returns existing hash entry.
+ *  Application should check via acl_htable_errno() to see if duplicate key
+ *  exists (ACL_HTABLE_STAT_DUPLEX_KEY)
  */
 ACL_API ACL_HTABLE_INFO *acl_htable_enter_r2(ACL_HTABLE *table,
 		const char *key, void *value, void **old_holder);
@@ -163,117 +172,123 @@ ACL_API ACL_HTABLE_INFO *acl_htable_enter_r(ACL_HTABLE *table,
 		const char *key, void *value);
 
 /**
- * 由所给的 key 键查寻某一特定哈希项
- * @param table 哈希表指针
- * @param key 键
- * @return 不为空指针: 表示查到了对应于 key 键的哈希项
- *         为空: 表示未查到对应于 key 键的哈希项
+ * Search for a specific hash entry based on key.
+ * @param table Hash table pointer
+ * @param key Key
+ * @return Non-NULL pointer: indicates found hash entry corresponding to key
+ *         NULL: indicates hash entry corresponding to key not found
  */
 ACL_API ACL_HTABLE_INFO *acl_htable_locate(ACL_HTABLE *table, const char *key);
 
 /**
- * 由所给的 key 键查寻某一特定哈希项，当多个线程同时进行此操作时，
- * 函数内部会自动保证互斥操作
- * @param table 哈希表指针
- * @param key 键
- * @return 不为空指针: 表示查到了对应于 key 键的哈希项
- *         为空: 表示未查到对应于 key 键的哈希项
+ * Search for a specific hash entry based on key, when multiple threads
+ * simultaneously perform this operation,
+ * internally automatically ensures thread safety.
+ * @param table Hash table pointer
+ * @param key Key
+ * @return Non-NULL pointer: indicates found hash entry corresponding to key
+ *         NULL: indicates hash entry corresponding to key not found
  */
 ACL_API ACL_HTABLE_INFO *acl_htable_locate_r(ACL_HTABLE *table, const char *key);
 
 /**
- * 由所给的 key 键查寻用户的数据项
- * @param table 哈希表指针
- * @param key 键
- * @return 不为空: 表示查到了对应于 key 键的数据项, 用户可以根据用户自己的
- *  数据类型进行转换; 为空: 表示未查到对应于 key 键的数据项
+ * Search for user data value based on key.
+ * @param table Hash table pointer
+ * @param key Key
+ * @return Non-NULL: indicates found data value corresponding to key, user
+ *  can cast to user's own data type; NULL: indicates data value corresponding
+ *  to key not found
  */
 ACL_API void *acl_htable_find(ACL_HTABLE *table, const char *key);
 
 /**
- * 由所给的 key 键查寻用户的数据项, 当多个线程同时进行此操作时，
- * 函数内部会自动保证互斥操作
- * @param table 哈希表指针
- * @param key 键
- * @return 不为空: 表示查到了对应于 key 键的数据项, 用户可以根据用户自己的
- *  数据类型进行转换; 为空: 表示未查到对应于 key 键的数据项
+ * Search for user data value based on key, when multiple threads simultaneously
+ *  perform this operation,internally automatically ensures thread safety.
+ * @param table Hash table pointer
+ * @param key Key
+ * @return Non-NULL: indicates found data value corresponding to key, user can
+ *  cast to user's own data type; NULL: indicates data value corresponding to
+ *  key not found
  */
 ACL_API void *acl_htable_find_r(ACL_HTABLE *table, const char *key);
 
 /**
- * 根据所给的 key 键删除某一哈希项
- * @param table 哈希表指针
- * @param key 键
- * @param free_fn 如果该函数指针不为空并且找到了对应于 key 键的数据项, 则先
- *  调用用户所提供的析构函数做一些清尾工作, 然后再释放该哈希项
- * @return 0: 成功;  -1: 未找到该 key 键
+ * Delete a hash entry based on key.
+ * @param table Hash table pointer
+ * @param key Key
+ * @param free_fn If this function pointer is not NULL and found data value
+ *  corresponding to key, internally calls user-provided function to perform
+ *  some cleanup, then frees the hash entry
+ * @return 0: success;  -1: key not found
  */
 ACL_API int acl_htable_delete(ACL_HTABLE *table, const char *key,
 		void (*free_fn) (void *));
 #define	acl_htable_delete_r	acl_htable_delete
 
 /**
- * 直接根据 acl_htable_locate 返回的非空对象从哈希表中删除该对象
- * @param table 哈希表指针
- * @param ht {ACL_HTABLE_INFO*} 存储于哈希表中的内部结构对象
- * @param free_fn 如果该函数指针不为空并且找到了对应于 key 键的数据项, 则先
- *  调用用户所提供的析构函数做一些清尾工作, 然后再释放该哈希项
+ * Directly delete entry from hash table based on non-NULL object returned
+ * by acl_htable_locate.
+ * @param table Hash table pointer
+ * @param ht {ACL_HTABLE_INFO*} Internal structure object stored in hash table
+ * @param free_fn If this function pointer is not NULL and found data value
+ *  corresponding to key, internally calls user-provided function to perform
+ *  some cleanup, then frees the hash entry
  */
 ACL_API void acl_htable_delete_entry(ACL_HTABLE *table, ACL_HTABLE_INFO *ht,
 		void (*free_fn) (void *));
 
 /**
- * 释放整个哈希表
- * @param table 哈希表指针
- * @param free_fn 如果该指针不为空则对哈希表中的每一项哈希项先用该函数做
- *  清尾工作, 然后再释放
+ * Free entire hash table.
+ * @param table Hash table pointer
+ * @param free_fn If pointer is not NULL, for each hash entry in hash table,
+ *  calls this function for cleanup, then frees
  */
 ACL_API void acl_htable_free(ACL_HTABLE *table, void (*free_fn) (void *));
 
 /**
- * 重置哈希表, 该函数会释放哈希表中的所有内容项, 并重新初始化
- * @param table 哈希表指针
- * @param free_fn 如果该指针不为空则对哈希表中的每一项哈希项先用该函数做
- *  清尾工作, 然后再释放
- * @return 是否重置成功. 0: OK; < 0: error.
+ * Reset hash table, this function frees all data in hash table, then reinitializes.
+ * @param table Hash table pointer
+ * @param free_fn If pointer is not NULL, for each hash entry in hash table,
+ *  calls this function for cleanup, then frees
+ * @return Whether reset succeeded. 0: OK; < 0: error.
  */
 ACL_API int acl_htable_reset(ACL_HTABLE *table, void (*free_fn) (void *));
 #define	acl_htable_reset_r	acl_htable_reset
 
 /**
- * 对哈希表中的每一项哈希项进行处理
- * @param table 哈希表指针
- * @param walk_fn 处理每一项哈希项的函数指针, 不能为空
- * @param arg 用户自己类型的数据
+ * Walk through each hash entry in hash table.
+ * @param table Hash table pointer
+ * @param walk_fn Function pointer for each hash entry, must not be NULL
+ * @param arg User's own passed parameter
  */
 ACL_API void acl_htable_walk(ACL_HTABLE *table,
 		void (*walk_fn) (ACL_HTABLE_INFO *, void *), void *arg);
 #define	acl_htable_walk_r	acl_htable_walk
 
 /**
- * 返回哈希表当前的容器空间大小
- * @param table 哈希表指针
- * @return 哈希表的容器空间大小
+ * Get hash table's current allocated space size.
+ * @param table Hash table pointer
+ * @return Hash table's allocated space size
  */
 ACL_API int acl_htable_size(const ACL_HTABLE *table);
 
 /**
- * 返回哈希表当前的窗口中所含元素个数
- * @param table 哈希表指针
- * @return 哈希表中元素个数
+ * Get hash table's current number of stored entry elements.
+ * @param table Hash table pointer
+ * @return Hash table element count
  */
 ACL_API int acl_htable_used(const ACL_HTABLE *table);
 
 /**
- * 将哈希表里的所有项组合成一个链表
- * @param table 哈希表
- * @return 不为空: 链表指针; 为空: 表示该哈希表里没有哈希项
+ * Convert hash table's entries into an array.
+ * @param table Hash table
+ * @return Non-NULL: array pointer; NULL: indicates hash table has no hash entries
  */
 ACL_API ACL_HTABLE_INFO **acl_htable_list(const ACL_HTABLE *table);
 
 /**
- * 显示哈希表中 key 键的分布状态
- * @param table 哈希表指针
+ * Display hash table's key distribution status.
+ * @param table Hash table pointer
  */
 ACL_API void acl_htable_stat(const ACL_HTABLE *table);
 #define	acl_htable_stat_r	acl_htable_stat
@@ -286,7 +301,7 @@ ACL_API const ACL_HTABLE_INFO *acl_htable_iter_tail(
 		ACL_HTABLE *table, ACL_HTABLE_ITER *iter);
 ACL_API const ACL_HTABLE_INFO *acl_htable_iter_prev(ACL_HTABLE_ITER *iter);
 
-/*--------------------  一些方便快捷的宏操作 --------------------------------*/
+/*--------------------  Some helper macros --------------------------------*/
 
 #define	ACL_HTABLE_ITER_KEY(iter)	((iter).ptr->key.c_key)
 #define	acl_htable_iter_key		ACL_HTABLE_ITER_KEY
@@ -295,7 +310,7 @@ ACL_API const ACL_HTABLE_INFO *acl_htable_iter_prev(ACL_HTABLE_ITER *iter);
 #define	acl_htable_iter_value		ACL_HTABLE_ITER_VALUE
 
 /**
- * 遍历 ACL_HTABLE
+ * Iterate ACL_HTABLE
  * @param iter {ACL_HTABLE_ITER}
  * @param table_ptr {ACL_HTABLE *}
  * @example:
@@ -354,4 +369,3 @@ ACL_API const ACL_HTABLE_INFO *acl_htable_iter_prev(ACL_HTABLE_ITER *iter);
 #endif
 
 #endif
-

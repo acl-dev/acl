@@ -9,11 +9,11 @@ extern "C" {
 #ifdef ACL_UNIX
 
 /**
- * 调用此函数设置程序崩溃时产生的 core 文件的最大值
- * @param max {long long int} 根据 max 的值范围不同，生成 core 规则有所不同：
- *  1)   0：禁止生成 core 文件
- *  2) < 0：生成 core 文件，且不限制 core 文件生成大小
- *  3) > 0：生成 core 文件，且 core 文件大小由 max 决定
+ * Use this function to set the maximum size of core file when program crashes.
+ * @param max {long long int} Meaning of max value range, same as system core file settings:
+ *  1)   0: prohibit generating core file
+ *  2) < 0: allow core file, and do not limit core file size
+ *  3) > 0: allow core file, and core file size cannot exceed max
  */
 void acl_set_core_limit(long long int max);
 

@@ -10,21 +10,21 @@ public:
 	~http_utils() {}
 
 	/**
-	 * 从完整的 url 中获得 WEB 服务器地址，格式：domain:port
-	 * @param url {const char*} HTTP url，非空
-	 * @param addr {char*} 存储结果，存储格式：domain:port
-	 * @param size {size_t} out 缓冲区大小
-	 * @return {bool} 是否成功获得
+	 * Get WEB server address from complete url, format: domain:port
+	 * @param url {const char*} HTTP url, non-empty
+	 * @param addr {char*} Store result, storage format: domain:port
+	 * @param size {size_t} out buffer size
+	 * @return {bool} Whether successfully obtained
 	 */
 	static bool get_addr(const char* url, char* addr, size_t size);
 
 	/**
-	 * 从完整的 url 中获得 WEB 服务器 IP 地址及端口号
-	 * @param url {const char*} HTTP url，非空
-	 * @param domain {char*} 存储域名
-	 * @param size {size_t} domain 内存大小
-	 * @param port {unsigned short*} 存储端口号大小
-	 * @return {bool} 是否成功获得
+	 * Get WEB server IP address and port number from complete url
+	 * @param url {const char*} HTTP url, non-empty
+	 * @param domain {char*} Store domain name
+	 * @param size {size_t} domain memory size
+	 * @param port {unsigned short*} Store port number size
+	 * @return {bool} Whether successfully obtained
 	 */
 	static bool get_addr(const char* url, char* domain, size_t size,
 		unsigned short* port);
@@ -39,7 +39,7 @@ public:
 
 public:
 	/**
-	 * 返回 URL 中的协议类型：http 或 https
+	 * Return protocol type in URL: http or https
 	 * @return {const char*}
 	 */
 	const char* get_proto() const {
@@ -47,15 +47,16 @@ public:
 	}
 
 	/**
-	 * 返回 URL 中的域名字段
-	 * @return {const char*} 返回空串则表示没有该字段
+	 * Return domain name field in URL
+	 * @return {const char*} Returns empty string if this field does not exist
 	 */
 	const char* get_domain() const {
 		return domain_.c_str();
 	}
 
 	/**
-	 * 返回根据 URL 提取的 HTTP 协议服务端端口号，内部缺省值为 80
+	 * Return HTTP protocol server port number extracted from URL, internal default
+	 * value is 80
 	 * @return {unsigned short}
 	 */
 	unsigned short get_port() const {
@@ -63,7 +64,7 @@ public:
 	}
 
 	/**
-	 * 返回根据 URL 提取的相对路径部分（不含 ? 后面的参数）
+	 * Return relative path part extracted from URL (excluding parameters after ?)
 	 * @return {const char*}
 	 */
 	const char* get_url_path() const {
@@ -71,7 +72,7 @@ public:
 	}
 
 	/**
-	 * 返回从 URL 中提取的参数字段
+	 * Return parameter field extracted from URL
 	 * @return {const char*}
 	 */
 	const char* get_url_params() const {
@@ -79,7 +80,8 @@ public:
 	}
 
 	/**
-	 * 清理解析过程中的中间状态，以便重复使用该类对象解析下一个 URL
+	 * Clear intermediate state during parsing process, so that this class object
+	 * can be reused to parse the next URL
 	 */
 	void reset();
 
@@ -95,3 +97,4 @@ private:
 };
 
 } // namespace acl
+

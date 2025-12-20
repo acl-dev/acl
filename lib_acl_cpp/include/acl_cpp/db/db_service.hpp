@@ -8,8 +8,7 @@
 
 namespace acl {
 
-typedef enum
-{
+typedef enum {
 	DB_OK,
 	DB_ERR_OPEN,
 	DB_ERR_EXEC_SQL,
@@ -19,8 +18,7 @@ typedef enum
 
 class db_rows;
 
-class ACL_CPP_API db_query
-{
+class ACL_CPP_API db_query {
 public:
 	db_query(void) {}
 	virtual ~db_query(void) {}
@@ -29,14 +27,14 @@ public:
 	virtual void on_ok(const db_rows* rows, int affected) = 0;
 
 	/**
-	 * 当任务处理完毕或出错时，内部处理过程会自动调用 destroy 接口，
-	 * 子类可以在该接口内进行一些释放过程，尤其当该对象是动态创建时，
-	 * 子类应该在该函数内 delete this 以删除自己，因为该函数最终肯定
-	 * 会被调用，所以子类不应在其它地方进行析构操作
+	 * When task processing is complete or error occurs, internal processing will
+	 * automatically call destroy interface. Subclasses can perform some release
+	 * process in this interface, especially when this object is dynamically created,
+	 * subclasses should delete this in this function to delete themselves, because
+	 * this function will definitely be called, so subclasses should not perform
+	 * destruction operations elsewhere.
 	 */
 	virtual void destroy(void) {}
-protected:
-private:
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -45,77 +43,81 @@ class db_handle;
 class aio_socket_stream;
 
 /**
- * 数据库服务类，该类是一个异步数据库操作管理类，该类对象所在的线程必须是
- * 一个非阻塞的线程过程
+ * Database service class. This class is an asynchronous database operation
+ * management class. The thread where objects of this class are located must be
+ * a non-blocking thread process
  */
-class ACL_CPP_API db_service : public ipc_service
-{
+class ACL_CPP_API db_service : public ipc_service {
 public:
 	/**
-	 * 当为 sqlite 数据库时的构造函数
-	 * @param dblimit {size_t} 数据库连接池的个数限制
-	 * @param nthread {int} 子线程池的最大线程数
-	 * @param win32_gui {bool} 是否是窗口类的消息，如果是，则内部的
-	 *  通讯模式自动设置为基于 _WIN32 的消息，否则依然采用通用的套接
-	 *  口通讯方式
+	 * Constructor when using sqlite database
+	 * @param dblimit {size_t} Connection pool count limit for database
+	 * @param nthread {int} Maximum thread count for child thread pool
+	 * @param win32_gui {bool} Whether it is window class message. If yes, then
+	 * internally communication mode is automatically set to _WIN32 message based,
+	 * otherwise still uses common socket communication method
 	 */
 	db_service(size_t dblimit = 100, int nthread = 2, bool win32_gui = false);
 	virtual ~db_service(void);
 
 	/**
-	 * 异步执行 SQL 查询语句
-	 * @param sql {const char*} 要执行的标准 SQL 语句
-	 * @param query {db_query*} 用来接收执行结果的类对象
+	 * Asynchronously execute SQL query statement
+	 * @param sql {const char*} Standard SQL statement to execute
+	 * @param query {db_query*} Class object used to receive execution results
 	 */
 	void sql_select(const char* sql, db_query* query);
 
 	/**
-	 * 异步执行 SQL 更新语句
-	 * @param sql {const char*} 要执行的标准 SQL 语句
-	 * @param query {db_query*} 用来接收执行结果的类对象
+	 * Asynchronously execute SQL update statement
+	 * @param sql {const char*} Standard SQL statement to execute
+	 * @param query {db_query*} Class object used to receive execution results
 	 */
 	void sql_update(const char* sql, db_query* query);
 
 	/**
-	 * 向数据库连接池中添加连接对象
-	 * @param db {db_handle*} 数据库连接对象
+	 * Add connection object to database connection pool
+	 * @param db {db_handle*} Database connection object
 	 */
 	void push_back(db_handle* db);
+
 protected:
 	/**
-	 * 需要子类实现此函数用来创建数据库对象
+	 * Subclasses need to implement this function to create database objects
 	 * @return {db_handle*}
 	 */
 	virtual db_handle* db_create() = 0;
 
 	/**
-	 * 基类虚函数，当有新连接到达时基类回调此函数
-	 * @param client {aio_socket_stream*} 接收到的新的客户端连接
+	 * Base class virtual function. Called by base class when new connection
+	 * arrives
+	 * @param client {aio_socket_stream*} Newly received client connection
 	 */
 	virtual void on_accept(aio_socket_stream* client);
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * 基类虚函数，当收到来自于子线程的 win32 消息时的回调函数
-	 * @param hWnd {HWND} 窗口句柄
-	 * @param msg {UINT} 用户自定义消息号
-	 * @param wParam {WPARAM} 参数
-	 * @param lParam {LPARAM} 参数
+	 * Base class virtual function. Callback function when win32 message from child
+	 * thread is received
+	 * @param hWnd {HWND} Window handle
+	 * @param msg {UINT} User-defined message number
+	 * @param wParam {WPARAM} Parameter
+	 * @param lParam {LPARAM} Parameter
 	 */
 	virtual void win32_proc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #endif
 
 private:
-	// 数据库引擎池
+	// Database engine pool
 	std::list<db_handle*> dbpool_;
 
-	// 数据库连接池的个数限制
+	// Connection pool count limit for database
 	size_t dblimit_;
 
-	// 当前数据库连接池的个数
+	// Current connection pool count for database
 	size_t dbsize_;
 };
 
 } // namespace acl
 
 #endif // !defined(ACL_DB_DISABLE)
+

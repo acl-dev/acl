@@ -9,31 +9,30 @@ namespace acl {
 
 class string;
 
-class ACL_CPP_API hsrow : public noncopyable
-{
+class ACL_CPP_API hsrow : public noncopyable {
 public:
 	/**
-	 * 构造函数
-	 * @param ncolum {int} 数据库查询时每条记录的列数
+	 * Constructor
+	 * @param ncolum {int} Number of columns per record in database query
 	 */
 	hsrow(int ncolum);
 	~hsrow();
 
 	/**
-	 * 重置数据查询时第条记录的列数
-	 * @param ncolum {int} 数据库查询时每条记录的列数
+	 * Reset the number of columns per record for data query
+	 * @param ncolum {int} Number of columns per record in database query
 	 */
 	void reset(int ncolum);
 
 	/**
-	 * 向该查询记录中添加列数值
-	 * @param value {const char*} 列值
-	 * @param dlen {size_t} 列值长度
+	 * Add column value to this query record
+	 * @param value {const char*} Column value
+	 * @param dlen {size_t} Column value length
 	 */
 	void push_back(const char* value, size_t dlen);
 
 	/**
-	 * 取得查询记录
+	 * Get query record
 	 * @return {const std::vector<const char*>&}
 	 */
 	const std::vector<const char*>& get_row() const;

@@ -6,47 +6,42 @@
 
 #ifndef ACL_CLIENT_ONLY
 
-namespace acl
-{
+namespace acl {
 
 class redis_result;
 
 /**
- * 在从 disque 队列中获得的任务信息的类
+ * Class for task information obtained from disque queue
  */
-class ACL_CPP_API disque_job : public noncopyable
-{
+class ACL_CPP_API disque_job : public noncopyable {
 public:
 	disque_job();
 	~disque_job();
 
 	/**
 	 * get the ID of the job
-	 * 获得当前任务的 ID 号
+	 * Get the ID number of the current task
 	 * @return {const char*}
 	 */
-	const char* get_id() const
-	{
+	const char* get_id() const {
 		return id_.c_str();
 	}
 
 	/**
 	 * get the queue name holding the job
-	 * 获得当前任务所在的队列
+	 * Get the queue where the current task is located
 	 * @return {const char*}
 	 */
-	const char* get_queue() const
-	{
+	const char* get_queue() const {
 		return queue_.c_str();
 	}
 
 	/**
 	 * get the job's data
-	 * 获得当前任务的消息内容
+	 * Get the message content of the current task
 	 * @return {const string&}
 	 */
-	const string& get_body() const
-	{
+	const string& get_body() const {
 		return body_;
 	}
 
@@ -58,53 +53,43 @@ public:
 
 	bool init(const redis_result& rr);
 
-	const char* get_state() const
-	{
+	const char* get_state() const {
 		return state_.c_str();
 	}
 
-	int get_repl() const
-	{
+	int get_repl() const {
 		return repl_;
 	}
 
-	int get_ttl() const
-	{
+	int get_ttl() const {
 		return ttl_;
 	}
 
-	long long int get_ctime() const
-	{
+	long long int get_ctime() const {
 		return ctime_;
 	}
 
-	int get_delay() const
-	{
+	int get_delay() const {
 		return delay_;
 	}
 
-	int get_retry() const
-	{
+	int get_retry() const {
 		return retry_;
 	}
 
-	const std::vector<string>& get_nodes_delivered() const
-	{
+	const std::vector<string>& get_nodes_delivered() const {
 		return nodes_delivered_;
 	}
 
-	const std::vector<string>& get_nodes_confirmed() const
-	{
+	const std::vector<string>& get_nodes_confirmed() const {
 		return nodes_confirmed_;
 	}
 
-	int get_next_requeue_within() const
-	{
+	int get_next_requeue_within() const {
 		return next_requeue_within_;
 	}
 
-	int get_next_awake_within() const
-	{
+	int get_next_awake_within() const {
 		return next_awake_within_;
 	}
 
@@ -131,3 +116,4 @@ private:
 } // namespace acl
 
 #endif // ACL_CLIENT_ONLY
+

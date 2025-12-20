@@ -8,14 +8,20 @@ extern "C" {
 #include "acl_define.h"
 
 #define	ACL_SLICE_FLAG_OFF		(0)
-#define	ACL_SLICE_FLAG_GC1		(1 << 0)  /**< 空间节省, 但 gc 性能差 */
-#define	ACL_SLICE_FLAG_GC2		(1 << 1)  /**< 空间中等, gc 比较好 */
-#define	ACL_SLICE_FLAG_GC3		(1 << 2)  /**< 空间最大, gc 只当顺序时最好 */
-#define	ACL_SLICE_FLAG_RTGC_OFF		(1 << 10) /**< 关闭实时内存释放 */
-#define	ACL_SLICE_FLAG_LP64_ALIGN	(1 << 11) /**< 是否针对64位平台需要按8字节对齐 */
+#define	ACL_SLICE_FLAG_GC1		(1 << 0)  /**< Space saving, gc
+						 *  performance poor */
+#define	ACL_SLICE_FLAG_GC2		(1 << 1)  /**< Space moderate, gc
+						 *  relatively good */
+#define	ACL_SLICE_FLAG_GC3		(1 << 2)  /**< Space wasteful, gc
+						 *  only runs when idle */
+#define	ACL_SLICE_FLAG_RTGC_OFF		(1 << 10) /**< Disable real-time
+						 *  memory release */
+#define	ACL_SLICE_FLAG_LP64_ALIGN	(1 << 11) /**< Whether to align to
+						 *  8 bytes for 64-bit
+						 *  platform requirements */
 
 /**
- * 内存分片池的状态结构
+ * Memory slice pool's status structure.
  */
 typedef struct ACL_SLICE_STAT {
 	int   nslots;           /**< total slice count free in slots */
@@ -33,76 +39,79 @@ typedef struct ACL_SLICE_STAT {
 typedef struct ACL_SLICE ACL_SLICE;
 
 /**
- * 创建内存片池对象
- * @param name {const char*} 标识名称，以便于调试
- * @param page_size {int} 分配内存时的分配内存页大小
- * @param slice_size {int} 每个固定长度内存片的大小
- * @param flag {unsigned int} 标志位，参见上述：ACL_SLICE_FLAG_xxx
- * @return {ACL_SLICE*} 内存片池对象句柄
+ * Create memory slice pool object.
+ * @param name {const char*} Identifier name, for debugging
+ * @param page_size {int} Page size when allocating memory
+ * @param slice_size {int} Size of each fixed-length memory slice
+ * @param flag {unsigned int} Flag bits, see ACL_SLICE_FLAG_xxx below
+ * @return {ACL_SLICE*} Memory slice pool object pointer
  */
 ACL_API ACL_SLICE *acl_slice_create(const char *name, int page_size,
 	int slice_size, unsigned int flag);
 
 /**
- * 销毁一个内存片池对象
- * @param slice {ACL_SLICE*} 内存片池对象
+ * Destroy a memory slice pool object.
+ * @param slice {ACL_SLICE*} Memory slice pool object
  */
 ACL_API void acl_slice_destroy(ACL_SLICE *slice);
 
 /**
- * 该内存片池中有多少个内存片正在被使用
- * @param slice {ACL_SLICE*} 内存片池对象
- * @return {int} >= 0, 正在被使用的内存片个数
+ * Check how many memory slices in memory slice pool are currently in use.
+ * @param slice {ACL_SLICE*} Memory slice pool object
+ * @return {int} >= 0, number of memory slices currently in use
  */
 ACL_API int acl_slice_used(ACL_SLICE *slice);
 
 /**
- * 分配一块内存片
- * @param slice {ACL_SLICE*} 内存片池对象
- * @return {void*} 内存片地址
+ * Allocate a memory slice.
+ * @param slice {ACL_SLICE*} Memory slice pool object
+ * @return {void*} Memory slice address
  */
 ACL_API void *acl_slice_alloc(ACL_SLICE *slice);
 
 /**
- * 分配一块内存片，且将内存片内容初始化为0
- * @param slice {ACL_SLICE*} 内存片池对象
- * @return {void*} 内存片地址
+ * Allocate a memory slice and initialize memory slice data to zero.
+ * @param slice {ACL_SLICE*} Memory slice pool object
+ * @return {void*} Memory slice address
  */
 ACL_API void *acl_slice_calloc(ACL_SLICE *slice);
 
 /**
- * 释放一块内存片
- * @param slice {ACL_SLICE*} 内存片池对象
- * @param ptr {void*} 内存片地址, 必须是由 acl_slice_alloc/acl_slice_calloc 所分配
+ * Free a memory slice.
+ * @param slice {ACL_SLICE*} Memory slice pool object
+ * @param ptr {void*} Memory slice address, must be returned by
+ *  acl_slice_alloc/acl_slice_calloc function
  */
 ACL_API void acl_slice_free2(ACL_SLICE *slice, void *ptr);
 
 /**
- * 释放一块内存片
- * @param ptr {void*} 内存片地址, 必须是由 acl_slice_alloc/acl_slice_calloc 所分配
+ * Free a memory slice.
+ * @param ptr {void*} Memory slice address, must be returned by
+ *  acl_slice_alloc/acl_slice_calloc function
  */
 ACL_API void acl_slice_free(void *ptr);
 
 /**
- * 查看内存片池的当前状态
- * @param slice {ACL_SLICE*} 内存片池对象
- * @param sbuf {ACL_SLICE_STAT*} 存储结果, 不能为空
+ * Check memory slice pool's current status.
+ * @param slice {ACL_SLICE*} Memory slice pool object
+ * @param sbuf {ACL_SLICE_STAT*} Storage buffer, must not be NULL
  */
 ACL_API void acl_slice_stat(ACL_SLICE *slice, ACL_SLICE_STAT *sbuf);
 
 /**
- * 手工将内存片池不用的内存进行释放
- * @param slice {ACL_SLICE*} 内存片池对象
+ * Manually trigger memory slice pool's unused memory to be released.
+ * @param slice {ACL_SLICE*} Memory slice pool object
  */
 ACL_API int acl_slice_gc(ACL_SLICE *slice);
 
-/*----------------------------------------------------------------------------*/
+/*------------------------*/
 
 typedef struct ACL_SLICE_POOL {
 	ACL_SLICE **slices;		/* the slice array */
 	int   base;			/* the base byte size */
 	int   nslice;			/* the max number of base size */
-	unsigned int slice_flag;	/* flag: ACL_SLICE_FLAG_GC2[3] | ACL_SLICE_FLAG_RTGC_OFF */
+	unsigned int slice_flag;	/* flag: ACL_SLICE_FLAG_GC2[3] |
+					 * ACL_SLICE_FLAG_RTGC_OFF */
 } ACL_SLICE_POOL;
 
 ACL_API void acl_slice_pool_init(ACL_SLICE_POOL *asp);

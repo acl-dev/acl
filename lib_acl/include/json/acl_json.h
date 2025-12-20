@@ -16,12 +16,15 @@ typedef struct ACL_JSON ACL_JSON;
 typedef struct ACL_JSON_NODE ACL_JSON_NODE;
 
 struct ACL_JSON_NODE {
-	ACL_VSTRING *ltag;          /**< 标签名 */
-	ACL_VSTRING *text;          /**< 当节点为叶节点时该文本内容非空 */
-	ACL_JSON_NODE *tag_node;    /**< 当标签值为 json 节点时此项非空 */
-	ACL_JSON_NODE *parent;      /**< 父节点 */
-	ACL_RING children;          /**< 子节点集合 */
-	unsigned short type;        /**< 节点类型 */
+	ACL_VSTRING *ltag;          /**< tag name */
+	ACL_VSTRING *text;          /**< When the node is a leaf
+				     *   node, the text content is
+				     *   non-empty */
+	ACL_JSON_NODE *tag_node;    /**< When the tag value is a
+				     *   json node, it is non-empty */
+	ACL_JSON_NODE *parent;      /**< parent node */
+	ACL_RING children;          /**< child node collection */
+	unsigned short type;        /**< node type */
 #define	ACL_JSON_T_A_STRING      (1 << 0)
 #define	ACL_JSON_T_A_NUMBER      (1 << 1)
 #define	ACL_JSON_T_A_BOOL        (1 << 2)
@@ -44,475 +47,554 @@ struct ACL_JSON_NODE {
 #define ACL_JSON_T_PAIR          (1 << 14)
 #define	ACL_JSON_T_ELEMENT       (1 << 15)
 
-	unsigned short depth;       /**< 当前节点的深度 */
+	unsigned short depth;       /**< current node depth */
 
 	/* private */
-	unsigned char quote;        /**< 非 0 表示 ' 或 " */
-	unsigned char left_ch;      /**< 本节点的第一个字符: { or [ */
-	unsigned char right_ch;     /**< 本节点的最后一个字符: } or ] */
-	unsigned backslash:1;       /**< 转义字符 \ */
-	unsigned part_word:1;       /**< 半个汉字的情况处理标志位 */
-	unsigned disabled:1;        /**< 该节点是否被禁止 */
-	ACL_JSON *json;             /**< json 对象 */
-	ACL_RING  node;             /**< 当前节点 */
+	unsigned char quote;        /**< If 0 indicates ' or " */
+	unsigned char left_ch;      /**< First character of the node: { or [ */
+	unsigned char right_ch;     /**< Last character of the node: } or ] */
+	unsigned backslash:1;       /**< escape character \ */
+	unsigned part_word:1;       /**< Whether the tag value contains a word flag */
+	unsigned disabled:1;        /**< Whether this node is disabled */
+	ACL_JSON *json;             /**< json object */
+	ACL_RING  node;             /**< current node */
 
-	/* public: for acl_iterator, 通过 acl_foreach 列出该节点的一级子节点 */
+	/* public: for acl_iterator, through acl_foreach to
+	 * iterate through all child nodes of this node */
 
-	/* 取迭代器头函数 */
+	/* Get the head element of the container */
 	ACL_JSON_NODE *(*iter_head)(ACL_ITER*, ACL_JSON_NODE*);
-	/* 取迭代器下一个函数 */
+	/* Get the next element of the container */
 	ACL_JSON_NODE *(*iter_next)(ACL_ITER*, ACL_JSON_NODE*);
-	/* 取迭代器尾函数 */
+	/* Get the tail element of the container */
 	ACL_JSON_NODE *(*iter_tail)(ACL_ITER*, ACL_JSON_NODE*);
-	/* 取迭代器上一个函数 */
+	/* Get the previous element of the container */
 	ACL_JSON_NODE *(*iter_prev)(ACL_ITER*, ACL_JSON_NODE*);
 };
 
 enum {
-	ACL_JSON_S_ROOT,	/**< 根节点 */
-	ACL_JSON_S_OBJ,		/**< 标签对象值 */
+	ACL_JSON_S_ROOT,	/**< root node */
+	ACL_JSON_S_OBJ,		/**< tag name and value */
 	ACL_JSON_S_MEMBER,
-	ACL_JSON_S_ARRAY,	/**< json 节点 array */
+	ACL_JSON_S_ARRAY,	/**< json node array */
 	ACL_JSON_S_ELEMENT,
 	ACL_JSON_S_PAIR,	/**< name:value pair */
-	ACL_JSON_S_NEXT,	/**< 下一个节点 */
-	ACL_JSON_S_TAG,		/**< 对象标签名 */
-	ACL_JSON_S_VALUE,	/**< 节点值处理过程 */
-	ACL_JSON_S_COLON,	/**< 冒号 : */
+	ACL_JSON_S_NEXT,	/**< next node */
+	ACL_JSON_S_TAG,		/**< tag name */
+	ACL_JSON_S_VALUE,	/**< node value or content */
+	ACL_JSON_S_COLON,	/**< colon : */
 	ACL_JSON_S_STRING,
 	ACL_JSON_S_STREND
 };
 
 struct ACL_JSON {
-	int   depth;                /**< 最大深度 */
-	int   node_cnt;             /**< 节点总数, 包括 root 节点 */
-	ACL_JSON_NODE *root;        /**< json 根节点 */
-	int   finish;               /**< 是否分析结束 */
-	unsigned flag;              /**< 标志位 */
-#define	ACL_JSON_FLAG_PART_WORD	(1 << 0)  /**< 是否兼容半个汉字 */
-#define ACL_JSON_FLAG_ADD_SPACE	(1 << 1)  /**< 创建 json 时是否添空格 */
+	int   depth;                /**< maximum depth */
+	int   node_cnt;             /**< node count, excluding root node */
+	ACL_JSON_NODE *root;        /**< json root node */
+	int   finish;               /**< whether parsing is complete */
+	unsigned flag;              /**< flag bit */
+#define	ACL_JSON_FLAG_PART_WORD	(1 << 0)  /**< whether data contains words */
+#define ACL_JSON_FLAG_ADD_SPACE	(1 << 1)  /**< whether to add
+					 *   spaces when outputting
+					 *   json */
 
-	/* public: for acl_iterator, 通过 acl_foreach 可以列出所有子节点 */
+	/* public: for acl_iterator, through acl_foreach to
+	 * iterate through all child nodes */
 
-	/* 取迭代器头函数 */
+	/* Get the head element of the container */
 	ACL_JSON_NODE *(*iter_head)(ACL_ITER*, ACL_JSON*);
-	/* 取迭代器下一个函数 */
+	/* Get the next element of the container */
 	ACL_JSON_NODE *(*iter_next)(ACL_ITER*, ACL_JSON*);
-	/* 取迭代器尾函数 */
+	/* Get the tail element of the container */
 	ACL_JSON_NODE *(*iter_tail)(ACL_ITER*, ACL_JSON*);
-	/* 取迭代器上一个函数 */
+	/* Get the previous element of the container */
 	ACL_JSON_NODE *(*iter_prev)(ACL_ITER*, ACL_JSON*);
 
 	/* private */
 
-	int   status;               /**< 状态机当前解析状态 */
+	int   status;               /**< state machine current state */
 
-	ACL_JSON_NODE *curr_node;   /**< 当前正在处理的 json 节点 */
-	ACL_DBUF_POOL *dbuf;        /**< 会话内存池对象 */
-	ACL_DBUF_POOL *dbuf_inner;  /**< 会话内存池对象 */
+	ACL_JSON_NODE *curr_node;   /**< current json node being processed */
+	ACL_DBUF_POOL *dbuf;        /**< session memory pool object */
+	ACL_DBUF_POOL *dbuf_inner;  /**< session memory pool object */
 	size_t dbuf_keep;
 };
 
 /*----------------------------- in acl_json.c -----------------------------*/
 
 /**
- * 创建一个 json 节点
- * @param json {ACL_JSON*} json 对象
- * @return {ACL_JSON_NODE*} json 节点对象
+ * Allocate a json node.
+ * @param json {ACL_JSON*} json object
+ * @return {ACL_JSON_NODE*} json node pointer
  */
 ACL_API ACL_JSON_NODE *acl_json_node_alloc(ACL_JSON *json);
 
 /**
- * 将某个 json 节点及其子节点从 json 对象中删除, 并释放该节点及其子节点
- * 所占空间函数来释放该 json 节点所占内存
- * @param node {ACL_JSON_NODE*} json 节点
- * @return {int} 返回删除的节点个数
+ * Delete a json node and its child nodes from the json object, and
+ * free the node and child nodes memory space. The memory pool
+ * function will free the memory space of the json node.
+ * @param node {ACL_JSON_NODE*} json node
+ * @return {int} Number of deleted nodes
  */
 ACL_API int acl_json_node_delete(ACL_JSON_NODE *node);
 
 /**
- * 从当前的 json 节点中删除迭代器节点，并返回下一个 json 节点
- * @param node {ACL_JSON_NODE*} json 节点
-* @return {ACL_JSON_NODE*} 返回的下一个 json 节点
+ * Delete the next node from the current json node, and return
+ * the next json node.
+ * @param node {ACL_JSON_NODE*} json node
+* @return {ACL_JSON_NODE*} Returns the next json node
  */
 ACL_API ACL_JSON_NODE *acl_json_node_erase(ACL_JSON_NODE *node, ACL_ITER *it);
 
 /**
- * 从当前的 json 节点中删除反向迭代器节点，并返回下一个 json 节点
- * @param node {ACL_JSON_NODE*} json 节点
-* @return {ACL_JSON_NODE*} 返回的前一个 json 节点
+ * Delete the previous node from the current json node, and
+ * return the previous json node.
+ * @param node {ACL_JSON_NODE*} json node
+* @return {ACL_JSON_NODE*} Returns the previous json node
  */
 ACL_API ACL_JSON_NODE *acl_json_node_rerase(ACL_JSON_NODE *node, ACL_ITER *it);
 
 /**
- * 禁止/启用某个 json 节点，被禁止的节点在构造 json 字符串时将不被添加，但在遍历 json 时
- * 却可以被获得，以方便再次将其启用
- * @param node {ACL_JSON_NODE*} json 节点
- * @param yes {int} 是否禁止该 json 节点
+ * Disable/enable a json node. Disabled nodes will not be added
+ * when building json strings, but when parsing json they can still
+ * be used, to allow re-parsing
+ * @param node {ACL_JSON_NODE*} json node
+ * @param yes {int} Whether to disable the json node
  */
 ACL_API void acl_json_node_disable(ACL_JSON_NODE *node, int yes);
 
 /**
- * 判断指定 json 节点是否已经被禁止
- * @param node {ACL_JSON_NODE*} json 节点
- * @return {int} 返回 0 表示未被禁止（即处于启用状态），否则表示被禁止了
+ * Check if the specified json node has been disabled.
+ * @param node {ACL_JSON_NODE*} json node
+ * @return {int} If 0 indicates not disabled, otherwise indicates
+ *  disabled state, non-zero indicates disabled
  */
 ACL_API int acl_json_node_disabled(ACL_JSON_NODE *node);
 
 /**
- * 向某个 json 节点添加兄弟节点(该兄弟节点必须是独立的 json 节点)
- * @param node1 {ACL_JSON_NODE*} 向本节点添加 json 节点
- * @param node2 {ACL_JSON_NODE*} 新添加的兄弟 json 节点
+ * Append a sibling node to a json node (the sibling node must be
+ * a detached json node)
+ * @param node1 {ACL_JSON_NODE*} The node to append to
+ * @param node2 {ACL_JSON_NODE*} The sibling json node to append
  */
 ACL_API void acl_json_node_append(ACL_JSON_NODE *node1, ACL_JSON_NODE *node2);
 
 /**
- * 将某个 json 节点作为子节点加入某父 json 节点中
- * @param parent {ACL_JSON_NODE*} 父节点
- * @param child {ACL_JSON_NODE*} 子节点
+ * Add a json node as a child node to a json node.
+ * @param parent {ACL_JSON_NODE*} Parent node
+ * @param child {ACL_JSON_NODE*} Child node
  */
 ACL_API void acl_json_node_add_child(ACL_JSON_NODE *parent, ACL_JSON_NODE *child);
 
 /**
- * 将一个 JSON 对象的 JSON 节点复制至 JSON 对象中的一个 JSON 节点中，并返回
- * 目标新创建的 JSON 节点
- * @param json {ACL_JSON*} 目标 JSON 对象
- * @param from {ACL_JSON_NODE*} 源 JSON 对象的一个 JSON 节点
- * @return {ACL_JSON_NODE*} 返回非空对象指针
+ * Copy a JSON node from a JSON object to a JSON node in the JSON
+ * object, and create a new JSON node at the target location
+ * @param json {ACL_JSON*} Target JSON object
+ * @param from {ACL_JSON_NODE*} A JSON node from the source JSON object
+ * @return {ACL_JSON_NODE*} Returns a non-empty pointer
  */
 ACL_API ACL_JSON_NODE *acl_json_node_duplicate(ACL_JSON *json, ACL_JSON_NODE *from);
 
 /**
- * 获得某个 json 节点的父节点
- * @param node {ACL_JSON_NODE*} json 节点
- * @return {ACL_JSON_NODE*} 父节点, 如果为 NULL 则表示其父节点不存在
+ * Get the parent node of a json node.
+ * @param node {ACL_JSON_NODE*} json node
+ * @return {ACL_JSON_NODE*} Parent node, if NULL indicates its
+ *  parent node does not exist
  */
 ACL_API ACL_JSON_NODE *acl_json_node_parent(ACL_JSON_NODE *node);
 
 /**
- * 获得某个 json 节点的后一个兄弟节点
- * @param node {ACL_JSON_NODE*} json 节点
- * @return {ACL_JSON_NODE*} 给定 json 节点的后一个兄弟节点, 若为NULL则表示不存在
+ * Get the next sibling node of a json node.
+ * @param node {ACL_JSON_NODE*} json node
+ * @return {ACL_JSON_NODE*} The next sibling node of the json node,
+ *  if NULL indicates it does not exist
  */
 ACL_API ACL_JSON_NODE *acl_json_node_next(ACL_JSON_NODE *node);
 
 /**
- * 获得某个 json 节点的前一个兄弟节点
- * @param node {ACL_JSON_NODE*} json 节点
- * @return {ACL_JSON_NODE*} 给定 json 节点的前一个兄弟节点, 若为NULL则表示不存在
+ * Get the previous sibling node of a json node.
+ * @param node {ACL_JSON_NODE*} json node
+ * @return {ACL_JSON_NODE*} The previous sibling node of the json
+ *  node, if NULL indicates it does not exist
  */
 ACL_API ACL_JSON_NODE *acl_json_node_prev(ACL_JSON_NODE *node);
 
 /**
- * 在遍历 Json 对象过程中，删除当前迭代器指向的 json 节点并返回下一个 json 节点
- * @param json {ACL_JSON*} json 对象
- * @param it {ACL_ITER*} 遍历 json 对象的迭代器
- * @return {ACL_JSON_NODE*} 返回下一个 json 节点
+ * In the process of iterating through Json objects, delete the
+ * json node pointed to by the current iterator and return the next
+ * json node
+ * @param json {ACL_JSON*} json object
+ * @param it {ACL_ITER*} Iterator for json objects
+ * @return {ACL_JSON_NODE*} Returns the next json node
  */
 ACL_API ACL_JSON_NODE *acl_json_erase(ACL_JSON *json, ACL_ITER *it);
 
 /**
- * 创建一个 json 对象
- * @return {ACL_JSON*} 新创建的 json 对象
+ * Create a json object.
+ * @return {ACL_JSON*} Newly created json object
  */
 ACL_API ACL_JSON *acl_json_alloc(void);
 
 /**
- * 创建一个 json 对象
- * @param dbuf {ACL_DBUF_POOL*} 内存池对象，当该针对非 NULL 时，则 json 对象
- *  及所属节点内存在其基础上进行分配，否则，内部自动创建隶属于 json 的内存池
- * @return {ACL_JSON*} 新创建的 json 对象
+ * Create a json object.
+ * @param dbuf {ACL_DBUF_POOL*} Memory pool object, if NULL, the json object
+ *  will allocate node memory on the heap, otherwise it will
+ *  automatically use the json object's memory pool
+ * @return {ACL_JSON*} Newly created json object
  */
 ACL_API ACL_JSON *acl_json_dbuf_alloc(ACL_DBUF_POOL *dbuf);
 
 /**
- * 根据一个 JSON 对象的一个 JSON 节点创建一个新的 JSON 对象
- * @param node {ACL_JSON_NODE*} 源 JSON 对象的一个 JSON 节点
- * @return {ACL_JSON*} 新创建的 JSON 对象
+ * Create a new JSON object from a JSON node in a JSON object.
+ * @param node {ACL_JSON_NODE*} A JSON node from the source JSON object
+ * @return {ACL_JSON*} Newly created JSON object
  */
 ACL_API ACL_JSON *acl_json_create(ACL_JSON_NODE *node);
 
 /**
- * 根据一个 JSON 对象的一个 JSON 节点创建一个新的 JSON 对象
- * @param dbuf {ACL_DBUF_POOL*} 内存池对象，当该针对非 NULL 时，则 json 对象
- *  及所属节点内存在其基础上进行分配，否则，内部自动创建隶属于 json 的内存池
- * @param node {ACL_JSON_NODE*} 源 JSON 对象的一个 JSON 节点
- * @return {ACL_JSON*} 新创建的 JSON 对象
+ * Create a new JSON object from a JSON node in a JSON object.
+ * @param dbuf {ACL_DBUF_POOL*} Memory pool object, if NULL, the json object
+ *  will allocate node memory on the heap, otherwise it will
+ *  automatically use the json object's memory pool
+ * @param node {ACL_JSON_NODE*} A JSON node from the source JSON object
+ * @return {ACL_JSON*} Newly created JSON object
  */
 ACL_API ACL_JSON *acl_json_dbuf_create(ACL_DBUF_POOL *dbuf, ACL_JSON_NODE *node);
 
 /**
- * 将某一个 ACL_JSON_NODE 节点作为一个 json 对象的根节点，
- * 从而可以方便地遍历出该节点的各级子节点(在遍历过程中的所有
- * 节点不含本节点自身)，该遍历方式有别于单独
- * 遍历某一个 ACL_JSON_NODE 节点时仅能遍历其一级子节点的情形
- * @param json {ACL_JSON*} json 对象
- * @param node {ACL_JSON_NODE*} ACL_JSON_NODE 节点
+ * Set a certain ACL_JSON_NODE node as the root node of a json object,
+ * so that you can easily iterate through all child nodes of
+ * this node (in the iteration process, the root node itself is
+ * not included in the iteration). This iteration method lists
+ * nodes when iterating through a certain ACL_JSON_NODE node,
+ * it can iterate through all child nodes in order
+ * @param json {ACL_JSON*} json object
+ * @param node {ACL_JSON_NODE*} ACL_JSON_NODE node
  */
 ACL_API void acl_json_foreach_init(ACL_JSON *json, ACL_JSON_NODE *node);
 
 /**
- * 释放一个 json 对象, 同时释放该对象里容纳的所有 json 节点
- * @param json {ACL_JSON*} json 对象
+ * Free a json object, and also free all json nodes created by the object.
+ * @param json {ACL_JSON*} json object
  */
 ACL_API void acl_json_free(ACL_JSON *json);
 
 /**
- * 重置 json 解析器对象
- * @param json {ACL_JSON*} json 对象
+ * Reset json object state.
+ * @param json {ACL_JSON*} json object
  */
 ACL_API void acl_json_reset(ACL_JSON *json);
 
 /*------------------------- in acl_json_parse.c ---------------------------*/
 
 /**
- * 解析 json 数据, 并持续地自动生成 json 节点树
- * @param json {ACL_JSON*} json 对象
- * @param data {const char*} 以 '\0' 结尾的数据字符串, 可以是完整的 json 数据;
- *  也可以是不完整的 json 数据, 允许循环调用此函数, 将不完整数据持续地输入; 该参数
- *  若为 NULL，则直接返回空串地址，因此禁止为 NULL
- * @return {const char*} 当解析结束后，该返回值表示剩余数据的指针地址
+ * Parse json data, and automatically create json nodes.
+ * @param json {ACL_JSON*} json object
+ * @param data {const char*} A string ending with '\0', which
+ *  can be a complete json string; it can also be an
+ *  incomplete json string, and you can call this function in
+ *  a loop, and when the data is complete, it will be parsed;
+ *  this parameter cannot be NULL, otherwise it will directly
+ *  return an empty string. This parameter is forbidden to be
+ *  NULL
+ * @return {const char*} After parsing is complete, this return
+ *  value indicates the pointer to the remaining data
  */
 ACL_API const char* acl_json_update(ACL_JSON *json, const char *data);
 
 /**
- * 判断 JSON 解析是否完成
- * @param json {ACL_JSON*} json 对象
- * @return {int} 返回非 0 值表示解析完成，否则表示未完成
+ * Check if JSON parsing is complete.
+ * @param json {ACL_JSON*} json object
+ * @return {int} Returns a non-zero value to indicate parsing
+ *  is complete, otherwise indicates not complete
  */
 ACL_API int acl_json_finish(ACL_JSON *json);
 
 /*------------------------- in acl_json_util.c ----------------------------*/
 
 /**
- * 从 json 对象中获得第一个与所给标签名相同的 json 节点
- * @param json {ACL_JSON*} json 对象
- * @param tag {const char*} 标签名称
- * @return {ACL_JSON_NODE*} 符合条件的 json 节点, 若返回 NULL 则
- *  表示没有符合条件的 json 节点
+ * Get the first json node with the same tag name from the json object.
+ * @param json {ACL_JSON*} json object
+ * @param tag {const char*} Tag name
+ * @return {ACL_JSON_NODE*} Returns the found json node, if NULL
+ *  indicates no matching json node was found
  */
 ACL_API ACL_JSON_NODE *acl_json_getFirstElementByTagName(
 	ACL_JSON *json, const char *tag);
 
 /**
- * 释放由 acl_json_getElementsByTagName, acl_json_getElementsByName,
- * 等函数返回的动态数组对象, 因为该动态数组中的
- * 元素都是 ACL_JSON 对象中元素的引用, 所以释放掉该动态数组后, 只要 ACL_JSON
- * 对象不释放, 则原来存于该数组中的元素依然可以使用.
- * 但并不释放里面的 xml 节点元素
- * @param a {ACL_ARRAY*} 动态数组对象
+ * Free the dynamic array returned by functions such as
+ * acl_json_getElementsByTagName, acl_json_getElementsByName,
+ * etc. Because the elements in this dynamic array are all
+ * pointers to elements in the ACL_JSON object, when freeing
+ * this dynamic array, as long as ACL_JSON is not freed, the
+ * elements originally in the array can still be used.
+ * This function only frees the xml node elements
+ * @param a {ACL_ARRAY*} Dynamic array pointer
  */
 ACL_API void acl_json_free_array(ACL_ARRAY *a);
 
 /**
- * 从 json 对象中获得所有的与所给标签名相同的 json 节点的集合
- * @param json {ACL_JSON*} json 对象
- * @param tag {const char*} 标签名称
- * @return {ACL_ARRAY*} 符合条件的 json 节点集合, 存于 动态数组中, 若返回 NULL 则
- *  表示没有符合条件的 json 节点, 非空值需要调用 acl_json_free_array 释放
+ * Get all json nodes with the same tag name from the json object collection.
+ * @param json {ACL_JSON*} json object
+ * @param tag {const char*} Tag name
+ * @return {ACL_ARRAY*} Returns the found json node
+ *  collection, which is a dynamic array, if NULL indicates no
+ *  matching json node was found, non-empty values need to be
+ *  freed with acl_json_free_array
  */
 ACL_API ACL_ARRAY *acl_json_getElementsByTagName(
 	ACL_JSON *json, const char *tag);
 
 /**
- * 从 json 对象中获得所有的与给定多级标签名相同的 json 节点的集合
- * @param json {ACL_JSON*} json 对象
- * @param tags {const char*} 多级标签名，由 '/' 分隔各级标签名，如针对 json 数据：
+ * Get all json nodes with the same multi-level tag name from
+ * the json object collection.
+ * @param json {ACL_JSON*} json object
+ * @param tags {const char*} Multi-level tag name, separated
+ *  by '/' to form a tag path, for example json data:
  *  { 'root': [
  *      'first': { 'second': { 'third': 'test1' } },
  *      'first': { 'second': { 'third': 'test2' } },
  *      'first': { 'second': { 'third': 'test3' } }
  *    ]
  *  }
- *  可以通过多级标签名：root/first/second/third 一次性查出所有符合条件的节点
- * @return {ACL_ARRAY*} 符合条件的 json 节点集合, 存于 动态数组中, 若返回 NULL 则
- *  表示没有符合条件的 json 节点, 非空值需要调用 acl_json_free_array 释放
+ *  You can use the multi-level tag path
+ *  root/first/second/third to find all matching nodes at once
+ * @return {ACL_ARRAY*} Returns the found json node
+ *  collection, which is a dynamic array, if NULL indicates no
+ *  matching json node was found, non-empty values need to be
+ *  freed with acl_json_free_array
  */
 ACL_API ACL_ARRAY *acl_json_getElementsByTags(
 	ACL_JSON *json, const char *tags);
 
 /**
- * 构建 json 对象时创建 json 叶节点
- * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
- * @param name {const char*} 标签名，非空
- * @param value {const char*} 标签值，非空
- * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
- *  一起被释放，所以不需要单独释放
+ * When creating json objects, create json leaf nodes.
+ * @param json {ACL_JSON*} Created by acl_json_alloc / acl_json_alloc1
+ * @param name {const char*} Tag name, non-empty
+ * @param value {const char*} Tag value, non-empty
+ * @return {ACL_JSON_NODE*} The newly created node will be
+ *  freed when the ACL_JSON object is freed, so there is no
+ *  need to manually free it
  */
 ACL_API ACL_JSON_NODE *acl_json_create_text(ACL_JSON *json,
 	const char *name, const char *value);
 #define acl_json_create_leaf acl_json_create_text
 
 /**
- * 构建 json 对象时创建 json 布尔类型的叶节点
- * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
- * @param name {const char*} 标签名，非空
- * @param value {int} 布尔类型值
- * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
- *  一起被释放，所以不需要单独释放
+ * When creating json objects, create json boolean type leaf nodes.
+ * @param json {ACL_JSON*} Created by acl_json_alloc / acl_json_alloc1
+ * @param name {const char*} Tag name, non-empty
+ * @param value {int} Boolean value
+ * @return {ACL_JSON_NODE*} The newly created node will be
+ *  freed when the ACL_JSON object is freed, so there is no
+ *  need to manually free it
  */
 ACL_API ACL_JSON_NODE *acl_json_create_bool(ACL_JSON *json,
 	const char *name, int value);
 
 /**
- * 构造 json 对象时创建 json null 类型的叶节点
- * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
- * @param name {const char*} 标签名，非空
- * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
- *  一起被释放，所以不需要单独释放
+ * When creating json objects, create json null type leaf nodes.
+ * @param json {ACL_JSON*} Created by acl_json_alloc / acl_json_alloc1
+ * @param name {const char*} Tag name, non-empty
+ * @return {ACL_JSON_NODE*} The newly created node will be
+ *  freed when the ACL_JSON object is freed, so there is no
+ *  need to manually free it
  */
 ACL_API ACL_JSON_NODE *acl_json_create_null(ACL_JSON *json, const char *name);
 
 /**
- * 构建 json 对象时创建 json int 类型的叶节点
- * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
- * @param name {const char*} 标签名，非空
- * @param value {acl_int64} 有符号整形值
- * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
- *  一起被释放，所以不需要单独释放
+ * When creating json objects, create json int type leaf nodes.
+ * @param json {ACL_JSON*} Created by acl_json_alloc / acl_json_alloc1
+ * @param name {const char*} Tag name, non-empty
+ * @param value {acl_int64} Integer value
+ * @return {ACL_JSON_NODE*} The newly created node will be
+ *  freed when the ACL_JSON object is freed, so there is no
+ *  need to manually free it
  */
 ACL_API ACL_JSON_NODE *acl_json_create_int64(ACL_JSON *json,
 	const char *name, acl_int64 value);
 
 /**
- * 构建 json 对象时创建 json double 类型的叶节点
- * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
- * @param name {const char*} 标签名，非空
- * @param value {double} 有符号整形值
- * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
- *  一起被释放，所以不需要单独释放
+ * When creating json objects, create json double type leaf nodes.
+ * @param json {ACL_JSON*} Created by acl_json_alloc / acl_json_alloc1
+ * @param name {const char*} Tag name, non-empty
+ * @param value {double} Floating point value
+ * @return {ACL_JSON_NODE*} The newly created node will be
+ *  freed when the ACL_JSON object is freed, so there is no
+ *  need to manually free it
  */
 ACL_API ACL_JSON_NODE *acl_json_create_double(ACL_JSON *json,
 	const char *name, double value);
 
 /**
- * 构建 json 对象时创建 json double 类型的叶节点
- * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
- * @param name {const char*} 标签名，非空
- * @param value {double} 有符号整形值
- * @param precision {int} 小数点精度，大于 0 时有效，否则取缺省值为 4
- * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
- *  一起被释放，所以不需要单独释放
+ * When creating json objects, create json double type leaf nodes.
+ * @param json {ACL_JSON*} Created by acl_json_alloc / acl_json_alloc1
+ * @param name {const char*} Tag name, non-empty
+ * @param value {double} Floating point value
+ * @param precision {int} Decimal point precision, when > 0,
+ *  it takes effect, default value is 4
+ * @return {ACL_JSON_NODE*} The newly created node will be
+ *  freed when the ACL_JSON object is freed, so there is no
+ *  need to manually free it
  */
 ACL_API ACL_JSON_NODE *acl_json_create_double2(ACL_JSON *json,
 	const char *name, double value, int precision);
 
 /**
- * 构建 json 对象的字符串节点，按 json 规范，该节点只能加入至数组对象中
- * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
+ * Create json array string nodes, according to json
+ * specification, this node can only add string type elements.
+ * @param json {ACL_JSON*} Created by acl_json_alloc / acl_json_alloc1
  * @param text {const char*}
- * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
- *  一起被释放，所以不需要单独释放
+ * @return {ACL_JSON_NODE*} The newly created node will be
+ *  freed when the ACL_JSON object is freed, so there is no
+ *  need to manually free it
  */
 ACL_API ACL_JSON_NODE *acl_json_create_array_text(ACL_JSON *json,
 	const char *text);
 
 /**
- * 构建 json 对象的数值节点，按 json 规范，该节点只能加入至数组对象中
- * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
+ * Create json array value nodes, according to json
+ * specification, this node can only add numeric type
+ * elements.
+ * @param json {ACL_JSON*} Created by acl_json_alloc / acl_json_alloc1
  * @param value {acl_int64}
- * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
- *  一起被释放，所以不需要单独释放
+ * @return {ACL_JSON_NODE*} The newly created node will be
+ *  freed when the ACL_JSON object is freed, so there is no
+ *  need to manually free it
  */
 ACL_API ACL_JSON_NODE *acl_json_create_array_int64(ACL_JSON *json,
 	acl_int64 value);
 /**
- * 构建 json 对象的数值节点，按 json 规范，该节点只能加入至数组对象中
- * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
+ * Create json array value nodes, according to json
+ * specification, this node can only add numeric type
+ * elements.
+ * @param json {ACL_JSON*} Created by acl_json_alloc / acl_json_alloc1
  * @param value {double}
- * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
- *  一起被释放，所以不需要单独释放
+ * @return {ACL_JSON_NODE*} The newly created node will be
+ *  freed when the ACL_JSON object is freed, so there is no
+ *  need to manually free it
  */
 ACL_API ACL_JSON_NODE *acl_json_create_array_double(ACL_JSON *json,
 	double value);
 
 /**
- * 构建 json 对象的布尔节点，按 json 规范，该节点只能加入至数组对象中
- * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
- * @param value {int} 非 0 表示 true，否则表示 false
- * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
- *  一起被释放，所以不需要单独释放
+ * Create json array boolean nodes, according to json
+ * specification, this node can only add boolean type
+ * elements.
+ * @param json {ACL_JSON*} Created by acl_json_alloc / acl_json_alloc1
+ * @param value {int} If 0 indicates true, otherwise indicates false
+ * @return {ACL_JSON_NODE*} The newly created node will be
+ *  freed when the ACL_JSON object is freed, so there is no
+ *  need to manually free it
  */
 ACL_API ACL_JSON_NODE *acl_json_create_array_bool(ACL_JSON *json, int value);
 
 /**
- * 构建 json 对象的 null 节点，按 json 规范，该节点只能加入至数组对象中
- * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
- * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
- *  一起被释放，所以不需要单独释放
+ * Create json array null nodes, according to json
+ * specification, this node can only add null type elements.
+ * @param json {ACL_JSON*} Created by acl_json_alloc / acl_json_alloc1
+ * @return {ACL_JSON_NODE*} The newly created node will be
+ *  freed when the ACL_JSON object is freed, so there is no
+ *  need to manually free it
  */
 ACL_API ACL_JSON_NODE *acl_json_create_array_null(ACL_JSON *json);
 
 /**
- * 构建 json 对象时创建 json 对象(即仅包含 {} 的对象)
- * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
- * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
- *  一起被释放，所以不需要单独释放
+ * When creating json objects, create json objects (objects wrapped in {}).
+ * @param json {ACL_JSON*} Created by acl_json_alloc / acl_json_alloc1
+ * @return {ACL_JSON_NODE*} The newly created node will be
+ *  freed when the ACL_JSON object is freed, so there is no
+ *  need to manually free it
  */
 ACL_API ACL_JSON_NODE *acl_json_create_obj(ACL_JSON *json);
 
 /**
- * 构建 json 对象时创建 json 数组对象(即仅包含 [] 的对象)
- * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
- * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
- *  一起被释放，所以不需要单独释放
+ * When creating json objects, create json arrays (objects wrapped in []).
+ * @param json {ACL_JSON*} Created by acl_json_alloc / acl_json_alloc1
+ * @return {ACL_JSON_NODE*} The newly created node will be
+ *  freed when the ACL_JSON object is freed, so there is no
+ *  need to manually free it
  */
 ACL_API ACL_JSON_NODE *acl_json_create_array(ACL_JSON *json);
 
 /**
- * 构建 json 对象时创建 json 节点对象(即 tagname: ACL_JSON_NODE)
- * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
- * @param name {const char*} json 节点的标签名
- * @param value {ACL_JSON_NODE*} json 节点对象作为标签值
- * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
- *  一起被释放，所以不需要单独释放
+ * When creating json objects, create json node pairs (e.g.
+ * tagname: ACL_JSON_NODE)
+ * @param json {ACL_JSON*} Created by acl_json_alloc / acl_json_alloc1
+ * @param name {const char*} json node's tag name
+ * @param value {ACL_JSON_NODE*} json node's tag value
+ * @return {ACL_JSON_NODE*} The newly created node will be
+ *  freed when the ACL_JSON object is freed, so there is no
+ *  need to manually free it
  */
 ACL_API ACL_JSON_NODE *acl_json_create_node(ACL_JSON *json,
 	const char *name, ACL_JSON_NODE *value);
 
 /**
- * 构建 json 对象时，向一个由 acl_json_create_obj 或 acl_json_create_array
- * 创建的 json 节点添加子节点，该子节点可以是由如下接口创建的节点:
+ * When creating json objects, add child nodes to json nodes
+ * created by acl_json_create_obj or acl_json_create_array
+ * child nodes can be created by the following interfaces:
  * acl_json_create_leaf, acl_json_create_obj, acl_json_create_array
  */
 ACL_API void acl_json_node_append_child(ACL_JSON_NODE *parent,
 	ACL_JSON_NODE *child);
 
 /**
- * 将 json 对象的一个 JSON 节点转成字符串内容
- * @param node {ACL_JSON_NODE*} json 节点对象
- * @param buf {ACL_VSTRING*} 存储结果集的缓冲区，当该参数为空时则函数内部会
- *  自动分配一段缓冲区，应用用完后需要释放掉；非空函数内部会直接将结果存储其中
- * @return {ACL_VSTRING*} json 节点对象转换成字符串后的存储缓冲区，
- *  该返回值永远非空，使用者可以通过 ACL_VSTRING_LEN(x) 宏来判断内容是否为空，
- *  返回的 ACL_VSTRING 指针如果为该函数内部创建的，则用户名必须用
- *  acl_vstring_free 进行释放
+ * Convert a JSON node in json object to string format.
+ * @param node {ACL_JSON_NODE*} json node pointer
+ * @param buf {ACL_VSTRING*} Buffer to store the result. If
+ *  this parameter is NULL, the internal will automatically
+ *  allocate a buffer. If the user needs to free it, it is a
+ *  non-empty buffer allocated internally, otherwise it will
+ *  directly use the storage space provided by the user
+ * @return {ACL_VSTRING*} Buffer to store the converted string
+ *  format of the json node. This return value is always
+ *  non-empty. Users can determine whether the content is empty
+ *  through ACL_VSTRING_LEN(x). If the returned ACL_VSTRING
+ *  pointer is allocated internally by this function, the user
+ *  needs to
+ *  call acl_vstring_free to free it
  */
 ACL_API ACL_VSTRING *acl_json_node_build(ACL_JSON_NODE *node, ACL_VSTRING *buf);
 
 /**
- * 将 json 对象转成字符串内容
- * @param json {ACL_JSON*} json 对象
- * @param buf {ACL_VSTRING*} 存储结果集的缓冲区，当该参数为空时则函数内部会
- *  自动分配一段缓冲区，应用用完后需要释放掉；非空函数内部会直接将结果存储其中
- * @return {ACL_VSTRING*} json 对象转换成字符串后的存储缓冲区，该返回值永远非空，
- *  使用者可以通过 ACL_VSTRING_LEN(x) 宏来判断内容是否为空，返回的 ACL_VSTRING
- *  指针如果为该函数内部创建的，则用户名必须用 acl_vstring_free 进行释放
+ * Convert json object to string format.
+ * @param json {ACL_JSON*} json object
+ * @param buf {ACL_VSTRING*} Buffer to store the result. If
+ *  this parameter is NULL, the internal will automatically
+ *  allocate a buffer. If the user needs to free it, it is a
+ *  non-empty buffer allocated internally, otherwise it will
+ *  directly use the storage space provided by the user
+ * @return {ACL_VSTRING*} Buffer to store the converted string
+ *  format of the json object. This return value is always
+ *  non-empty. Users can determine whether the content is empty
+ *  through ACL_VSTRING_LEN(x). The returned ACL_VSTRING
+ *  pointer is allocated internally by this function. If the
+ *  user needs to free it, call acl_vstring_free to free it
  */
 ACL_API ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf);
 
 /**
- * 流式 JSON 对象转字符串处理过程，即该函数在将 JSON 对象转为字符串的过程中，
- * 一边转换一边将数据通过回调函数输出给调用者，调用者可以限定长度限定调用回
- * 调函数的时机；该处理过程适应于当JSON对象转成的字符串非常长时(如超过100 MB),
- * 因为采用流式转换方式，所以并不需要分配一个大内存
- * @param json {ACL_JSON*} json 对象
- * @param length {size_t} 在转换为字符串的过程中如果缓冲区长度超过该长度则回调
- *  用户设定的回调函数
- * @param callback {int (*)(ACL_JSON*, ACL_VSTRING*, void*)} 用户设定的回调
- *  函数，当回调函数给的第二个参数为 NULL 时表示处理完毕；如果用户在该回调
- *  的某次被调用后返回值 < 0 则停止处理过程
- * @param ctx {void*} callback 函数的最后一个参数
+ * Stream JSON object to string conversion process. This
+ * function converts JSON object to string in the process,
+ * converts while calling the callback function to notify the
+ * caller, and the caller can limit the length and limit the
+ * user memory usage. This function is suitable when the JSON
+ * object converted to string is very long (e.g. exceeding 100
+ * MB), because it uses streaming conversion format, so it
+ * does not need to allocate a large amount of memory at once
+ * @param json {ACL_JSON*} json object
+ * @param length {size_t} During the process of converting to
+ *  string, when the length exceeds the length set by the user,
+ *  the callback
+ *  function will be called
+ * @param callback {int (*)(ACL_JSON*, ACL_VSTRING*, void*)}
+ *  User-defined callback function. When the second parameter
+ *  of the callback function is NULL, it indicates the
+ *  conversion is complete. If the user returns
+ *  a value < 0 in a certain callback, the conversion will stop
+ * @param ctx {void*} One of the parameters for the callback function
  */
 ACL_API void acl_json_building(ACL_JSON *json, size_t length,
 	int (*callback)(ACL_JSON *, ACL_VSTRING *, void *), void *ctx);

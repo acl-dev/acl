@@ -19,41 +19,45 @@ public:
 	queue_file();
 
 	/**
-	 * 获得文件流指针
-	 * @return {acl::fstream*} 文件流指针, 如果为 NULL 则说明文件还未打开
+	 * Get file stream pointer
+	 * @return {acl::fstream*} File stream pointer. If NULL, it indicates file has
+	 * not been opened yet
 	 */
 	fstream* get_fstream(void) const;
 
 	/**
-	 * 获得文件创建时间
-	 * @return {time_t}, 返回自 1970 年以来的秒数, 如果返回值为 (time_t) -1,
-	 *  则表示出错
+	 * Get file creation time
+	 * @return {time_t}, Returns seconds since 1970. If return value is (time_t)
+	 * -1,
+	 *  it indicates error
 	 */
 	time_t get_ctime(void) const;
 
 	/**
-	 * 向文件中写数据
-	 * @param data {const void*} 数据地址
-	 * @param len {size} 数据长度
-	 * @return {bool} 写数据是否成功
+	 * Write data to file
+	 * @param data {const void*} Data address
+	 * @param len {size} Data length
+	 * @return {bool} Whether writing data was successful
 	 */
 	bool write(const void* data, size_t len);
 	int format(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
 	int vformat(const char* fmt, va_list ap);
 
 	/**
-	 * 从文件中读取数据
-	 * @param buf {void*} 缓存地址
-	 * @param len {size_t} buf 大小
-	 * @return {int} 读取的数据长度, -1: 表示读结束或读失败或输入参数错误,
-	 *  应该关闭该文件对象, > 0: 表示成功
+	 * Read data from file
+	 * @param buf {void*} Buffer address
+	 * @param len {size_t} buf size
+	 * @return {int} Length of data read. -1: Indicates read ended or read failed
+	 * or input parameter error,
+	 *  should close this file object. > 0: Indicates success
 	 */
 	int read(void* buf, size_t len);
 
 	/**
-	 * 取得本队列文件的键值, 该值即是队列文件的部分文件名(不含路径,
-	 * 扩展名)
-	 * @return {const char*} 队列文件键值
+	 * Get key value of this queue file. This value is part of queue file name
+	 * (excluding path,
+	 * extension)
+	 * @return {const char*} Queue file key value
 	 */
 	const char* key(void) const
 	{
@@ -61,7 +65,7 @@ public:
 	}
 
 	/**
-	 * 获得队列文件的访问全路径
+	 * Get full access path of queue file
 	 * @return {const char*}
 	 */
 	const char* get_filePath(void) const
@@ -70,7 +74,7 @@ public:
 	}
 
 	/**
-	 * 获得队列文件的根路径部分(不含队列目录)
+	 * Get root path part of queue file (excluding queue directory)
 	 * @return {const char*}
 	 */
 	const char* get_home(void) const
@@ -79,8 +83,8 @@ public:
 	}
 
 	/**
-	 * 获得该队列文件的队列名
-	 * @return {const char*} 队列名称
+	 * Get queue name of this queue file
+	 * @return {const char*} Queue name
 	 */
 	const char* get_queueName(void) const
 	{
@@ -88,8 +92,8 @@ public:
 	}
 
 	/**
-	 * 获得队列子目录
-	 * @return {const char*} 队列子目录名
+	 * Get queue subdirectory
+	 * @return {const char*} Queue subdirectory name
 	 */
 	const char* get_queueSub(void) const
 	{
@@ -97,8 +101,8 @@ public:
 	}
 
 	/**
-	 * 获得该队列文件的扩展名
-	 * @return {const char*} 扩展名称
+	 * Get extension name of this queue file
+	 * @return {const char*} Extension name
 	 */
 	const char* get_extName(void) const
 	{
@@ -106,7 +110,7 @@ public:
 	}
 
 	/**
-	 * 获得已经写入的数据大小尺寸
+	 * Get size of data already written
 	 * @return {size_t}
 	 */
 	size_t get_fileSize() const
@@ -120,103 +124,107 @@ private:
 	~queue_file();
 
 	/**
-	 * 创建新的队列文件, 创建完毕后会自动创建该文件的加锁对象
-	 * 可以直接调用该文件的 lock()/unlock()
-	 * @param home {const char*} 队列文件所在根路径
-	 * @param queueName {const char*} 队列名
-	 * @param extName {const char*} 队列文件扩展名
-	 * @param width {unsigned} 队列二级目录的个数
-	 * @return {bool} 创建新队列文件是否成功, 如果返回 false 则说明
-	 *  输入的 path 或 extName 非法
+	 * Create new queue file. After creation, will automatically create lock object
+	 * for this file.
+	 * Can directly call lock()/unlock() of this file
+	 * @param home {const char*} Root path where queue file is located
+	 * @param queueName {const char*} Queue name
+	 * @param extName {const char*} Queue file extension name
+	 * @param width {unsigned} Number of queue second-level directories
+	 * @return {bool} Whether creating new queue file was successful. If returns
+	 * false, it indicates
+	 *  input path or extName is illegal
 	 */
 	bool create(const char* home, const char* queueName,
 		const char* extName, unsigned width);
 
 	/**
-	 * 打开已经存在的队列文件, 打开后会自动创建该文件的加锁对象,
-	 * 可以直接调用该文件的 lock()/unlock()
-	 * @param filePath {const char*} 队列文件路径
-	 * @return {bool} 打开队列文件是否成功
+	 * Open existing queue file. After opening, will automatically create lock
+	 * object for this file.
+	 * Can directly call lock()/unlock() of this file
+	 * @param filePath {const char*} Queue file path
+	 * @return {bool} Whether opening queue file was successful
 	 */
 	bool open(const char* filePath);
 	bool open(const char* home, const char* queueName, const char* queueSub,
 		const char* partName, const char* extName);
 
 	/**
-	 * 关闭当前文件句柄
+	 * Close current file handle
 	 */
 	void close();
 
 	/**
-	 * 从磁盘上删除本队列文件
-	 * @return {bool} 删除是否成功
+	 * Delete this queue file from disk
+	 * @return {bool} Whether deletion was successful
 	 */
 	bool remove();
 
 	/**
-	 * 将队列文件从当前队列中移至目标队列中
-	 * @param queueName {const char*} 目标队列名称
-	 * @param extName {const char*} 目标扩展名称
-	 * @return {bool} 移动文件是否成功
+	 * Move queue file from current queue to target queue
+	 * @param queueName {const char*} Target queue name
+	 * @param extName {const char*} Target extension name
+	 * @return {bool} Whether moving file was successful
 	 */
 	bool move_file(const char* queueName, const char* extName);
 
 	/**
-	 * 设置队列名
-	 * @param queueName {const char*} 队列名称
+	 * Set queue name
+	 * @param queueName {const char*} Queue name
 	 */
 	void set_queueName(const char* queueName);
 
 	/**
-	 * 设置队列文件的扩展名
+	 * Set extension name of queue file
 	 */
 	void set_extName(const char* extName);
 
 	/**
-	 * 对当前队列文件对象加锁(包括互斥锁及文件锁)
-	 * @return {bool} 加锁是否成功
+	 * Lock current queue file object (including mutex lock and file lock)
+	 * @return {bool} Whether locking was successful
 	 */
 	bool lock(void);
 
 	/**
-	 * 对当前队列文件对象解锁(包括互斥锁及文件锁)
-	 * @return {bool} 解锁是否成功
+	 * Unlock current queue file object (including mutex lock and file lock)
+	 * @return {bool} Whether unlocking was successful
 	 */
 	bool unlock(void);
 
 private:
-	// 文件流对象
+	// File stream object
 	fstream* m_fp;
 
-	// 队列文件相对于队列根目录的全路径名
+	// Full path name of queue file relative to queue root directory
 	string m_filePath;
 
-	// 队列文件的根路径
+	// Root path of queue file
 	char  m_home[MAXPATH255];
 
-	// 队列名称
+	// Queue name
 	char  m_queueName[32];
 
-	// 队列下的子目录
+	// Subdirectory under queue
 	char  m_queueSub[32];
 
-	// 队列文件名, 不包括路径, 也不包括文件的扩展名
+	// Queue filename, excluding path, also excluding file extension
 	char  m_partName[MAXPATH255];
 
-	// 队列文件的扩展名
+	// Extension name of queue file
 	char  m_extName[32];
 
-	// 加锁对象
+	// Lock object
 	locker m_locker;
 
-	// 当前文件是否已经被加锁了
+	// Whether current file has already been locked
 	bool  m_bLocked;
 
-	// 文件锁是否已经打开了
+	// Whether file lock has already been opened
 	bool  m_bLockerOpened;
 
-	// 已经写入的文件尺寸大小
+	// Size of file data already written
 	size_t nwriten_;
 };
 
 } // namespace acl
+

@@ -7,147 +7,166 @@
 namespace acl {
 
 /**
- * http 协议头中 cookie 对象类
+ * Cookie object class in HTTP protocol header
  */
 class ACL_CPP_API HttpCookie : public dbuf_obj {
 public:
 	/**
-	 * 构造函数
-	 * @param name {const char*} cookie 名，为非空字符串且字符串长度 > 0
-	 * @param value {const char*} cookie 值，指针非空，字符串长度可以为 0
-	 * 注：如果输入的两个参数不符合条件，内部将会产生断言
-	 * @param dbuf {dbuf_guard*} 非空时将做为内存分配池
+	 * Constructor
+	 * @param name {const char*} Cookie name, non-empty string with string length >
+	 * 0
+	 * @param value {const char*} Cookie value, pointer is non-empty, string length
+	 * can be 0
+	 * Note: If input two parameters do not meet conditions, internally will
+	 * generate assertion
+	 * @param dbuf {dbuf_guard*} When not empty, will be used as memory allocation
+	 * pool
 	 */
 	HttpCookie(const char* name, const char* value, dbuf_guard* dbuf = NULL);
 
 	/**
-	 * 当使用该构造函数时，可以使用 setCookie 来添加 cookie 项
-	 * @param dbuf {dbuf_guard*} 非空时将做为内存分配池
+	 * When using this constructor, can use setCookie to add cookie items
+	 * @param dbuf {dbuf_guard*} When not empty, will be used as memory allocation
+	 * pool
 	 */
 	explicit HttpCookie(dbuf_guard* dbuf = NULL);
 
 	/**
-	 * 拷贝构造函数
-	 * @param cookie {const HttpCookie*} 非 NULL， 内部将复制拷贝其成员变量
-	 * @param dbuf {dbuf_guard*} 非空时将做为内存分配池
+	 * Copy constructor
+	 * @param cookie {const HttpCookie*} Non-NULL, internally will copy its member
+	 * variables
+	 * @param dbuf {dbuf_guard*} When not empty, will be used as memory allocation
+	 * pool
 	 */
 	explicit HttpCookie(const HttpCookie* cookie, dbuf_guard* dbuf = NULL);
 
 	/**
-	 * 析构函数
+	 * Destructor
 	 */
 	~HttpCookie();
 
 	/**
-	 * 对于 Set-Cookie: xxx=xxx; domain=xxx; expires=xxx; path=xxx; max-age=xxx; ...
-	 * 类的数据进行分析
-	 * @param value {const char*} 类似于 xxx=xxx; domain=xxx; ... 内容
-	 * @return {bool} 传入的数据是否合法
+	 * Parse data like Set-Cookie: xxx=xxx; domain=xxx; expires=xxx; path=xxx;
+	 * max-age=xxx; ...
+	 * @param value {const char*} Content like xxx=xxx; domain=xxx; ...
+	 * @return {bool} Whether input data is legal
 	 */
 	bool setCookie(const char* value);
 
 	/**
-	 * 动态创建的类对象通过此函数释放
+	 * Dynamically created class objects are released through this function
 	 */
 	void destroy();
 
 	/**
-	 * 设置 cookie 的作用域
-	 * @param domain {const char*} cookie 作用域
-	 * @return {HttpCookie&} 返回本对象的引用，便于用户连续操作
+	 * Set cookie's scope
+	 * @param domain {const char*} Cookie scope
+	 * @return {HttpCookie&} Returns reference to this object for convenient
+	 * chained operations
 	 */
 	HttpCookie& setDomain(const char* domain);
 
 	/**
-	 * 设置 cookie 的 path 字段
-	 * @param path {const char*} path 字段值
-	 * @return {HttpCookie&} 返回本对象的引用，便于用户连续操作
+	 * Set cookie's path field
+	 * @param path {const char*} path field value
+	 * @return {HttpCookie&} Returns reference to this object for convenient
+	 * chained operations
 	 */
 	HttpCookie& setPath(const char* path);
 
 	/**
-	 * 设置 cookie 的过期时间段，即用当前时间加输入的时间即为 cookie
-	 * 的过期时间
-	 * @param timeout {time_t} 过期时间值(单位为秒)，当前时间加该时间
-	 * 即 cookie 的过期时间
-	 * @return {HttpCookie&} 返回本对象的引用，便于用户连续操作
+	 * Set cookie's expiration time period, i.e., current time plus input time is
+	 * cookie's
+	 * expiration time
+	 * @param timeout {time_t} Expiration time value (unit: seconds). Current time
+	 * plus this time
+	 * is cookie's expiration time
+	 * @return {HttpCookie&} Returns reference to this object for convenient
+	 * chained operations
 	 */
 	HttpCookie& setExpires(time_t timeout);
 
 	/**
-	 * 设置 cookie 的过期时间截字符串
-	 * @param expires {const char*} 过期时间截
-	 * @return {HttpCookie&} 返回本对象的引用，便于用户连续操作
+	 * Set cookie's expiration timestamp string
+	 * @param expires {const char*} Expiration timestamp
+	 * @return {HttpCookie&} Returns reference to this object for convenient
+	 * chained operations
 	 */
 	HttpCookie& setExpires(const char* expires);
 
 	/**
-	 * 设置 cookie 的生存周期
-	 * @param max_age {int} 生存秒数
-	 * @return {HttpCookie&} 返回本对象的引用，便于用户连续操作
+	 * Set cookie's lifetime
+	 * @param max_age {int} Lifetime in seconds
+	 * @return {HttpCookie&} Returns reference to this object for convenient
+	 * chained operations
 	 */
 	HttpCookie& setMaxAge(int max_age);
 
 	/**
-	 * 添加与该 cookie 对象其它属性值
-	 * @param name {const char*} 属性名
-	 * @param value {const char*} 属性值
-	 * @return {HttpCookie&} 返回本对象的引用，便于用户连续操作
+	 * Add other attribute values for this cookie object
+	 * @param name {const char*} Attribute name
+	 * @param value {const char*} Attribute value
+	 * @return {HttpCookie&} Returns reference to this object for convenient
+	 * chained operations
 	 */
 	HttpCookie& add(const char* name, const char* value);
 
 	/**
-	 * 获得 cookie 名称，取决于构建函数输入值
-	 * @return {const char*} 为长度大于 0 的字符串，永远非空指针
-	 * 注：用户必须在调用 HttpCookie(const char*, const char*) 构造
-	 *     或调用 setCookie(const char*) 成功后才可以调用该函数，
-	 *     否则返回的数据是 "\0"
+	 * Get cookie name, depends on constructor input value
+	 * @return {const char*} String with length > 0, always non-NULL pointer
+	 * Note: User must call HttpCookie(const char*, const char*) constructor
+	 * or call setCookie(const char*) successfully before calling this function,
+	 *     otherwise returned data is "\0"
 	 */
 	const char* getName() const;
 
 	/**
-	 * 获得 cookie 值，取决于构造函数输入值
-	 * @return {const char*} 非空指针，有可能是空字符串("\0")
+	 * Get cookie value, depends on constructor input value
+	 * @return {const char*} Non-NULL pointer, may be empty string ("\0")
 	 */
 	const char* getValue() const;
 
 	/**
-	 * 获得字符串格式的过期时间
-	 * @return {const char*} 非空指针，返回值为 "\0" 表示不存在
+	 * Get expiration time in string format
+	 * @return {const char*} Non-NULL pointer. Return value "\0" indicates does not
+	 * exist
 	 */
 	const char* getExpires() const;
 
 	/**
-	 * 获得 cookie 作用域
-	 * @return {const char*} 非空指针，返回值为 "\0" 表示不存在
+	 * Get cookie scope
+	 * @return {const char*} Non-NULL pointer. Return value "\0" indicates does not
+	 * exist
 	 */
 	const char* getDomain() const;
 
 	/**
-	 * 获得 cookie 的存储路径
-	 * @return {const char*} 非空指针，返回值为 "\0" 表示不存在
+	 * Get cookie's storage path
+	 * @return {const char*} Non-NULL pointer. Return value "\0" indicates does not
+	 * exist
 	 */
 	const char* getPath() const;
 
 	/**
-	 * 获得 cookie 的生存周期
-	 * @return {int} 返回 -1 时表示没有该 Max-Age 字段
+	 * Get cookie's lifetime
+	 * @return {int} Returns -1 indicates Max-Age field does not exist
 	 */
 	int  getMaxAge() const;
 
 	/**
-	 * 获得对应参数名的参数值
-	 * @param name {const char*} 参数名
-	 * @param case_insensitive {bool} 是否区分大小写，true 表示
-	 *  不区分大小写
-	 * @return {const char*} 非空指针，返回值为 "\0" 表示不存在
+	 * Get parameter value corresponding to parameter name
+	 * @param name {const char*} Parameter name
+	 * @param case_insensitive {bool} Whether case-sensitive. true indicates
+	 *  case-insensitive
+	 * @return {const char*} Non-NULL pointer. Return value "\0" indicates does not
+	 * exist
 	 */
 	const char* getParam(const char* name,
 		bool case_insensitive = true) const;
 
 	/**
-	 * 获得该 cookie 对象的除 cookie 名及 cookie 值之外的
-	 * 所有属性及属性值
+	 * Get all attributes and attribute values of this cookie object except cookie
+	 * name and cookie value
 	 * @return {const std::list<HTTP_PARAM*>&}
 	 */
 	const std::list<HTTP_PARAM*>& getParams() const;
@@ -168,3 +187,4 @@ protected:
 };
 
 } // namespace acl end
+

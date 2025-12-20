@@ -14,17 +14,21 @@ class mysql_conf;
 class ACL_CPP_API db_mysql : public db_handle {
 public:
 	/**
-	 * 构造函数方式一
-	 * @param dbaddr {const char*} 数据库监听地址，可以为 TCP 套接口或在 UNIX
-	 *  平台下的域套接口，格式如：127.0.0.1:3306，或 /tmp/mysql.sock
-	 * @param dbname {const char*} 数据库名称，非 NULL
-	 * @param dbuser {const char*} 连接数据库时的用户名
-	 * @param dbpass {const char*} 连接数据库时的用户密码
-	 * @param dbflags {unsigned long} 连接 MYSQL 时的标志位
-	 * @param auto_commit {bool} 当对数据库进行修改时是否自动提交事务
-	 * @param conn_timeout {int} 连接数据库的超时时间（秒）
-	 * @param rw_timeout {int} 进行数据库操作时的超时时间（秒）
-	 * @param charset {const char*} 连接数据库时的本地字符集（gbk, utf8, ...）
+	 * Constructor method one
+	 * @param dbaddr {const char*} Database listening address, can be TCP socket or
+	 * domain socket on UNIX
+	 *  platform, format: 127.0.0.1:3306, or /tmp/mysql.sock
+	 * @param dbname {const char*} Database name, non-NULL
+	 * @param dbuser {const char*} Username when connecting to database
+	 * @param dbpass {const char*} User password when connecting to database
+	 * @param dbflags {unsigned long} Flag bits when connecting to MYSQL
+	 * @param auto_commit {bool} Whether to auto commit transaction when modifying
+	 * database
+	 * @param conn_timeout {int} Timeout for connecting to database (seconds)
+	 * @param rw_timeout {int} Timeout when performing database operations
+	 * (seconds)
+	 * @param charset {const char*} Local character set when connecting to database
+	 * (gbk, utf8, ...)
 	 */
 	db_mysql(const char* dbaddr, const char* dbname,
 		const char* dbuser, const char* dbpass,
@@ -33,44 +37,47 @@ public:
 		const char* charset = "utf8");
 
 	/**
-	 * 构造函数方式二：使用参数配置类对象进行构造
-	 * @param conf {const mysql_conf&} mysql 数据库连接配置类对象
+	 * Constructor method two: Construct using parameter configuration class object
+	 * @param conf {const mysql_conf&} MySQL database connection configuration
+	 * class object
 	 */
 	db_mysql(const mysql_conf& conf);
 	~db_mysql(void);
 
 	/**
-	 * 获得 mysql 客户端库的版本号
+	 * Get MySQL client library version number
 	 * @return {unsigned long}
 	 */
 	unsigned long mysql_libversion(void) const;
 
 	/**
-	 * 获得 mysql 客户端库的信息
+	 * Get MySQL client library information
 	 * @return {const char*}
 	 */
 	const char* mysql_client_info(void) const;
 
 	/**
-	 * 直接获得 mysql 的连接句柄，如果返回 NULL 则表示 mysql 还没有打开
-	 * 或出错时内部自动关闭了 mysql 连接
-	 * @return {void*} 类型同 MYSQL*
+	 * Directly get MySQL connection handle. If returns NULL, it indicates MySQL
+	 * has not been opened yet
+	 * or MySQL connection was automatically closed internally when error occurred
+	 * @return {void*} Type is the same as MYSQL*
 	 */
 	void* get_conn(void) const {
 		return conn_;
 	}
 
 	/**
-	 * 当动态加载 libmysqlclient.so / libmysqlclient.dll 时，可以调用本
-	 * 静态函数显式动态加载 mysql 客户端库，如果加载失败，内部会自动产生
-	 * 断言，以免运行时出错，也可不调用本函数，使 db_mysql 类对象内部在
-	 * 使用时隐式加载 mysql 动态库
-	 * @return {bool} 加载 Mysql 动态库是否成功
+	 * When dynamically loading libmysqlclient.so / libmysqlclient.dll, this
+	 * static function can be called to explicitly dynamically load MySQL client
+	 * library. If loading fails, internally will automatically generate assertion
+	 * to avoid runtime errors. Can also not call this function, letting db_mysql
+	 * class objects internally implicitly load MySQL dynamic library when used
+	 * @return {bool} Whether loading MySQL dynamic library was successful
 	 */
 	static bool load(void);
 
 	/********************************************************************/
-	/*         以下为基类 db_handle 的虚接口                            */
+	/*         The following are virtual interfaces of the base class db_handle */
 	/********************************************************************/
 
 	/**
@@ -125,8 +132,9 @@ public:
 
 	/**
 	 * @override
-	 * 基类 db_handle 的虚函数，用来表示事务的开始，注意若要使用事务方式，
-	 * 则需要在 db_mysql 的构造函数中传入的参数 auto_commit 为 false
+	 * Virtual function of base class db_handle, used to indicate start of
+	 * transaction. Note that to use transaction mode, need to pass parameter
+	 * auto_commit as false in db_mysql constructor
 	 */
 	bool begin_transaction(void);
 
@@ -141,11 +149,11 @@ public:
 	bool rollback(void);
 
 private:
-	std::string dbaddr_;  // 数据库监听地址
-	std::string dbname_;  // 数据库名
-	std::string dbuser_;  // 数据库账号
-	std::string dbpass_;  // 数据库账号密码
-	string charset_; // 连接数据库采用的字符集
+	std::string dbaddr_;  // Database listening address
+	std::string dbname_;  // Database name
+	std::string dbuser_;  // Database account
+	std::string dbpass_;  // Database account password
+	string charset_; // Character set used when connecting to database
 
 	std::string sslcrt_;
 	std::string sslkey_;
@@ -157,7 +165,7 @@ private:
 	int    conn_timeout_;
 	int    rw_timeout_;
 	bool   auto_commit_;
-	void*  conn_;	// MYSQL 对象指针
+	void*  conn_;	// MYSQL object pointer
 
 	bool sane_mysql_query(const char* sql);
 	void sane_mysql_init(const mysql_conf& conf);
@@ -166,3 +174,4 @@ private:
 } // namespace acl
 
 #endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
+

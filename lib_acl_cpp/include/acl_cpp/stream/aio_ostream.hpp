@@ -13,16 +13,25 @@ namespace acl {
 class aio_ostream;
 
 /**
- * 延迟异步写数据类，基类为 aio_timer_callback (see aio_handle.hpp)，
- * 所谓延迟异步写，就是把异步写流(aio_ostream)放在定时器中，将该异
- * 步流的异步写操作解除绑定(即从 aio_handle 的监控中解除)，当指定
- * 时间到达后再启动异步写操作(在 timer_callback 回调中再重新将异步
- * 流的异步写操作绑定)，同时该定时器自动销毁(调用 destroy 方法)，
- * 所以如果用户继承了 aio_timer_writer 类，且子类不是在堆上分配的，
- * 则必须重载 destroy方法，同时在子类的 destroy 中执行与资源释放的
- * 相关操作，如果子类未重载 destroy，则当定时器结束后内部会自动调用
- * 基类 aio_timer_writer 的 destroy--该类调用了 delete this，此时就
- * 会导致非法内存释放操作)
+ * Delayed asynchronous write data class. Base class is aio_timer_callback (see
+ * aio_handle.hpp).
+ * So-called delayed asynchronous write is to put asynchronous write stream
+ * (aio_ostream) in timer, unbind
+ * asynchronous write operation of this asynchronous stream (i.e., remove from
+ * aio_handle's monitoring),
+ * then start asynchronous write operation when specified time arrives (rebind
+ * asynchronous stream's
+ * asynchronous write operation in timer_callback callback), and timer
+ * automatically destroys (calls destroy method).
+ * So if user inherits aio_timer_writer class, and subclass is not allocated on
+ * heap,
+ * must override destroy method, and perform resource release related operations
+ * in subclass's destroy.
+ * If subclass does not override destroy, when timer ends, internally will
+ * automatically call
+ * base class aio_timer_writer's destroy--this class calls delete this, which
+ * will cause
+ * illegal memory release operation)
  * 
  */
 class ACL_CPP_API aio_timer_writer : public aio_timer_callback {
@@ -30,7 +39,8 @@ public:
 	aio_timer_writer();
 
 	/**
-	 * 在 aio_istream 中调用此函数以释放类对象，子类应该实现该函数
+	 * Called in aio_istream to release class object. Subclass should implement
+	 * this function
 	 */
 	virtual void destroy() {
 		delete this;
@@ -40,7 +50,8 @@ protected:
 	virtual ~aio_timer_writer();
 
 	/**
-	 * 延迟读数据时的回调函数，从 aio_timer_callback 类中继承而来
+	 * Callback function when delayed read data. Inherited from aio_timer_callback
+	 * class
 	 */
 	virtual void timer_callback(unsigned int id);
 private:
@@ -52,21 +63,23 @@ private:
 };
 
 /**
- * 异步写数据流类定义，该类只能在堆上被实例化，在析构时需要调用 close
- * 函数以释放该类对象
+ * Asynchronous write data stream class definition. This class can only be
+ * instantiated on heap. Need to call close
+ * function during destruction to release this class object
  */
 class ACL_CPP_API aio_ostream : virtual public aio_stream {
 public:
 	/**
-	 * 构造函数
-	 * @param handle {aio_handle*} 异步事件引擎句柄
+	 * Constructor
+	 * @param handle {aio_handle*} Asynchronous event engine handle
 	 */
 	aio_ostream(aio_handle* handle);
 
 	/**
-	 * 构造函数，创建异步写流对象，并 hook 写过程及关闭/超时过程
-	 * @param handle {aio_handle*} 异步事件引擎句柄
-	 * @param fd {int} 连接套接口句柄
+	 * Constructor. Create asynchronous write stream object, and hook write process
+	 * and close/timeout process
+	 * @param handle {aio_handle*} Asynchronous event engine handle
+	 * @param fd {int} Connection socket handle
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	aio_ostream(aio_handle* handle, SOCKET fd);
@@ -75,48 +88,58 @@ public:
 #endif
 
 	/**
-	 * 添加异可写时的回调类对象指针，如果该回调类对象已经存在，则只是
-	 * 使该对象处于打开可用状态
-	 * @param callback {aio_callback*} 继承 aio_callback 的子类回调类对象，
-	 *  当异步流有数据时会先调用此回调类对象中的 write_callback 接口
+	 * Add callback class object pointer when writable. If this callback class
+	 * object already exists, only
+	 * enables this object to be in open available state
+	 * @param callback {aio_callback*} Subclass callback class object inheriting
+	 * aio_callback.
+	 * When asynchronous stream has data, will first call write_callback interface
+	 * in this callback class object
 	 */
 	void add_write_callback(aio_callback* callback);
 
 	/**
-	 * 从写回调对象集合中删除
-	 * @param callback {aio_callback*} 被删除的写回调对象，
-	 *  若该值为空，则删除所有的回调写对象
-	 * @return {int} 返回被从回调对象集合中删除的回调对象的个数
+	 * Delete from write callback object collection
+	 * @param callback {aio_callback*} Write callback object to be deleted.
+	 *  If this value is empty, deletes all callback write objects
+	 * @return {int} Returns number of callback objects deleted from callback
+	 * object collection
 	 */
 	int del_write_callback(aio_callback* callback = NULL);
 
 	/**
-	 * 禁止回调对象类集合中的某个回调类对象，但并不从回调类对象
-	 * 集合中删除，只是不被调用而已
-	 * @param callback {aio_callback*} 被禁用的写回调对象，
-	 *  若该值为空，则禁用所有的写回调对象
-	 * @return {int} 返回被从回调对象集合中禁用的回调对象的个数
+	 * Disable a callback class object in callback object class collection, but
+	 * does not delete from callback class object
+	 * collection, just not called
+	 * @param callback {aio_callback*} Write callback object to be disabled.
+	 *  If this value is empty, disables all write callback objects
+	 * @return {int} Returns number of callback objects disabled from callback
+	 * object collection
 	 */
 	int disable_write_callback(aio_callback* callback = NULL);
 
 	/**
-	 * 启用所有的回调对象被调用
-	 * @param callback {aio_callback*} 启用指定的写回调对象，
-	 *  如果该值为空，则启用所有的写回调对象
-	 * @return {int} 返回被启用的写回调对象的个数
+	 * Enable all callback objects to be called
+	 * @param callback {aio_callback*} Enable specified write callback object.
+	 *  If this value is empty, enables all write callback objects
+	 * @return {int} Returns number of enabled write callback objects
 	 */
 	int enable_write_callback(aio_callback* callback = NULL);
 
 	/**
-	 * 异步写规定字节数的数据，当完全写成功或出错或超时时会
-	 * 调用用户注册的回调函数，在延迟异步写时，当在一个函数
-	 * 内连续调用此过程时，每个延迟异步写操作会被加入延迟写
-	 * 的队列中，以保证每个延迟异步写操作都可在各自的定时器
-	 * 到达时被执行
-	 * @param data {const void*} 数据地址
-	 * @param len {int} 数据长度
-	 * @param delay {int64} 如果该值 > 0 则采用延迟发送的模式(单位为微秒)
-	 * @param callback {aio_timer_writer*} 定时器到达时的回调函数类对象，
+	 * Asynchronously write specified number of bytes of data. When completely
+	 * written successfully or error or timeout occurs, will
+	 * call user-registered callback function. In delayed asynchronous write, when
+	 * this process is called continuously within a function,
+	 * each delayed asynchronous write operation will be added to delayed write
+	 * queue to ensure each delayed asynchronous write operation can be executed
+	 * when its timer arrives
+	 * @param data {const void*} Data address
+	 * @param len {int} Data length
+	 * @param delay {int64} If this value > 0, uses delayed send mode (unit:
+	 * microseconds)
+	 * @param callback {aio_timer_writer*} Callback function class object when
+	 * timer arrives
 	 */
 	void write_await(const void* data, int len, long long int delay = 0,
 		aio_timer_writer* callback = NULL);
@@ -130,32 +153,37 @@ public:
 	}
 
 	/**
-	 * 当采用报文方式发送数据时，可调用本方法向目标地址发送数据包
-	 * @param data {const void*} 数据地址
-	 * @param len {int} 数据长度
-	 * @param dest_addr {const char*} 目标地址，格式：ip|port
-	 * @param flags {int} 发送标志位，请参考系统 sendto() api 中 flags 说明
-	 * @return {int} 返回 -1 表示发送失败
+	 * When sending data in datagram mode, can call this method to send data packet
+	 * to target address
+	 * @param data {const void*} Data address
+	 * @param len {int} Data length
+	 * @param dest_addr {const char*} Target address, format: ip|port
+	 * @param flags {int} Send flag bits. Please refer to flags description in
+	 * system sendto() api
+	 * @return {int} Returns -1 indicates send failed
 	 */
 	int sendto(const void* data, int len, const char* dest_addr, int flags = 0);
 
 	/**
-	 * 当采用报文方式发送数据时，可调用本方法向目标地址发送数据包
-	 * @param data {const void*} 数据地址
-	 * @param len {int} 数据长度
-	 * @param dest_addr {const sockaddr*} 目标地址，格式：ip|port
-	 * @param addrlen {int} dest_addr 地址长度
-	 * @param flags {int} 发送标志位，请参考系统 sendto() api 中 flags 说明
-	 * @return {int} 返回 -1 表示发送失败
+	 * When sending data in datagram mode, can call this method to send data packet
+	 * to target address
+	 * @param data {const void*} Data address
+	 * @param len {int} Data length
+	 * @param dest_addr {const sockaddr*} Target address, format: ip|port
+	 * @param addrlen {int} dest_addr address length
+	 * @param flags {int} Send flag bits. Please refer to flags description in
+	 * system sendto() api
+	 * @return {int} Returns -1 indicates send failed
 	 */
 	int sendto(const void* data, int len,
 		const struct sockaddr* dest_addr, int addrlen, int flags = 0);
 
 	/**
-	 * 异步向流中写数据, 当流出错、写超时或写成功时将触发事件通知过程，
-	 * 类似系统的 writev
-	 * @param iov {const struct iovec*} 数据集合数组
-	 * @param count {int} iov 数组的长度
+	 * Asynchronously write data to stream. When stream error, write timeout or
+	 * write success occurs, will trigger event notification process,
+	 * similar to system's writev
+	 * @param iov {const struct iovec*} Data collection array
+	 * @param count {int} Length of iov array
 	 */
 	void writev_await(const struct iovec *iov, int count);
 
@@ -167,9 +195,10 @@ public:
 	}
 
 	/**
-	 * 格式化方式异步写数据，当完全写成功或出错或超时时会
-	 * 调用用户注册的回调函数
-	 * @param fmt {const char*} 格式字符串
+	 * Asynchronously write data in formatted way. When completely written
+	 * successfully or error or timeout occurs, will
+	 * call user-registered callback function
+	 * @param fmt {const char*} Format string
 	 */
 	void format_await(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
 
@@ -185,10 +214,11 @@ public:
 	}
 
 	/**
-	 * 格式化方式异步写数据，当完全写成功或出错或超时时会
-	 * 调用用户注册的回调函数
-	 * @param fmt {const char*} 格式字符串
-	 * @param ap {va_list} 数据值列表
+	 * Asynchronously write data in formatted way. When completely written
+	 * successfully or error or timeout occurs, will
+	 * call user-registered callback function
+	 * @param fmt {const char*} Format string
+	 * @param ap {va_list} Data value list
 	 */
 	void vformat_await(const char* fmt, va_list ap);
 
@@ -200,9 +230,11 @@ public:
 	}
 
 	/**
-	 * 异步等待连接流可写，该函数设置异步流的写监听状态，当有可写时，
-	 * 回调函数被触发，由用户自己负责数据的读取
-	 * @param timeout {int} 写超时时间(秒)，当该值为 <= 0 时，则没有写超时
+	 * Asynchronously wait for connection stream to be writable. This function sets
+	 * asynchronous stream's write monitoring state. When writable,
+	 * callback function is triggered, user is responsible for data reading
+	 * @param timeout {int} Write timeout (seconds). When this value is <= 0, there
+	 * is no write timeout
 	 */
 	void writable_await(int timeout = 0);
 
@@ -214,14 +246,16 @@ public:
 	}
 
 	/**
-	 * 禁止异步流的异步写状态，则将该异步流从异步引擎的监控
-	 * 事件中移除，直到用户调用任何一个写操作时会自动打开异
-	 * 步写状态(此时该流会重新被异步引擎监控)
+	 * Disable asynchronous stream's asynchronous write state, remove this
+	 * asynchronous stream from asynchronous engine's monitoring
+	 * events until user calls any write operation, then automatically opens
+	 * asynchronous write state
+	 * (at this time, this stream will be monitored by asynchronous engine again)
 	 */
 	void disable_write();
 
 	/**
-	 * 获得发送队列里数据长度
+	 * Get data length in send queue
 	 * @return {size_t}
 	 */
 	size_t pending_length() const;
@@ -230,12 +264,12 @@ protected:
 	virtual ~aio_ostream();
 
 	/**
-	 * 释放动态类对象的虚函数
+	 * Virtual function for releasing dynamic class objects
 	 */
 	virtual void destroy();
 
 	/**
-	 * 注册写过程
+	 * Register write process
 	 */
 	void enable_write();
 
@@ -249,3 +283,4 @@ private:
 };
 
 }  // namespace acl
+

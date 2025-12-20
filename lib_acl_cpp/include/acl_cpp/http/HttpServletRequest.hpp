@@ -25,21 +25,26 @@ class HttpCookie;
 class HttpServletResponse;
 
 /**
- * 与 HTTP 客户端请求相关的类，该类不应被继承，用户也不需要
- * 定义或创建该类对象
+ * Class related to HTTP client request parsing. This class should not be
+ * inherited. Users also do not need to
+ * create this object directly.
  */
 class ACL_CPP_API HttpServletRequest : public noncopyable {
 public:
 	/**
-	 * 构造函数
+	 * Constructor
 	 * @param res {HttpServletResponse&}
-	 * @param sess {session*} 存储会话数据的对象
-	 * @param stream {socket_stream&} 数据流，内部不会主动关闭流
-	 * @param charset {const char*} 本地字符集，该值非空时，
-	 *  内部会自动将 HTTP 请求的数据转换为本地字符集，否则不转换
-	 * @param body_limit {int} 针对 POST 方法，当数据体为文本参数
-	 *  类型时，此参数限制数据体的长度；当数据体为数据流或 MIME
-	 *  格式或 on 为 false，此参数无效
+	 * @param sess {session*} Object storing session data.
+	 * @param stream {socket_stream&} Connection stream. Internally automatically
+	 * manages and closes it.
+	 * @param charset {const char*} Local character set. When this value is not
+	 * empty,
+	 * internally automatically converts HTTP request data to local character set
+	 * for conversion.
+	 * @param body_limit {int} When POST request body is text type,
+	 * this parameter limits maximum request body length. When body length exceeds
+	 * this value, it returns error. When body is MIME
+	 *  format, on is false, this parameter is invalid.
 	 */
 	HttpServletRequest(HttpServletResponse& res, session* sess,
 		socket_stream& stream, const char* charset = NULL,
@@ -47,106 +52,115 @@ public:
 	~HttpServletRequest();
 
 	/**
-	 * 针对 POST 方法，该方法设置是否需要解析 Form 数据体数据，默认为解析，
-	 * 该函数必须在 doRun 之前调用才有效；当数据体为数据流或 MIME 格式，
-	 * 即使调用本方法设置了解析数据，也不会对数据体进行解析
-	 * @param yes {bool} 是否需要解析
+	 * Set POST request. This function sets whether to parse Form request body
+	 * data. Default is parsing.
+	 * This function must be called before doRun to be effective. When body is MIME
+	 * format,
+	 * even if you call this function to disable parsing, it will still parse MIME
+	 * data.
+	 * @param yes {bool} Whether to parse.
 	 */
 	void setParseBody(bool yes);
 
 	/**
-	 * 获得 HTTP 客户端请求方法：GET, POST, PUT, CONNECT, PURGE
-	 * @param method_s {string*} 非空时存储字符串方式的请求方法
+	 * Get HTTP client request method: GET, POST, PUT, CONNECT, PURGE
+	 * @param method_s {string*} When not empty, stores string format request
+	 * method.
 	 * @return {http_method_t}
 	 */
 	http_method_t getMethod(string* method_s = NULL) const;
 
 	/**
-	 * 将 HTTP 请求方法类型转换为可描述性字符串
+	 * Convert HTTP request method type to corresponding string.
 	 * @param type {http_method_t}
-	 * @param buf  {string&} 存放结果字符串
+	 * @param buf  {string&} Store result string.
 	 */
 	static void methodString(http_method_t type, string& buf);
 
 	/**
-	 * 获得 HTTP 客户端请求的所有 cookie 对象集合
+	 * Get all cookie objects from HTTP client request.
 	 * @return {const std::vector<HttpCookie*>&}
 	 */
 	const std::vector<HttpCookie*>& getCookies() const;
 
 	/**
-	 * 获得 HTTP 客户端请求的某个 cookie 值
-	 * @param name {const char*} cookie 名称，必须非空
-	 * @return {const char*} cookie 值，若返回 NULL 则表示该 cookie
-	 *  不存在
+	 * Get a certain cookie value from HTTP client request.
+	 * @param name {const char*} Cookie name, cannot be empty.
+	 * @return {const char*} Cookie value. Returns NULL to indicate this cookie
+	 *  does not exist.
 	 */
 	const char* getCookieValue(const char* name) const;
 
 	/**
-	 * 给 HTTP 请求对象添加 cookie 对象
-	 * @param name {const char*} cookie 名，非空字符串
-	 * @param value {const char*} cookie 值，非空字符串
+	 * Set cookie in HTTP request header.
+	 * @param name {const char*} Cookie name, non-empty string.
+	 * @param value {const char*} Cookie value, non-empty string.
 	 */
 	void setCookie(const char* name, const char* value);
 
 	/**
-	 * 获得 HTTP 请求头中的某个字段值
-	 * @param name {const char*} HTTP 请求头中的字段名，非空
-	 * @return {const char*} HTTP 请求头中的字段值，返回 NULL
-	 *  时表示不存在
+	 * Get a certain field value in HTTP request header.
+	 * @param name {const char*} Field name in HTTP request header, cannot be
+	 * empty.
+	 * @return {const char*} Field value in HTTP request header. Returns NULL
+	 *  when not found.
 	 */
 	const char* getHeader(const char* name) const;
 
 	/**
-	 * 获得 HTTP GET 请求方式 URL 中的参数部分，即 ? 后面的部分
-	 * @return {const char*} 没有进行URL 解码的请求参数部分，
-	 *  返回空串则表示 URL 中没有参数
+	 * Get parameter part in HTTP GET request format URL, i.e., part after ?.
+	 * @return {const char*} URL decoded parameter part string.
+	 *  Returns empty string to indicate URL has no parameters.
 	 */
 	const char* getQueryString() const;
 
 	/**
-	 * 获得  http://test.com.cn/cgi-bin/test?name=value 中的
-	 * /cgi-bin/test 路径部分
-	 * @return {const char*} 返回空串表示不存在
+	 * Get /cgi-bin/test path part in
+	 *  http://test.com.cn/cgi-bin/test?name=value.
+	 * @return {const char*} Returns empty string to indicate error.
 	 */
 	const char* getPathInfo() const;
 
 	/**
-	 * 获得  http://test.com.cn/cgi-bin/test?name=value 中的
-	 * /cgi-bin/test?name=value 路径部分
-	 * @return {const char*} 返回空串表示不存在
+	 * Get /cgi-bin/test?name=value path part in
+	 *  http://test.com.cn/cgi-bin/test?name=value.
+	 * @return {const char*} Returns empty string to indicate error.
 	 */
 	const char* getRequestUri() const;
 
 	/**
-	 * 获得与该 HTTP 会话相关的 HttpSession 对象引用
-	 * @param create {bool} 当 session 不存在时是否在缓存服务器自动创建；
-	 *  当某客户端的 session 不存在且该参数为 false 时，则该函数返
-	 *  回的 session 对象会因没有被真正创建而无法进行读写操作
-	 * @param sid {const char*} 当 session 不存在，且 create 参数非空时，
-	 *  如果 sid 非空，则使用此值设置用户的唯一会话，同时添加进客户端的
-	 *  cookie 中
+	 * Get HttpSession object related to HTTP session.
+	 * @param create {bool} When session does not exist, whether to automatically
+	 * create
+	 * a session object for this client. When this parameter is false, this
+	 * function
+	 *  returns session object without binding, and cannot read/write.
+	 * @param sid {const char*} When session does not exist and create parameter is
+	 * not empty,
+	 * if sid is not empty, use this value as user's unique session ID, and add it
+	 * to client's
+	 *  cookie.
 	 * @return {HttpSession&}
-	 *  注：优先级，浏览器 COOKIE > create = true > sid != NULL
+	 *  Note: Priority order: COOKIE > create = true > sid != NULL
 	 */
 	HttpSession& getSession(bool create = true, const char* sid = NULL);
 
 	/**
-	 * 获得与 HTTP 客户端连接关联的输入流对象引用
+	 * Get HTTP client connection input stream object.
 	 * @return {istream&}
 	 */
 	istream& getInputStream() const;
 
 	/**
-	 * 获得 HTTP 双向流对象，由构造函数的参数输入
+	 * Get HTTP bidirectional stream object passed to constructor parameter.
 	 * @return {socket_stream&}
 	 */
 	socket_stream& getSocketStream() const;
 
 	/**
-	 * 获得 HTTP 请求数据的数据长度
-	 * @return {acl_int64} 返回 -1 表示可能为 GET 方法，
-	 *  或 HTTP 请求头中没有 Content-Length 字段
+	 * Get HTTP request body data length.
+	 * @return {acl_int64} Returns -1 to indicate it is GET request
+	 *  or HTTP request header has no Content-Length field.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 getContentLength() const;
@@ -155,12 +169,14 @@ public:
 #endif
 
 	/**
-	 * 如果客户端的请求是分段数据，则该函数将获得请求头中的长度起始地址
-	 * 及结束地址
-	 * @param range_from {long long int&} 偏移起始位置
-	 * @param range_to {long long int&} 偏移结束位置
-	 * @return {bool} 若出错或非分段请求则返回false，若是分段请求则返回true
-	 *  注：range_from/range_to 下标从 0 开始
+	 * Determine whether client request is range data. This function gets start
+	 * address and
+	 * end address from request header.
+	 * @param range_from {long long int&} Start offset position.
+	 * @param range_to {long long int&} End offset position.
+	 * @return {bool} When request is range data, returns true. When not range
+	 * data, returns false.
+	 *  Note: range_from/range_to subscript starts from 0.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	bool getRange(__int64& range_from, __int64& range_to);
@@ -168,237 +184,271 @@ public:
 	bool getRange(long long int& range_from, long long int& range_to);
 #endif
 	/**
-	 * 获得 HTTP 请求头中 Content-Type: text/html; charset=gb2312
-	 * Content-Type 的字段值
-	 * @param part {bool} 如果为 true 则返回 text，否则返回完整的
-	 * 值，如：text/html; charset=gb2312
-	 * @param ctype {http_ctype*} 为非空指针时，将存储完整的 http_ctype 信息
-	 * @return {const char*} 返回 NULL 表示 Content-Type 字段不存在
+	 * Get Content-Type field value in HTTP request header: Content-Type:
+	 * text/html; charset=gb2312
+	 * @param part {bool} When true, returns text. Otherwise returns complete
+	 *  value, e.g.: text/html; charset=gb2312
+	 * @param ctype {http_ctype*} When pointer is not empty, stores parsed
+	 * http_ctype information.
+	 * @return {const char*} Returns NULL to indicate Content-Type field does not
+	 * exist.
 	 */
 	const char* getContentType(bool part = true, http_ctype* ctype = NULL) const;
 
 	/**
-	 * 获得 HTTP 请求头中的 Content-Type: text/html; charset=gb2312
-	 * 中的 charset 字段值 gb2312
-	 * @return {const char*} 返回 NULL 表示 Content-Type 字段 或
-	 *  charset=xxx 不存在
+	 * Get charset field value gb2312 in HTTP request header Content-Type:
+	 * text/html; charset=gb2312.
+	 * @return {const char*} Returns NULL to indicate Content-Type field or
+	 *  charset=xxx does not exist.
 	 */
 	const char* getCharacterEncoding() const;
 
 	/**
-	 * 返回本地的字段字符集
-	 * @ return {const char*} 返回 NULL 表示没有设置本地字符集
+	 * Get local character set field string.
+	 * @ return {const char*} Returns NULL to indicate local character set was not
+	 * set.
 	 */
 	const char* getLocalCharset() const;
 
 	/**
-	 * 返回 HTTP 连接的本地 IP 地址
-	 * @return {const char*} 返回空，表示无法获得
+	 * Get local IP address of HTTP connection.
+	 * @return {const char*} Returns empty string to indicate unable to get.
 	 */
 	const char* getLocalAddr() const;
 
 	/**
-	 * 返回 HTTP 连接的本地 PORT 号
-	 * @return {unsigned short} 返回 0 表示无法获得
+	 * Get local PORT number of HTTP connection.
+	 * @return {unsigned short} Returns 0 to indicate unable to get.
 	 */
 	unsigned short getLocalPort() const;
 
 	/**
-	 * 返回 HTTP 连接的远程客户端 IP 地址
-	 * @return {const char*} 返回空，表示无法获得
+	 * Get remote client IP address of HTTP connection.
+	 * @return {const char*} Returns empty string to indicate unable to get.
 	 */
 	const char* getRemoteAddr() const;
 
 	/**
-	 * 返回 HTTP 连接的远程客户端 PORT 号
-	 * @return {unsigned short} 返回 0 表示无法获得
+	 * Get remote client PORT number of HTTP connection.
+	 * @return {unsigned short} Returns 0 to indicate unable to get.
 	 */
 	unsigned short getRemotePort() const;
 
 	/**
-	 * 获得 HTTP 请求头中设置的 Host 字段
-	 * @return {const char*} 如果为空，则表示不存在
+	 * Get Host field set in HTTP request header.
+	 * @return {const char*} When empty, it means not found.
 	 */
 	const char* getRemoteHost() const;
 
 	/**
-	 * 获得 HTTP 请求头中设置的 User-Agent 字段
-	 * @return {const char*} 如果为空，则表示不存在
+	 * Get User-Agent field set in HTTP request header.
+	 * @return {const char*} When empty, it means not found.
 	 */
 	const char* getUserAgent() const;
 
 	/**
-	 * 获得 HTTP 请求中的参数值，该值已经被 URL 解码且
-	 * 转换成本地要求的字符集；针对 GET 方法，则是获得
-	 * URL 中 ? 后面的参数值；针对 POST 方法，则可以获得
-	 * URL 中 ? 后面的参数值或请求体中的参数值
-	 * @param name {const char*} 参数名
-	 * @param case_sensitive {bool} 比较时针对参数名是否区分大小写
-	 * @return {const char*} 返回参数值，当参数不存在时返回 NULL
+	 * Get parameter value in HTTP request. Value has been URL decoded
+	 * and converted to local character set. For GET request, you can get
+	 * parameter value after ? in URL. For POST request, you can get
+	 * parameter value after ? in URL, plus all parameter values in body.
+	 * @param name {const char*} Parameter name.
+	 * @param case_sensitive {bool} Whether case-sensitive when comparing parameter
+	 * names.
+	 * @return {const char*} Returns parameter value. Returns NULL when parameter
+	 * does not exist.
 	 */
 	const char* getParameter(const char* name,
 		bool case_sensitive = false) const;
 
 	/**
-	 * 当 HTTP 请求头中的 Content-Type 为
-	 * multipart/form-data; boundary=xxx 格式时，说明为文件上传数据类型，
-	 * 则可以通过此函数获得 http_mime 对象
-	 * @return {const http_mime*} 返回 NULL 则说明没有 MIME 对象，
-	 *  返回的值用户不能手工释放，因为在 HttpServletRequest 的析
-	 *  构中会自动释放
+	 * When Content-Type in HTTP request header is
+	 * multipart/form-data; boundary=xxx format, it indicates file upload request
+	 * type.
+	 * You can get http_mime object through this function.
+	 * @return {const http_mime*} Returns NULL to indicate no MIME data.
+	 * Returned value user should not manually release, because HttpServletRequest
+	 * object
+	 *  will automatically release it.
 	 */
 	http_mime* getHttpMime();
 
 	/**
-	 * 数据类型为 text/json 或 application/json 格式时可调用此方法读取 json
-	 * 数据体并进行解析，成功后返回 json 对象，该对象由内部产生并管理，当
-	 * 本 HttpServletRequest 对象释放时该 json 对象一起被释放
-	 * @param body_limit {size_t} 限定数据体长度以防止内存溢出，若请求数据
-	 *  体超过此值，则返回错误；如果此值设为 0，则不限制长度
-	 * @return {json*} 返回解析好的 json 对象，若返回 NULL 则有以下几个原因：
-	 *  1、读数据出错
-	 *  2、非 json 数据格式
-	 *  3、数据体过长
+	 * When body is text/json or application/json format, you can call this method
+	 * to get json
+	 * body and parse it. Returns json object on success. This object is internally
+	 * automatically managed. When
+	 * HttpServletRequest object is destroyed, json object will also be destroyed.
+	 * @param body_limit {size_t} Limit body length to prevent memory overflow.
+	 * When
+	 * body length exceeds this value, returns error. When this value is 0, no
+	 * length limit.
+	 * @return {json*} Returns successfully parsed json object. Returns NULL for
+	 * following reasons:
+	 *  1. Data length exceeded.
+	 *  2. Invalid json data format.
+	 *  3. Error occurred.
 	 */
 	json* getJson(size_t body_limit = 1024000);
 
 	/**
-	 * 该功能与上面方法类似，唯一区别是将解析结果存入用户传入的对象中
+	 * Same as above function, except that result is stored in user-provided
+	 * object.
 	 * @param out {json&}
-	 * @param body_limit {size_t} 限定数据体长度以防止内存溢出，若请求数据
-	 *  体超过此值，则返回错误；如果此值设为 0，则不限制长度
-	 * @return {bool} 返回 false 原因如下：
-	 *  1、读数据出错
-	 *  2、非 json 数据格式
-	 *  3、数据体过长
+	 * @param body_limit {size_t} Limit body length to prevent memory overflow.
+	 * When
+	 * body length exceeds this value, returns error. When this value is 0, no
+	 * length limit.
+	 * @return {bool} Returns false for following reasons:
+	 *  1. Data length exceeded.
+	 *  2. Invalid json data format.
+	 *  3. Error occurred.
 	 */
 	bool getJson(json& out, size_t body_limit = 1024000);
 
 	/**
-	 * 数据类型为 text/xml 或 application/xml 格式时可调用此方法读取 xml
-	 * 数据体并进行解析，成功后返回 mxl 对象，该对象由内部产生并管理，当
-	 * 本 HttpServletRequest 对象释放时该 xml 对象一起被释放
-	 * @param body_limit {size_t} 限定数据体长度以防止内存溢出，若请求数据
-	 *  体超过此值，则返回错误；如果此值设为 0，则不限制长度
-	 * @return {xml*} 返回解析好的 xml 对象，若返回 NULL 则有以下几个原因：
-	 *  1、读数据出错
-	 *  2、非 xml 数据格式
+	 * When body is text/xml or application/xml format, you can call this method to
+	 * get xml
+	 * body and parse it. Returns mxl object on success. This object is internally
+	 * automatically managed. When
+	 * HttpServletRequest object is destroyed, xml object will also be destroyed.
+	 * @param body_limit {size_t} Limit body length to prevent memory overflow.
+	 * When
+	 * body length exceeds this value, returns error. When this value is 0, no
+	 * length limit.
+	 * @return {xml*} Returns successfully parsed xml object. Returns NULL for
+	 * following reasons:
+	 *  1. Data length exceeded.
+	 *  2. Invalid xml data format.
 	 */
 	xml* getXml(size_t body_limit = 1024000);
 
 	/**
-	 * 该功能与上面方法类似，唯一区别是将解析结果存入用户传入的对象中
+	 * Same as above function, except that result is stored in user-provided
+	 * object.
 	 * @param out {xml&}
-	 * @param body_limit {size_t} 限定数据体长度以防止内存溢出，若请求数据
-	 *  体超过此值，则返回错误；如果此值设为 0，则不限制长度
-	 * @return {bool} 返回 false 原因如下：
-	 *  1、读数据出错
-	 *  2、非 xml 数据格式
-	 *  3、数据体过长
+	 * @param body_limit {size_t} Limit body length to prevent memory overflow.
+	 * When
+	 * body length exceeds this value, returns error. When this value is 0, no
+	 * length limit.
+	 * @return {bool} Returns false for following reasons:
+	 *  1. Data length exceeded.
+	 *  2. Invalid xml data format.
+	 *  3. Error occurred.
 	 */
 	bool getXml(xml& out, size_t body_limit = 1024000);
 
 	/**
-	 * 针对 POST 类方法（即有数据请求体情形），可以直接调用此方法获得请求
-	 * 数据体的内容
-	 * @param body_limit {size_t} 限定数据体长度以防止内存溢出，若请求数据
-	 *  体超过此值，则返回错误；如果此值设为 0，则不限制长度
-	 * @return {string*} 返回存放数据体的对象，返回 NULL 有以下原因：
-	 *  1、读数据出错
-	 *  2、没有数据体
-	 *  3、数据体过长
+	 * Get POST request body data. For other request types, you can directly call
+	 * this method to get
+	 * request body data.
+	 * @param body_limit {size_t} Limit body length to prevent memory overflow.
+	 * When
+	 * body length exceeds this value, returns error. When this value is 0, no
+	 * length limit.
+	 * @return {string*} Returns successfully parsed object. Returns NULL for
+	 * following reasons:
+	 *  1. Data length exceeded.
+	 *  2. No request body.
+	 *  3. Error occurred.
 	 */
 	string* getBody(size_t body_limit = 1024000);
 
 	/**
-	 * 该功能与上面方法类似，唯一区别是将结果存入用户传入的对象中
+	 * Same as above function, except that result is stored in user-provided
+	 * object.
 	 * @param out {string&}
 	 * @param body_limit {size_t}
-	 * @return {bool} 返回 false 原因如下：
-	 *  1、读数据出错
-	 *  2、没有数据体
-	 *  3、数据体过长
+	 * @return {bool} Returns false for following reasons:
+	 *  1. Data length exceeded.
+	 *  2. No request body.
+	 *  3. Error occurred.
 	 */
 	bool getBody(string& out, size_t body_limit = 1024000);
 
 	/**
-	 * 获得 HTTP 请求数据的类型
-	 * @return {http_request_t}，一般对 POST 方法中的上传文件应用，需要调用
-	 *  该函数获得是否是上传数据类型，当该函数返回 HTTP_REQUEST_OTHER 时，
-	 *  用户可以通过调用 getContentType 获得具体的类型字符串
+	 * Get HTTP request data type.
+	 * @return {http_request_t} For POST request with file upload, you need to call
+	 * this function to determine whether it is file upload request type. When this
+	 * function returns HTTP_REQUEST_OTHER,
+	 *  users can get request body type string by calling getContentType.
 	 */
 	http_request_t getRequestType() const;
 
 	/**
-	 * 获得 HTTP 请求页面的 referer URL
-	 * @return {const char*} 为 NULL 则说明用户直接访问本 URL
+	 * Get referer URL of HTTP request page.
+	 * @return {const char*} Returns NULL to indicate user directly accessed this
+	 * URL.
 	 */
 	const char* getRequestReferer() const;
 
 	/**
-	 * 获得根据 HTTP 请求头获得的 http_ctype 对象
+	 * Get http_ctype object parsed from HTTP request header.
 	 * @return {const http_ctype&}
 	 */
 	const http_ctype& getHttpCtype() const;
 
 	/**
-	 * 判断 HTTP 客户端是否要求保持长连接
+	 * Determine whether HTTP client wants to keep connection alive.
 	 * @return {bool}
 	 */
 	bool isKeepAlive() const;
 
 	/**
-	 * 当客户端要求保持长连接时，从 HTTP 请求头中获得保持的时间
-	 * @return {int} 返回值 < 0 表示不存在 Keep-Alive 字段
+	 * When client wants to keep connection alive, get timeout value from HTTP
+	 * request header.
+	 * @return {int} Return value < 0 indicates no Keep-Alive field.
 	 */
 	int getKeepAlive() const;
 
 	/**
-	 * 获得 HTTP 客户端请求的版本号
-	 * @param major {unsigned&} 将存放主版本号
-	 * @param minor {unsigned&} 将存放次版本号
-	 * @return {bool} 是否成功取得了客户端请求的版本号
+	 * Get HTTP client request version.
+	 * @param major {unsigned&} Major version number.
+	 * @param minor {unsigned&} Minor version number.
+	 * @return {bool} Whether successfully got client request version.
 	 */
 	bool getVersion(unsigned& major, unsigned& minor) const;
 
 	/**
-	 * 获得 HTTP 客户端支持的数据压缩算法集合
-	 * @param out {std::vector<string>&} 存储结果集
+	 * Get compression algorithms supported by HTTP client.
+	 * @param out {std::vector<string>&} Store result.
 	 */
 	void getAcceptEncoding(std::vector<string>& out) const;
 
 	/*
-	 * 当 HTTP 请求为 POST 方法，通过本函数设置读 HTTP 数据体的
-	 * IO 超时时间值(秒)
-	 * @param rw_timeout {int} 读数据体时的超时时间(秒)
+	 * When HTTP request is POST request, you can call this function to set HTTP request body
+	 * IO timeout value (seconds).
+	 * @param rw_timeout {int} Read/write timeout time when reading body (seconds).
 	 */
 	void setRwTimeout(int rw_timeout);
 
 	/**
-	 * 获得上次出错的错误号
+	 * Get last error code.
 	 * @return {http_request_error_t}
 	 */
 	http_request_error_t getLastError() const;
 
 	/**
-	 * 当 HttpServlet 类以服务模式(即非 CGI 方式)运行时，可以调用此
-	 * 方法获得客户端连接的 HTTP 类对象，从而获得更多的参数
-	 * @return {http_client*} 当以服务模式运行时，此函数返回 HTTP 客户端
-	 *  连接非空对象；当以 CGI 方式运行时，则返回空指针
+	 * When HttpServlet runs in server mode (not CGI mode), you can call this
+	 * function to get HTTP client connection request, thereby getting more
+	 * parameters.
+	 * @return {http_client*} When running in server mode, this function returns
+	 * HTTP client
+	 * connection non-empty object. When running in CGI mode, returns empty
+	 * pointer.
 	 */
 	http_client* getClient() const;
 
 	/**
-	 * 将 HTTP 请求头输出至流中（文件流或网络流）
+	 * Print HTTP request header to file stream.
 	 * @param out {ostream&}
-	 * @param prompt {const char*} 提示内容
+	 * @param prompt {const char*} Prompt string.
 	 */	 
 	void fprint_header(ostream& out, const char* prompt);
 
 	/**
-	 * 将 HTTP 请求头输出至给定缓冲区中
+	 * Print HTTP request header to string.
 	 * @param out {string&}
-	 * @param prompt {const char*} 提示内容
+	 * @param prompt {const char*} Prompt string.
 	 */
 	void sprint_header(string& out, const char* prompt);
 
@@ -442,3 +492,4 @@ private:
 } // namespace acl
 
 #endif // ACL_CLIENT_ONLY
+

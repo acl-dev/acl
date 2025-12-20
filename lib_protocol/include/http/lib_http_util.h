@@ -8,222 +8,243 @@ extern "C" {
 #endif
 
 typedef struct HTTP_UTIL {
-	HTTP_HDR_REQ *hdr_req;		/**< HTTP 请求头 */
-	HTTP_HDR_RES *hdr_res;		/**< HTTP 响应头 */
-	HTTP_RES *http_res;		/**< HTTP 响应体 */
-	char  server_addr[256];		/**< 远程 HTTP 服务器地址 */
-	ACL_VSTREAM *stream;		/**< 与 HTTP 服务器建立的网络流 */
-	int   conn_timeout;		/**< 连接 HTTP 服务器的超时时间 */
-	int   rw_timeout;		/**< 与 HTTP 服务器通信时每次 IO 的超时时间 */
-	ACL_VSTRING *req_buf;		/**< 缓冲区 */
-	int   res_body_dlen;		/**< HTTP 响应数据体的长度 */
-	ACL_VSTREAM *dump_stream;	/**< 转储接收数据的流 */
-	unsigned int   flag;		/**< 标志位 */
-#define	HTTP_UTIL_FLAG_SET_DUMP_FILE	(1 << 0)	/**< 允许转储响应体至文件 */
-#define	HTTP_UTIL_FLAG_SET_DUMP_STREAM	(1 << 1)	/**< 允许转储响应体至流 */
-#define	HTTP_UTIL_FLAG_HAS_RES_BODY	(1 << 2)	/**< 有 HTTP 响应体 */
-#define	HTTP_UTIL_FLAG_NO_RES_BODY	(1 << 3)	/**< 无 HTTP 响应体 */
+	HTTP_HDR_REQ *hdr_req;		/* HTTP request header */
+	HTTP_HDR_RES *hdr_res;		/* HTTP response header */
+	HTTP_RES *http_res;		/* HTTP response object */
+	char  server_addr[256];		/* Remote HTTP server address */
+	ACL_VSTREAM *stream;		/* Stream for communicating with HTTP server */
+	int   conn_timeout;		/* Timeout for connecting to HTTP server */
+	int   rw_timeout;		/* IO timeout during HTTP communication */
+	ACL_VSTRING *req_buf;		/* Request buffer */
+	int   res_body_dlen;		/* Length of HTTP response body */
+	ACL_VSTREAM *dump_stream;	/* Stream for dumping response data */
+	unsigned int   flag;		/* Flag bits */
+#define	HTTP_UTIL_FLAG_SET_DUMP_FILE	(1 << 0)	/* Set dump response file */
+#define	HTTP_UTIL_FLAG_SET_DUMP_STREAM	(1 << 1)	/* Set dump response stream */
+#define	HTTP_UTIL_FLAG_HAS_RES_BODY	(1 << 2)	/* Has HTTP response body */
+#define	HTTP_UTIL_FLAG_NO_RES_BODY	(1 << 3)	/* No HTTP response body */
 } HTTP_UTIL;
 
 /**
- * 创建一个 HTTP_UTIL 请求对象
- * @param url {const char*} 完整的请求 url
- * @param method {const char*} 请求方法，有效的请求方法有：GET, POST, HEAD, CONNECT
+ * Create an HTTP_UTIL request object
+ * @param url {const char*} Request url
+ * @param method {const char*} Request method. Valid methods:
+ *  GET, POST, HEAD, CONNECT
  * @return {HTTP_UTIL*}
  */
 HTTP_API HTTP_UTIL *http_util_req_new(const char *url, const char *method);
 
 /**
- * 构建一个 HTTP_UTIL 响应对象
- * @param status {int} 状态码，有效的状态码为: 1xx, 2xx, 3xx, 4xx, 5xx
+ * Create an HTTP_UTIL response object
+ * @param status {int} Status code. Valid status codes:
+ *  1xx, 2xx, 3xx, 4xx, 5xx
  * @return {HTTP_UTIL*}
  */
 HTTP_API HTTP_UTIL *http_util_res_new(int status);
 
 /**
- * 释放一个 HTTP_UTIL 对象
+ * Free an HTTP_UTIL object
  * @param http_util {HTTP_UTIL*}
  */
 HTTP_API void http_util_free(HTTP_UTIL *http_util);
 
 /**
- * 设置 HTTP 请求头信息, 如: Accept-Encoding: gzip,deflate
+ * Set HTTP request header info, e.g.: Accept-Encoding: gzip,deflate
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} 请求头中字段名称, 如 Accept-Encoding
- * @param value {const char*} 请求头中字段的值, 如 gzip,deflate
+ * @param name {const char*} Request header field name, e.g. Accept-Encoding
+ * @param value {const char*} Request header field value, e.g. gzip,deflate
  */
 HTTP_API void http_util_set_req_entry(HTTP_UTIL *http_util, const char *name, const char *value);
 
 /**
- * 关闭 HTTP 请求头中的某个请求字段，该请求字段不会发往服务器
+ * Disable a specific field in HTTP request header, this field won't be
+ * sent to server
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} 请求头中字段名称, 如 Accept-Encoding
+ * @param name {const char*} Request header field name, e.g. Accept-Encoding
  */
 HTTP_API void http_util_off_req_entry(HTTP_UTIL *http_util, const char *name);
 
 /**
- * 获得请求头中某个字段的值
+ * Get value of a field from request header
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} 请求头中字段名称, 如 Accept-Encoding
- * @return {char*} 如果非空则为请求字段值，否则表明该字段不存在
+ * @param name {const char*} Request header field name, e.g. Accept-Encoding
+ * @return {char*} May be NULL if field value doesn't exist or field
+ *  doesn't exist
  */
 HTTP_API char *http_util_get_req_value(HTTP_UTIL *http_util, const char *name);
 
 /**
- * 获得请求头中某个字段的 HTTP_HDR_ENTRY 对象
+ * Get HTTP_HDR_ENTRY object for a field from request header
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} 请求头中字段名称, 如 Accept-Encoding
- * @return {HTTP_HDR_ENTRY*} 若为空则表示该字段不存在
+ * @param name {const char*} Request header field name, e.g. Accept-Encoding
+ * @return {HTTP_HDR_ENTRY*} NULL indicates field doesn't exist
  */
 HTTP_API HTTP_HDR_ENTRY *http_util_get_req_entry(HTTP_UTIL *http_util, const char *name);
 
 /**
- * 设置请求头中 HTTP 数据体的数据长度
+ * Set HTTP request body data length in request header
  * @param http_util {HTTP_UTIL*}
- * @param len {int} HTTP 数据体长度(必须 >= 0)
+ * @param len {int} HTTP request body length (must be >= 0)
  */
 HTTP_API void http_util_set_req_content_length(HTTP_UTIL *http_util, int len);
 
 /**
- * 设置请求头中 HTTP 会话保持长连接的存活时间(单位为秒)
+ * Set HTTP session keep-alive connection duration in request header (seconds)
  * @param http_util {HTTP_UTIL*}
- * @param timeout {int} HTTP 长连接的存活时间(单位为秒)
+ * @param timeout {int} HTTP connection duration (in seconds)
  */
 HTTP_API void http_util_set_req_keep_alive(HTTP_UTIL *http_util, int timeout);
 
 /**
- * 设置请求头中 Connection 字段
+ * Set Connection field in request header
  * @param http_util {HTTP_UTIL*}
- * @param value {const char*} 字段值，有效的字段为: keep-alive, close
+ * @param value {const char*} Field value. Valid fields: keep-alive, close
  */
 HTTP_API void http_util_set_req_connection(HTTP_UTIL *http_util, const char *value);
 
 /**
- * 设置请求头中的 Referer 字段
+ * Set Referer field in request header
  * @param http_util {HTTP_UTIL*}
- * @param refer {const char*} 完整的 url, 如: http://www.test.com
+ * @param refer {const char*} Referrer url, e.g.: http://www.test.com
  */
 HTTP_API void http_util_set_req_refer(HTTP_UTIL *http_util, const char *refer);
 
 /**
- * 设置请求头中的 Cookie 字段，采用的是追加方式
+ * Set Cookie field in request header, uses append method when called
+ * multiple times
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} Cookie 名称
- * @param value {const char*} Cookie 值
+ * @param name {const char*} Cookie name
+ * @param value {const char*} Cookie value
  */
 HTTP_API void http_util_set_req_cookie(HTTP_UTIL *http_util, const char *name, const char *value);
 
 /**
- * 设置 HTTP 代理服务器地址
+ * Set HTTP proxy server address
  * @param http_util {HTTP_UTIL*}
- * @param proxy {const char*} 代理服务器地址，有效格式为: IP:PORT, DOMAIN:PORT,
- *  如: 192.168.0.1:80, 192.168.0.2:8088, www.g.cn:80
+ * @param proxy {const char*} Proxy server address. Valid formats:
+ *  IP:PORT, DOMAIN:PORT,
+ *  e.g.: 192.168.0.1:80, 192.168.0.2:8088, www.g.cn:80
  */
 HTTP_API void http_util_set_req_proxy(HTTP_UTIL *http_util, const char *proxy);
 
 /**
- * 设置 HTTP 响应体的转储流，设置后 HTTP 响应体数据便会同时向该流转发
+ * Set HTTP response dump stream. After setting, HTTP response body data
+ * will be simultaneously dumped
  * @param http_util {HTTP_UTIL*}
- * @param stream {ACL_VSTREAM *} 转储流
+ * @param stream {ACL_VSTREAM *} Dump stream
  */
 HTTP_API void http_util_set_dump_stream(HTTP_UTIL *http_util, ACL_VSTREAM *stream);
 
 /**
- * 设置 HTTP 响应体的转储文件，设置后 HTTP 响应体数据便会转储于该文件
+ * Set HTTP response dump file. After setting, HTTP response body data
+ * will be dumped to this file
  * @param http_util {HTTP_UTIL*}
- * @param filename {const char*} 转储文件名
- * @return {int} 如果返回值 < 0 则表示无法打开该文件, 否则表示打开文件成功
+ * @param filename {const char*} Dump filename
+ * @return {int} Return value < 0 indicates unable to open file,
+ *  otherwise indicates file opened successfully
  */
 HTTP_API int http_util_set_dump_file(HTTP_UTIL *http_util, const char *filename);
 
 /**
- * 打开远程 HTTP 服务器或代理服务器连接，同时构建 HTTP 请求头数据并且将该数据
- * 发给新建立的网络连接
+ * Connect to remote HTTP server, send HTTP request header data and parse
+ * response, then close connection and return result
  * @param http_util {HTTP_UTIL*}
- * @return {int} 0: 成功; -1: 无法打开连接或发送请求头数据失败
+ * @return {int} 0: success; -1: unable to establish connection or send
+ *  header failed
  */
 HTTP_API int http_util_req_open(HTTP_UTIL *http_util);
 
 /**
- * 当采用 POST 方法时，可以通过此函数向 HTTP 服务器或代理服务器发送请求体数据,
- * 在一个请求过程中，可以多次调用本函数直至发送完请求体数据
+ * When using POST request, send HTTP request body data to server through
+ * this function. Can repeatedly call this function in a loop until all
+ * data sent
  * @param http_util {HTTP_UTIL*}
- * @param data {const char*} 本次发送的数据地址，必须非空
- * @param dlen {size_t} data 数据长度, 必须大于 0
- * @return {int} > 0 表示本次成功发送的数据; -1: 表示发送数据失败, 应调用
- *  http_util_free 关闭网络流且释放内存资源
+ * @param data {const char*} Address of data to send each time, may be NULL
+ * @param dlen {size_t} data length, must not be 0
+ * @return {int} > 0 indicates number of bytes successfully sent this time;
+ *  -1: indicates network failure, should call http_util_free to close
+ *  connection and free memory resources
  */
 HTTP_API int http_util_put_req_data(HTTP_UTIL *http_util, const char *data, size_t dlen);
 
 /**
- * 发送完请求数据后调用此函数从 HTTP 服务器读取完整的 HTTP 响应头
+ * After sending all request data, call this function to read HTTP response
+ * header from HTTP server
  * @param http_util {HTTP_UTIL*}
- * @return {int} 0: 成功; -1: 失败
+ * @return {int} 0: success; -1: failure
  */
 HTTP_API int http_util_get_res_hdr(HTTP_UTIL *http_util);
 
 /**
- * 从 HTTP 响应头中获得某个字段值
+ * Get a field value from HTTP response header
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} 字段名称, 如 Content-Length
- * @return {char*} 对应 name 的字段值, 如果为空则表示该字段不存在
+ * @param name {const char*} Field name, e.g. Content-Length
+ * @return {char*} Field value corresponding to name, NULL indicates field
+ *  doesn't exist
  */
 HTTP_API char *http_util_get_res_value(HTTP_UTIL *http_util, const char *name);
 
 /**
- * 从 HTTP 响应头中获得某个字段对象
+ * Get a field object from HTTP response header
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} 字段名称, 如 Content-Length
- * @return {HTTP_HDR_ENTRY*} 对应 name 的字段对象, 如果为空则表示该字段不存在
+ * @param name {const char*} Field name, e.g. Content-Length
+ * @return {HTTP_HDR_ENTRY*} Field object corresponding to name, NULL
+ *  indicates field doesn't exist
  */
 HTTP_API HTTP_HDR_ENTRY *http_util_get_res_entry(HTTP_UTIL *http_util, const char *name);
 
 /**
- * 设置 HTTP 响应头中的某个字段值
+ * Set a field value in HTTP response header
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} 字段名称, 如 Content-Type
- * @param value {const char*} 字段值, 如 text/html
+ * @param name {const char*} Field name, e.g. Content-Type
+ * @param value {const char*} Field value, e.g. text/html
  */
 HTTP_API void http_util_set_res_entry(HTTP_UTIL *http_util, const char *name, const char *value);
 
 /**
- * 关闭 HTTP 响应头中的某个字段
+ * Disable a field in HTTP response header
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} 字段名称, 如 Content-Type
+ * @param name {const char*} Field name, e.g. Content-Type
  */
 HTTP_API void http_util_off_res_entry(HTTP_UTIL *http_util, const char *name);
 
 /**
- * 读完 HTTP 响应头后调用此函数判断是否有 HTTP 响应体
+ * After getting HTTP response header, call this function to check if
+ * HTTP response body exists
  * @param http_util {HTTP_UTIL*}
- * @return {int}  0: 表示无响应体; !0: 表示有响应体
+ * @return {int}  0: indicates no response body; !0: indicates has body
  */
 HTTP_API int http_util_has_res_body(HTTP_UTIL *http_util);
 
 /**
- * 读完 HTTP 响应头后调用此函数从 HTTP 服务器读取 HTTP 数据体数据，需要连续调用
- * 此函数，直至返回值 <= 0, 如果之前设置了转储文件或转储则在读取数据过程中同时会
- * 拷贝一份数据给转储文件或转储流
+ * After getting HTTP response header, call this function to read HTTP
+ * response body data from HTTP server. Need to repeatedly call this
+ * function until return value <= 0. If dump file or stream was set before,
+ * during data reading process, simultaneously copy data to dump file or
+ * stream
  * @param http_util {HTTP_UTIL*}
- * @param buf {char *} 存储 HTTP 响应体的缓冲区
- * @param size {size_t} buf 的空间大小
- * @return {int} <= 0: 表示读结束; > 0: 表示本次读到的数据长度
+ * @param buf {char *} Buffer to store HTTP response body
+ * @param size {size_t} Size of buf space
+ * @return {int} <= 0: indicates read complete; > 0: indicates data length
+ *  read this time
  */
 HTTP_API int http_util_get_res_body(HTTP_UTIL *http_util, char *buf, size_t size);
 
 /**
- * 将某个 url 的响应体数据转储至某个文件中
- * @param url {const char*} 完整请求 url, 如: http://www.g.cn
- * @param dump {const char*} 转储文件名
- * @return {int} 读到的响应体数据长度, >=0: 表示成功, -1: 表示失败
+ * Dump response body from a url to a file
+ * @param url {const char*} Request url, e.g.: http://www.g.cn
+ * @param dump {const char*} Dump filename
+ * @return {int} Returns response body data length, >=0: success,
+ *  -1: failure
  */
 HTTP_API int http_util_dump_url(const char *url, const char *dump);
 
 /**
- * 将某个 url 的响应体数据转储至某个流中
- * @param url {const char*} 完整请求 url, 如: http://www.g.cn
- * @param stream {ACL_VSTREAM *} 转储流
- * @return {int} 读到的响应体数据长度, >=0: 表示成功, -1: 表示失败
+ * Dump response body from a url to a stream
+ * @param url {const char*} Request url, e.g.: http://www.g.cn
+ * @param stream {ACL_VSTREAM *} Dump stream
+ * @return {int} Returns response body data length, >=0: success,
+ *  -1: failure
  */
 HTTP_API int http_util_dump_url_to_stream(const char *url, ACL_VSTREAM *stream);
 
@@ -232,3 +253,4 @@ HTTP_API int http_util_dump_url_to_stream(const char *url, ACL_VSTREAM *stream);
 #endif
 
 #endif
+

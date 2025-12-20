@@ -18,7 +18,7 @@ typedef struct ACL_CFG_LINE {
 			 * invalid line, but still be stored
 			 * here in pdata.
 			 */
-	int   line_number;	/* 该行在配置文件中的行号 */
+	int   line_number;	/* Line number of this line in the file */
 } ACL_CFG_LINE;
 
 typedef struct ACL_CFG_FN {
@@ -44,4 +44,3 @@ ACL_API ACL_CFG_LINE *acl_cfg_line_new(const char **value, int ncount);
 # endif
 
 #endif
-

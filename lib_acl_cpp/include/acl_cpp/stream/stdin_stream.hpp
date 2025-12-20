@@ -5,7 +5,7 @@
 namespace acl {
 
 /**
- * 标准输入流，该类对象仅能进行读操作
+ * Standard input stream, objects of this class can only perform read operations
  */
 
 class ACL_CPP_API stdin_stream : public istream {
@@ -15,3 +15,4 @@ public:
 };
 
 } // namespace acl
+

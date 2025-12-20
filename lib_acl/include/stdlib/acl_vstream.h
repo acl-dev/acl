@@ -54,22 +54,24 @@ typedef int (*ACL_FSTREAM_WR_FN)(ACL_FILE_HANDLE fh, const void *buf,
 typedef int (*ACL_FSTREAM_WV_FN)(ACL_FILE_HANDLE fh, const struct iovec *vec,
 	int count, int timeout, ACL_VSTREAM *fp, void *context);
 
-/* 当关闭或释放一个数据流时, 需要回调一些释放函数, 此结果定义了该回调
- * 函数的句柄类型 ---add by zsx, 2006.6.20
+/* When closing and freeing a stream, some cleanup functions need
+ * to be called back. This structure provides this callback
+ * mechanism ---add by zsx, 2006.6.20
  */
 typedef struct ACL_VSTREAM_CLOSE_HANDLE {
 	void (*close_fn)(ACL_VSTREAM*, void*);
 	void *context;
 } ACL_VSTREAM_CLOSE_HANDLE;
 
-/* 数据读写流类型定义 */
+/* Virtual stream read/write object */
 struct ACL_VSTREAM {
 	union {
 		ACL_SOCKET      sock;   /**< the master socket */
 		ACL_FILE_HANDLE h_file; /**< the file handle */
 	} fd;
 
-	int   is_nonblock;              /**< just for WINDOWS, because the ioctlsocket is too weak */
+	int   is_nonblock;              /**< just for WINDOWS, because
+					 *   the ioctlsocket is too weak */
 	int   type;                     /**< defined as: ACL_VSTREAM_TYPE_XXX */
 #define	ACL_VSTREAM_TYPE_SOCK           (1 << 0)
 #define	ACL_VSTREAM_TYPE_FILE           (1 << 1)
@@ -84,9 +86,12 @@ struct ACL_VSTREAM {
 	acl_off_t offset;               /**< cached seek info */
 	acl_off_t sys_offset;           /**< cached seek info */
 
-	unsigned char *wbuf;            /**< used when call acl_vstream_buffed_writen */
-	unsigned wbuf_size;             /**< used when call acl_vstream_buffed_writen */
-	int   wbuf_dlen;                /**< used when call acl_vstream_buffed_writen */
+	unsigned char *wbuf;            /**< used when call
+					 *   acl_vstream_buffed_writen */
+	unsigned wbuf_size;             /**< used when call
+					 *   acl_vstream_buffed_writen */
+	int   wbuf_dlen;                /**< used when call
+					 *   acl_vstream_buffed_writen */
 
 	unsigned char *read_buf;        /**< read buff */
 	unsigned read_buf_len;             /**< read_buf's capacity */
@@ -106,12 +111,12 @@ struct ACL_VSTREAM {
 #define	ACL_VSTREAM_FLAG_WRITE          (1 << 1)
 #define	ACL_VSTREAM_FLAG_RW             (1 << 2)
 #define ACL_VSTREAM_FLAG_CACHE_SEEK     (1 << 3)
-#define	ACL_VSTREAM_FLAG_DEFER_FREE	(1 << 4)	/**< 延迟关闭 */
+#define	ACL_VSTREAM_FLAG_DEFER_FREE	(1 << 4)	/**< Defer close */
 
-#define	ACL_VSTREAM_FLAG_ERR            (1 << 10)	/**< 其它错误 */
-#define	ACL_VSTREAM_FLAG_EOF            (1 << 11)	/**< 结束 */
-#define	ACL_VSTREAM_FLAG_TIMEOUT        (1 << 12)	/**< 超时 */
-#define	ACL_VSTREAM_FLAG_RDSHORT        (1 << 13)	/**< 读的不够 */
+#define	ACL_VSTREAM_FLAG_ERR            (1 << 10)	/**< Error occurred */
+#define	ACL_VSTREAM_FLAG_EOF            (1 << 11)	/**< End of file */
+#define	ACL_VSTREAM_FLAG_TIMEOUT        (1 << 12)	/**< Timeout */
+#define	ACL_VSTREAM_FLAG_RDSHORT        (1 << 13)	/**< Read incomplete */
 #define ACL_VSTREAM_FLAG_BAD  (ACL_VSTREAM_FLAG_ERR \
                                | ACL_VSTREAM_FLAG_EOF \
                                | ACL_VSTREAM_FLAG_TIMEOUT)
@@ -119,37 +124,46 @@ struct ACL_VSTREAM {
 #define	ACL_VSTREAM_FLAG_CONNECT        (1 << 15)
 #define	ACL_VSTREAM_FLAG_SOCKPAIR       (1 << 16)
 
-#define	ACL_VSTREAM_FLAG_TAGYES	        (1 << 17)	/* 若读到要求的标志位则置位 */
+#define	ACL_VSTREAM_FLAG_TAGYES	        (1 << 17)	/* Flag bit
+							 * indicating whether
+							 * tag was found */
 
-#define	ACL_VSTREAM_FLAG_CONNECTING     (1 << 18)	/* 正在连接过程中 */
-#define	ACL_VSTREAM_FLAG_PREREAD	(1 << 19)	/* 对于 acl_vstream_can_read 调用过程是否允许预读 */
+#define	ACL_VSTREAM_FLAG_CONNECTING     (1 << 18)	/* Currently connecting */
+#define	ACL_VSTREAM_FLAG_PREREAD	(1 << 19)	/* Used by
+							 * acl_vstream_can_read
+							 * to set whether to
+							 * enable preread */
 
-#define ACL_VSTREAM_FLAG_MS		(1 << 20)	/**< 毫秒超时级别 */
-#define ACL_VSTREAM_FLAG_US		(1 << 21)	/**< 微秒超时级别 */
-#define ACL_VSTREAM_FLAG_NS		(1 << 22)	/**< 纳秒超时级别 */
+#define ACL_VSTREAM_FLAG_MS		(1 << 20)	/**< Millisecond timeout unit */
+#define ACL_VSTREAM_FLAG_US		(1 << 21)	/**< Microsecond timeout unit */
+#define ACL_VSTREAM_FLAG_NS		(1 << 22)	/**< Nanosecond timeout unit */
 
-#define ACL_VSTREAM_FLAG_BIND_IFACE_OK	(1 << 23)	/**< 绑定本机网卡成功 */
-#define ACL_VSTREAM_FLAG_BIND_IP_OK	(1 << 24)	/**< 绑定本机 IP 成功 */
+#define ACL_VSTREAM_FLAG_BIND_IFACE_OK	(1 << 23)	/**< Binding to
+							 *   network interface
+							 *   succeeded */
+#define ACL_VSTREAM_FLAG_BIND_IP_OK	(1 << 24)	/**< Binding to
+							 *   local IP
+							 *   succeeded */
 
-/* 设置毫秒级超时 */
+/* Set millisecond timeout unit */
 #define ACL_VSTREAM_SET_MS(x)	((x)->flag |= ACL_VSTREAM_FLAG_MS)
-/* 设置微秒级超时 */
+/* Set microsecond timeout unit */
 #define ACL_VSTREAM_SET_US(x)	((x)->flag |= ACL_VSTREAM_FLAG_US)
-/* 设置纳秒级超时 */
+/* Set nanosecond timeout unit */
 #define ACL_VSTREAM_SET_NS(x)	((x)->flag |= ACL_VSTREAM_FLAG_NS)
 
-/* 清除毫秒级超时 */
+/* Clear millisecond timeout unit */
 #define ACL_VSTREAM_CLR_MS(x)	((x)->flag &= ~ACL_VSTREAM_FLAG_MS)
-/* 清除微秒级超时 */
+/* Clear microsecond timeout unit */
 #define ACL_VSTREAM_CLR_US(x)	((x)->flag &= ~ACL_VSTREAM_FLAG_US)
-/* 清除纳秒级超时 */
+/* Clear nanosecond timeout unit */
 #define ACL_VSTREAM_CLR_NS(x)	((x)->flag &= ~ACL_VSTREAM_FLAG_NS)
 
-/* 判断是否设置了毫秒级超时 */
+/* Check if millisecond timeout unit is set */
 #define ACL_VSTREAM_IS_MS(x)	(((x)->flag & ACL_VSTREAM_FLAG_MS) != 0)
-/* 判断是否设置了微秒级超时 */
+/* Check if microsecond timeout unit is set */
 #define ACL_VSTREAM_IS_US(x)	(((x)->flag & ACL_VSTREAM_FLAG_US) != 0)
-/* 判断是否设置了纳秒级超时 */
+/* Check if nanosecond timeout unit is set */
 #define ACL_VSTREAM_IS_NS(x)	(((x)->flag & ACL_VSTREAM_FLAG_NS) != 0)
 
 	int   errnum;                   /**< record the system errno here */
@@ -206,119 +220,129 @@ struct ACL_VSTREAM {
 };
 
 extern ACL_API ACL_VSTREAM acl_vstream_fstd[];  /**< pre-defined streams */
-#define ACL_VSTREAM_IN          (&acl_vstream_fstd[0]) /**< 标准输入 */
-#define ACL_VSTREAM_OUT         (&acl_vstream_fstd[1]) /**< 标准输出 */
-#define ACL_VSTREAM_ERR         (&acl_vstream_fstd[2]) /**< 标准错误输出 */
+#define ACL_VSTREAM_IN          (&acl_vstream_fstd[0]) /**< Standard input */
+#define ACL_VSTREAM_OUT         (&acl_vstream_fstd[1]) /**< Standard output */
+#define ACL_VSTREAM_ERR         (&acl_vstream_fstd[2]) /**< Standard
+							 *   error output */
 
 /*--------------------------------------------------------------------------*/
 /**
- * 初始化ACL_VSTREAM流的函数库
- * 对于_WIN32来说，如果想要用标准输入输出，则需要调用此函数进行初始化
+ * Initialize ACL_VSTREAM-related functions.
+ * For _WIN32, if you need to use standard input/output/error
+ * streams, you need to call this function for initialization.
  */
 ACL_API void acl_vstream_init(void);
 
 /**
- * 设置内部使用的缺省值用来批示写缓冲区大小
+ * Set the default value used internally, indicating the write buffer size.
  * @poaram size {unsigned}
  */
 ACL_API void acl_vstream_set_wbuf_size(unsigned size);
 
 /**
- * 设置内部使用的缺省值用来批示读缓冲区的最小值
+ * Set the default value used internally, indicating the read buffer size.
  * @poaram size {unsigned}
  */
 ACL_API void acl_vstream_set_rbuf_size(unsigned size);
 
 /**
- * 功能: 探测流中有多少数据, 包含缓冲区中的数据与系统缓冲区的数据
- * @param fp {ACL_VSTREAM*} 流指针, 不能为空
+ * Function: Probe whether there is data in the socket, and copy
+ * the data in the system buffer to the internal buffer.
+ * @param fp {ACL_VSTREAM*} Stream pointer, must not be NULL
  * @return ret {int}, ret > 0 OK; ret <= 0 Error
- * 注: 仅适应于网络套接字
+ * Note: This function should be used for sockets.
  */
 ACL_API int acl_vstream_peekfd(ACL_VSTREAM *fp);
 
 /**
- * 克隆一个ACL_VSTREAM流，除ioctl_read_ctx, ioctl_write_ctx, fdp
- * 外所有数据都拷贝，如果是动态内存数据，则新的流将在内部动态分配
- * 内存且将源数据进行拷贝
- * @param stream_src {ACL_VSTREAM*} 源流指针
- * @return {ACL_VSTREAM*} 目的流指针
+ * Clone an ACL_VSTREAM object, excluding ioctl_read_ctx, ioctl_write_ctx, fdp.
+ * The cloned data are all static memory data, and the new object
+ * internally allocates dynamic memory and copies the source data.
+ * @param stream_src {ACL_VSTREAM*} Source stream pointer
+ * @return {ACL_VSTREAM*} Target stream pointer
  */
 ACL_API ACL_VSTREAM *acl_vstream_clone(const ACL_VSTREAM *stream_src);
 
 /**
- * 设置数据流的类型，该函数将根据所给类型设定用于该数据流上的读、写、关闭函数
- * @param fp {ACL_VSTREAM*} 流指针, 不能为空
- * @param type {int} 数据流的类型，defined above: ACL_VSTREAM_TYPE_XXX
+ * Set the stream's file descriptor type. This function will set
+ * the corresponding read/write/close functions based on the
+ * stream type.
+ * @param fp {ACL_VSTREAM*} Stream pointer, must not be NULL
+ * @param type {int} Stream file descriptor type, defined above:
+ *  ACL_VSTREAM_TYPE_XXX
  * @return ret {int}, ret >= 0 OK; ret < 0 Error
  */
 ACL_API int acl_vstream_set_fdtype(ACL_VSTREAM *fp, int type);
 
 /**
- * 分配一文件句柄所对应的数据流
- * @param fh {ACL_FILE_HANDLE} 文件句柄
- * @param oflags {unsigned int} 标志位, We're assuming that O_RDONLY: 0x0000,
+ * Open a file handle and create a corresponding stream.
+ * @param fh {ACL_FILE_HANDLE} File handle
+ * @param oflags {unsigned int} Flag bits, We're assuming that O_RDONLY: 0x0000,
  *  O_WRONLY: 0x0001, O_RDWR: 0x0002, O_APPEND: 0x0008, O_CREAT: 0x0100,
  *  O_TRUNC: 0x0200, O_EXCL: 0x0400; just for win32, O_TEXT: 0x4000,
  *  O_BINARY: 0x8000, O_RAW: O_BINARY, O_SEQUENTIAL: 0x0020, O_RANDOM: 0x0010.
- *  同时设置
- * @return {ACL_VSTREAM*} 数据流句柄
+ *  Simultaneously set.
+ * @return {ACL_VSTREAM*} Stream object
  */
 ACL_API ACL_VSTREAM *acl_vstream_fhopen(ACL_FILE_HANDLE fh, unsigned int oflags);
 
 /**
- * 分配一个数据流
- * @param fd {ACL_SOCKET} 描述符(可以为网络描述字也可以为文件描述字)
- * @param oflags {unsigned int} 标志位, We're assuming that O_RDONLY: 0x0000,
+ * Open a file descriptor.
+ * @param fd {ACL_SOCKET} File descriptor (can be a socket
+ *  descriptor or a file descriptor)
+ * @param oflags {unsigned int} Flag bits, We're assuming that O_RDONLY: 0x0000,
  *  O_WRONLY: 0x0001, O_RDWR: 0x0002, O_APPEND: 0x0008, O_CREAT: 0x0100,
  *  O_TRUNC: 0x0200, O_EXCL: 0x0400; just for win32, O_TEXT: 0x4000,
  *  O_BINARY: 0x8000, O_RAW: O_BINARY, O_SEQUENTIAL: 0x0020, O_RANDOM: 0x0010.
- * @param buflen {size_t} 内置缓冲区的大小
- * @param rw_timeout {int} 读写超时时间(默认以秒为单位, 当ACL_VSTREAM_IS_MS() 时
- *  则单位为毫秒), 当该值 >= 0 时, 则会启用读写超时检测机制, < 0 则不检测.
+ * @param buflen {size_t} Buffer size to be set
+ * @param rw_timeout {int} Read/write timeout time (default unit
+ *  is seconds, when ACL_VSTREAM_IS_MS() unit is milliseconds),
+ *  when value >= 0, enables read/write timeout checking, < 0
+ *  disables checking.
  * @param fdtype {int} ACL_VSTREAM_TYPE_FILE, ACL_VSTREAM_TYPE_SOCK,
- *  ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET | ACL_VSTREAM_TYPE_LISTEN_UNIX
- * @return ret {ACL_VSTREAM*}, ret == NULL: 出错, ret != NULL: OK
+ *  ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET |
+ *  ACL_VSTREAM_TYPE_LISTEN_UNIX
+ * @return ret {ACL_VSTREAM*}, ret == NULL: Error, ret != NULL: OK
  */
 ACL_API ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 		size_t buflen, int rw_timeout, int fdtype);
 
 /**
- * 打开一个文件的数据流
- * @param path {const char*} 文件名
- * @param oflags {unsigned int} 标志位, We're assuming that O_RDONLY: 0x0000,
+ * Open a file and create a stream.
+ * @param path {const char*} File path
+ * @param oflags {unsigned int} Flag bits, We're assuming that O_RDONLY: 0x0000,
  *  O_WRONLY: 0x0001, O_RDWR: 0x0002, O_APPEND: 0x0008, O_CREAT: 0x0100,
  *  O_TRUNC: 0x0200, O_EXCL: 0x0400; just for win32, O_TEXT: 0x4000,
  *  O_BINARY: 0x8000, O_RAW: O_BINARY, O_SEQUENTIAL: 0x0020, O_RANDOM: 0x0010.
- * @param mode {int} 打开文件句柄时的模式(如: 0600)
- * @param buflen {size_t} 内置缓冲区的大小
- * @return ret {ACL_VSTREAM*}, ret== NULL: 出错, ret != NULL: OK
+ * @param mode {int} File creation mode when creating file (e.g.: 0600)
+ * @param buflen {size_t} Buffer size to be set
+ * @return ret {ACL_VSTREAM*}, ret== NULL: Error, ret != NULL: OK
  */
 ACL_API ACL_VSTREAM *acl_vstream_fopen(const char *path, unsigned int oflags,
 		int mode, size_t buflen);
 
 /**
- * 读取整个文件内容于内存中
- * @param path {const char*} 文件名, 如: /opt/acl/conf/service/test.cf
- * @return {char*} 存有文件全部内容的缓冲区, 用完后用户需要调用 acl_myfree
- *  释放该内存区
+ * Load the entire file content into memory.
+ * @param path {const char*} File path, e.g.: /opt/acl/conf/service/test.cf
+ * @return {char*} Buffer containing the entire file content, the
+ *  caller needs to call acl_myfree to free this memory.
  */
 ACL_API char *acl_vstream_loadfile(const char *path);
 
 /**
- * 读取整个文件内容于内存中
- * @param path {const char*} 文件名, 如: /opt/acl/conf/service/test.cf
- * @param size {ssize_t*} 如果非空，则该值存储返回的缓冲区大小，如果读取内容
- *  出错，则该值会被置 -1
- * @return {char*} 存有文件全部内容的缓冲区, 用完后用户需要调用 acl_myfree
- *  释放该内存区
+ * Load the entire file content into memory.
+ * @param path {const char*} File path, e.g.: /opt/acl/conf/service/test.cf
+ * @param size {ssize_t*} If not NULL, stores the returned buffer
+ *  size. If file reading fails, this value will be set to -1
+ * @return {char*} Buffer containing the entire file content, the
+ *  caller needs to call acl_myfree to free this memory.
  */
 ACL_API char *acl_vstream_loadfile2(const char *path, ssize_t *size);
 
 /**
- * 设置流的各个参数
- * @param fp {ACL_VSTREAM*} 流指针
- * @param name {int} 所设置的参数类型中的第一个参数类型名,
+ * Control the stream's various parameters.
+ * @param fp {ACL_VSTREAM*} Stream pointer
+ * @param name {int} The first parameter in the parameter list to be set,
  *  defined as ACL_VSTREAM_CTL_
  */
 ACL_API void acl_vstream_ctl(ACL_VSTREAM *fp, int name,...);
@@ -333,495 +357,569 @@ ACL_API void acl_vstream_ctl(ACL_VSTREAM *fp, int name,...);
 #define ACL_VSTREAM_CTL_CACHE_SEEK  7
 
 /**
- * 定位文件指针
- * @param fp {ACL_VSTREAM*} 数据流指针
- * @param offset {acl_off_t} 偏移量
- * @param whence {int} 偏移方向, SEEK_SET, SEEK_CUR, SEEK_END
- * @return ret {acl_off_t}, ret >= 0: 正确, ret < 0: 出错
- * 注： acl_vstream_fseek() 效率更高些, 其充分利用了缓冲区的功能,
- *      且比 acl_vstream_fseek2() 少调用一次 lseek() 系统调用.
+ * Reposition file pointer.
+ * @param fp {ACL_VSTREAM*} Stream pointer
+ * @param offset {acl_off_t} Offset value
+ * @param whence {int} Offset direction, SEEK_SET, SEEK_CUR, SEEK_END
+ * @return ret {acl_off_t}, ret >= 0: Correct, ret < 0: Error
+ * Note: acl_vstream_fseek() is more efficient, it uses cached
+ * buffer functionality, while acl_vstream_fseek2() calls the
+ * lseek() system call once more.
  */
 ACL_API acl_off_t acl_vstream_fseek(ACL_VSTREAM *fp, acl_off_t offset, int whence);
 
 /**
- * 定位文件指针
- * @param fp {ACL_VSTREAM*} 数据流指针
- * @param offset {acl_off_t} 偏移量
- * @param whence {int} 移动方向：SEEK_SET（从文件起始位置后移动）,
- *  SEEK_CUR（从当前文件指针位置向后移动）, SEEK_END（从文件尾向前移动）
- * @return ret {acl_off_t}, ret >= 0: 正确, ret < 0: 出错
- * @DEPRECATED 该函数的效率较低
+ * Reposition file pointer.
+ * @param fp {ACL_VSTREAM*} Stream pointer
+ * @param offset {acl_off_t} Offset value
+ * @param whence {int} Movement direction: SEEK_SET moves from
+ *  the beginning of the file, SEEK_CUR moves from the current
+ *  file pointer position, SEEK_END moves from the end of the
+ *  file forward
+ * @return ret {acl_off_t}, ret >= 0: Correct, ret < 0: Error
+ * @DEPRECATED This function has lower efficiency.
  */
 ACL_API acl_off_t acl_vstream_fseek2(ACL_VSTREAM *fp, acl_off_t offset, int whence);
 
 /**
- * 返回当前文件指针所在位置
- * @param fp {ACL_VSTREAM*} 数据流指针
- * @return {acl_off_t} 当前文件指针所在位置, -1 表示出错
+ * Get the current file pointer's absolute position.
+ * @param fp {ACL_VSTREAM*} Stream pointer
+ * @return {acl_off_t} Current file pointer's absolute position,
+ *  -1 indicates error
  */
 ACL_API acl_off_t acl_vstream_ftell(ACL_VSTREAM *fp);
 
 /**
- * 将源文件进程截断
- * @param fp {ACL_VSTREAM*} 数据流指针
- * @param length {acl_off_t} 数据长度(>=0)
+ * Truncate the source file to a specified length.
+ * @param fp {ACL_VSTREAM*} Stream pointer
+ * @param length {acl_off_t} Data length (>=0)
  * @return {int} 0: ok, -1: error
  */
 ACL_API int acl_file_ftruncate(ACL_VSTREAM *fp, acl_off_t length);
 
 /**
- * 将源文件进程截断
- * @param path {const char*} 文件名(可以是全路径或相对路径)
- * @param length {acl_off_t} 数据长度(>=0)
+ * Truncate the source file to a specified length.
+ * @param path {const char*} File path (can be absolute path or relative path)
+ * @param length {acl_off_t} Data length (>=0)
  * @return {int} 0: ok, -1: error
  */
 ACL_API int acl_file_truncate(const char *path, acl_off_t length);
 
 /**
- * 查看一个文件流句柄的属性
- * @param fp {ACL_VSTREAM *} 文件流句柄
- * @param buf {acl_stat *} 存储结果的结构地址
+ * Check a file's status information.
+ * @param fp {ACL_VSTREAM *} File stream
+ * @param buf {acl_stat *} Address of structure to store status
  * @return {int} 0: ok; -1: error
  */
 ACL_API int acl_vstream_fstat(ACL_VSTREAM *fp, struct acl_stat *buf);
 
 /**
- * 查看一个文件的大小
- * @param fp {ACL_VSTREAM *} 文件流句柄
+ * Check a file's size.
+ * @param fp {ACL_VSTREAM *} File stream
  * @return {int} >= 0: ok;  -1: error
  */
 ACL_API acl_int64 acl_vstream_fsize(ACL_VSTREAM *fp);
 
 /**
- * 从流中读取一个字节
- * @param fp {ACL_VSTREAM*} 数据流指针
- * @return {int} ACL_VSTREAM_EOF(出错) 或所读到的某个字节的ASCII
- *  或为 ACL_VSTREAM_EOF: 读出错或对方关闭了连接, 应该关闭该数据流
+ * Read a byte from the stream.
+ * @param fp {ACL_VSTREAM*} Stream pointer
+ * @return {int} ACL_VSTREAM_EOF (error) or the ASCII value of the read byte.
+ *  If it is ACL_VSTREAM_EOF: the stream was closed by the
+ *  peer, the application should close the stream.
  */
 ACL_API int acl_vstream_getc(ACL_VSTREAM *fp);
 #define	acl_vstream_get_char	acl_vstream_getc
 
 /**
- * 从流中非阻塞地一次性最大读取 size 个字节
- * @param fp {ACL_VSTREAM*} 数据流指针
- * @param buf {char*} 用户传来的内存缓存区
- * @param size {int} buf 缓存区的空间大小
- * @return {int} 所读取的字节数 n, 如果 n == ACL_VSTREAM_EOF 表明出错, 否则
- *         n >= 0 正确.
+ * Read size bytes from a non-blocking stream.
+ * @param fp {ACL_VSTREAM*} Stream pointer
+ * @param buf {char*} User-provided memory buffer
+ * @param size {int} Space size of buf buffer
+ * @return {int} Number of bytes read n, if n == ACL_VSTREAM_EOF
+ *  indicates error, otherwise
+ *         n >= 0 is correct.
  */
 ACL_API int acl_vstream_nonb_readn(ACL_VSTREAM *fp, char *buf, int size);
 
 /**
- * 判断一个给定的数据流是否已经被系统关闭了，当数据流缓存区没有数据时，
- * 该函数会调用系统的读函数（即读一个字节）来判断是否socket出错或已经
- * 关闭；如成功读取一个字节，则说明socket正常，同时将所读的数据放回缓存
- * 区, 如果读返回ACL_VSTREAM_EOF, 便需要判断错误号是否被关闭
- * @param fp {ACL_VSTREAM*} 数据流指针
- * @return {int}, 0 说明该socket正常; -1 该socket出错或已经被系统关闭
+ * Check whether a socket stream has been closed by the system.
+ * When there is no data in the buffer, this function will try to
+ * read one byte from the system's socket buffer to determine
+ * whether the socket stream has been closed. If it successfully
+ * reads one byte, it means the socket stream is still open, and
+ * simultaneously puts the read data back into the buffer area.
+ * If it returns ACL_VSTREAM_EOF, it is necessary to determine
+ * whether the stream was closed.
+ * @param fp {ACL_VSTREAM*} Stream pointer
+ * @return {int}, 0 indicates the socket is open; -1 indicates
+ *  the socket stream has been closed by the system
  */
 ACL_API int acl_vstream_probe_status(ACL_VSTREAM *fp);
 
 /**
- * 将一个字符放回数据流中
- * @param fp {ACL_VSTREAM*} 数据流指针
- * @param ch {int} 字符的 ASCII 码 
- * @return {int} 字符的 ASCII 码, 该函数应不会出错, 除非内部内存分配失败而产生
- *  core 文件.
+ * Push a character back into the stream.
+ * @param fp {ACL_VSTREAM*} Stream pointer
+ * @param ch {int} Character's ASCII value 
+ * @return {int} Character's ASCII value, this function should
+ *  succeed, otherwise internal memory allocation failure will
+ *  cause core dump.
  */
 ACL_API int acl_vstream_ungetc(ACL_VSTREAM *fp, int ch);
 
 /**
- * 将指定长度的数据放回至数据流中
- * @param fp {ACL_VSTREAM*} 数据流指针
- * @param ptr {const void *} 需要放回至流中的数据的起始地址
- * @param length {size_t} 需要放回至流中的数据的长度
- * @return {int} 被成功放回至流中的数据长度, 应该永不会出错, 除非内部内存分配
- *  失败而自动产生 core 文件!
+ * Push data of specified length back into the stream buffer.
+ * @param fp {ACL_VSTREAM*} Stream pointer
+ * @param ptr {const void *} Starting address of the data to be
+ *  pushed back into the buffer
+ * @param length {size_t} Length of the data to be pushed back into the buffer
+ * @return {int} Length of data successfully pushed back into
+ *  the buffer, should be equal to length, otherwise internal
+ *  memory allocation failure will automatically cause core dump!
  */
 ACL_API int acl_vstream_unread(ACL_VSTREAM *fp, const void *ptr, size_t length);
 
 /**
- * 从数据流中读取一行数据, 直到读到  "\n" 或读结束为止, 正常情况下包括 "\n"
- * @param fp {ACL_VSTREAM*} 数据流
- * @param vptr {void*} 用户所给的内存缓冲区指针
- * @param maxlen {size_t} vptr 缓冲区的大小
- * @return  ret {int}, ret == ACL_VSTREAM_EOF:  读出错或对方关闭了连接, 
- *  应该关闭本地数据流; n > 0:  读到 了 n 个字节的数据, 如果该 n 个数据
- *  的最后一个非 0 字符为 "\n" 表明读到了一个完整的行, 否则表明读到了 n
- *  个数据但对方未发送 "\n" 就关闭了连接; 还可以通过检查
- *  (fp->flag & ACL_VSTREAM_FLAG_TAGYES)
- *	不等于 0 来判断是否读到了 "\n", 如果非 0 则表示读到了 "\n".
+ * Read a line from the stream, until encountering "\n" or end of
+ * stream, the returned result includes "\n"
+ * @param fp {ACL_VSTREAM*} Stream
+ * @param vptr {void*} User-provided memory buffer pointer
+ * @param maxlen {size_t} Size of vptr buffer
+ * @return  ret {int}, ret == ACL_VSTREAM_EOF:  The stream was
+ *  closed by the peer, should close the stream; n > 0:
+ *  Successfully read n bytes of data, where n may be less than
+ *  maxlen. The last character at position 0 is "\n" indicating
+ *  a complete line was read, otherwise n indicates the data
+ *  from the peer did not send "\n" and closed the stream;
+ *  otherwise through checking (fp->flag &
+ *  ACL_VSTREAM_FLAG_TAGYES) whether it is 0 to determine
+ *  whether "\n" was found, if it is 0 it means "\n" was found.
  */
 ACL_API int acl_vstream_gets(ACL_VSTREAM *fp, void *vptr, size_t maxlen);
 #define	acl_vstream_readline	acl_vstream_gets
 #define	acl_vstream_fgets	acl_vstream_gets
 
 /**
- * 从数据流中读取一行数据, 直到读到 "\n" 或读结束为止, 返回的结果中不包括 "\n"
- * @param fp {ACL_VSTREAM*} 数据流 
- * @param vptr {void*} 用户所给的内存缓冲区指针
- * @param maxlen {size_t} vptr 缓冲区的大小
- * @return ret {int}, ret == ACL_VSTREAM_EOF:  读出错或对方关闭了连接,
- *  应该关闭本地数据流, n == 0: 读到了一行数据, 但该行数据仅有 "\r\n",
- *  n > 0:  读到 了 n 个字节的数据.
+ * Read a line from the stream, until encountering "\n" or end
+ * of stream, the returned result does not include "\n"
+ * @param fp {ACL_VSTREAM*} Stream 
+ * @param vptr {void*} User-provided memory buffer pointer
+ * @param maxlen {size_t} Size of vptr buffer
+ * @return ret {int}, ret == ACL_VSTREAM_EOF:  The stream was closed by the peer,
+ *  should close the stream, n == 0: An empty line was read, the read data ends with "\r\n",
+ *  n > 0:  Successfully read n bytes of data.
  */
 ACL_API int acl_vstream_gets_nonl(ACL_VSTREAM *fp, void *vptr, size_t maxlen);
 
 /**
- * 从数据流中获得以字符串为标志结束位的内容
- * @param fp {ACL_VSTREAM*} 类型指针
- * @param vptr {void*} 数据存储缓冲区
- * @param maxlen {size_t} vptr 缓冲区大小
- * @param tag {const char*} 字符串标志
- * @param taglen {size_t} tag 中内容的长度大小
- * @return ret {int}, ret == ACL_VSTREAM_EOF:  读出错或对方关闭了连接, 
- *  应该关闭本地数据流, n > 0:  读到 了 n 个字节的数据, 如果读到了所需要的
- *  标志串, 则 fp 流中 (fp->flag & ACL_VSTREAM_FLAG_TAGYES) 不等于 0.
+ * Read data from the stream with a string as a tag delimiter.
+ * @param fp {ACL_VSTREAM*} Stream pointer
+ * @param vptr {void*} Data storage buffer
+ * @param maxlen {size_t} vptr buffer size
+ * @param tag {const char*} String tag
+ * @param taglen {size_t} Length of tag data
+ * @return ret {int}, ret == ACL_VSTREAM_EOF:  The stream was
+ *  closed by the peer, should close the stream; n > 0:
+ *  Successfully read n bytes of data, if the required tag is
+ *  found, then fp flag (fp->flag & ACL_VSTREAM_FLAG_TAGYES) is
+ *  not 0.
  */
 ACL_API int acl_vstream_readtags(ACL_VSTREAM *fp, void *vptr, size_t maxlen,
 		const char *tag, size_t taglen);
 
 /**
- * 循环读取 maxlen 个数据, 直到读到 maxlen 个字节为止或读出错
- * @param fp {ACL_VSTREAM*} 数据流
- * @param vptr {void*} 用户的数据缓冲区指针地址
- * @param maxlen {size_t} vptr 数据缓冲区的空间大小
- * @return ret {int}, ret == ACL_VSTREAM_EOF:  读出错或对方关闭了连接, 应该
- *  关闭本地数据流 n > 0:  成功读取了 maxlen 个字节的数据
- *  如果实际读取的字节数与 maxlen 不相等也返回错误(ACL_VSTREAM_EOF)
+ * Loop to read maxlen bytes of data, until maxlen bytes are
+ * read or an error occurs.
+ * @param fp {ACL_VSTREAM*} Stream
+ * @param vptr {void*} User-provided data buffer pointer
+ * @param maxlen {size_t} vptr data buffer space size
+ * @return ret {int}, ret == ACL_VSTREAM_EOF:  The stream was
+ *  closed by the peer, should close the stream; n > 0:
+ *  Successfully read maxlen bytes of data. If the actual bytes
+ *  read are less than maxlen, an error will also be returned
+ *  (ACL_VSTREAM_EOF)
  */
 ACL_API int acl_vstream_readn(ACL_VSTREAM *fp, void *vptr, size_t maxlen);
 
 /**
- * 将缓冲区内的数据拷贝到 vptr 中
- * @param fp {ACL_VSTREAM*} 数据流
- * @param vptr {void*} 用户的数据缓冲区指针地址
- * @param maxlen {size_t} vptr 数据缓冲区的空间大小
- * @return ret {int}, ret == ACL_VSTREAM_EOF: 表示出错, 应该关闭本地数据流,
- *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据
+ * Copy the data in the stream buffer to vptr.
+ * @param fp {ACL_VSTREAM*} Stream
+ * @param vptr {void*} User-provided data buffer pointer
+ * @param maxlen {size_t} vptr data buffer space size
+ * @return ret {int}, ret == ACL_VSTREAM_EOF: indicates error,
+ *  should close the stream, ret >= 0: Successfully read ret
+ *  bytes of data from fp stream's buffer
  */
 ACL_API int acl_vstream_bfcp_some(ACL_VSTREAM *fp, void *vptr, size_t maxlen);
 
 /**
- * 从数据流中一次性读取 n 个数据, 该 n 有可能会小于用户所需要的 maxlen
- * @param fp {ACL_VSTREAM*} 数据流 
- * @param vptr {void*} 用户的数据缓冲区指针地址
- * @param maxlen {size_t} vptr 数据缓冲区的空间大小
- * @return ret {int}, ret == ACL_VSTREAM_EOF: 表示出错, 应该关闭本地数据流,
- *  ret > 0:  表示读到了 ret 个字节的数据
- *  注: 如果缓冲区内有数据, 则直接把缓冲区内的数据复制到用户的缓冲区然后直接返回;
- *     如果缓冲区内无数据, 则需要调用系统读操作(有可能会阻塞在系统读操作上), 该
- *     次调用返回后则把读到数据复制到用户缓冲区返回.
- *     在这两种情况下都不能保证读到的字节数等于所要求的字节数, 若想读到所要求的
- *     字节后才返回则请调用 vstream_loop_readn() 函数.
+ * Read n bytes from the stream at once, where n may be less
+ * than the user-requested maxlen
+ * @param fp {ACL_VSTREAM*} Stream 
+ * @param vptr {void*} User-provided data buffer pointer
+ * @param maxlen {size_t} vptr data buffer space size
+ * @return ret {int}, ret == ACL_VSTREAM_EOF: indicates error, should close the stream,
+ *  ret > 0:  indicates successfully read ret bytes of data
+ *  Note: If there is data in the buffer, directly copy the data
+ *  in the buffer to the user's buffer and return directly; If
+ *  there is no data in the buffer, need to call the system
+ *  read() (may call the system read() multiple times), and
+ *  then copy the read data to the user's buffer and return.
+ *  This function cannot guarantee that the read bytes equal the
+ *  requested bytes, if you need to read the exact number of
+ *  bytes, please use vstream_loop_readn() function.
  */
 ACL_API int acl_vstream_read(ACL_VSTREAM *fp, void *vptr, size_t maxlen);
 
 /**
- * 一次性从 ACL_VSTREAM 流或系统缓存区中读取一行数据, 包括回车换行符
- * (调用者自行解决WINDOWS与UNIX对于回车换行的兼容性问题), 如果未读到
- * 回车换行符, 也将数据拷贝至用户的内存缓冲区.
- * @param fp {ACL_VSTREAM*} 数据流 
- * @param buf {ACL_VSTRING*} 数据缓冲区，当 buf->maxlen > 0 时，则限制每行数据
- *  的长度，即当 buf 中的数据长度达到 maxlen 时，即使没有读到完整一行数据，该
- *  函数也会返回，且会将 ready 置 1，调用者需调用 fp->flag 标志位中是否包含
- *  ACL_VSTREAM_FLAG_TAGYES 来判断是否读到一行数据
- * @param ready {int*} 是否按要求读到所需数据的标志位指针, 不能为空
- * @return ret {int}, ret == ACL_VSTREAM_EOF 时，如果 acl_last_error() 系统错误
- *  号为 ACL_EWOULDBLOCK 或 ACL_EAGAIN，则表示在非阻塞套接字上未读到数据，否则，
- *  表示出错，应该关闭该流对象；
- *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据
+ * Read a line from ACL_VSTREAM stream system buffer at once,
+ * including the newline character (handles differences in
+ * newline characters between WINDOWS and UNIX platforms), if no
+ * newline character is encountered, also copy the data to the
+ * user's memory buffer.
+ * @param fp {ACL_VSTREAM*} Stream 
+ * @param buf {ACL_VSTRING*} Data buffer, when buf->maxlen > 0,
+ *  limits the maximum length per line read. When the data
+ *  length in buf reaches maxlen, even if a complete line has
+ *  not been read, it will also return, and will set ready to
+ *  1. Then check the fp->flag flag bit to see if
+ *  ACL_VSTREAM_FLAG_TAGYES is set to determine whether a
+ *  complete line was read
+ * @param ready {int*} Flag pointer indicating whether a
+ *  complete line was read, can be NULL
+ * @return ret {int}, ret == ACL_VSTREAM_EOF when checking
+ *  acl_last_error() system error is ACL_EWOULDBLOCK or
+ *  ACL_EAGAIN, indicates no data available in the socket
+ *  stream, otherwise indicates error, should close the stream.
+ *  ret >= 0: Successfully read ret bytes of data from fp
+ *  stream's buffer
  */
 ACL_API int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready);
 
 /**
- * 一次性从 ACL_VSTREAM 流或系统缓存区中读取一行数据, 如果未读到回车换行符,
- * 也将数据拷贝至用户的内存缓冲区, 如果读到回车换行符便将回车换行符自动去掉,
- * 并将回车换行符前的数据拷贝至用户内存区.
- * @param fp {ACL_VSTREAM*} 数据流 
- * @param buf {ACL_VSTRING*} 数据缓冲区，当 buf->maxlen > 0 时，则限制每行数据
- *  的长度，即当 buf 中的数据长度达到 maxlen 时，即使没有读到完整一行数据，该
- *  函数也会返回，且会将 ready 置 1，调用者需调用 fp->flag 标志位中是否包含
- *  ACL_VSTREAM_FLAG_TAGYES 来判断是否读到一行数据
- * @param ready {int*} 是否按要求读到所需数据的标志位指针, 不能为空
- * @return ret {int}, ret == ACL_VSTREAM_EOF 时，如果 acl_last_error() 系统错误
- *  号为 ACL_EWOULDBLOCK 或 ACL_EAGAIN，则表示在非阻塞套接字上未读到数据，否则，
- *  表示出错，应该关闭该流对象；
- *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据, 如果仅
- *  读到了一个空行, 则 ret == 0.
+ * Read a line from ACL_VSTREAM stream system buffer at once,
+ * if no newline character is encountered, also copy the data
+ * to the user's memory buffer. If a newline character is
+ * encountered, the newline character will be automatically
+ * removed, and the data before the newline character will be
+ * copied to the user's memory.
+ * @param fp {ACL_VSTREAM*} Stream 
+ * @param buf {ACL_VSTRING*} Data buffer, when buf->maxlen > 0,
+ *  limits the maximum length per line read. When the data
+ *  length in buf reaches maxlen, even if a complete line has
+ *  not been read, it will also return, and will set ready to
+ *  1. Then check the fp->flag flag bit to see if
+ *  ACL_VSTREAM_FLAG_TAGYES is set to determine whether a
+ *  complete line was read
+ * @param ready {int*} Flag pointer indicating whether a
+ *  complete line was read, can be NULL
+ * @return ret {int}, ret == ACL_VSTREAM_EOF when checking
+ *  acl_last_error() system error is ACL_EWOULDBLOCK or
+ *  ACL_EAGAIN, indicates no data available in the socket
+ *  stream, otherwise indicates error, should close the stream.
+ *  ret >= 0: Successfully read ret bytes of data from fp
+ *  stream's buffer, if
+ *  a complete line was read, then ret == 0.
  */
 ACL_API int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready);
 
 /**
- * 一次性从 ACL_VSTREAM 流或系统缓存区中读取固定长度的数据, 如果未读到所要求的
- * 数据, 也将数据拷贝至用户内存缓冲区, 如果读到所要求的数据, 则将 ready 标志位置位.
- * @param fp {ACL_VSTREAM*} 数据流 
- * @param buf {ACL_VSTRING*} 数据缓冲区
- * @param cnt {int} 所需要读的数据的长度
- * @param ready {int*} 是否按要求读到所需数据的标志位指针, 不能为空
- * @return ret {int}, ret == ACL_VSTREAM_EOF 时，如果 acl_last_error() 系统错误
- *  号为 ACL_EWOULDBLOCK 或 ACL_EAGAIN，则表示在非阻塞套接字上未读到数据，否则，
- *  表示出错，应该关闭该流对象；
- *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据, 
- *  (*ready) != 0: 表示读到了所要求长度的数据.
+ * Read fixed-length data from ACL_VSTREAM stream system buffer
+ * at once, if the required data length is not available, also
+ * copy the data to the user's memory buffer. If the required
+ * data length is available, set the ready flag bit.
+ * @param fp {ACL_VSTREAM*} Stream 
+ * @param buf {ACL_VSTRING*} Data buffer
+ * @param cnt {int} Required data length to read
+ * @param ready {int*} Flag pointer indicating whether a
+ *  complete line was read, can be NULL
+ * @return ret {int}, ret == ACL_VSTREAM_EOF when checking
+ *  acl_last_error() system error is ACL_EWOULDBLOCK or
+ *  ACL_EAGAIN, indicates no data available in the socket
+ *  stream, otherwise indicates error, should close the stream.
+ *  ret >= 0: Successfully read ret bytes of data from fp
+ *  stream's buffer, 
+ *  (*ready) != 0: indicates data of the required length was read.
  */
 ACL_API int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int cnt, int *ready);
 
 /**
- * 一次性从 ACL_VSTREAM 流或系统缓存区中读取不固定长度的数据
- * @param fp {ACL_VSTREAM*} 数据流 
- * @param buf {ACL_VSTRING*} 数据缓冲区
- * @return ret {int}, ret == ACL_VSTREAM_EOF 时，如果 acl_last_error() 系统错误
- *  号为 ACL_EWOULDBLOCK 或 ACL_EAGAIN，则表示在非阻塞套接字上未读到数据，否则，
- *  表示出错，应该关闭该流对象；
- *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据.
+ * Read non-fixed-length data from ACL_VSTREAM stream system buffer at once.
+ * @param fp {ACL_VSTREAM*} Stream 
+ * @param buf {ACL_VSTRING*} Data buffer
+ * @return ret {int}, ret == ACL_VSTREAM_EOF when checking
+ *  acl_last_error() system error is ACL_EWOULDBLOCK or
+ *  ACL_EAGAIN, indicates no data available in the socket
+ *  stream, otherwise indicates error, should close the stream.
+ *  ret >= 0: Successfully read ret bytes of data from fp
+ *  stream's buffer.
  */
 ACL_API int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf);
 
 /**
- * 一次性从 ACL_VSTREAM 流或系统缓存区中读取不固定长度的数据
- * @param fp {ACL_VSTREAM*} 数据流 
- * @param buf {void*} 数据缓冲区
- * @param size {size_t} buf 长度
- * @return ret {int}, ret == ACL_VSTREAM_EOF 时，如果 acl_last_error() 系统错误
- *  号为 ACL_EWOULDBLOCK 或 ACL_EAGAIN，则表示在非阻塞套接字上未读到数据，否则，
- *  表示出错，应该关闭该流对象；
- *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据.
+ * Read non-fixed-length data from ACL_VSTREAM stream system buffer at once.
+ * @param fp {ACL_VSTREAM*} Stream 
+ * @param buf {void*} Data buffer
+ * @param size {size_t} buf size
+ * @return ret {int}, ret == ACL_VSTREAM_EOF when checking
+ *  acl_last_error() system error is ACL_EWOULDBLOCK or
+ *  ACL_EAGAIN, indicates no data available in the socket
+ *  stream, otherwise indicates error, should close the stream.
+ *  ret >= 0: Successfully read ret bytes of data from fp
+ *  stream's buffer.
  */
 ACL_API int acl_vstream_read_peek3(ACL_VSTREAM *fp, void *buf, size_t size);
 
 /**
- * 检查 ACL_VSTREAM 流是否可读或出错
- * @param fp {ACL_VSTREAM*} 数据流 
- * @return {int} 0: 表示无数据可读; ACL_VSTREAM_EOF 表示出错; > 0 表示有数据可读
+ * Check if ACL_VSTREAM stream has readable data.
+ * @param fp {ACL_VSTREAM*} Stream 
+ * @return {int} 0: indicates no data readable; ACL_VSTREAM_EOF
+ *  indicates error; > 0 indicates data readable
  */
 ACL_API int acl_vstream_can_read(ACL_VSTREAM *fp);
 
 /**
- * 检查 ACL_VSTREAM 流是否可读,该函数会首先调用 acl_vstream_can_read() 检查是否
- * 可读,如果不可读会再次调用 poll() 方法检测 fd 句柄是否可读.
- * @param fp {ACL_VSTREAM*} 数据流 
- * @return {int} 如果返回 0 表示当前 fd 对应的流暂不可读,返回 1 则表示有数据可
- *  读或连接已经断开或出错.
+ * Check if ACL_VSTREAM stream is readable. This function first
+ * calls acl_vstream_can_read() to check if it is readable. If
+ * it is readable, it calls poll() again to check if fd is
+ * readable.
+ * @param fp {ACL_VSTREAM*} Stream 
+ * @return {int} Return value 0 indicates current fd has no
+ *  data readable, otherwise 1 indicates data is readable or
+ *  the stream has been closed by the peer.
  */
 ACL_API int acl_vstream_readable(ACL_VSTREAM *fp);
 
 /**
- * 将文件流中的系统缓冲区及流缓冲区中的数据都直接同步至硬盘
- * @param fp {ACL_VSTREAM*} 文件流指针
+ * Flush the system buffer and data in the file stream to disk synchronously.
+ * @param fp {ACL_VSTREAM*} File stream pointer
  * @return {int} 0: ok; ACL_VSTREAM_EOF: error
  */
 ACL_API int acl_vstream_fsync(ACL_VSTREAM *fp);
 
 /**
- * 对于带缓冲方式的写，该函数保证缓冲区空间非空
- * @param fp {ACL_VSTREAM*} 数据流
+ * Ensure buffer space is available for buffered write mode.
+ * @param fp {ACL_VSTREAM*} Stream
  */
 ACL_API void acl_vstream_buffed_space(ACL_VSTREAM *fp);
 
 /**
- * 刷新写缓冲区里的数据
- * @param fp socket 数据流
- * @return 刷新写缓冲区里的数据量或出错 ACL_VSTREAM_EOF
+ * Flush the write buffer data to the socket stream.
+ * @param fp socket stream
+ * @return Returns the number of bytes flushed to the write
+ *  buffer, or ACL_VSTREAM_EOF on error
  */
 ACL_API int acl_vstream_fflush(ACL_VSTREAM *fp);
 
 /**
- * 带缓冲式写
- * @param fp {ACL_VSTREAM*} 数据流
- * @param vptr {const void*} 数据指针起始位置
- * @param dlen {size_t} 要写入的数据量
- * @return {int} 写入的数据量或出错 ACL_VSTREAM_EOF
+ * Buffered write mode.
+ * @param fp {ACL_VSTREAM*} Stream
+ * @param vptr {const void*} Data pointer starting position
+ * @param dlen {size_t} Data length to write
+ * @return {int} Number of bytes written successfully, or
+ *  ACL_VSTREAM_EOF on error
  */
 ACL_API int acl_vstream_buffed_writen(ACL_VSTREAM *fp, const void *vptr, size_t dlen);
 #define	acl_vstream_buffed_fwrite	acl_vstream_buffed_writen
 
 /**
- * 缓冲带格式的流输出, 类似于 vfprintf()
- * @param fp {ACL_VSTREAM*} 数据流 
- * @param fmt {const char*} 数据格式
+ * Buffered format output function, similar to vfprintf()
+ * @param fp {ACL_VSTREAM*} Stream 
+ * @param fmt {const char*} Format string
  * @param ap {va_list}
- * @return ret {int}, ret == ACL_VSTREAM_EOF: 表示写出错, 应该关闭本地数据流,
- *  ret > 0:  表示成功写了 dlen 个字节的数据
+ * @return ret {int}, ret == ACL_VSTREAM_EOF: indicates write
+ *  error, should close the stream, ret > 0: indicates
+ *  successfully wrote dlen bytes of data
  */
 ACL_API int acl_vstream_buffed_vfprintf(ACL_VSTREAM *fp, const char *fmt, va_list ap);
 
 /**
- * 缓冲带格式的流输出, 类似于 fprintf()
- * @param fp {ACL_VSTREAM*} 数据流 
- * @param fmt {const char*} 数据格式 
- * @param ... 变参序列
- * @return ret {int}, ret == ACL_VSTREAM_EOF: 表示写出错, 应该关闭本地数据流,
- *  ret > 0:  表示成功写了 dlen 个字节的数据
+ * Buffered format output function, similar to fprintf()
+ * @param fp {ACL_VSTREAM*} Stream 
+ * @param fmt {const char*} Format string 
+ * @param ... Variable arguments
+ * @return ret {int}, ret == ACL_VSTREAM_EOF: indicates write
+ *  error, should close the stream, ret > 0: indicates
+ *  successfully wrote dlen bytes of data
  */
 ACL_API int ACL_PRINTF(2, 3) acl_vstream_buffed_fprintf(ACL_VSTREAM *fp,
 	const char *fmt, ...);
 
 /**
- * 向标准输出打印信息
- * @param ... 变参序列
- * @return {int}, ACL_VSTREAM_EOF: 表示写出错, > 0:  表示成功写了 dlen 个字节的数据
+ * Print message to standard output.
+ * @param ... Variable arguments
+ * @return {int}, ACL_VSTREAM_EOF: indicates write error, > 0:
+ *  indicates successfully wrote dlen bytes of data
  */
 ACL_API int acl_vstream_buffed_printf(const char*, ...);
 
 /**
- * 向流缓冲区中写入一行数据
- * @param s {const char*} 源字符串
- * @param fp {ACL_VSTREAM*} 数据流
- * @return {int} 0 成功; ACL_VSTREAM_EOF 失败
+ * Write a string to the stream in buffered mode.
+ * @param s {const char*} Source string
+ * @param fp {ACL_VSTREAM*} Stream
+ * @return {int} 0 success; ACL_VSTREAM_EOF failure
  */
 ACL_API int acl_vstream_buffed_fputs(const char *s, ACL_VSTREAM *fp);
 
 /**
- * 向标准输出流缓冲区中写入一行数据
- * @param s {const char*} 源字符串
- * @return {int} 0 成功; ACL_VSTREAM_EOF 失败
+ * Write a string to standard output in buffered mode.
+ * @param s {const char*} Source string
+ * @return {int} 0 success; ACL_VSTREAM_EOF failure
  */
 ACL_API int acl_vstream_buffed_puts(const char *s);
 
 /**
-* 一次性写入流操作, 返回实际写入的字节数.
-* @param fp {ACL_VSTREAM*} 数据流 
-* @param vptr {const void*} 数据区指针地址
-* @param dlen {int} 待写的数据区数据长度
-* @return ret {int}, ret == ACL_VSTREAM_EOF: 表示写出错, 应该关闭本地数据流,
-*  ret > 0:  表示成功写了 ret 个字节的数据
+* Write data to the stream at once, returns the actual number of bytes written.
+* @param fp {ACL_VSTREAM*} Stream 
+* @param vptr {const void*} Data pointer address
+* @param dlen {int} Data length to write
+ * @return ret {int}, ret == ACL_VSTREAM_EOF: indicates write error,
+ *  should close the stream, ret > 0: indicates successfully wrote
+ *  ret bytes of data
 */
 ACL_API int acl_vstream_write(ACL_VSTREAM *fp, const void *vptr, int dlen);
 
 /**
- * 一次性写入流操作，采用 writev 模式，返回实际写入的字节数
+ * Write data to the stream in writev mode at once, returns
+ * the actual number of bytes written
  * @param fp {ACL_VSTREAM*}
  * @param vector {const struct iovec*}
- * @param count {int} vector 数组的长度
- * @return {int} 返回成功写入的字节数，如果出错，则返回 ACL_VSTREAM_EOF
+ * @param count {int} Length of vector array
+ * @return {int} Returns the number of bytes written successfully, or ACL_VSTREAM_EOF on error
  */
 ACL_API int acl_vstream_writev(ACL_VSTREAM *fp, const struct iovec *vector, int count);
 
 /**
- * 采用 writev 模式往流中写，直至全部数据写完为止或出错
+ * Loop write in writev mode until all data is written or an error occurs.
  * @param fp {ACL_VSTREAM*}
  * @param vector {const struct iovec*}
- * @param count {int} vector 数组的长度
- * @return {int} 返回成功写入的字节数，如果出错，则返回 ACL_VSTREAM_EOF
+ * @param count {int} Length of vector array
+ * @return {int} Returns the number of bytes written successfully, or ACL_VSTREAM_EOF on error
  */
 ACL_API int acl_vstream_writevn(ACL_VSTREAM *fp, const struct iovec *vector, int count);
 
 /**
- * 带格式的流输出, 类似于 vfprintf()
- * @param fp {ACL_VSTREAM*} 数据流 
- * @param fmt {const char*} 数据格式
+ * Format output function, similar to vfprintf()
+ * @param fp {ACL_VSTREAM*} Stream 
+ * @param fmt {const char*} Format string
  * @param ap {va_list}
- * @return ret {int}, ret == ACL_VSTREAM_EOF: 表示写出错, 应该关闭本地数据流,
- *  ret > 0:  表示成功写了 dlen 个字节的数据
+ * @return ret {int}, ret == ACL_VSTREAM_EOF: indicates write
+ *  error, should close the stream, ret > 0: indicates
+ *  successfully wrote dlen bytes of data
  */
 ACL_API int acl_vstream_vfprintf(ACL_VSTREAM *fp, const char *fmt, va_list ap);
 
 /**
- * 带格式的流输出, 类似于 fprintf()
- * @param fp {ACL_VSTREAM*} 数据流 
- * @param fmt {const char*} 数据格式 
- * @param ... 变参序列
- * @return ret {int}, ret == ACL_VSTREAM_EOF: 表示写出错, 应该关闭本地数据流,
- *  ret > 0:  表示成功写了 dlen 个字节的数据
+ * Format output function, similar to fprintf()
+ * @param fp {ACL_VSTREAM*} Stream 
+ * @param fmt {const char*} Format string 
+ * @param ... Variable arguments
+ * @return ret {int}, ret == ACL_VSTREAM_EOF: indicates write
+ *  error, should close the stream, ret > 0: indicates
+ *  successfully wrote dlen bytes of data
  */
 ACL_API int ACL_PRINTF(2, 3) acl_vstream_fprintf(ACL_VSTREAM *fp,
 	const char *fmt, ...);
 
 /**
- * 向标准输出打印信息
- * @param ... 变参序列
- * @return {int}, ACL_VSTREAM_EOF: 表示写出错, > 0:  表示成功写了 dlen 个字节的数据
+ * Print message to standard output.
+ * @param ... Variable arguments
+ * @return {int}, ACL_VSTREAM_EOF: indicates write error, > 0:
+ *  indicates successfully wrote dlen bytes of data
  */
 ACL_API int acl_vstream_printf(const char*, ...);
 
 /**
- * 向流中写入一行数据
- * @param s {const char*} 源字符串
- * @param fp {ACL_VSTREAM*} 数据流
- * @return {int} 0 成功; ACL_VSTREAM_EOF 失败
+ * Write a string to the stream.
+ * @param s {const char*} Source string
+ * @param fp {ACL_VSTREAM*} Stream
+ * @return {int} 0 success; ACL_VSTREAM_EOF failure
  */
 ACL_API int acl_vstream_fputs(const char *s, ACL_VSTREAM *fp);
 
 /**
- * 向标准输出流中写入一行数据
- * @param s {const char*} 源字符串
- * @return {int} 0 成功; ACL_VSTREAM_EOF 失败
+ * Write a string to standard output.
+ * @param s {const char*} Source string
+ * @return {int} 0 success; ACL_VSTREAM_EOF failure
  */
 ACL_API int acl_vstream_puts(const char *s);
 
 /**
- * 循环向数据流中写 dlen 个字节的数据直至写完或出错为止
- * @param fp {ACL_VSTREAM*} 数据流 
- * @param vptr {const char*} 数据区指针地址
- * @param dlen {size_t} 待写的数据区数据长度
- * @return ret {int}, ret == ACL_VSTREAM_EOF: 表示写出错, 应该关闭本地数据流,
- *  ret > 0:  表示成功写了 dlen 个字节的数据
+ * Loop to write dlen bytes of data until all data is written
+ * or an error occurs.
+ * @param fp {ACL_VSTREAM*} Stream 
+ * @param vptr {const char*} Data pointer address
+ * @param dlen {size_t} Data length to write
+ * @return ret {int}, ret == ACL_VSTREAM_EOF: indicates write
+ *  error, should close the stream, ret > 0: indicates
+ *  successfully wrote dlen bytes of data
  */
 ACL_API int acl_vstream_writen(ACL_VSTREAM *fp, const void *vptr, size_t dlen);
 #define	acl_vstream_fwrite	acl_vstream_writen
 
 /**
- * 释放一个数据流的内存空间, 但并不关闭 socket 描述符
- * @param fp {ACL_VSTREAM*} 数据流
+ * Free a stream object's memory space, but do not close the socket descriptor.
+ * @param fp {ACL_VSTREAM*} Stream
  */
 ACL_API void acl_vstream_free(ACL_VSTREAM *fp);
 
 /**
- * 释放一个数据流的内存空间并关闭其所携带的 socket 描述符
- * @param fp {ACL_VSTREAM*} 数据流
+ * Free a stream object's memory space and close the socket
+ * descriptor it carries.
+ * @param fp {ACL_VSTREAM*} Stream
  */
 ACL_API int acl_vstream_close(ACL_VSTREAM *fp);
 #define	acl_vstream_fclose	acl_vstream_close
 
 /**
- * 调用数据流中的所有关闭回调函数同时清除这些回调函数
- * @param fp {ACL_VSTREAM*} 数据流
+ * Call all registered close handles for the stream and clear these handles.
+ * @param fp {ACL_VSTREAM*} Stream
  */
 ACL_API void acl_vstream_call_close_handles(ACL_VSTREAM *fp);
 
 /**
- * 注册一个关闭函数
- * @param fp {ACL_VSTREAM*} 数据流
- * @param close_fn {void (*)(ACL_VSTREAM*, void*)} 关闭函数指针
- * @param context {void*} close_fn 所需要的参数
+ * Register a close handle.
+ * @param fp {ACL_VSTREAM*} Stream
+ * @param close_fn {void (*)(ACL_VSTREAM*, void*)} Close function pointer
+ * @param context {void*} Parameter needed by close_fn
  */
 ACL_API void acl_vstream_add_close_handle(ACL_VSTREAM *fp,
 		void (*close_fn)(ACL_VSTREAM*, void*), void *context);
 
 /**
- * 删除一个关闭句柄.
- * @param fp {ACL_VSTREAM*} 数据流
- * @param close_fn {void (*)(ACL_VSTREAM*, void*)} 关闭函数指针
- * @param context {void*} close_fn 所需要的参数
+ * Delete a close handle.
+ * @param fp {ACL_VSTREAM*} Stream
+ * @param close_fn {void (*)(ACL_VSTREAM*, void*)} Close function pointer
+ * @param context {void*} Parameter needed by close_fn
  */
 ACL_API void acl_vstream_delete_close_handle(ACL_VSTREAM *fp,
 		void (*close_fn)(ACL_VSTREAM*, void*), void *context);
 /**
- * 清除一个数据流中所有的关闭句柄
- * @param fp {ACL_VSTREAM*} 数据流
+ * Clear all close handles for a stream.
+ * @param fp {ACL_VSTREAM*} Stream
  */
 ACL_API void acl_vstream_clean_close_handle(ACL_VSTREAM *fp);
 
 /**
- * 重新复位数据流的内部数据指针及计数值
- * @param fp {ACL_VSTREAM*} 数据流
+ * Reset and restore the stream's internal pointer and flag values.
+ * @param fp {ACL_VSTREAM*} Stream
  */
 ACL_API void acl_vstream_reset(ACL_VSTREAM *fp);
 
 /**
- * 取得当前数据流的错误状态
- * @param fp {ACL_VSTREAM*} 数据流
- * @return {const char*} 错误描述
+ * Get the current stream's error status.
+ * @param fp {ACL_VSTREAM*} Stream
+ * @return {const char*} Error message
  */
 ACL_API const char *acl_vstream_strerror(ACL_VSTREAM *fp);
 
-/*-----------------------  以下为常用的宏函数 ------------------------------*/
+/*-------------  The following are commonly used macros ---------------------*/
 /**
- * 从流中读取一个字节的宏实现，效率要比 acl_vstream_getc()/1 高
- * @param stream_ptr {ACL_VSTREAM*} 数据流指针
- * @return {int} ACL_VSTREAM_EOF(出错) 或所读到的某个字节的ASCII,
- *  若为 ACL_VSTREAM_EOF: 读出错或对方关闭了连接, 应该关闭该数据流
+ * Macro implementation for reading a byte from the stream,
+ * more efficient than acl_vstream_getc()/1.
+ * @param stream_ptr {ACL_VSTREAM*} Stream pointer
+ * @return {int} ACL_VSTREAM_EOF (error) or the ASCII value of the read byte.
+ *  If it is ACL_VSTREAM_EOF: the stream was closed by the
+ *  peer, the application should close the stream.
  */
 #define ACL_VSTREAM_GETC(stream_ptr) (                        \
     (stream_ptr)->read_cnt > 0 ?                              \
@@ -831,9 +929,9 @@ ACL_API const char *acl_vstream_strerror(ACL_VSTREAM *fp);
         (stream_ptr)->sys_getc((stream_ptr)))
 
 /**
- * 向流中写一个字节的宏实现
- * @param stream_ptr {ACL_VSTREAM*} 数据流指针
- * @return {int} ACL_VSTREAM_EOF(出错) 或所写入字节的 ASCII
+ * Macro implementation for writing a byte to the stream.
+ * @param stream_ptr {ACL_VSTREAM*} Stream pointer
+ * @return {int} ACL_VSTREAM_EOF (error) or the written byte's ASCII
  */
 #define ACL_VSTREAM_PUTC(ch, stream_ptr) (                                   \
   (stream_ptr)->wbuf_size == 0 ?                                             \
@@ -846,67 +944,70 @@ ACL_API const char *acl_vstream_strerror(ACL_VSTREAM *fp);
         : ((stream_ptr)->wbuf[(size_t) (stream_ptr)->wbuf_dlen++] = (ch))))
 
 /**
- * 由流获得套接字
+ * Get the socket descriptor.
  * @param stream_ptr {ACL_VSTREAM*}
  */
 #define ACL_VSTREAM_SOCK(stream_ptr) ((stream_ptr)->fd.sock)
 
 /**
- * 由流获得文件句柄
+ * Get the file handle.
  * @param stream_ptr {ACL_VSTREAM*}
  */
 #define ACL_VSTREAM_FILE(stream_ptr) ((stream_ptr)->fd.h_file)
 
 /**
- * 获得文件流句柄的文件路径名
+ * Get the file path for file streams.
  * @param stream_ptr {ACL_VSTREAM*}
  */
 #define	ACL_VSTREAM_PATH(stream_ptr) ((stream_ptr)->path ? (stream_ptr)->path : "")
 
 /**
- * 当 ACL_VSTREAM 为文件流时，设置文件流的路径
- * @param fp {ACL_VSTREAM*} 文件流
- * @param path {const char*} 文件路径
+ * When ACL_VSTREAM is a file stream, set the file's path.
+ * @param fp {ACL_VSTREAM*} File stream
+ * @param path {const char*} File path
  */
 ACL_API void acl_vstream_set_path(ACL_VSTREAM *fp, const char *path);
 
 /**
- * 当 ACL_VSTREAM 为网络流时，用此宏取得对方的地址
+ * When ACL_VSTREAM is a socket stream, use this macro to get
+ * the peer's address.
  */
 #define	ACL_VSTREAM_PEER(stream_ptr) ((stream_ptr)->addr_peer ? (stream_ptr)->addr_peer : "")
 
 /**
- * 当 ACL_VSTREAM 为网络流时，此函数设置远程连接地址
- * @param fp {ACL_VSTREAM*} 网络流，非空
- * @param addr {const char*} 远程连接地址，非空
+ * When ACL_VSTREAM is a socket stream, use this function to
+ * set the remote connection address.
+ * @param fp {ACL_VSTREAM*} Socket stream, must not be NULL
+ * @param addr {const char*} Remote connection address, must not be NULL
  */
 ACL_API void acl_vstream_set_peer(ACL_VSTREAM *fp, const char *addr);
 
 /**
- * 当 ACL_VSTREAM 为网络流时，此函数设置远程连接地址
- * @param fp {ACL_VSTREAM*} 网络流，非空
- * @param sa {const struct sockaddr *} 远程连接地址，非空
- * @return {int} 返回值 == 0 表示成功，< 0 表示失败
+ * When ACL_VSTREAM is a socket stream, use this function to
+ * set the remote connection address.
+ * @param fp {ACL_VSTREAM*} Socket stream, must not be NULL
+ * @param sa {const struct sockaddr *} Remote connection address, must not be NULL
+ * @return {int} Return value == 0 indicates success, < 0 indicates failure
  */
 ACL_API int acl_vstream_set_peer_addr(ACL_VSTREAM *fp, const struct sockaddr *sa);
 
 /**
- * 当 ACL_VSTREAM 为网络流时，用此宏取得本地的地址
+ * When ACL_VSTREAM is a socket stream, use this macro to get the local address.
  */
 #define	ACL_VSTREAM_LOCAL(stream_ptr) ((stream_ptr)->addr_local ? (stream_ptr)->addr_local : "")
 
 /**
- * 当 ACL_VSTREAM 为网络流时，此函数设置本地地址
- * @param fp {ACL_VSTREAM*} 网络流，非空
- * @param addr {const char*} 本地地址，非空
+ * When ACL_VSTREAM is a socket stream, use this function to set the local address.
+ * @param fp {ACL_VSTREAM*} Socket stream, must not be NULL
+ * @param addr {const char*} Local address, must not be NULL
  */
 ACL_API void acl_vstream_set_local(ACL_VSTREAM *fp, const char *addr);
 
 /**
- * 当 ACL_VSTREAM 为网络流时，此函数设置本地地址
- * @param fp {ACL_VSTREAM*} 网络流，非空
- * @param sa {const sockaddr*} 本地地址，非空
- * @return {int} 返回值 == 0 表示成功，< 0 表示失败
+ * When ACL_VSTREAM is a socket stream, use this function to set the local address.
+ * @param fp {ACL_VSTREAM*} Socket stream, must not be NULL
+ * @param sa {const sockaddr*} Local address, must not be NULL
+ * @return {int} Return value == 0 indicates success, < 0 indicates failure
  */
 ACL_API int acl_vstream_set_local_addr(ACL_VSTREAM *fp, const struct sockaddr *sa);
 
@@ -920,9 +1021,9 @@ ACL_API void acl_socket_writev_hook(ACL_VSTREAM_WV_FN writev_fn);
 ACL_API void acl_socket_close_hook(int (*close_fn)(ACL_SOCKET));
 
 /**
- * 设定流的读/写套接字
+ * Set the read/write socket descriptor.
  * @param stream_ptr {ACL_VSTREAM*}
- * @param _fd {ACL_SOCKET} 套接字
+ * @param _fd {ACL_SOCKET} Socket descriptor
  */
 #define	ACL_VSTREAM_SET_SOCK(stream_ptr, _fd) do {            \
         ACL_VSTREAM *__stream_ptr = stream_ptr;               \
@@ -930,7 +1031,7 @@ ACL_API void acl_socket_close_hook(int (*close_fn)(ACL_SOCKET));
 } while (0)
 
 /**
- * 设置流中的文件句柄
+ * Set/get the file handle.
  * @param stream_ptr {ACL_VSTREAM*}
  * @param _fh {ACL_FILE_HANDLE}
  */
@@ -939,20 +1040,20 @@ ACL_API void acl_socket_close_hook(int (*close_fn)(ACL_SOCKET));
         __stream_ptr->fd.h_file = _fh;                        \
 } while (0)
 
-/* 一些比较快速的宏的运算模式 */
+/* Some relatively fast macro patterns */
 
 /**
- * 流中在读缓冲区中的数据量大小
- * @param stream_ptr {ACL_VSTREAM*) 类型的指针
- * @return -1: 表示出错, >= 0 此值即为流读缓冲区中的数据量大小
+ * Get the remaining data length in the read buffer.
+ * @param stream_ptr {ACL_VSTREAM*) Stream pointer
+ * @return -1: indicates error, >= 0 value is the remaining data length in the read buffer
  */
 #define	ACL_VSTREAM_BFRD_CNT(stream_ptr)                      \
 	((stream_ptr) == NULL ? -1 : (stream_ptr)->read_cnt)
 
 /**
- * 设定流的读写超时值
- * @param stream_ptr {ACL_VSTREAM*) 类型的指针
- * @param _rw_timeo {int} 超时值大小(以秒为单位)
+ * Set the stream's read/write timeout value.
+ * @param stream_ptr {ACL_VSTREAM*) Stream pointer
+ * @param _rw_timeo {int} Timeout value (default unit is seconds)
  */
 #define	ACL_VSTREAM_SET_RWTIMO(stream_ptr, _rw_timeo) do {    \
         ACL_VSTREAM *__stream_ptr  = stream_ptr;              \
@@ -960,8 +1061,8 @@ ACL_API void acl_socket_close_hook(int (*close_fn)(ACL_SOCKET));
 } while (0)
 
 /**
- * 将流置为结束状态
- * @param stream_ptr {ACL_VSTREAM*) 类型的指针
+ * Set the stream to EOF state.
+ * @param stream_ptr {ACL_VSTREAM*) Stream pointer
  */
 #define	ACL_VSTREAM_SET_EOF(stream_ptr) do {                  \
         ACL_VSTREAM *__stream_ptr = stream_ptr;               \
@@ -969,9 +1070,9 @@ ACL_API void acl_socket_close_hook(int (*close_fn)(ACL_SOCKET));
 } while (0)
 
 /**
- * 判断数据流是否出了错
- * @param stream_ptr: ACL_VSTREAM 类型的指针
- * @return 0表示正常, 非0表示出错
+ * Check whether the stream has an error.
+ * @param stream_ptr: ACL_VSTREAM Stream pointer
+ * @return 0 indicates no error, non-0 indicates error
  */
 #define ACL_IF_VSTREAM_ERR(stream_ptr)                        \
 	((stream_ptr)->flag & ACL_VSTREAM_FLAG_BAD)
@@ -981,16 +1082,17 @@ ACL_API void acl_socket_close_hook(int (*close_fn)(ACL_SOCKET));
 #endif
 
 /**
- * 从数据流中取出与该流读写有关的系统错误号
- * @param stream_ptr {ACL_VSTREAM*) 类型的指针
- * @return err {int} 整形错误号，调用者可以用 strerror(err) 的方式查看具体含义
+ * Get the system error number related to read/write operations on the stream.
+ * @param stream_ptr {ACL_VSTREAM*) Stream pointer
+ * @return err {int} If there is an error number, the caller can use
+ *  strerror(err) to view the error content
  */
 #define	ACL_VSTREAM_ERRNO(stream_ptr) ((stream_ptr)->errnum)
 
 /**
- * 判断一个流是否超时
- * @param stream_ptr {ACL_VSTREAM*) 类型的指针
- * @return {int} 0: 否; != 0: 是
+ * Check whether a stream has timed out.
+ * @param stream_ptr {ACL_VSTREAM*) Stream pointer
+ * @return {int} 0: No; != 0: Yes
  */
 #define	acl_vstream_ftimeout(stream_ptr) \
         ((stream_ptr)->flag & ACL_VSTREAM_FLAG_TIMEOUT)

@@ -4,11 +4,9 @@
 
 #if !defined(ACL_DB_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
-class ACL_CPP_API db_cursor : public noncopyable
-{
+class ACL_CPP_API db_cursor : public noncopyable {
 public:
 	db_cursor(void) {}
 	virtual ~db_cursor(void) {}

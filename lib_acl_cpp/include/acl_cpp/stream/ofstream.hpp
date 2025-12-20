@@ -11,17 +11,17 @@ public:
 	virtual ~ofstream();
 
 	/**
-	 * 以只写方式打开文件，如果文件不存在则创建新文件
-	 * @param path {const char*} 文件名
-	 * @param otrunc {bool} 若文件存在，则打开文件时是否需要先清空该文件
-	 * @return {bool} 是否成功
+	 * Open file in write-only mode, create new file if it doesn't exist
+	 * @param path {const char*} Filename
+	 * @param otrunc {bool} If file exists, whether to clear the file when opening
+	 * @return {bool} Whether successful
 	 */
 	bool open_write(const char* path, bool otrunc = true);
 
 	/**
-	 * 以尾部添加方式打开文件，如果文件不存在则创建新文件
-	 * @param path {const char*} 文件名
-	 * @return {bool} 是否成功
+	 * Open file in append mode, create new file if it doesn't exist
+	 * @param path {const char*} Filename
+	 * @return {bool} Whether successful
 	 */
 	bool open_append(const char* path);
 };

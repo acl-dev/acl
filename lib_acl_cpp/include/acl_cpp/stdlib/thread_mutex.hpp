@@ -14,37 +14,40 @@ struct acl_pthread_mutex_t;
 namespace acl {
 
 /**
- * 线程互斥锁
+ * Thread mutex.
  */
 class ACL_CPP_API thread_mutex : public noncopyable {
 public:
 	/**
-	 * 构造方法
-	 * @param recursive {bool} 是否启用递归锁方式
+	 * Constructor.
+	 * @param recursive {bool} Whether to use recursive lock mode.
 	 */
 	thread_mutex(bool recursive = true);
 	~thread_mutex();
 
 	/**
-	 * 对线程锁进行加锁，一直到加锁成功或内部失败(一般不会失败，除非是系统问题)
-	 * @return {bool} 返回 false 说明线程锁有问题
+	 * Lock in current thread. Will wait until successful. Internal failure
+	 * (generally does not fail, unless system error).
+	 * @return {bool} Returns false to indicate thread lock failed.
 	 */
 	bool lock();
 
 	/**
-	 * 尝试性加锁，无论成功与否都会立即返回
-	 * @return {bool} 返回 true 表示加锁成功，返回 false 表示加锁失败
+	 * Try to lock. Returns immediately regardless of success or failure.
+	 * @return {bool} Returns true to indicate lock successful. Returns false to
+	 * indicate lock failed.
 	 */
 	bool try_lock();
 
 	/**
-	 * 解线程锁
-	 * @return {bool} 返回 false 表示解锁失败，有可能之前并未加锁成功所致
+	 * Unlock thread lock.
+	 * @return {bool} Returns false to indicate unlock failed, possibly because
+	 * lock was not successful before.
 	 */
 	bool unlock();
 
 	/**
-	 * 获得 acl 中 C 版本的系统类型的线程锁
+	 * Get acl library's C version system type thread mutex.
 	 * @return {acl_pthread_mutex_t*}
 	 */
 	acl_pthread_mutex_t* get_mutex() const;

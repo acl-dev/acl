@@ -36,179 +36,199 @@ public:
 
 	
 	/**
-	 * 执行一个 AOF文件 重写操作。重写会创建一个当前 AOF 文件的体积优化版本；
-	 * 即使 BGREWRITEAOF 执行失败，也不会有任何数据丢失，因为旧的 AOF 文件在
-	 * BGREWRITEAOF 成功之前不会被修改
+	 * Execute an AOF file rewrite operation. Rewrite creates a volume-optimized
+	 * version of current AOF file.
+	 * Even if BGREWRITEAOF execution fails, there will be no data loss, because
+	 * old AOF file will not be modified
+	 * before BGREWRITEAOF succeeds
 	 * @return {bool}
 	 */
 	bool bgrewriteaof();
 
 	/**
-	 * 在后台异步(Asynchronously)保存当前数据库的数据到磁盘，BGSAVE 命令执行之后
-	 * 立即返回 OK ，然后 Redis fork 出一个新子进程，原来的 Redis 进程(父进程)
-	 * 继续处理客户端请求，而子进程则负责将数据保存到磁盘，然后退出；客户端可以通过
-	 * LASTSAVE 命令查看相关信息，判断 BGSAVE 命令是否执行成功
+	 * Asynchronously save current database data to disk in background. BGSAVE
+	 * command returns
+	 * OK immediately after execution, then Redis forks a new child process.
+	 * Original Redis process (parent process)
+	 * continues to handle client requests, while child process is responsible for
+	 * saving data to disk, then exits. Clients can
+	 * use LASTSAVE command to check related information and determine whether
+	 * BGSAVE command executed successfully
 	 * @return {bool}
 	 */
 	bool bgsave();
 
 	/**
-	 * 返回 CLIENT SETNAME 命令为连接设置的名字
-	 * @param buf {string&} 存储结果，如果没有设置则为空
-	 * @return {bool} 返回 false 则表明没有设置连接名字或出错
+	 * Return name set for connection by CLIENT SETNAME command
+	 * @param buf {string&} Store result. If not set, it is empty
+	 * @return {bool} Returns false indicates connection name was not set or error
+	 * occurred
 	 */
 	bool client_getname(string& buf);
 
 	/**
-	 * 关闭地址为 ip:port 的客户端
-	 * @param addr {const char*} 客户端连接地址，格式：ip:port
-	 * @return {bool} 是否成功，返回 false 表明连接不存在或出错
+	 * Close client at address ip:port
+	 * @param addr {const char*} Client connection address, format: ip:port
+	 * @return {bool} Whether successful. Returns false indicates connection does
+	 * not exist or error occurred
 	 */
 	bool client_kill(const char* addr);
 
 	/**
-	 * 返回所有连接到服务器的客户端信息和统计数据
-	 * @param buf {string&} 存储结果
-	 * @return {int} 返回结果数据长度，-1 表示出错
+	 * Return information and statistics of all clients connected to server
+	 * @param buf {string&} Store result
+	 * @return {int} Returns result data length. -1 indicates error
 	 */
 	int client_list(string& buf);
 
 	/**
-	 * 为当前连接分配一个名字，该名字会出现在 CLIENT LIST 命令的结果中；
-	 * 在 Redis 应用程序发生连接泄漏时，为连接设置名字是一种很好的 debug 手段
-	 * @param name {const char*} 连接名字，该名字不需要唯一性
-	 * @return {bool} 操作是否成功
+	 * Assign a name to current connection. This name will appear in CLIENT LIST
+	 * command's results.
+	 * When Redis application has connection leaks, setting name for connection is
+	 * a good debug method
+	 * @param name {const char*} Connection name. This name does not need to be
+	 * unique
+	 * @return {bool} Whether operation was successful
 	 */
 	bool client_setname(const char* name);
 
 	/**
-	 * 命令用于取得运行中的 Redis 服务器的配置参数
-	 * @param parameter {const char*} 配置参数名
-	 * @param out {std::map<string, string>&} 存储结果，由 name-value 组成，
-	 *  因为 parameter 支持模糊匹配，所以有可能返回的结果集中会有多个参数项
-	 * @return {int} 结果 "参数-值" 的个数，-1 表示出错
+	 * Command used to get configuration parameters of running Redis server
+	 * @param parameter {const char*} Configuration parameter name
+	 * @param out {std::map<string, string>&} Store result, composed of name-value
+	 * pairs.
+	 * Because parameter supports fuzzy matching, result set may contain multiple
+	 * parameter items
+	 * @return {int} Number of "parameter-value" pairs in result. -1 indicates
+	 * error
 	 */
 	int config_get(const char* parameter, std::map<string, string>& out);
 
 	/**
-	 * 重置 INFO 命令中的某些统计数据
-	 * @return {bool} 重置是否成功
+	 * Reset some statistics in INFO command
+	 * @return {bool} Whether reset was successful
 	 */
 	bool config_resetstat();
 
 	/**
-	 * 对启动 Redis 服务器时所指定的 redis.conf 文件进行改写
-	 * @return {bool} 重写配置是否成功
+	 * Rewrite redis.conf file specified when starting Redis server
+	 * @return {bool} Whether rewriting configuration was successful
 	 */
 	bool config_rewrite();
 
 	/**
-	 * 动态地调整 Redis 服务器的配置而无需重启服务
-	 * @param name {const char*} 配置参数名
-	 * @param value {const char*} 配置参数值
-	 * @return {bool} 是否成功
+	 * Dynamically adjust Redis server's configuration without restarting service
+	 * @param name {const char*} Configuration parameter name
+	 * @param value {const char*} Configuration parameter value
+	 * @return {bool} Whether successful
 	 */
 	bool config_set(const char* name, const char* value);
 
 	/**
-	 * 返回当前数据库的 key 的数量
-	 * @return {int} 返回 -1 表示出错
+	 * Return number of keys in current database
+	 * @return {int} Returns -1 indicates error
 	 */
 	int dbsize();
 
 	/**
-	 * 清空整个 Redis 服务器的数据(删除所有数据库的所有 key )
+	 * Clear all data of Redis server (delete all keys in all databases)
 	 * @return {bool}
-	 *  注：此命令要慎用，以免造成误操作
+	 *  Note: Use this command with caution to avoid misoperation
 	 */
 	bool flushall();
 
 	/**
-	 * 清空当前数据库中的所有 key
+	 * Clear all keys in current database
 	 * @return {bool}
-	 *  注：此命令要慎用，以免造成误操作
+	 *  Note: Use this command with caution to avoid misoperation
 	 */
 	bool flushdb();
 
 	/**
-	 * 返回关于 Redis 服务器的各种信息和统计数值
-	 * @param buf {string&} 存储结果
-	 * @return {int} 返回所存储的数据长度
+	 * Return various information and statistics about Redis server
+	 * @param buf {string&} Store result
+	 * @return {int} Returns length of stored data
 	 */
 	int info(string& buf);
 
 	/**
-	 * 返回关于 Redis 服务器的各种信息和统计数值
-	 * @param out {std::map<string, string>&} 存储结果
-	 * @return {int} 返回所存储的数据条目数量, -1 表示出错
+	 * Return various information and statistics about Redis server
+	 * @param out {std::map<string, string>&} Store result
+	 * @return {int} Returns number of stored data entries. -1 indicates error
 	 */
 	int info(std::map<string, string>& out);
 
 	/**
-	 * 返回最近一次 Redis 成功将数据保存到磁盘上的时间，以 UNIX 时间戳格式表示
+	 * Return time when Redis last successfully saved data to disk, represented in
+	 * UNIX timestamp format
 	 * @return {time_t}
 	 */
 	time_t lastsave();
 
 	/**
-	 * 实时打印出 Redis 服务器接收到的命令，调试用; 调用本命令后可以循环调用下面的
-	 * get_command 方法获得服务器收到的命令
+	 * Real-time print commands received by Redis server, for debugging. After
+	 * calling this command, can call following
+	 * get_command method in a loop to get commands received by server
 	 * @return {bool}
 	 */
 	bool monitor();
 
 	/**
-	 * 调用 monitor 方法后需要调用本方法获得服务器收到的命令，可以循环调用本方法
-	 * 以便于不断地获得服务器收到的命令
-	 * @param buf {string&} 存储结果
+	 * After calling monitor method, need to call this method to get commands
+	 * received by server. Can call this method in a loop
+	 * to continuously get commands received by server
+	 * @param buf {string&} Store result
 	 * @return {bool}
 	 */
 	bool get_command(string& buf);
 
 	/**
-	 * 命令执行一个同步保存操作，将当前 Redis 实例的所有数据快照(snapshot)
-	 * 以 RDB 文件的形式保存到硬盘
+	 * Command executes a synchronous save operation, saving all data snapshots of
+	 * current Redis instance
+	 * to disk in RDB file format
 	 * @return {bool}
 	 */
 	bool save();
 
 	/**
-	 * 停止所有客户端连接将数据保存至磁盘后服务器程序退出
-	 * @param save_data {bool} 是否在退出前保存数据至磁盘
+	 * Stop all client connections, save data to disk, then server program exits
+	 * @param save_data {bool} Whether to save data to disk before exiting
 	 */
 	void shutdown(bool save_data = true);
 
 	/**
-	 * 将当前服务器转变为指定服务器的从属服务器
-	 * @param ip {const char*} 指定服务器的 IP
-	 * @param port {int} 指定服务器的端口
-	 * @return {bool} 是否成功
+	 * Convert current server to slave server of specified server
+	 * @param ip {const char*} IP of specified server
+	 * @param port {int} Port of specified server
+	 * @return {bool} Whether successful
 	 */
 	bool slaveof(const char* ip, int port);
 
 	/**
-	 * 查询较慢的操作日志
-	 * @param number {int} 大于 0 时则限定日志条数，否则列出所有日志
+	 * Query slow operation log
+	 * @param number {int} When > 0, limits number of log entries, otherwise lists
+	 * all logs
 	 * @return {const redis_result*}
 	 */
 	const redis_result* slowlog_get(int number = 0);
 
 	/**
-	 * 可以查看当前日志的数量
+	 * Can view number of current logs
 	 * @return {int}
 	 */
 	int slowlog_len();
 
 	/**
-	 * 可以清空 slow log
+	 * Can clear slow log
 	 * @return {bool}
 	 */
 	bool slowlog_reset();
 
 	/**
-	 * 返回当前服务器时间
-	 * @param stamp {time_t&} 存储时间截(以 UNIX 时间戳格式表示)
-	 * @param escape {int*} 存储当前这一秒钟已经逝去的微秒数
+	 * Return current server time
+	 * @param stamp {time_t&} Store timestamp (represented in UNIX timestamp
+	 * format)
+	 * @param escape {int*} Store number of microseconds elapsed in current second
 	 */
 	bool get_time(time_t& stamp, int& escape);
 };
@@ -216,3 +236,4 @@ public:
 } // namespace acl
 
 #endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
+

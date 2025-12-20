@@ -8,8 +8,9 @@ namespace acl {
 class string;
 
 /**
- * 输入流操作类，如果想确切知道输入流是否关闭或出错或读到了文件流的
- * 尾部，应通过调用 stream->eof() 来进行判断
+ * Input stream base class. Users cannot accurately know whether the stream is
+ * closed or has reached the end of the file. At the
+ * end, users should call stream->eof() to determine.
  */
 
 class ACL_CPP_API istream : virtual public stream {
@@ -18,47 +19,55 @@ public:
 	virtual ~istream() {}
 
 	/**
-	 * 从输入流中读数据
-	 * @param buf {void*} 用户缓冲区
-	 * @param size {size_t} 用户缓冲区长度
-	 * @param loop {bool} 是否读满 size 后才返回
-	 * @return {int} 读操作结果, -1 表示关闭或出错, > 0 表示成功
+	 * Read data from input stream.
+	 * @param buf {void*} User buffer.
+	 * @param size {size_t} User buffer size.
+	 * @param loop {bool} Whether to read until size bytes are read.
+	 * @return {int} Number of bytes read, -1 indicates closed or error, > 0
+	 * indicates success.
 	 */
 	int read(void* buf, size_t size, bool loop = true);
 
 	/**
-	 * 从输入流读数据直至读到所要求的字符串或出错才返回
-	 * @param buf {void*} 用户缓冲区
-	 * @param inout {size_t*} 作为参数时 *inout 表示缓冲 buf
-	 *  的空间大小，函数返回后记录存储于 buf 中的数据长度
-	 * @param tag {const char*} 要求读到的字符串
-	 * @param len {size_t} tag 字符串的长度
-	 * @return {bool} 是否读到所要求的字符串数据
+	 * Read data from input stream until a specified tag string is encountered,
+	 * then stop reading.
+	 * @param buf {void*} User buffer.
+	 * @param inout {size_t*} When not empty, *inout indicates available buf
+	 *  space size. After return, stores data length in buf.
+	 * @param tag {const char*} Tag string to search for.
+	 * @param len {size_t} Length of tag string.
+	 * @return {bool} Whether the specified tag string was encountered.
 	 */
 
 	bool readtags(void *buf, size_t* inout, const char *tag, size_t len);
 
 	/**
-	 * 从输入流中读到一行数据
-	 * @param buf {void*} 用户缓冲区
-	 * @param size_inout {size_t*} 作为参数时 *size_inout 表示缓冲 buf
-	 *  的空间大小，函数返回后记录存储于 buf 中的数据长度
-	 * @param nonl {bool} 如果为 true 则会将读到的一行数据尾部的 "\r\n"
-	 *  或 "\n" 去掉，*size_inout 存储的数据长度是去掉 "\r\n" 或 "\n" 后
-	 *  的长度；否则，保留数据行中的 "\r\n" 或 "\n"，同时 *size_inout 存
-	 *  储的是包含 "\r\n" 或 "\n" 的数据长度
-	 * @return {bool} 是否读到了一行数据, 出错则返回 false; 对文件输入流而
-	 *  言，如果读到的数据是最后一部分数据且这部分数据不含 "\r\n" 或 "\n"
-	 *  则也会返回 false, 调用者需要检查 *size_inout 值是否大于 0
-	 *  来确定是否读到了最后一部分数据
+	 * Read one line from input stream.
+	 * @param buf {void*} User buffer.
+	 * @param size_inout {size_t*} When not empty, *size_inout indicates available
+	 * buf
+	 *  space size. After return, stores data length in buf.
+	 * @param nonl {bool} When set to true, will remove "\r\n"
+	 * or "\n" at the end of the read line. *size_inout stores data length after
+	 * removing "\r\n" or "\n"
+	 * length. Otherwise, this function will read all "\r\n" or "\n" in the stream,
+	 * and *size_inout
+	 *  will store data length including "\r\n" or "\n".
+	 * @return {bool} Whether one line was read. Returns false on error. For file
+	 * stream
+	 * characteristics, when reading the last line, if external data does not end
+	 * with "\r\n" or "\n"
+	 * it will also return false. At this time, users need to check if *size_inout
+	 * value is greater than 0
+	 *  to determine whether the last line was read.
 	 */
 	bool gets(void* buf, size_t* size_inout, bool nonl = true);
 
 	/**
-	 * 从输入流中读一个 64 位整数
-	 * @param n {acl_int64&} 64 位整数
-	 * @param loop {bool} 是否阻塞式读完8个字节
-	 * @return {bool} 是否读取成功
+	 * Read a 64-bit integer from input stream.
+	 * @param n {acl_int64&} 64-bit integer.
+	 * @param loop {bool} Whether to read in loop mode until 8 bytes are read.
+	 * @return {bool} Whether reading was successful.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	bool read(__int64& n, bool loop = true);
@@ -67,116 +76,131 @@ public:
 #endif
 
 	/**
-	 * 从输入流中读一个 32 位整数
-	 * @param n {int&} 32 位整数
-	 * @param loop {bool} 是否阻塞式读完4个字节
-	 * @return {bool} 是否读取成功
+	 * Read a 32-bit integer from input stream.
+	 * @param n {int&} 32-bit integer.
+	 * @param loop {bool} Whether to read in loop mode until 4 bytes are read.
+	 * @return {bool} Whether reading was successful.
 	 */
 	bool read(int& n, bool loop = true);
 
 	/**
-	 * 从输入流中读一个 16 位整数
-	 * @param n {short&} 16 位整数
-	 * @param loop {bool} 是否阻塞式读完2个字节
-	 * @return {bool} 是否读取成功
+	 * Read a 16-bit integer from input stream.
+	 * @param n {short&} 16-bit integer.
+	 * @param loop {bool} Whether to read in loop mode until 2 bytes are read.
+	 * @return {bool} Whether reading was successful.
 	 */
 	bool read(short& n, bool loop = true);
 
 	/**
-	 * 从输入流中读取一个字节
+	 * Read one byte from input stream.
 	 * @param ch {char&}
-	 * @return {bool} 读取是否成功
+	 * @return {bool} Whether reading was successful.
 	 */
 	bool read(char& ch);
 
 	/**
-	 * 从输入流中读数据至缓冲区中
-	 * @param s {string*} 缓冲区，内部会首先自动清空该缓冲区
-	 * @param loop {bool} 是否阻塞式读满整个缓冲，缓冲区
-	 *  的容量为 s.capacity()
-	 * @return {bool} 读数据是否成功
+	 * Read string data from input stream.
+	 * @param s {string*} String buffer. Internally automatically expands buffer.
+	 * @param loop {bool} Whether to read in loop mode until buffer is full. Buffer
+	 *  capacity is s.capacity().
+	 * @return {bool} Whether reading was successful.
 	 */
 	bool read(string& s, bool loop = true);
 	bool read(string* s, bool loop = true);
 
 	/**
-	 * 从输入流中读数据至缓冲区中
-	 * @param s {string*} 缓冲区，内部会首先自动清空该缓冲区
-	 * @param max {size_t} 希望读到的数据的最大值
-	 * @param loop {bool} 是否读到要求的 max 字节数为止
-	 * @return {bool} 读数据是否成功
+	 * Read string data from input stream.
+	 * @param s {string*} String buffer. Internally automatically expands buffer.
+	 * @param max {size_t} Maximum length of data to be read.
+	 * @param loop {bool} Whether to read until max bytes are read.
+	 * @return {bool} Whether reading was successful.
 	 */
 	bool read(string& s, size_t max, bool loop = true);
 	bool read(string* s, size_t max, bool loop = true);
 
 	/**
-	 * 从输入流中读一行数据至缓冲区中
-	 * @param s {string&} 缓冲区，内部会首先自动清空该缓冲区
-	 * @param nonl {bool} 是否自动去掉所读行数据中尾部的 "\r\n" 或 "\n"
-	 * @param max {size_t} 当该值 > 0 时，该值限定了所读到行的最大值，当
-	 *  接收到数据行长度大于该值时，则仅返回部分数据，同时内部会记录警告；
-	 *  当该值 = 0 时，则不限制行数据长度
-	 * @return {bool} 是否读到了一行数据
-	 *  1）如果返回 true 则说明读到了完整一行数据；如果该行数据中只有
-	 *     "\r\n" 或 "\n"，则 s 的内容为空，即：s.empty() == true
-	 *  2）如果返回 false 则说明读关闭且未读到一行数据，此时 s 中有可能
-	 *     存储着部分数据，需要用 if (s.empty() == true) 判断一下
+	 * Read one line string from input stream.
+	 * @param s {string&} String buffer. Internally automatically expands buffer.
+	 * @param nonl {bool} Whether to automatically remove "\r\n" or "\n" at the end
+	 * of the read line.
+	 * @param max {size_t} When value > 0, this value limits the maximum length of
+	 * the read line. When
+	 * the received line length exceeds this value, this function will not return
+	 * incomplete data, and internally will record an error;
+	 *  When value = 0, there is no limit on data length.
+	 * @return {bool} Whether one line was read.
+	 * 1. When returning true, it means one line of data was read. If the read line
+	 * only contains
+	 *     "\r\n" or "\n", s content will be empty, i.e., s.empty() == true
+	 * 2. When returning false, it means stream is closed or one line was not read.
+	 * At this time s may
+	 *     store incomplete data. Users need to check if (s.empty() == true).
 	 */
 	bool gets(string& s, bool nonl = true, size_t max = 0);
 	bool gets(string* s, bool nonl = true, size_t max = 0);
 
 	/**
-	 * 从输入流中读数据直到读到要求的字符串数据作为分隔符的数据，
-	 * 读取的数据的最后部分应该是该字符串
-	 * @param s {string&} 缓冲区，内部会首先自动清空该缓冲区
-	 * @param tag {const string&} 要求读的字符串数据
-	 * @return {bool} 是否读到要求的字符串数据
+	 * Read data from input stream until a specified tag string is encountered,
+	 * then stop reading. The tag
+	 * is used as a delimiter for data. The last part of the read data should be
+	 * the tag string.
+	 * @param s {string&} String buffer. Internally automatically expands buffer.
+	 * @param tag {const string&} Tag string to search for.
+	 * @return {bool} Whether the specified tag string was encountered.
 	 */
 	bool readtags(string& s, const string& tag);
 	bool readtags(string* s, const string& tag);
 
 	/**
-	 * 从输入流中读一个字节数据
-	 * @return {int} 所读字节的 ASCII 码值，如果返回值为 -1 则表示对方关闭或
-	 *  读出错
+	 * Read one byte character from input stream.
+	 * @return {int} ASCII value of the read byte. Return value of -1 indicates
+	 * peer closed or
+	 *  error.
 	 */
 	int getch();
 
 	/**
-	 * 向输入流中放加一个字节的数据
-	 * @param ch {int} 一个字符的 ASCII 码值
-	 * @return {int} 如果返回值与 ch 值相同则表示正确，否则表示出错
+	 * Push back one byte character to input stream.
+	 * @param ch {int} ASCII value of a character.
+	 * @return {int} Return value. If same as ch value, it means correct. Otherwise
+	 * indicates error.
 	 */
 	int ugetch(int ch);
 
 	/**
-	 * 检测当前流是否可读(有数据, 连接关闭或出错均表示可读),该方法可用于和
-	 * 下面的 xxx_peek() 结合.
+	 * Detect whether current stream is readable (readable, connection closed or
+	 * error indicates readable). This method is used in conjunction
+	 * with xxx_peek() methods.
 	 * @return {bool}
 	 */
 	bool readable() const;
 
 	/**
-	 * 判断当前连接是否有数据可读
-	 * @param timeo {int} 等待超时值（毫秒）
+	 * Determine whether current stream has readable data.
+	 * @param timeo {int} Wait timeout value (seconds).
 	 * @return {bool}
 	 */
 	bool read_wait(int timeo) const;
 
 	/**
-	 * 尝试性从输入流中读取一行数据
-	 * @param buf {string&} 缓冲区
-	 * @param nonl {bool} 是否保留所读行数据中的 "\r\n" 或 "\n"
-	 * @param clear {bool} 是否内部自动清空 buf 缓冲区
-	 * @param max {int} 当该值 > 0 时则设置所读行数据的最大长度以避免本地
-	 *  缓冲区溢出
-	 * @return {bool} 是否读了一行数据; 如果返回 false 并不表示输入
-	 *  流结束，只是表示未读到一个完整行数据，应该通过调用 stream->eof()
-	 *  来检查输入流是否关闭，另外，如果仅读到了部分数据，则 buf 会存储
-	 *  这些部分数据
-	 *  注意：为了防止 buf 缓冲区溢出，调用者调用该方法获得的数据即使不够
-	 *  一行数据，应尽量取出 buf 中的数据然后将 buf->clear()，以防止 buf
-	 *  内存过大导致缓冲区溢出
+	 * Peek and read one line from source stream buffer.
+	 * @param buf {string&} Buffer.
+	 * @param nonl {bool} Whether to remove "\r\n" or "\n" from the read line.
+	 * @param clear {bool} Whether to internally automatically clear buf buffer.
+	 * @param max {int} When value > 0, limits the maximum length of the read line
+	 * to prevent this
+	 *  function from reading too much data.
+	 * @return {bool} Whether one line was read; returning false does not indicate
+	 * error.
+	 * It only means one line was not read or incomplete data. Applications should
+	 * call stream->eof()
+	 * to determine whether the stream is closed. Additionally, if this function
+	 * reads incomplete data, buf will store
+	 *  this incomplete data.
+	 * Note: To prevent buf from growing too large, callers should extract data
+	 * from buf after using the data, even if only
+	 *  one line is used, then call buf->clear() to prevent buf
+	 *  memory from continuously growing.
 	 */
 	bool gets_peek(string& buf, bool nonl = true,
 		bool clear = false, int max = 0);
@@ -184,45 +208,55 @@ public:
 		bool clear = false, int max = 0);
 
 	/**
-	 * 尝试性从输入流中读取数据
-	 * @param buf {string&} 缓冲区
-	 * @param clear {bool} 函数开始时是否内部自动清空 buf 缓冲区
-	 * @return {bool} 是否读到数据, 如果返回 false 仅 表示未读完所要求
-	 *  的数据长度，应该通过调用 stream->eof() 来检查输入流是否关闭
-	 *  注意：为了防止 buf 缓冲区溢出，调用者调用该方法获得的数据即使不够
-	 *  一行数据，应尽量取出 buf 中的数据然后将 buf->clear()，以防止 buf
-	 *  内存过大导致缓冲区溢出
+	 * Peek and read data from source stream buffer.
+	 * @param buf {string&} Buffer.
+	 * @param clear {bool} Whether to internally automatically clear buf buffer at
+	 * the beginning.
+	 * @return {bool} Whether data was read. Returning false does not indicate
+	 * error, it only means no data of required
+	 * length was read. Applications should call stream->eof() to determine whether
+	 * the stream is closed.
+	 * Note: To prevent buf from growing too large, callers should extract data
+	 * from buf after using the data, even if only
+	 *  one line is used, then call buf->clear() to prevent buf
+	 *  memory from continuously growing.
 	 */
 	bool read_peek(string& buf, bool clear = false);
 	bool read_peek(string* buf, bool clear = false);
 
 	/**
-	 * 尝试性从输入流中读取数据
-	 * @param buf {void*} 缓冲区
-	 * @param size {size_t} buf 缓冲区大小
-	 * @return {int} 返回 -1 表示读出错或关闭，> 0 表示读到的数据长度，
-	 *  如果返回 0 表示本次没有读到数据，可以继续读，当返回值 < 0 时，
-	 *  可通过 eof() 判断流是否应该关闭
+	 * Peek and read data from source stream buffer.
+	 * @param buf {void*} Buffer.
+	 * @param size {size_t} Buffer size.
+	 * @return {int} Returns -1 to indicate stream closed or error, > 0 indicates
+	 * number of bytes read,
+	 * returning 0 indicates no readable data yet. You can continue reading. When
+	 * return value < 0,
+	 *  you should use eof() to determine whether the stream should be closed.
 	 */
 	int read_peek(void* buf, size_t size);
 
 	/**
-	 * 尝试性从输入流中读取指定长度的数据
-	 * @param buf {string&} 缓冲区
-	 * @param cnt {size_t} 要求读到的数据长度
-	 * @param clear {bool} 函数开始时是否内部自动清空 buf 缓冲区
-	 * @return {bool} 是否读到所要求数据长度的数据, 如果返回 false 仅
-	 *  表示未读完所要求的数据长度，应该通过调用 stream->eof() 来检查
-	 *  输入流是否关闭
-	 *  注意：为了防止 buf 缓冲区溢出，调用者调用该方法获得的数据即使不够
-	 *  一行数据，应尽量取出 buf 中的数据然后将 buf->clear()，以防止 buf
-	 *  内存过大导致缓冲区溢出
+	 * Peek and read data of specified length from source stream buffer.
+	 * @param buf {string&} Buffer.
+	 * @param cnt {size_t} Length of data to be read.
+	 * @param clear {bool} Whether to internally automatically clear buf buffer at
+	 * the beginning.
+	 * @return {bool} Whether data of required length was read. Returning false
+	 * does not
+	 * indicate no data of required length was read. Applications should call
+	 * stream->eof() to determine
+	 *  whether the stream is closed.
+	 * Note: To prevent buf from growing too large, callers should extract data
+	 * from buf after using the data, even if only
+	 *  one line is used, then call buf->clear() to prevent buf
+	 *  memory from continuously growing.
 	 */
 	bool readn_peek(string& buf, size_t cnt, bool clear = false);
 	bool readn_peek(string* buf, size_t cnt, bool clear = false);
 
-	/* 以下几个函数重载了输入操作符，它们都是阻塞式操作过程，且需要
-	 * 调用 stream->eof() 来判断输入流是否关闭或是否读到了文件尾
+	/* The following are stream input operators. These are non-blocking input operators. Users need to
+	 * call stream->eof() to determine whether the stream is closed or has reached the end of the file.
 	 */
 
 	istream& operator>>(string& s);
@@ -237,10 +271,12 @@ public:
 
 public:
 	/**
-	 * 进程初始化时可以调用此方法设置进程级别的读缓存区大小，内部缺省值为4096
+	 * When process initializes, you can call this method to set the process-level
+	 * read buffer size. Internal default value is 4096.
 	 * @param n {size_t}
 	 */
 	static void set_rbuf_size(size_t n);
 };
 
 } // namespace acl
+

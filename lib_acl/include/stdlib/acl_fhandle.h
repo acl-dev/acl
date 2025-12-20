@@ -13,68 +13,83 @@ extern "C" {
 #include <time.h>
 
 /**
- * 通用的存储文件句柄对象类型定义
+ * Generic file handle cache object type definition.
  */
 
 typedef struct ACL_FHANDLE	ACL_FHANDLE;
 
 struct ACL_FHANDLE {
-	ACL_VSTREAM *fp;			/**< 存储文件句柄 */
-	acl_int64 fsize;			/**< 存储文件大小 */
-	int   nrefer;				/**< 该存储句柄被引用的计数值 */
-	acl_pthread_mutex_t mutex;		/**< 线程锁 */
+	ACL_VSTREAM *fp;			/**< Cached file handle */
+	acl_int64 fsize;			/**< Cached file size */
+	int   nrefer;				/**< Reference count value for this cached handle */
+	acl_pthread_mutex_t mutex;		/**< Thread lock */
 #if defined(_WIN32) || defined(_WIN64)
-	unsigned long tid;			/**< 打开该存储的线程号 */
-	unsigned long lock_mutex_tid;		/**< 加线程锁的线程号 */
+	unsigned long tid;			/**< Thread ID that opened this cached handle */
+	unsigned long lock_mutex_tid;		/**< Thread ID that locked mutex */
 #else
-	acl_pthread_t tid;			/**< 打开该存储的线程号 */
-	acl_pthread_t lock_mutex_tid;		/**< 加线程锁的线程号 */
+	acl_pthread_t tid;			/**< Thread ID that opened this cached handle */
+	acl_pthread_t lock_mutex_tid;		/**< Thread ID that locked mutex */
 #endif
-	unsigned int oflags;			/**< 打开时的标志位 */
-#define	ACL_FHANDLE_O_FLOCK	(1 << 0)	/**< 使用文件锁 */
-#define	ACL_FHANDLE_O_MLOCK	(1 << 1)	/**< 使用线程锁 */
-#define	ACL_FHANDLE_O_MKDIR	(1 << 2)	/**< 是否自动检查并创建不存在的目录 */
-#define	ACL_FHANDLE_O_NOATIME	(1 << 3)	/**< 打开文件时添加 O_NOATIME 标志位 */
-#define	ACL_FHANDLE_O_DIRECT	(1 << 4)	/**< 打开文件时添加 O_DIRECT 标志位 */
-#define	ACL_FHANDLE_O_SYNC	(1 << 5)	/**< 打开文件时添加 O_SYNC 标志位 */
-#define	ACL_FHANDLE_O_EXCL	(1 << 6)	/**< 打开文件时是否是自动加锁 */
+	unsigned int oflags;			/**< Open flag bits */
+#define	ACL_FHANDLE_O_FLOCK	(1 << 0)	/**< Use file lock */
+#define	ACL_FHANDLE_O_MLOCK	(1 << 1)	/**< Use thread lock */
+#define	ACL_FHANDLE_O_MKDIR	(1 << 2)	/**< Whether to automatically
+						 *  check and create
+						 *  non-existent directories */
+#define	ACL_FHANDLE_O_NOATIME	(1 << 3)	/**< When opening file, add
+						 *  O_NOATIME flag bit */
+#define	ACL_FHANDLE_O_DIRECT	(1 << 4)	/**< When opening file, add
+						 *  O_DIRECT flag bit */
+#define	ACL_FHANDLE_O_SYNC	(1 << 5)	/**< When opening file, add
+						 *  O_SYNC flag bit */
+#define	ACL_FHANDLE_O_EXCL	(1 << 6)	/**< When opening file,
+						 *  whether to automatically
+						 *  create */
 
-	unsigned int status;			/**< 该存储文件句柄的状态 */
-#define	ACL_FHANDLE_S_FLOCK_ON	(1 << 0)	/**< 该存储句柄已经加文件锁 */
-#define	ACL_FHANDLE_S_MUTEX_ON	(1 << 1)	/**< 该存储句柄已经加线程锁 */
+	unsigned int status;			/**< This cached file handle's status */
+#define	ACL_FHANDLE_S_FLOCK_ON	(1 << 0)	/**< This cached handle has
+						 *  file lock */
+#define	ACL_FHANDLE_S_MUTEX_ON	(1 << 1)	/**< This cached handle has
+						 *  thread lock */
 
-	time_t  when_free;			/**< 在延迟关闭缓存队列中存活的时间截 */
-	ACL_RING ring;				/**< 缓存数据结点 */
-	size_t size;				/**< 该 ACL_FHANDLE 对象的实际大小 >= sizeof(ACL_FHANDLE) */
-	void (*on_close)(ACL_FHANDLE*);		/**< 当该文件缓存句柄真正关闭时的回调函数，可以为空 */
+	time_t  when_free;			/**< Time when delayed close
+						 *  or delayed write occurs */
+	ACL_RING ring;				/**< Internal ring node */
+	size_t size;				/**< Actual size of
+						 *  ACL_FHANDLE object >=
+						 *  sizeof(ACL_FHANDLE) */
+	void (*on_close)(ACL_FHANDLE*);		/**< Callback function when
+						 *  file handle is about to
+						 *  be closed, can be NULL */
 };
 
 #define	ACL_FHANDLE_PATH(x)	(ACL_VSTREAM_PATH((x)->fp))
 
 /**
- * 初始化文件句柄操作，该函数须在程序运行初始化时被调用且只能被调用一次
- * @param cache_size {int} 内部被打开文件句柄的最大个数
- * @param debug_section {int} 调试级别
+ * Initialize file handle cache. This function should be called during program
+ * initialization, can only be called once.
+ * @param cache_size {int} Internal cached file handle count
+ * @param debug_section {int} Debug section
  * @param flags {unsigned int}
  */
 void acl_fhandle_init(int cache_size, int debug_section, unsigned int flags);
 #define	ACL_FHANDLE_F_LOCK	(1 << 0)
 
 /**
- * 当程序退出时需要调用此函数来释放系统资源
+ * When program exits, need to call this function to free system resources.
  */
 void acl_fhandle_end(void);
 
 /**
- * 打开一个文件
- * @param size {size_t} 分配结构 FS_HANDDLE 需要的空间大小
- * @param oflags {unsigned int} 打开文件句柄时的标志位, ACL_FHANDLE_O_XXX
- * @param file_path {const char*} 文件名(包含路径)
- * @param on_open {int (*)(ACL_FHANDLE*, void*)} 如果不为空，
- *  则当文件句柄被成功打开后便调用此函数
- * @param open_arg {void *} on_open 的回调参数之一
- * @param on_close {void (*)(ACL_FHANDLE*)} 如果不为空，
- *  则当文件句柄被正直关闭时便调用此函数
+ * Open a file.
+ * @param size {size_t} Required space size for structure FS_HANDDLE
+ * @param oflags {unsigned int} Flag bits when opening file, ACL_FHANDLE_O_XXX
+ * @param file_path {const char*} File name (can include path)
+ * @param on_open {int (*)(ACL_FHANDLE*, void*)} If not NULL,
+ *  after file handle is successfully opened, call this function
+ * @param open_arg {void *} One of on_open's callback parameters
+ * @param on_close {void (*)(ACL_FHANDLE*)} If not NULL,
+ *  when file handle is about to be closed, call this function
  */
 ACL_FHANDLE *acl_fhandle_open(size_t size, unsigned int oflags,
 	const char *file_path,
@@ -82,21 +97,21 @@ ACL_FHANDLE *acl_fhandle_open(size_t size, unsigned int oflags,
 	void (*on_close)(ACL_FHANDLE*));
 
 /**
- * 关闭一个文件句柄
+ * Close a file handle.
  * @param fs {ACL_FHANDLE*}
- * @param delay_timeout {int} 如果 > 0, 则延迟该时间后才真正关闭,
- *  否则，其引用计数为 0 则立即关闭
+ * @param delay_timeout {int} If > 0, delay closing for this timeout duration,
+ *  otherwise close immediately when reference count is 0
  */
 void acl_fhandle_close(ACL_FHANDLE *fs, int delay_timeout);
 
 /**
- * 对一个文件句柄加锁(先加线程锁后加文件锁)
+ * Lock a file handle (equivalent to thread lock and file lock).
  * @param fs {ACL_FHANDLE*}
  */
 void acl_fhandle_lock(ACL_FHANDLE *fs);
 
 /**
- * 对一个文件句柄解锁(先解文件锁再解线程锁)
+ * Unlock a file handle (first unlock file lock, then unlock thread lock).
  * @param fs {ACL_FHANDLE*}
  */
 void acl_fhandle_unlock(ACL_FHANDLE *fs);

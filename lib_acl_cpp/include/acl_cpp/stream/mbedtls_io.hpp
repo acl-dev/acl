@@ -9,53 +9,60 @@ namespace acl {
 class mbedtls_conf;
 
 /**
- * stream/aio_stream 流对象底层 IO 处理过程的处理类，该类对象中的读写的过程将会替代
- * stream/aio_stream 流对象中 默认的底层 IO 过程；该类对象必须是动态创建的(即为堆对象)，
- * stream/aio_stream 流对象通过调用本类对象的 destroy()　方法释放本类对象
+ * Processing class for the underlying IO processing of stream/aio_stream stream
+ * objects. The read/write process in objects of this class will replace
+ * the default underlying IO process in stream/aio_stream stream objects.
+ * Objects of this class must be dynamically created (i.e., heap objects).
+ * stream/aio_stream stream objects release objects of this class by calling the
+ * destroy() method of this class object
  */
 class ACL_CPP_API mbedtls_io : public sslbase_io {
 public:
 	/**
-	 * 构造函数
-	 * @param conf {mbedtls_conf&} 对每一个 SSL 连接进行配置的类对象
-	 * @param server_side {bool} 是否为服务端模式，因为客户端模式与服务端
-	 *  模式的握手方法不同，所以通过此参数来进行区分
-	 * @param nblock {bool} 是否为非阻塞模式
+	 * Constructor
+	 * @param conf {mbedtls_conf&} Class object for configuring each SSL connection
+	 * @param server_side {bool} Whether it is server mode, because the handshake
+	 * methods differ between client mode and server
+	 *  mode, this parameter is used to distinguish them
+	 * @param nblock {bool} Whether it is non-blocking mode
 	 */
 	mbedtls_io(mbedtls_conf& conf, bool server_side, bool nblock = false);
 
 	/**
 	 * @override stream_hook
-	 * 销毁 SSL IO 对象
+	 * Destroy SSL IO object
 	 */
 	void destroy();
 
 	/**
 	 * @override sslbase_io
-	 * 调用此方法进行 SSL 握手，在非阻塞 IO 模式下该函数需要与 handshake_ok()
-	 * 函数组合使用来判断 SSL 握手是否成功
+	 * Call this method to perform SSL handshake. In non-blocking IO mode, this
+	 * function needs to be used together with handshake_ok()
+	 * function to determine whether SSL handshake was successful
 	 * @return {bool}
-	 *  1、返回 false 表示握手失败，需要关闭连接；
-	 *  2、当返回 true 时：
-	 *  2.1、如果为阻塞 IO 模式则表示 SSL 握手成功
-	 *  2.2、在非阻塞 IO 模式下仅代表本次握手过程中 IO 是成功的，还需要调用
-	 *       handshake_ok() 函数判断 SSL 握手是否成功
+	 *  1. Returns false indicates handshake failed, connection needs to be closed;
+	 *  2. When returns true:
+	 *  2.1. If in blocking IO mode, it indicates SSL handshake was successful
+	 * 2.2. In non-blocking IO mode, it only means IO was successful in this
+	 * handshake process, still need to call
+	 * handshake_ok() function to determine whether SSL handshake was successful
 	 */
 	bool handshake();
 
 	/**
-	 * 检查对方证书是否有效（一般不必调用此函数）
+	 * Check whether the peer certificate is valid (generally no need to call this
+	 * function)
 	 * @return {bool}
 	 */
 	bool check_peer();
 
-	// @override sslbase_io, 目前仅支持mbedtls3.x.x系列.
+	// @override sslbase_io, currently only supports mbedtls3.x.x series.
 	int get_version() const;
 
 protected:
 	~mbedtls_io();
 
-	// 实现 stream_hook 类的虚方法
+	// Implement virtual methods of stream_hook class
 
 	// @override stream_hook
 	bool open(ACL_VSTREAM* s);
@@ -83,3 +90,4 @@ private:
 };
 
 } // namespace acl
+

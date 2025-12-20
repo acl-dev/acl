@@ -16,8 +16,8 @@ public:
 	virtual ~mime_attach();
 
 	/**
-	 * 获得附件的文件名
-	 * @return {const char*} 返回值为 NULL 则说明没有找到文件名
+	 * Get the attachment filename
+	 * @return {const char*} Returns NULL if filename was not found
 	 */
 	const char* get_filename() const;
 
@@ -28,3 +28,4 @@ private:
 } // namespace acl
 
 #endif // !defined(ACL_MIME_DISABLE)
+

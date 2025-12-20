@@ -63,24 +63,24 @@ struct frame_header {
 class string;
 
 /**
- * websocket 基础类
+ * websocket base class
  */
 class ACL_CPP_API websocket : public noncopyable {
 public:
 	/**
-	 * 构造方法
+	 * Constructor
 	 * @param client {socket_stream&}
 	 */
 	explicit websocket(socket_stream& client);
 	~websocket();
 
 	/**
-	 * 当类对象被重复使用时，需要通过本方法将状态重重
+	 * When class object is reused, need to reset state through this method
 	 */
 	websocket& reset();
 
 	/**
-	 * 获得本类对象所绑定的 socket_stream 对象
+	 * Get socket_stream object bound to this class object
 	 * @return {socket_stream&}
 	 */
 	socket_stream& get_stream() const {
@@ -88,61 +88,63 @@ public:
 	}
 
 	/**
-	 * 设置是否结束的标志位
+	 * Set finish flag bit
 	 * @param yes {bool}
 	 * @return {websocket&}
 	 */
 	websocket& set_frame_fin(bool yes);
 
 	/**
-	 * 设置保留标志位
+	 * Set reserved flag bit
 	 * @param yes {bool}
 	 * @return {websocket&}
 	 */
 	websocket& set_frame_rsv1(bool yes);
 
 	/**
-	 * 设置保留标志位
+	 * Set reserved flag bit
 	 * @param yes {bool}
 	 * @return {websocket&}
 	 */
 	websocket& set_frame_rsv2(bool yes);
 
 	/**
-	 * 设置保留标志位
+	 * Set reserved flag bit
 	 * @param yes {bool}
 	 * @return {websocket&}
 	 */
 	websocket& set_frame_rsv3(bool yes);
 
 	/**
-	 * 设置数据帧类型，参见上面定义：FRAME_XXX
+	 * Set data frame type. See definitions above: FRAME_XXX
 	 * @param type {unsigned char}
 	 * @return {websocket&}
 	 */
 	websocket& set_frame_opcode(unsigned char type);
 
 	/**
-	 * 设置本数据帧数据载体的总长度
+	 * Set total length of this data frame's data payload
 	 * @param len {unsigned long long}
 	 * @return {websocket&}
 	 */
 	websocket& set_frame_payload_len(unsigned long long len);
 
 	/**
-	 * 设置数据帧数据的掩码值，客户端模式下必须设置此项
+	 * Set masking key value of data frame data. Must set this item in client mode
 	 * @param mask {unsigned int}
 	 * @return {websocket&}
 	 */
 	websocket& set_frame_masking_key(unsigned int mask);
 
 	/**
-	 * 发送数制帧中的数据体，可以循环调用本方法发送本帧的数据，发送数据
-	 * 总长度(即多次调用本方法的数据长度之和)应与 set_frame_payload_len
-	 * 方法设置的值相同
+	 * Send data body in data frame. Can call this method in a loop to send data of
+	 * this frame. Total length of sent data
+	 * (i.e., sum of data lengths from multiple calls to this method) should be
+	 * same as value set by set_frame_payload_len
+	 * method
 	 * @param data {const void*}
 	 * @param len {size_t}
-	 * @return {bool} 发送是否成功
+	 * @return {bool} Whether sending was successful
 	 */
 	bool send_frame_data(const void* data, size_t len);
 	bool send_frame_data(void* data, size_t len);
@@ -150,11 +152,11 @@ public:
 	bool send_frame_data(char* str);
 
 	/**
-	 * 发送 PONG 数据帧
-	 * @param data {const void*} PONG 数据帧的数据载体，可以为 NULL
-	 * @param len {size_t} data 数据长度，当 data 为 NULL 或 len 为 0 时，
-	 *  表示没有数据载荷
-	 * @return {bool} 发送是否成功
+	 * Send PONG data frame
+	 * @param data {const void*} Data payload of PONG data frame, can be NULL
+	 * @param len {size_t} data data length. When data is NULL or len is 0,
+	 *  indicates no data payload
+	 * @return {bool} Whether sending was successful
 	 */
 	bool send_frame_pong(const void* data, size_t len);
 	bool send_frame_pong(void* data, size_t len);
@@ -162,11 +164,11 @@ public:
 	bool send_frame_pong(char* str);
 
 	/**
-	 * 发送 PING 数据帧
-	 * @param data {const void*} PING 数据帧的数据载体，可以为 NULL
-	 * @param len {size_t} data 数据长度，当 data 为 NULL 或 len 为 0 时，
-	 *  表示没有数据载荷
-	 * @return {bool} 发送是否成功
+	 * Send PING data frame
+	 * @param data {const void*} Data payload of PING data frame, can be NULL
+	 * @param len {size_t} data data length. When data is NULL or len is 0,
+	 *  indicates no data payload
+	 * @return {bool} Whether sending was successful
 	 */
 	bool send_frame_ping(const void* data, size_t len);
 	bool send_frame_ping(void* data, size_t len);
@@ -174,18 +176,20 @@ public:
 	bool send_frame_ping(char* str);
 
 	/**
-	 * 调用非阻塞发送接口异步发送数据，当发送完数据后，应用层应该调用
-	 * reset() 方法重置状态，在发送一个数据包前，应用层需要调用以上的
-	 * set_frame_xxx 方法用来设置每一个数据包的帧头信息
+	 * Call non-blocking send interface to asynchronously send data. After sending
+	 * data, application layer should call
+	 * reset() method to reset state. Before sending a data packet, application
+	 * layer needs to call above
+	 * set_frame_xxx methods to set frame header information for each data packet
 	 * @param conn {aio_socket_stream&}
-	 * @param data {void*} 要发送的数据，内部会被修改
-	 * @param len {size_t} data 数据长度
-	 * @return {bool} 是否出错
+	 * @param data {void*} Data to be sent, will be modified internally
+	 * @param len {size_t} data data length
+	 * @return {bool} Whether error occurred
 	 */
 	bool send_frame_data(aio_socket_stream& conn, void* data, size_t len);
 
 	/**
-	 * 异步发送一个 FRAME_TEXT 类型的数据帧
+	 * Asynchronously send a FRAME_TEXT type data frame
 	 * @param conn {aio_socket_stream&}
 	 * @param data {char*}
 	 * @param len {size_t}
@@ -194,7 +198,7 @@ public:
 	bool send_frame_text(aio_socket_stream& conn, char* data, size_t len);
 
 	/**
-	 * 异步发送一个 FRAME_BINARY 类型的数据帧
+	 * Asynchronously send a FRAME_BINARY type data frame
 	 * @param conn {aio_socket_stream&}
 	 * @param data {char*}
 	 * @param len {size_t}
@@ -203,7 +207,7 @@ public:
 	bool send_frame_binary(aio_socket_stream& conn, void* data, size_t len);
 
 	/**
-	 * 异步发送一个 FRAME_PING 类型的数据帧
+	 * Asynchronously send a FRAME_PING type data frame
 	 * @param conn {aio_socket_stream&}
 	 * @param data {char*}
 	 * @param len {size_t}
@@ -212,7 +216,7 @@ public:
 	bool send_frame_ping(aio_socket_stream& conn, void* data, size_t len);
 
 	/**
-	 * 异步发送一个 FRAME_PONG 类型的数据帧
+	 * Asynchronously send a FRAME_PONG type data frame
 	 * @param conn {aio_socket_stream&}
 	 * @param data {char*}
 	 * @param len {size_t}
@@ -221,56 +225,64 @@ public:
 	bool send_frame_pong(aio_socket_stream& conn, void* data, size_t len);
 
 	/**
-	 * 读取数据帧帧头
+	 * Read data frame header
 	 * @return {bool}
 	 */
 	bool read_frame_head();
 
 	/**
-	 * 读取数据帧数据体，需要循环调用本方法直至正常结束或出错
-	 * @param buf {void*} 存放数据的缓冲区
-	 * @param size {size_t} buf 数据缓冲区大小
-	 * @return {int} 返回值 > 0 表示读到的数据长度需再次读，== 0 表示读结束，
-	 *  < 0 表示读出错
+	 * Read data frame body. Need to call this method in a loop until normally ends
+	 * or error occurs
+	 * @param buf {void*} Buffer for storing data
+	 * @param size {size_t} buf data buffer size
+	 * @return {int} Return value > 0 indicates length of data read, need to read
+	 * again. == 0 indicates read complete,
+	 *  < 0 indicates read error
 	 */
 	int read_frame_data(void* buf, size_t size);
 
 	/**
-	 * 用在非阻塞网络通信中，尝试读取 websocket 数据头，可以循环调用本方法
-	 * 走到该方法返回 true 表示读到了完整的 websocket 头；如果返回 false，
-	 * 则需通过 eof() 方法来判断网络连接是否已经断开，如 eof() 返回 true，
-	 * 则应释放本对象
-	 * @return {bool} 返回 true 表示读到了完整的 websocket 头，可以通过调用
-	 *  read_frame_data() 来读取数据体
+	 * Used in non-blocking network communication, try to read websocket header.
+	 * Can call this method in a loop
+	 * until this method returns true indicating complete websocket header was
+	 * read. If returns false,
+	 * need to determine whether network connection has been disconnected through
+	 * eof() method. If eof() returns true,
+	 * should release this object
+	 * @return {bool} Returns true indicates complete websocket header was read,
+	 * can read body by calling
+	 *  read_frame_data()
 	 */
 	bool peek_frame_head();
 
 	/**
-	 * 用在非阻塞网络通信中，尝试读取 websocket 数据体，可以循环调用本方法
-	 * @param buf {char*} 存放读到的数据
-	 * @param size {size_t} buf 的空间大小
-	 * @return {int} 读到的数据长度，当返回值为：
-	 *   0: 表示本帧的数据体读完毕
-	 *  -1: 表示读出错，需通过调用 eof() 判断连接是否已经关闭
-	 *  >0: 表示本次读到的数据长度
+	 * Used in non-blocking network communication, try to read websocket body. Can
+	 * call this method in a loop
+	 * @param buf {char*} Store read data
+	 * @param size {size_t} buf space size
+	 * @return {int} Length of data read. When return value is:
+	 *   0: Indicates body data of this frame is read complete
+	 * -1: Indicates read error, need to determine whether connection has been
+	 * closed by calling eof()
+	 *  >0: Indicates length of data read this time
 	 */
 	int peek_frame_data(char* buf, size_t size);
 	int peek_frame_data(string& buf, size_t size);
 
 	/**
-	 * 判断当前是否已读完 websocket 帧头数据
+	 * Determine whether websocket frame header data has been read completely
 	 * @return {bool}
 	 */
 	bool is_head_finish() const;
 
 	/**
-	 * 判断当前网络连接是否已经断开
+	 * Determine whether current network connection has been disconnected
 	 * @return {bool}
 	 */
 	bool eof();
 
 	/**
-	 * 获得读到的数据帧的帧头
+	 * Get read data frame's frame header
 	 * @return {const frame_header&}
 	 */
 	const frame_header& get_frame_header() const {
@@ -278,7 +290,7 @@ public:
 	}
 
 	/**
-	 * 判断本帧是否为结束帧
+	 * Determine whether this frame is an end frame
 	 * @return {bool}
 	 */
 	bool frame_is_fin() const {
@@ -286,7 +298,7 @@ public:
 	}
 
 	/**
-	 * 判断本帧是否设置了保留标志位
+	 * Determine whether this frame has reserved flag bit set
 	 * @return {bool}
 	 */
 	bool frame_is_rsv1() const {
@@ -294,7 +306,7 @@ public:
 	}
 
 	/**
-	 * 判断本帧是否设置了保留标志位
+	 * Determine whether this frame has reserved flag bit set
 	 * @return {bool}
 	 */
 	bool frame_is_rsv2() const {
@@ -302,7 +314,7 @@ public:
 	}
 
 	/**
-	 * 判断本帧是否设置了保留标志位
+	 * Determine whether this frame has reserved flag bit set
 	 * @return {bool}
 	 */
 	bool frame_is_rsv3() const {
@@ -310,7 +322,7 @@ public:
 	}
 
 	/**
-	 * 获得本数据帧的状态码，参见上面：FRAME_XXX
+	 * Get opcode of this data frame. See above: FRAME_XXX
 	 * @return {unsigned char}
 	 */
 	unsigned char get_frame_opcode() const {
@@ -318,7 +330,7 @@ public:
 	}
 
 	/**
-	 * 获得本数据帧是否设置了掩码
+	 * Get whether this data frame has mask set
 	 * @return {bool}
 	 */
 	bool frame_has_mask() const {
@@ -326,7 +338,7 @@ public:
 	}
 
 	/**
-	 * 获得本数据帧的数据体长度
+	 * Get body length of this data frame
 	 * @return {unsigned long long}
 	 */
 	unsigned long long get_frame_payload_len() const {
@@ -334,7 +346,7 @@ public:
 	}
 
 	/**
-	 * 获得本数据帧的掩码值
+	 * Get masking key value of this data frame
 	 * @return {unsigned int}
 	 */
 	unsigned int get_frame_masking_key() const {
@@ -342,7 +354,7 @@ public:
 	}
 
 	/**
-	 * 获得本数据帧已读到的数据长度
+	 * Get length of data already read for this data frame
 	 * @return {unsigned long long}
 	 */
 	unsigned long long get_frame_payload_nread() const {
@@ -373,3 +385,4 @@ private:
 };
 
 } // namespace acl
+

@@ -8,35 +8,35 @@ extern "C" {
 #include "../stdlib/acl_define.h"
 
 /**
- * 初始化整个ACL库
+ * Initialize ACL library.
  */
 ACL_API void acl_lib_init(void);
 
 /**
- * 结束整个ACL库
+ * Cleanup ACL library.
  */
 ACL_API void acl_lib_end(void);
 
 /**
- * 是否优先使用 poll 而非 select
- * @param yesno {int} 非 0 时表示优先使用 poll
+ * Whether to prefer using poll over select.
+ * @param yesno {int} Non-zero indicates prefer using poll
  */
 ACL_API void acl_poll_prefered(int yesno);
 
 /**
- * 获得当前 acl 库的版本信息
- * @return {const char*} 当前 acl 库版本信息
+ * Get current ACL library version information.
+ * @return {const char*} Current ACL library version information
  */
 ACL_API const char *acl_version(void);
 
 /**
- * 获得当前 acl 库具备的相关能力
- * @return {const char*} 返回非空字符串，该函数不是线程安全的
+ * Get current ACL library compilation configuration information.
+ * @return {const char*} Returns non-empty string, this function is thread-safe
  */
 ACL_API const char *acl_verbose(void);
 
 /**
- * 获得主线程的线程号
+ * Get main thread's thread ID.
  * @return {unsigned int}
  */
 ACL_API unsigned long acl_main_thread_self(void);

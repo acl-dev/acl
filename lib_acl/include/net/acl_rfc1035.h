@@ -54,7 +54,9 @@ typedef struct ACL_RFC1035_MESSAGE {
  				 */
     unsigned short qdcount;	/* the number of entries in the question section */
     unsigned short ancount;	/* the number of resource records in the answer section */
-    unsigned short nscount;	/* the number of name server resource records in the authority records */
+    unsigned short nscount;	/* the number of name server
+				 * resource records in the authority
+				 * records */
     unsigned short arcount;	/* the number of resource records in the additional records section */
     ACL_RFC1035_QUERY *query;
     ACL_RFC1035_RR    *answer;
@@ -228,11 +230,14 @@ ACL_API size_t acl_rfc1035_build_reply(const ACL_RFC1035_REPLY *reply,
 #define ACL_RFC1035_TYPE_AAAA	28	/* a IPv6 address of host */
 #define ACL_RFC1035_TYPE_AXFR	252	/* a request for a transfer of an entire zone */
 #define ACL_RFC1035_TYPE_MAILB	253	/* a request for mailbox-related records (MB, MG or MR) */
-#define ACL_RFC1035_TYPE_MAILA	253	/* a request for mail agent RRs (Obsolete - see MX) */
+#define ACL_RFC1035_TYPE_MAILA	253	/* a request for mail agent RRs
+					 * (Obsolete - see MX) */
 #define ACL_RFC1035_TYPE_ALL	255	/* a request for all records */
 
 #define ACL_RFC1035_CLASS_IN	1	/* the Internet */
-#define ACL_RFC1035_CLASS_CS	2	/* the CSNET class (Obsolete - used only for examples in some obsolete RFCs */
+#define ACL_RFC1035_CLASS_CS	2	/* the CSNET class (Obsolete -
+					 * used only for examples in
+					 * some obsolete RFCs */
 #define ACL_RFC1035_CLASS_CH	3	/* the CHAOS class */
 #define ACL_RFC1035_CLASS_HS	4	/* Hesiod [Dyer 87] */
 

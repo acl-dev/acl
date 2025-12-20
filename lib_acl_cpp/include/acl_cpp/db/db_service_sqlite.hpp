@@ -7,30 +7,30 @@
 
 namespace acl {
 
-class ACL_CPP_API db_service_sqlite : public db_service
-{
+class ACL_CPP_API db_service_sqlite : public db_service {
 public:
 	/**
-	 * 当为 sqlite 数据库时的构造函数
-	 * @param dbname {const char*} 数据库名
-	 * @param dbfile {const char*} 数据库文件名(对于一些内嵌数据库有用)
-	 * @param dblimit {size_t} 数据库连接池的个数限制
-	 * @param nthread {int} 子线程池的最大线程数
-	 * @param win32_gui {bool} 是否是窗口类的消息，如果是，则内部的
-	 *  通讯模式自动设置为基于 _WIN32 的消息，否则依然采用通用的套接
-	 *  口通讯方式
+	 * Constructor when it is sqlite database.
+	 * @param dbname {const char*} Database name.
+	 * @param dbfile {const char*} Database file name (useful for some embedded
+	 * databases).
+	 * @param dblimit {size_t} Database connection pool count limit.
+	 * @param nthread {int} Maximum thread count of child thread pool.
+	 * @param win32_gui {bool} Whether it is window class message. If yes, internal
+	 * communication mode is automatically set to _WIN32-based message. Otherwise,
+	 * still uses generic socket communication method.
 	 */
 	db_service_sqlite(const char* dbname, const char* dbfile,
 		size_t dblimit = 100, int nthread = 2, bool win32_gui = false);
 	~db_service_sqlite();
 
 private:
-	// 数据库名称
+	// Database name.
 	string dbname_;
-	// sqlite 数据库文件名
+	// sqlite database file name.
 	string dbfile_;
 
-	// 基类纯虚函数
+	// Base class pure virtual function.
 	virtual db_handle* db_create(void);
 };
 

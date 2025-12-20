@@ -20,45 +20,52 @@ using shared_stream = std::shared_ptr<socket_stream>;
 
 enum {
 	OPEN_FLAG_NONE           = 0,
-	OPEN_FLAG_NONBLOCK       = 1,        // 非阻塞模式
-	OPEN_FLAG_REUSEPORT      = (1 << 1), // 端口复用，要求 Linux3.0 以上
-	OPEN_FLAG_FASTOPEN       = (1 << 2), // 是否启用 Fast open（实验阶段）
-	OPEN_FLAG_EXCLUSIVE      = (1 << 3), // 是否禁止复用地址
-	OPEN_FLAG_MULTICAST_LOOP = (1 << 4), // 是否允许组播时接收回路包
+	OPEN_FLAG_NONBLOCK       = 1,        // Non-blocking mode
+	OPEN_FLAG_REUSEPORT      = (1 << 1), // Port reuse, requires Linux 3.0 or above
+	OPEN_FLAG_FASTOPEN       = (1 << 2), // Whether to enable Fast open (experimental stage)
+	OPEN_FLAG_EXCLUSIVE      = (1 << 3), // Whether to prohibit address reuse
+	OPEN_FLAG_MULTICAST_LOOP = (1 << 4), // Whether to allow receiving loopback packets during multicast
 };
 
 /**
- * 服务端监听套接口类，接收客户端连接，并创建客户端流连接对象
+ * Server listening socket class. Receives client connections and creates client
+ * stream connection objects
  */
 class ACL_CPP_API server_socket : public noncopyable {
 public:
 #if 0
 	/**
-	 * 构造函数，调用本构造函数后需调用类方法 open 来监听指定服务地址
-	 * @param backlog {int} 监听套接口队列长度
-	 * @param block {bool} 是阻塞模式还是非阻塞模式
+	 * Constructor. After calling this constructor, need to call class method open
+	 * to listen on specified service address
+	 * @param backlog {int} Listening socket queue length
+	 * @param block {bool} Whether it is blocking mode or non-blocking mode
 	 */
 	server_socket(int backlog, bool block);
 #endif
 
 	/**
-	 * 构造函数
-	 * @param flag {unsigned} 定义参见 OPEN_FLAG_XXX
-	 * @param backlog {int} 监听套接口队列长度
+	 * Constructor
+	 * @param flag {unsigned} Definition see OPEN_FLAG_XXX
+	 * @param backlog {int} Listening socket queue length
 	 */
 	server_socket(unsigned flag, int backlog);
 
 	/**
-	 * 构造函数，调用本构造函数后禁止再调用 open 方法
-	 * @param sstream {ACL_VSTREAM*} 外部创建的监听流对象，本类仅使用
-	 *  但并不释放，由应用自行关闭该监听对象
+	 * Constructor. After calling this constructor, calling open method again is
+	 * prohibited
+	 * @param sstream {ACL_VSTREAM*} Externally created listening stream object.
+	 * This class only uses
+	 * but does not release it. Application should close this listening object
+	 * itself
 	 */
 	server_socket(ACL_VSTREAM* sstream);
 
 	/**
-	 * 构造函数，调用本构造函数后禁止再调用 open 方法
-	 * @param fd {ACL_SOCKET} 外部创建的监听句柄，本类仅使用但并不释放，
-	 *  由应用自行关闭该监听句柄
+	 * Constructor. After calling this constructor, calling open method again is
+	 * prohibited
+	 * @param fd {ACL_SOCKET} Externally created listening handle. This class only
+	 * uses but does not release it.
+	 *  Application should close this listening handle itself
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	server_socket(SOCKET fd);
@@ -70,30 +77,33 @@ public:
 	~server_socket();
 
 	/**
-	 * 开始监听给定服务端地址
-	 * @param addr {const char*} 服务器监听地址，格式为：
-	 *  ip:port；在 unix 环境下，还可以是域套接口，格式为：/path/xxx，在
-	 *  Linux 平台下，如果域套接口地址为：@xxx 格式，即第一个字母为 @ 则
-	 *  内部自动启用 Linux 下的抽象域套接字方式（abstract unix socket）
-	 * @return {bool} 监听是否成功
+	 * Start listening on given server address
+	 * @param addr {const char*} Server listening address, format:
+	 * ip:port. In unix environment, can also be domain socket, format: /path/xxx.
+	 * On
+	 * Linux platform, if domain socket address is: @xxx format, i.e., first
+	 * character is @, then
+	 * internally automatically enables Linux abstract domain socket mode (abstract
+	 * unix socket)
+	 * @return {bool} Whether listening was successful
 	 */
 	bool open(const char* addr);
 
 	/**
-	 * 判断当前监听套接口是否打开着
+	 * Determine whether current listening socket is open
 	 * @return {bool}
 	 */
 	bool opened() const;
 
 	/**
-	 * 关闭已经打开的监听套接口
-	 * @return {bool} 是否正常关闭
+	 * Close already opened listening socket
+	 * @return {bool} Whether closed normally
 	 */
 	bool close();
 
 	/**
-	 * 将监听套接口从服务监听对象中解绑
-	 * @return {SOCKET} 返回被解绑的句柄
+	 * Unbind listening socket from service listening object
+	 * @return {SOCKET} Returns unbound handle
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	SOCKET unbind(void);
@@ -102,18 +112,22 @@ public:
 #endif
 
 	/**
-	 * 接收客户端连接并创建客户端连接流
-	 * @param timeout {int} 当该值 >= 0 时，采用超时方式接收客户端连接，
-	 *  若在指定时间内未获得客户端连接，则返回 NULL
-	 * @param etimed {bool*} 当此指针非 NULL 时，如果因超时导致该函数返回
-	 *  NULL，则此值被置为 true
-	 * @return {socket_stream*} 返回空表示接收失败或超时, 返回的流对象在用
-	 *  完用户需要自行 delete 流对象.
+	 * Accept client connection and create client connection stream
+	 * @param timeout {int} When this value >= 0, uses timeout mode to accept
+	 * client connection.
+	 *  If client connection is not obtained within specified time, returns NULL
+	 * @param etimed {bool*} When this pointer is not NULL, if this function
+	 * returns
+	 *  NULL due to timeout, this value is set to true
+	 * @return {socket_stream*} Returns NULL indicates accept failed or timeout.
+	 * Returned stream object needs
+	 *  to be deleted by user after use.
 	 */
 	socket_stream* accept(int timeout = -1, bool* etimed = NULL);
 
 #if __cplusplus >= 201103L
-	// 使用 c++11 shared_ptr 方式获得客户端流对象, 更安全地使用流对象
+	// Use c++11 shared_ptr method to get client stream object, use stream object
+	// more safely
 
 	shared_stream shared_accept(int timeout = -1, bool* etimed = NULL) {
 		shared_stream ss(accept(timeout, etimed));
@@ -122,15 +136,16 @@ public:
 #endif
 
 	/**
-	 * 获得监听的地址
-	 * @return {const char*} 返回值非空指针
+	 * Get listening address
+	 * @return {const char*} Return value is non-NULL pointer
 	 */
 	const char* get_addr() const {
 		return addr_.c_str();
 	}
 
 	/**
-	 * 当正常监听服务器地址后调用本函数可以获得监听套接口
+	 * After normally listening on server address, calling this function can get
+	 * listening socket
 	 * @return {int}
 	 */
 #if defined(_WIN32) || defined(_WIN64)
@@ -142,10 +157,12 @@ public:
 	}
 
 	/**
-	 * 设置监听套接字的延迟接收功能，即当客户端连接上有数据时才将该连接返回
-	 * 给应用，目前该功能仅支持 Linux
-	 * @param timeout {int} 如果客户端连接在规定的时间内未发来数据，
-	 *  也将该连接返回给应用
+	 * Set listening socket's deferred accept function, i.e., only return
+	 * connection to application when client connection has data.
+	 * Currently this function only supports Linux
+	 * @param timeout {int} If client connection does not send data within
+	 * specified time,
+	 *  also return this connection to application
 	 */
 	void set_tcp_defer_accept(int timeout);
 
@@ -165,3 +182,4 @@ private:
 };
 
 } // namespace acl
+

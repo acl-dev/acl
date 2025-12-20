@@ -8,13 +8,14 @@ namespace acl {
 class fstream;
 
 /**
- * 异步文件读写流，该类对象只可用在 UNIX 系统中
+ * Asynchronous file read/write stream. Objects of this class can only be used
+ * in UNIX systems
  */
 class ACL_CPP_API aio_fstream : public aio_istream , public aio_ostream {
 public:
 	/**
-	 * 构造函数
-	 * @param handle {aio_handle*} 异步事件句柄
+	 * Constructor
+	 * @param handle {aio_handle*} Asynchronous event handle
 	 */
 	explicit aio_fstream(aio_handle* handle);
 
@@ -25,61 +26,67 @@ public:
 #endif
 
 	/**
-	 * 根据文件路径打开文件流, 这是最基础的打开文件的方式
-	 * @param path {const char*} 文件名
-	 * @param oflags {unsigned int} 标志位, We're assuming that O_RDONLY: 0x0000,
+	 * Open file stream based on file path. This is the most basic way to open a
+	 * file
+	 * @param path {const char*} Filename
+	 * @param oflags {unsigned int} Flag bits. We're assuming that O_RDONLY:
+	 * 0x0000,
 	 *  O_WRONLY: 0x0001, O_RDWR: 0x0002, O_APPEND: 0x0008, O_CREAT: 0x0100,
 	 *  O_TRUNC: 0x0200, O_EXCL: 0x0400; just for win32, O_TEXT: 0x4000,
 	 *  O_BINARY: 0x8000, O_RAW: O_BINARY, O_SEQUENTIAL: 0x0020, O_RANDOM: 0x0010.
-	 * @param mode {int} 打开文件句柄时的模式(如: 0600)
-	 * @return {bool} 打开文件是否成功
+	 * @param mode {int} Mode when opening file handle (e.g.: 0600)
+	 * @return {bool} Whether opening file was successful
 	 */
 	bool open(const char* path, unsigned int oflags, unsigned int mode);
 
 	/**
-	 * 以读/写方式打开文件流，当文件不存在时则创建新文件，当文件存在时则
-	 * 将文件清空, 文件属性为 0700
-	 * @param path {const char*} 文件名
-	 * @param mode {int} 打开文件句柄时的模式(如: 0600)
-	 * @return {bool} 打开文件是否成功
+	 * Open file stream in read/write mode. When file does not exist, create new
+	 * file. When file exists, then
+	 * clear file content. File attributes are 0700
+	 * @param path {const char*} Filename
+	 * @param mode {int} Mode when opening file handle (e.g.: 0600)
+	 * @return {bool} Whether opening file was successful
 	 */
 	bool open_trunc(const char* path, unsigned int mode = 0600);
 
 	/**
-	 * 以读/写方式建新文件，文件属性为 0600, 若文件不存在则创建新文件，若存在则
-	 * 打开旧文件
-	 * @param path {const char*} 文件全路径
-	 * @param mode {int} 打开文件句柄时的模式(如: 0600)
-	 * @return {bool} 文件创建是否成功
+	 * Create new file in read/write mode. File attributes are 0600. If file does
+	 * not exist, create new file. If exists, then
+	 * open old file
+	 * @param path {const char*} Full file path
+	 * @param mode {int} Mode when opening file handle (e.g.: 0600)
+	 * @return {bool} Whether file creation was successful
 	 */
 	bool create(const char* path, unsigned int mode = 0600);
 
 	/**
-	 * 以只读方式打开已经存在的文件
-	 * @param path {const char*} 文件名
-	 * @return {bool} 打开文件是否成功
+	 * Open existing file in read-only mode
+	 * @param path {const char*} Filename
+	 * @return {bool} Whether opening file was successful
 	 */
 	bool open_read(const char* path);
 
 	/**
-	 * 以只写方式打开文件，如果文件不存在则创建新文件，如果文件
-	 * 存在，则将文件内容清空
-	 * @param path {const char*} 文件名
-	 * @return {bool} 是否成功
+	 * Open file in write-only mode. If file does not exist, create new file. If
+	 * file
+	 * exists, then clear file content
+	 * @param path {const char*} Filename
+	 * @return {bool} Whether successful
 	 */
 	bool open_write(const char* path);
 
 	/**
-	 * 以尾部添加方式打开文件，如果文件不存在则创建新文件
-	 * @param path {const char*} 文件名
-	 * @return {bool} 是否成功
+	 * Open file in append mode. If file does not exist, create new file
+	 * @param path {const char*} Filename
+	 * @return {bool} Whether successful
 	 */
 	bool open_append(const char* path);
 
 protected:
 	~aio_fstream();
 	/**
-	 * 通过此函数来动态释放只能在堆上分配的异步流类对象
+	 * Dynamically release asynchronous stream class objects that can only be
+	 * allocated on heap through this function
 	 */
 	virtual void destroy();
 
@@ -87,3 +94,4 @@ private:
 };
 
 }  // namespace acl
+

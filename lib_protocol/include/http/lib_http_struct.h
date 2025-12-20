@@ -26,7 +26,7 @@ extern "C" {
 
 typedef	acl_int64	http_off_t;
 
-/* 结构类型定义 */
+/* Structure type definitions */
 typedef struct HTTP_HDR HTTP_HDR;
 typedef struct HTTP_HDR_REQ HTTP_HDR_REQ;
 typedef struct HTTP_HDR_RES HTTP_HDR_RES;
@@ -34,154 +34,154 @@ typedef struct HTTP_REQ HTTP_REQ;
 typedef struct HTTP_RES HTTP_RES;
 typedef struct HTTP_HDR_ENTRY HTTP_HDR_ENTRY;
 
-/* 函数类型定义 */
+/* Callback type definitions */
 
 /**
- * 数据头过程中的回回调函数类型定义
+ * Callback function type for header reading process
  * @param status {int} HTTP_CHAT_XXX
  *    status:
- *      HTTP_CHAT_OK: 读到完整的数据头
- *      HTTP_CHAT_ERR_TOO_MANY_LINES: 数据头中的行数太多
- * @param arg {void*} 回调函数的参数
- * @return {int} 该回调函数如果返回值为 -1 则上级调用者便结束; 若返回 0 
- *    上级调用者继续
+ *      HTTP_CHAT_OK: Successfully read complete header
+ *      HTTP_CHAT_ERR_TOO_MANY_LINES: Too many lines in header
+ * @param arg {void*} Parameter for callback function
+ * @return {int} If callback function returns -1, upper layer stops or
+ *    aborts; otherwise upper layer continues
  */
 typedef int  (*HTTP_HDR_NOTIFY)(int status, void *arg);
 
 /**
- * 数据体请求过程中的回调函数类型定义
+ * Callback function type during request/response body reading
  * @param status {int} HTTP_CHAT_XXX
  *  status:
- *    HTTP_CHAT_OK: 已经读完整个数据体，且 data 代表最后一部分数据, dlen 表示
- *      data 的数据长度
- *    HTTP_CHAT_DATA: 当为块传输方式时，表示每个数据块中的数据体中的部分数据；
- *      当非块传输方式时，表示整个数据体的一部分数据
- *    HTTP_CHAT_CHUNK_HDR: 表示块传输方式中的某个数据块的头数据
- *    HTTP_CHAT_CHUNK_TRAILER: 表示块传输方式中的最后一个数据块的头数据
- *    HTTP_CHAT_CHUNK_DATA_ENDL: 表示块传输方式中每块数据中最后的分隔行数据
- *    HTTP_CHAT_ERR_PROTO: 表示协议出错
- * @param data {char *} 所读到的数据开始地址，永远不为空
- * @param dlen {int} 表示当前 data 数据长度
- * @return {int} 该回调函数如果返回值为 -1 则上级调用者便结束; 若返回 0 
- *    上级调用者继续
+ *    HTTP_CHAT_OK: Received complete body, data stores last chunk,
+ *      dlen indicates data length
+ *    HTTP_CHAT_DATA: In chunked transfer mode, indicates partial data
+ *      in each chunk; in non-chunked mode, indicates a portion of body
+ *    HTTP_CHAT_CHUNK_HDR: Indicates a chunk header in chunked mode
+ *    HTTP_CHAT_CHUNK_TRAILER: Last chunk header in chunked mode
+ *    HTTP_CHAT_CHUNK_DATA_ENDL: Separator at end of each data chunk
+ *    HTTP_CHAT_ERR_PROTO: Protocol error
+ * @param data {char *} Start address of body data, may be NULL
+ * @param dlen {int} Current data length
+ * @return {int} If callback function returns -1, upper layer stops or
+ *    aborts; otherwise upper layer continues
  */
 typedef int  (*HTTP_BODY_NOTIFY)(int status, char *data, int dlen, void *arg);
 
-/* 通信过程状态字定义 */
-#define	HTTP_CHAT_OK                    0       /**< 读完了整个数据 */
-#define	HTTP_CHAT_CONTINUE              1       /**< 内部用 */
-#define	HTTP_CHAT_DATA                  2       /**< 数据体中的部分数据 */
-#define	HTTP_CHAT_CHUNK_HDR             3       /**< 块数据头中的数据 */
-#define HTTP_CHAT_CHUNK_DATA_ENDL       4       /**< 块数据体中的分隔行数据 */
-#define	HTTP_CHAT_CHUNK_TRAILER         5       /**< 最后一个数据块的头部分数据 */
-#define HTTP_CHAT_ERR_MIN               100     /**< 做为错误值的最小值 */
-#define	HTTP_CHAT_ERR_IO                101     /**< IO出错 */
-#define	HTTP_CHAT_ERR_PROTO             102     /**< 请求数据或响应数据的协议出错 */
-#define	HTTP_CHAT_ERR_TOO_MANY_LINES    103     /**< 数据头太多行 */
-#define HTTP_CHAT_ERR_MAX               1000    /**< 最大错误范围 */
+/* Common status field definitions */
+#define	HTTP_CHAT_OK                    0       /* Normal completion */
+#define	HTTP_CHAT_CONTINUE              1       /* Internal use */
+#define	HTTP_CHAT_DATA                  2       /* Partial data in body */
+#define	HTTP_CHAT_CHUNK_HDR             3       /* Chunk header data */
+#define HTTP_CHAT_CHUNK_DATA_ENDL       4       /* Separator in chunks */
+#define	HTTP_CHAT_CHUNK_TRAILER         5       /* Last chunk header */
+#define HTTP_CHAT_ERR_MIN               100     /* Minimum error value */
+#define	HTTP_CHAT_ERR_IO                101     /* IO error */
+#define	HTTP_CHAT_ERR_PROTO             102     /* Protocol error */
+#define	HTTP_CHAT_ERR_TOO_MANY_LINES    103     /* Header too many lines */
+#define HTTP_CHAT_ERR_MAX               1000    /* Error range */
 
-/* 设置的标志位 */
+/* Set flag bits */
 #define	HTTP_CHAT_FLAG_BUFFED           0x0001
 
-/* HTTP 协议头部字段的定义 */
-#define	HTTP_HDR_ENTRY_VIA              "via"   /**< HTTP 头添加字段，防止递归请求 */
-#define	HTTP_HDR_ENTRY_FORWARD_FOR      "X-Forwarded-For"  /**< HTTP 请求头添加字段 */
+/* HTTP protocol header field definitions */
+#define	HTTP_HDR_ENTRY_VIA              "via"   /* Prevent recursion */
+#define	HTTP_HDR_ENTRY_FORWARD_FOR      "X-Forwarded-For"  /* Request hdr */
 
-/* HTTP 协议请求结构 */
+/* HTTP protocol request structure */
 struct HTTP_REQ {
-	HTTP_HDR_REQ *hdr_req;  /**< 与 client 相关 */
-	int  status;            /**< 是否出错, defined above: HTTP_STATUS_ */
-	unsigned int flag;      /**< defined as: HTTP_CHAT_FLAG_XXX */
+	HTTP_HDR_REQ *hdr_req;  /* From client */
+	int  status;            /* Status, defined above: HTTP_STATUS_ */
+	unsigned int flag;      /* Defined as: HTTP_CHAT_FLAG_XXX */
 	void *ctx;
 	void (*free_ctx)(void*);
 };
 
 struct HTTP_RES {
-	HTTP_HDR_RES *hdr_res;  /**< 与 client 相关 */
+	HTTP_HDR_RES *hdr_res;  /* From client */
 	int   read_cnt;
-	int   status;           /**< 是否出错, defined above: HTTP_STATUS_ */
-	unsigned int flag;      /**< defined as: HTTP_CHAT_FLAG_XXX */
+	int   status;           /* Status, defined above: HTTP_STATUS_ */
+	unsigned int flag;      /* Defined as: HTTP_CHAT_FLAG_XXX */
 	void *ctx;
 	void (*free_ctx)(void*);
 };
 
-/* name-value 格式的条目 */
+/* Name-value pair entry */
 struct HTTP_HDR_ENTRY {
 	char *name;
 	char *value;
 	int   off;
 };
 
-/* HTTP 协议头 */
+/* HTTP protocol header */
 
 struct HTTP_HDR {
-	/* 通用实体 */
-	char  proto[8];        /**< 支持的协议: HTTP */
+	/* Common members */
+	char  proto[8];        /* Supported protocol: HTTP */
 	struct {
-		unsigned int major; /**< 主版本号 */
-		unsigned int minor; /**< 次版本号 */
+		unsigned int major; /* Major version number */
+		unsigned int minor; /* Minor version number */
 	} version;
 
-	http_off_t content_length; /**< HTTP协议体数据长度 */
+	http_off_t content_length; /* HTTP protocol body data length */
 
-	/**< 是否保持长连接: 0 -> 不保持，> 0 -> 保持，< 0 -> 没有该字段 */
+	/* Keep-alive: 0 -> no keep-alive, > 0 -> keep-alive, < 0 -> no field */
 	short  keep_alive;
-	short  chunked; /* 该字段本来对HTTP协议响应有意义, 为了将来的扩展, 故定义于此 */
+	short  chunked; /* This field is used for req/res body. For expansion */
 
-	/* 内部变量 */
+	/* Internal variables */
 	short  cur_lines;
 	short  max_lines;
 	short  valid_lines;
 	short  status;
-	short  keep_alive_count; /**< 处理次数 */
+	short  keep_alive_count; /* Keep-alive counter */
 
-	ACL_ARRAY  *entry_lnk;  /**< 存储着 HTTP_HDR_ENTRY 类型的元素 */
+	ACL_ARRAY  *entry_lnk;  /* Stores HTTP_HDR_ENTRY type elements */
 	void *chat_ctx;
 	void (*chat_free_ctx_fn)(void*);
 
-	short  debug;            /**< 调试信息头的标志位 */
+	short  debug;            /* Debug flag for message header */
 };
 
 #define HDR_RESTORE(hdr_ptr, hdr_type, hdr_member) \
 	((hdr_type *) (((char *) (hdr_ptr)) - offsetof(hdr_type, hdr_member)))
 
-/* HTTP 请求头 */
+/* HTTP request header */
 struct HTTP_HDR_REQ {
-	HTTP_HDR hdr;       /**< 包裹了通用的HDR头, 便于通用分析 */
+	HTTP_HDR hdr;       /* Common header, for common methods */
 
-	int   port;         /**< 所请求的服务端的服务端口号 */
-	/* 请求实体 */
-	char  method[32];   /**< 请求方法: POST, GET, CONNECT */
-	char  host[512];    /**< 所请示的主机的域名或IP地址 */
-	ACL_VSTRING *url_part; /**
-                                * 存储着请求行 URL 中的后半部分,
-                                * 如:
+	int   port;         /* Server port number of the request */
+	/* Request-specific members */
+	char  method[32];   /* Request method: POST, GET, CONNECT */
+	char  host[512];    /* Server domain or IP address */
+	ACL_VSTRING *url_part; /*
+                                * Stores backend part from request URL,
+                                * e.g.:
                                 * 1) http://test.com.cn/cgi-bin/test?name=value
                                 *    => /cgi-bin/test?name=value
                                 */
-	ACL_VSTRING *url_path;  /**
-                                 * 存储着请求行 URL 中的相对路径发(不包含主机部分),
-                                 * 如对于 /path/test.cgi?name=value,
-                                 * 仅存储 /path/test.cgi, 剩余的
-                                 * 参数部分则由 url_params 存储.
+	ACL_VSTRING *url_path;  /*
+                                 * Stores pure path from URL (without params),
+                                 * e.g. for /path/test.cgi?name=value,
+                                 * stores /path/test.cgi, remaining
+                                 * params stored in url_params.
                                  */
-	ACL_VSTRING *url_params; /**< 存储着 URL 中的参数部分 */
+	ACL_VSTRING *url_params; /* Stores parameters from URL */
 	ACL_VSTRING *file_path;
 
-	ACL_HTABLE *params_table; /**< 存储着 URL 请求行的各个字段的数据 */
-	ACL_HTABLE *cookies_table; /**< 存储着的 cookie 项 */
-	unsigned int flag;        /**< 标志位 */
+	ACL_HTABLE *params_table; /* Stores various fields from URL params */
+	ACL_HTABLE *cookies_table; /* Stores cookies */
+	unsigned int flag;        /* Flag bits */
 #define	HTTP_HDR_REQ_FLAG_PARSE_PARAMS	(1 << 0)
 #define	HTTP_HDR_REQ_FLAG_PARSE_COOKIE	(1 << 1)
 };
 
-/* HTTP 响应头 */
+/* HTTP response header */
 
 struct HTTP_HDR_RES {
-	HTTP_HDR hdr;           /**< 包裹了通用的HDR头, 便于通用分析 */
+	HTTP_HDR hdr;           /* Common header, for common methods */
 
-	/* 响应实体 */
-	int   reply_status;     /**< 服务器的响应代码，如: 100, 200, 404, 304, 500 */
+	/* Response-specific members */
+	int   reply_status;     /* Server response code: 100, 200, 404, etc */
 };
 
 #ifdef	__cplusplus
@@ -189,4 +189,5 @@ struct HTTP_HDR_RES {
 #endif
 
 #endif
+
 

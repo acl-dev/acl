@@ -7,23 +7,22 @@
 
 namespace acl {
 
-class ACL_CPP_API db_service_mysql : public db_service
-{
+class ACL_CPP_API db_service_mysql : public db_service {
 	/**
-	 * 当为 mysql 数据库时的构造函数
-	 * @param dbaddr {const char*} mysql 服务器地址
-	 * @param dbname {const char*} 数据库名
-	 * @param dbuser {const char*} 数据库用户名
-	 * @param dbpass {const char*} 数据库用户密码
-	 * @param dbflags {unsigned long} 数据库连接标志位
-	 * @param auto_commit {bool} 数据修改时是否自动提交
-	 * @param conn_timeout {int} 数据库连接超时时间
-	 * @param rw_timeout {int} 数据库操作时IO读写超时时间
-	 * @param dblimit {size_t} 数据库连接池的个数限制
-	 * @param nthread {int} 子线程池的最大线程数
-	 * @param win32_gui {bool} 是否是窗口类的消息，如果是，则内部的
-	 *  通讯模式自动设置为基于 _WIN32 的消息，否则依然采用通用的套接
-	 *  口通讯方式
+	 * Constructor when using mysql database
+	 * @param dbaddr {const char*} MySQL server address
+	 * @param dbname {const char*} Database name
+	 * @param dbuser {const char*} Database username
+	 * @param dbpass {const char*} Database user password
+	 * @param dbflags {unsigned long} Database connection flag bits
+	 * @param auto_commit {bool} Whether to auto commit when modifying data
+	 * @param conn_timeout {int} Database connection timeout
+	 * @param rw_timeout {int} IO read/write timeout when operating database
+	 * @param dblimit {size_t} Connection pool count limit for database
+	 * @param nthread {int} Maximum thread count for child thread pool
+	 * @param win32_gui {bool} Whether it is window class message. If yes, then
+	 * internally communication mode is automatically set to _WIN32 message
+	 * based, otherwise still uses common socket communication method
 	 */
 	db_service_mysql(const char* dbaddr, const char* dbname,
 		const char* dbuser, const char* dbpass,
@@ -34,27 +33,28 @@ class ACL_CPP_API db_service_mysql : public db_service
 	~db_service_mysql(void);
 
 private:
-	// 数据库服务器地址
+	// Database server address
 	string dbaddr_;
-	// 数据库名
+	// Database name
 	string dbname_;
-	// 数据库用户名
+	// Database username
 	string dbuser_;
-	// 数据库用户密码
+	// Database user password
 	string dbpass_;
-	// 数据库连接标志位
+	// Database connection flag bits
 	unsigned long dbflags_;
-	// 修改数据时是否自动提交数据
+	// Whether to auto commit when modifying data
 	bool auto_commit_;
-	// 连接数据库超时时间
+	// Database connection timeout
 	int conn_timeout_;
-	// 数据库操作时的读写超时时间
+	// Read/write timeout when operating database
 	int rw_timeout_;
 
-	// 基类纯虚函数
+	// Base class pure virtual function
 	virtual db_handle* db_create(void);
 };
 
 }
 
 #endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
+

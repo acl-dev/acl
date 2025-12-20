@@ -30,7 +30,7 @@ public:
 protected:
 	~openssl_io();
 
-	// 实现 stream_hook 类的虚方法
+	// Implement virtual methods of stream_hook class
 
 	// @override stream_hook
 	bool open(ACL_VSTREAM* s);
@@ -50,3 +50,4 @@ private:
 };
 
 } // namespace acl
+

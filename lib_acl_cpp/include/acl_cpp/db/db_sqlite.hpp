@@ -16,60 +16,63 @@ class sqlite_cursor;
 class ACL_CPP_API db_sqlite : public db_handle {
 public:
 	/**
-	 * 构造函数(内部会自动加载sqlite动态库)
-	 * @param charset {const char*} 本地字符集(gbk, utf-8, ...)
+	 * Constructor (internally automatically loads sqlite dynamic library)
+	 * @param charset {const char*} Database character set (gbk, utf-8, ...)
 	 */
 	db_sqlite(const char* dbfile, const char* charset = "utf-8");
 	~db_sqlite(void);
 
 	/**
-	 * 显式动态加载 sqlite 动态库
+	 * Manually statically load sqlite dynamic library.
 	 * @return {bool}
 	 */
 	static bool load(void);
 
 	/**
-	 * 返回当前的 sqlite 的版本信息
+	 * Get the version information of the current sqlite.
 	 * @return {const char*}
 	 */
 	const char* version(void) const;
 
 	/**
-	 * 当数据库打开后通过此函数对数据库的操作引擎进行配置，
-	 * 进行配置的内容需要严格遵循 sqlite 本身的配置选项要求
-	 * @param pragma {const char*} 配置选项内容，格式为：
+	 * After the database is opened, configure the database's pragma options
+	 * through this function. The pragma options used need to strictly follow
+	 * sqlite's pragma option requirements.
+	 * @param pragma {const char*} Pragma option content, format is:
 	 *  PRAGMA xxx=xxx
-	 *  如：PRAGMA synchronous = NORMAL
-	 * @return {bool} 配置数据库是否成功
+	 *  e.g.: PRAGMA synchronous = NORMAL
+	 * @return {bool} Whether configuring the database was successful
 	 */
 	bool set_conf(const char* pragma);
 
 	/**
-	 * 当数据库打开调用此函数获得数据引擎的配置选项
-	 * @param pragma {const char*} 配置选项内容，格式为：
-	 *  PRAGMA xxx
-	 *  如：PRAGMA synchronous
-	 * @param out {string&} 如果返回值非空则存储结果
-	 * @return {const char*} 为空则说明该配置不存在或数据库未打开
+	 * After the database is opened, call this function to query pragma options.
+	 * @param pragma {const char*} Pragma option content, format is:
+	 *  PRAGMA xxx, e.g.: PRAGMA synchronous
+	 * @param out {string&} Non-empty buffer to store the result value.
+	 * @return {const char*} Returns NULL to indicate the option does not exist or
+	 * database is not opened.
 	 */
 	const char* get_conf(const char* pragma, string& out);
 
 	/**
-	 * 在数据库打开的情况下输入数据库引擎的配置选项
-	 * @param pragma {const char*} 指定的配置选项，如果该参数为空，
-	 *  则输出所有的配置选项，格式为：PRAGMA xxx，如：PRAGMA synchronous
+	 * After the database is opened, call this function to display database pragma
+	 * options.
+	 * @param pragma {const char*} Specify a pragma option. If this parameter is
+	 * empty, display all pragma options, format: PRAGMA xxx, e.g.: PRAGMA synchronous
 	 */
 	void show_conf(const char* pragma = NULL);
 
 	/**
-	 * 自数据库打开后所有的影响的记录行数
-	 * @return {int} 影响的行数，-1 表示出错
+	 * Get the number of affected records after the database is opened.
+	 * @return {int} Number of affected records, -1 indicates error.
 	 */
 	int affect_total_count(void) const;
 
 	/**
-	 * 直接获得 sqlite 的句柄，如果返回 NULL 则表示 sqlite 还没有打开
-	 * 或出错时内部自动关闭了 sqlite
+	 * Directly get sqlite's native connection handle. Returns NULL to indicate
+	 * sqlite has not been opened.
+	 * When this handle is closed, internally automatically closes sqlite.
 	 * @return {sqlite3*}
 	 */
 	sqlite3* get_conn(void) const {
@@ -77,172 +80,178 @@ public:
 	}
 
 	/**
-	 * 准备游标
+	 * Prepare cursor.
 	 * @param cursor {sqlite_cursor&}
 	 * @return {bool}
 	 */
 	bool prepare(sqlite_cursor& cursor);
 
 	/**
-	 * 执行下一步，如果是查询类过程，则将查询结果存入给定的参数中
+	 * Execute the next step. If it is a query process, bind the query result to
+	 * the cursor parameter.
 	 * @param cursor {sqlite_cursor&}
 	 * @return {bool}
 	 */
 	bool next(sqlite_cursor& cursor, bool* done);
 
 	/********************************************************************/
-	/*            以下为一些 sqlite3 的私有接口                         */
+	/*            The following are some sqlite3 private interfaces                         */
 	/********************************************************************/
 
 	/**
-	 * 将zSql初始化为 prepared statement
-	 * @param zSql {const char*} utf-8编码的sql
-	 * @param nByte {int} zSql的最大字节长度
-	 * @param ppStmt {sqlite3_stmt**} OUT: prepared statement句柄
-	 * @param pzTail {const char**} OUT: 指向zSql未使用部分的指针
-	 * @return {int} 成功返回 SQLITE_OK，否则返回相应的错误代码
+	 * Compile zSql into a prepared statement.
+	 * @param zSql {const char*} utf-8 encoded sql.
+	 * @param nByte {int} Byte length of zSql string.
+	 * @param ppStmt {sqlite3_stmt**} OUT: prepared statement handle.
+	 * @param pzTail {const char**} OUT: Pointer to unused part of zSql.
+	 * @return {int} Returns SQLITE_OK on success, otherwise returns corresponding
+	 * error code.
 	 */
 	int sqlite3_prepare_v2(const char *zSql,
 		int nByte, sqlite3_stmt **ppStmt, const char **pzTail);
 
 	/**
-	 * 计算 prepared statement
+	 * Execute prepared statement.
 	 * @param stmt {sqlite3_stmt*} prepared statement
-	 * @return {int} 返回 SQLITE_BUSY, SQLITE_DONE, SQLITE_ROW,
-	 *          SQLITE_ERROR, 或 SQLITE_MISUSE
+	 * @return {int} Returns SQLITE_BUSY, SQLITE_DONE, SQLITE_ROW,
+	 *          SQLITE_ERROR, or SQLITE_MISUSE
 	 */
 	int sqlite3_step(sqlite3_stmt *stmt);
 
 	/**
-	 * 将prepared statement重置为初始化状态
+	 * Reset prepared statement to initial state.
 	 * @param pStmt {sqlite3_stmt*} prepared statement
-	 * @return {int} SQLITE_ROW, SQLITE_DONE 或 SQLITE_OK
+	 * @return {int} SQLITE_ROW, SQLITE_DONE or SQLITE_OK
 	 */
 	int sqlite3_reset(sqlite3_stmt *pStmt);
 
 	/**
-	 * 释放 prepared statement 资源
-	 * @param stmt {sqlite3_stmt*} prepared statement句柄
-	 * @return {int} SQLITE_OK 或其他错误代码
+	 * Release prepared statement resources.
+	 * @param stmt {sqlite3_stmt*} prepared statement handle.
+	 * @return {int} SQLITE_OK indicates success, otherwise indicates error.
 	 */
 	int sqlite3_finalize(sqlite3_stmt *stmt);
 
 	/**
-	 * 绑定二进制数据
+	 * Bind binary data parameter.
 	 * @param stmt {sqlite3*} prepared statement
-	 * @param iCol {int} 待绑定到sql中的参数索引
-	 * @param value {const void*} 待绑定到sql中的参数数值
-	 * @param n {int} 参数的字节长度
-	 * @param destory {void(*)(void*)} 传入参数的析构函数
-	 * @return {int} 成功返回 SQLITE_OK，否则返回相应的错误代码
+	 * @param iCol {int} Parameter index in sql to bind.
+	 * @param value {const void*} Parameter value in sql to bind.
+	 * @param n {int} Parameter byte length.
+	 * @param destory {void(*)(void*)} Parameter destruction callback function.
+	 * @return {int} Returns SQLITE_OK on success, otherwise returns corresponding
+	 * error code.
 	 */
 	int sqlite3_bind_blob(sqlite3_stmt *stmt, int iCol,
 		const void *value, int n, void(*destory)(void*));
 
 	/**
-	 * 绑定int类型数据
+	 * Bind int parameter.
 	 * @param stmt {sqlite3*} prepared statement
-	 * @param iCol {int} 待绑定到sql中的参数索引
-	 * @param value {int} 待绑定到sql中的参数数值
-	 * @return {int} 成功返回 SQLITE_OK，否则返回相应的错误代码
+	 * @param iCol {int} Parameter index in sql to bind.
+	 * @param value {int} Parameter value in sql to bind.
+	 * @return {int} Returns SQLITE_OK on success, otherwise returns corresponding
+	 * error code.
 	 */
 	int sqlite3_bind_int(sqlite3_stmt *stmt, int iCol, int value);
 
 	/**
-	 * 绑定int64数据
+	 * Bind int64 parameter.
 	 * @param stmt {sqlite3*} prepared statement
-	 * @param iCol {int} 待绑定到sql中的参数索引
-	 * @param value {long long int} 待绑定到sql中的参数数值
-	 * @return {int} 成功返回 SQLITE_OK，否则返回相应的错误代码
+	 * @param iCol {int} Parameter index in sql to bind.
+	 * @param value {long long int} Parameter value in sql to bind.
+	 * @return {int} Returns SQLITE_OK on success, otherwise returns corresponding
+	 * error code.
 	 */
 	int sqlite3_bind_int64(sqlite3_stmt* stmt, int iCol, long long int value);
 
 	/**
-	 * 绑定text数据
+	 * Bind text parameter.
 	 * @param stmt {sqlite3*} prepared statement
-	 * @param iCol {int} 待绑定到sql中的参数索引
-	 * @param value {const void*} 待绑定到sql中的参数数值
-	 * @param n {int} 参数的字节长度
-	 * @param destory {void(*)(void*)} 传入参数的析构函数
-	 * @return {int} 成功返回 SQLITE_OK，否则返回相应的错误代码
+	 * @param iCol {int} Parameter index in sql to bind.
+	 * @param value {const void*} Parameter value in sql to bind.
+	 * @param n {int} Parameter byte length.
+	 * @param destory {void(*)(void*)} Parameter destruction callback function.
+	 * @return {int} Returns SQLITE_OK on success, otherwise returns corresponding
+	 * error code.
 	 */
 	int sqlite3_bind_text(sqlite3_stmt *stmt, int iCol,
 		const char *value, int n, void(*destory)(void*));
 
 	/**
-	 * 返回 prepared statement 结果集的列数
+	 * Get the number of columns in prepared statement result set.
 	 * @param stmt {sqlite3_stmt*} prepared statement
-	 * @return {int} 列数量
+	 * @return {int} Number of columns.
 	 */
 	int sqlite3_column_count(sqlite3_stmt *stmt);
 
 	/**
-	 * 返回查询结果的对应列的二进制结果信息
+	 * Get binary data information of corresponding column in query result.
 	 * @param stmt {sqlite3_stmt*} prepared statement
-	 * @param iCol {int} 列索引
-	 * @return {const void*} 数据指针
+	 * @param iCol {int} Column number.
+	 * @return {const void*} Data pointer.
 	 */
 	const void *sqlite3_column_blob(sqlite3_stmt *stmt, int iCol);
 
 	/**
-	 * 返回查询结果的对应列的int结果信息
+	 * Get int data information of corresponding column in query result.
 	 * @param stmt {sqlite3_stmt*} prepared statement
-	 * @param iCol {int} 列索引
-	 * @return {int} 数据
+	 * @param iCol {int} Column number.
+	 * @return {int} Data.
 	 */
 	int sqlite3_column_int(sqlite3_stmt *stmt, int iCol);
 
 	/**
-	 * 返回查询结果的对应列的int64结果信息
+	 * Get int64 data information of corresponding column in query result.
 	 * @param stmt {sqlite3_stmt*} prepared statement
-	 * @param iCol {int} 列索引
-	 * @return {long long int} 数据
+	 * @param iCol {int} Column number.
+	 * @return {long long int} Data.
 	 */
 	long long int sqlite3_column_int64(sqlite3_stmt *stmt, int iCol);
 
 	/**
-	 * 返回查询结果的对应列的 utf-8 text 结果信息
+	 * Get utf-8 text data information of corresponding column in query result.
 	 * @param stmt {sqlite3_stmt*} prepared statement
-	 * @param iCol {int} 列索引
-	 * @return {const unsigned char *} 数据指针
+	 * @param iCol {int} Column number.
+	 * @return {const unsigned char *} Data pointer.
 	 */
 	const unsigned char *sqlite3_column_text(sqlite3_stmt *stmt, int iCol);
 
 	/**
-	 * 返回查询结果的对应列的结果信息数据字节长度
+	 * Get data information of corresponding column in query result, byte length.
 	 * @param stmt {sqlite3_stmt*} prepared statement
-	 * @param iCol {int} 列索引
-	 * @return {const unsigned char *} 数据指针
+	 * @param iCol {int} Column number.
+	 * @return {const unsigned char *} Data pointer.
 	 */
 	int sqlite3_column_bytes(sqlite3_stmt *stmt, int iCol);
 
 	/**
-	 * 返回select结果集中特定列的名称
+	 * Get column name of specified column in select query result.
 	 * @param stmt {sqlite3_stmt*} prepared statement
-	 * @param iCol {int} 列索引
-	 * @return {const char*} 列名
+	 * @param iCol {int} Column number.
+	 * @return {const char*} Name.
 	 */
 	const char *sqlite3_column_name(sqlite3_stmt *stmt, int iCol);
 
 	/**
-	 * 执行单条sql语句
-	 * @param sql {const char*} 待执行的sql语句
-	 * @param callback {int (*)(void*,int,char**,char**)} callback函数
-	 * @param arg {void*}callback函数的第一个参数
-	 * @param errmsg {char**} 错误信息
-	 * @return {int} SQLITE_OK 或其他错误码
+	 * Execute sql statement.
+	 * @param sql {const char*} Sql statement to execute.
+	 * @param callback {int (*)(void*,int,char**,char**)} callback function.
+	 * @param arg {void*} First parameter of callback function.
+	 * @param errmsg {char**} Error message.
+	 * @return {int} SQLITE_OK indicates success, otherwise indicates error.
 	 */
 	int sqlite3_exec(const char *sql,
 		int(*callback)(void*,int,char**,char**), void *arg, char **errmsg);
 
 	/**
-	 * 为释放 errmsg 而添加的接口
-	 * @param ptr {void*} 待释放数据指针
+	 * Additional interface for releasing errmsg memory.
+	 * @param ptr {void*} Pointer to be released.
 	 */
 	void sqlite3_free(void* ptr);
 
 	/********************************************************************/
-	/*            以下为基类 db_handle 的虚接口                         */
+	/*            The following are virtual interfaces of base class db_handle                         */
 	/********************************************************************/
 
 	/**
@@ -312,22 +321,23 @@ public:
 
 
 private:
-	// sqlite 引擎
+	// sqlite handle
 	sqlite3* db_;
 
-	// 数据存储文件
+	// Data storage file
 	string dbfile_;
 
-	// 字符集转码器
+	// Character set converter
 	charset_conv* conv_;
 
-	// 本地字符集
+	// Database character set
 	string charset_;
 
-	// 真正执行SQL查询的函数
+	// Function for executing SQL query
 	bool exec_sql(const char* sql, db_rows* result = NULL);
 };
 
 } // namespace acl
 
 #endif // !defined(ACL_DB_DISABLE)
+

@@ -18,16 +18,20 @@ class ifstream;
 class ACL_CPP_API mime_node : public noncopyable {
 public:
 	/**
-	 * 构造函数
-	 * @param emailFile {const char*} 存储邮件内容的源文件，可以
-	 *  为空，但当为空时在调用 save_body 函数时，则不能指定源文件
-	 * @param node {const MIME_NODE*} 邮件中的某个结点对象
-	 * @param enableDecode {bool} 当邮件内容为 base64/qp 等编码格式
-	 *  时是否需要自动进行解码
-	 * @param toCharset {const char*} 缺省的目标字符集，如果目标
-	 *  字符集与源字符集不同，则进行字符集转换
-	 * @param off {off_t} 邮件内容在整个数据中的起始位置中附加的
-	 *  相对偏移量，以便于用户可以在邮件内容前面加自己的私有数据
+	 * Constructor
+	 * @param emailFile {const char*} Source file name storing email data. If
+	 * empty, when calling save_body function later, the source file must be
+	 * specified.
+	 * @param node {const MIME_NODE*} A certain MIME node in the email.
+	 * @param enableDecode {bool} Whether to automatically decode when email
+	 * content is in base64/qp encoding format.
+	 * @param toCharset {const char*} Default target character set. If target
+	 * character set is different from source character set, character set
+	 * conversion will be performed.
+	 * @param off {off_t} Starting position offset in the email body data stream,
+	 * with additional
+	 * offset added, so that users can add their own private data before the email
+	 * body.
 	 */
 	mime_node(const char* emailFile, const MIME_NODE* node,
 		bool enableDecode = true, const char* toCharset = "gb2312",
@@ -35,8 +39,8 @@ public:
 	virtual ~mime_node();
 
 	/**
-	 * 获得 MIME 结点中 Content-Type 值中的 name 字段值
-	 * @return {const char*} 如果为空则表示没有该字段值
+	 * Get the name field value in the MIME node's Content-Type value.
+	 * @return {const char*} Returns NULL if there is no such field value.
 	 */
 	const char* get_name() const {
 		if (m_name.empty()) {
@@ -46,54 +50,54 @@ public:
 	}
 
 	/**
-	 * 获得 Content-Type 中的主类型，如: Content-Type: image/jpeg, 则本
-	 * 函数返回 MIME_CTYPE_IMAGE (在 mime_define.hpp 中定义)
-	 * @return {int} 返回 mime_define.hpp 中定义的 MIME_CTYPE_XXX
+	 * Get the main type in Content-Type, e.g.: Content-Type: image/jpeg, then
+	 * returns MIME_CTYPE_IMAGE (defined in mime_define.hpp)
+	 * @return {int} Returns MIME_CTYPE_XXX defined in mime_define.hpp
 	 */
 	int get_ctype() const {
 		return m_ctype;
 	}
 
 	/**
-	 * 获得 Content-Type 中的从类型，如: Content-Type: image/jpeg, 则本
-	 * 函数返回 MIME_STYPE_JPEG (在 mime_define.hpp 中定义)
-	 * @return {int} 返回 mime_define.hpp 中定义的 MIME_STYPE_XXX
+	 * Get the sub type in Content-Type, e.g.: Content-Type: image/jpeg, then
+	 * returns MIME_STYPE_JPEG (defined in mime_define.hpp)
+	 * @return {int} Returns MIME_STYPE_XXX defined in mime_define.hpp
 	 */
 	int get_stype() const {
 		return m_stype;
 	}
 
 	/**
-	 * 获得 Content-Type 中的主类型，以字符串方式表示
-	 * @return {const char*} 返回 "" 表示不存在
+	 * Get the main type in Content-Type, represented as a string format.
+	 * @return {const char*} Returns "" if unknown.
 	 */
 	const char* get_ctype_s() const;
 
 	/**
-	 * 获得 Content-Type 中的从类型，以字符串方式表示
-	 * @return {const char*} 返回 "" 表示不存在
+	 * Get the sub type in Content-Type, represented as a string format.
+	 * @return {const char*} Returns "" if unknown.
 	 */
 	const char* get_stype_s() const;
 
 	/**
-	 * 获得传输编码类型 (对应于 Content-Transfer-Encoding)
-	 * @return {int} 返回 mime_define.hpp 中定义的 MIME_ENC_XXX
+	 * Get encoding method (corresponding to Content-Transfer-Encoding)
+	 * @return {int} Returns MIME_ENC_XXX defined in mime_define.hpp
 	 */
 	int get_encoding() const {
 		return m_encoding;
 	}
 
 	/**
-	 * 获得结点字符集字符串(对应于 Content-Type 中的 charset 字段)
-	 * @return {const char*} 为空则表示没有该字段
+	 * Get character set string (corresponding to charset field in Content-Type)
+	 * @return {const char*} Returns NULL if there is no such field.
 	 */
 	const char* get_charset() const {
 		return m_charset;
 	}
 
 	/**
-	 * 获得目标字符集, 由用户在构造函数中传入
-	 * @return {const char*} 为空则表示用户未设置
+	 * Get target character set. If not set in constructor.
+	 * @return {const char*} Returns NULL if user has not set it.
 	 */
 	const char* get_toCharset() const {
 		if (m_toCharset[0]) {
@@ -104,7 +108,7 @@ public:
 	}
 
 	/**
-	 * 获得本结点在邮件中的起始偏移量
+	 * Get the starting offset of this node in the email.
 	 * @return {off_t}
 	 */
 	off_t get_bodyBegin() const {
@@ -112,7 +116,7 @@ public:
 	}
 
 	/**
-	 * 获得本结点在邮件中的结束偏移量
+	 * Get the ending offset of this node in the email.
 	 * @return {off_t}
 	 */
 	off_t get_bodyEnd() const {
@@ -120,130 +124,141 @@ public:
 	}
 
 	/**
-	 * 获得本结点头部中某个字段的值
-	 * @param name {const char*} 字段名, 如: Content-Type
-	 * @return {const char*} 为空则表示不存在
+	 * Get the value of a certain header field in this node.
+	 * @param name {const char*} Field name, e.g.: Content-Type
+	 * @return {const char*} Returns NULL if not found.
 	 */
 	const char* header_value(const char* name) const;
 
 	/**
-	 * 取得该结点的所有头部字段集合
+	 * Get the header field collection of this node.
 	 * @return {const std::map<string, string>&}
 	 */
 	const std::map<string, string>& get_headers() const;
 
 	/**
-	 * 转储本结点内容于指定的管道流中
+	 * Convert this node's body data to the specified pipe stream.
 	 * @param out {pipe_manager&}
-	 * @return {bool} 是否成功
+	 * @return {bool} Whether successful
 	 */
 	bool save(pipe_manager& out) const;
 
 	/**
-	 * 转储本结点内容于指定的管道流中
+	 * Convert this node's body data to the specified pipe stream.
 	 * @param out {pipe_manager&}
-	 * @param src {const char*} 邮件内容的起始地址，如果为空指针，
-	 *  则从构造函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @param len {int} 邮件内容的数据长度，如果为0，则从构造
-	 *  函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @return {bool} 是否成功
+	 * @param src {const char*} Starting address of email data. If NULL pointer,
+	 *  then use the emailFile file provided by the constructor to read email data.
+	 * @param len {int} Length of email data content. If 0, then use the
+	 * constructor's
+	 *  provided emailFile file to read email data.
+	 * @return {bool} Whether successful
 	 */
 	bool save(pipe_manager& out, const char* src, int len) const;
 
 	/**
-	 * 转储本结点内容于指定的输出流中
-	 * @param out {ostream&} 流出流
-	 * @param src {const char*} 邮件内容的起始地址，如果为空指针，
-	 *  则从构造函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @param len {int} 邮件内容的数据长度，如果为0，则从构造
-	 *  函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @return {bool} 是否成功
+	 * Convert this node's body data to the specified output stream.
+	 * @param out {ostream&} Output stream
+	 * @param src {const char*} Starting address of email data. If NULL pointer,
+	 *  then use the emailFile file provided by the constructor to read email data.
+	 * @param len {int} Length of email data content. If 0, then use the
+	 * constructor's
+	 *  provided emailFile file to read email data.
+	 * @return {bool} Whether successful
 	 */
 	bool save(ostream& out, const char* src = NULL, int len = 0) const;
 
 	/**
-	 * 转储本结点内容于指定的文件中
-	 * @param outFile {const char*} 目标文件名
-	 * @param src {const char*} 邮件内容的起始地址，如果为空指针，
-	 *  则从构造函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @param len {int} 邮件内容的数据长度，如果为0，则从构造
-	 *  函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @return {bool} 是否成功
+	 * Convert this node's body data to the specified file.
+	 * @param outFile {const char*} Target file name
+	 * @param src {const char*} Starting address of email data. If NULL pointer,
+	 *  then use the emailFile file provided by the constructor to read email data.
+	 * @param len {int} Length of email data content. If 0, then use the
+	 * constructor's
+	 *  provided emailFile file to read email data.
+	 * @return {bool} Whether successful
 	 */
 	bool save(const char* outFile, const char* src = NULL, int len = 0) const;
 
 	/**
-	 * 转储本结点内容于缓冲区中
-	 * @param out {string&} 缓冲区
-	 * @param src {const char*} 邮件内容的起始地址，如果为空指针，
-	 *  则从构造函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @param len {int} 邮件内容的数据长度，如果为0，则从构造
-	 *  函数中所提供的 emailFile 的文件中提取邮件内容
-	 * @return {bool} 是否成功
+	 * Convert this node's body data to a string buffer.
+	 * @param out {string&} Output buffer
+	 * @param src {const char*} Starting address of email data. If NULL pointer,
+	 *  then use the emailFile file provided by the constructor to read email data.
+	 * @param len {int} Length of email data content. If 0, then use the
+	 * constructor's
+	 *  provided emailFile file to read email data.
+	 * @return {bool} Whether successful
 	 */
 	bool save(string& out, const char* src, int len) const;
 
 	/**
-	 * 获得本结点对应的父结点对象
-	 * @return {mime_node*} 为空则表示本结点没有父结点(则说明
-	 *  本结点为邮件的根结点); 否则则返回的父结点需要在用完后
-	 *  delete 掉以释放相应内存
+	 * Get the parent node corresponding to this node.
+	 * @return {mime_node*} Returns NULL if this node has no parent (i.e.,
+	 * this node is the email's root node); otherwise, returns the parent node. The
+	 * caller needs to use
+	 *  delete to release the corresponding memory.
 	 */
 	mime_node* get_parent() const;
 
 	/**
-	 * 判断本结点是否有父结点
-	 * @return {bool} true 则表示有父结点, 否则表示没有
+	 * Determine whether this node has a parent.
+	 * @return {bool} true means there is a parent, false means there is not.
 	 */
 	bool has_parent() const;
 
 	/**
-	 * 获得父结点的主类型 (MIME_CTYPE_XXX), 如果为 MIME_CTYPE_OTHER
-	 * 则说明父结点不存在或父结点的主类型未知
+	 * Get parent node's main type (MIME_CTYPE_XXX). If return value is
+	 * MIME_CTYPE_OTHER,
+	 * it means this node does not exist or parent node's main type is unknown.
 	 * @return {int} MIME_CTYPE_XXX
 	 */
 	int parent_ctype() const;
 	const char* parent_ctype_s() const;
 
 	/**
-	 * 获得父结点的从类型 (MIME_STYPE_XXX), 如果为 MIME_STYPE_OTHER
-	 * 则说明父结点不存在或父结点的从类型未知
+	 * Get parent node's sub type (MIME_STYPE_XXX). If return value is
+	 * MIME_STYPE_OTHER,
+	 * it means this node does not exist or parent node's sub type is unknown.
 	 * @return {int} MIME_STYPE_XXX
 	 */
 	int parent_stype() const;
 	const char* parent_stype_s() const;
 
 	/**
-	 * 获得父结点的编码类型 (MIME_ENC_XXX), 如果返回值为 MIME_ENC_OTHER
-	 * 则说明父结点不存在或父结点的编码类型未知
+	 * Get parent node's encoding method (MIME_ENC_XXX). If return value is
+	 * MIME_ENC_OTHER,
+	 * it means this node does not exist or parent node's encoding method is
+	 * unknown.
 	 * @return {int} MIME_ENC_XXX
 	 */
 	int parent_encoding() const;
 
 	/**
-	 * 获得父结点的字符集类型, 如果返回值为空则说明父结点不存在或父结点
-	 * 中没有字符集类型
+	 * Get parent node's character set string. If return value is NULL, it means
+	 * this node does not exist or parent
+	 * node has no character set string.
 	 * @return {const char*}
 	 */
 	char* parent_charset() const;
 
 	/**
-	 * 获得父结点的数据体起始偏移量
-	 * @return {off_t} 返回值为 -1 表示父结点不存在
+	 * Get parent node's body starting offset.
+	 * @return {off_t} Return value of -1 means this node does not exist.
 	 */
 	off_t parent_bodyBegin() const;
 
 	/**
-	 * 获得父结点的数据体结束偏移量
-	 * @return {off_t} 返回值为 -1 表示父结点不存在
+	 * Get parent node's body ending offset.
+	 * @return {off_t} Return value of -1 means this node does not exist.
 	 */
 	off_t parent_bodyEnd() const;
 
 	/**
-	 * 获得父结点头部中某个字段名对应的字段值, 如: Content-Type
-	 * @param name {const char*} 字段名
-	 * @return {const char*} 字段值, 返回空则说明父结点不存在
-	 *  或父结点头部中不存在该字段
+	 * Get the value corresponding to a certain header field name in parent node,
+	 * e.g.: Content-Type
+	 * @param name {const char*} Field name
+	 * @return {const char*} Field value. Returns empty if this node does not exist
+	 *  or parent node's header does not contain this field.
 	 */
 	const char* parent_header_value(const char* name) const;
 
@@ -266,3 +281,4 @@ protected:
 } // namespace acl
 
 #endif // !defined(ACL_MIME_DISABLE)
+

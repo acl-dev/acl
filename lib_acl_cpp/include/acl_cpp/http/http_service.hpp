@@ -8,75 +8,90 @@ namespace acl {
 class string;
 
 /**
- * HTTP 服务请求类，子类必须继承该类
+ * HTTP service request class. Subclasses must inherit this class
  */
 class ACL_CPP_API http_service_request : public http_header {
 public:
 	/**
-	 * 构造函数
-	 * @param domain {const char*} HTTP 服务器的域名(也可以是IP)，非空
-	 *  如果传入了空值，则会 fatal
-	 * @param port {unsigned short} HTTP 服务端口
+	 * Constructor
+	 * @param domain {const char*} Domain name of HTTP server (can also be IP),
+	 * non-empty.
+	 *  If empty value is passed, will fatal
+	 * @param port {unsigned short} HTTP service port
 	 */
 	http_service_request(const char* domain, unsigned short port);
 
 	/**
-	 * 获得由构造函数输入的 domain
-	 * @return {const char*} 永不为空
+	 * Get domain input by constructor
+	 * @return {const char*} Never empty
 	 */
 	const char* get_domain() const;
 
 	/**
-	 * 获得由构造函数输入的 port
+	 * Get port input by constructor
 	 * @return {unsigned short}
 	 */
 	unsigned short get_port() const;
 
 	/**
-	 * 当任务处理完毕或出错时，内部处理过程会自动调用 destroy 接口，
-	 * 子类可以在该接口内进行一些释放过程，尤其当该对象是动态创建时，
-	 * 子类应该在该函数内 delete this 以删除自己，因为该函数最终肯定
-	 * 会被调用，所以子类不应在其它地方进行析构操作
+	 * When task processing is complete or error occurs, internal processing will
+	 * automatically call destroy interface.
+	 * Subclasses can perform some release process in this interface, especially
+	 * when this object is dynamically created,
+	 * subclasses should delete this in this function to delete themselves, because
+	 * this function will definitely
+	 * be called, so subclasses should not perform destruction operations elsewhere
 	 */
 	virtual void destroy() {}
 
 	//////////////////////////////////////////////////////////////////////
-	// 子类必须实现如此虚接口
+	// Subclasses must implement the following virtual interfaces
 
 	/**
-	 * 获得 HTTP 请求体数据，该函数会在请求过程中被循环调用，直到返回的数据
-	 * 对象中的数据为空
-	 * @return {const string*} 请求体结果数据，如果返回空指针或返回的缓冲区
-	 *  对象的数据为空(即 string->empty()) 则表示 HTTP 请求体数据结束
-	 * 注意：与其它函数不同，该虚接口是另外的子线程中被调用的，所以如果子类
-	 * 实现了该接口，如果需要调用与原有线程具备竞争的资源时应该注意加锁保护
+	 * Get HTTP request body data. This function will be called in a loop during
+	 * request process until returned data
+	 * object's data is empty
+	 * @return {const string*} Request body result data. If returns NULL pointer or
+	 * returned buffer
+	 * object's data is empty (i.e., string->empty()), it indicates HTTP request
+	 * body data ends
+	 * Note: Different from other functions, this virtual interface is called in
+	 * another child thread, so if subclass
+	 * implements this interface and needs to call resources that compete with
+	 * original thread, should pay attention to lock protection
 	 */
 	virtual const string* get_body();
 
 	/**
-	 * 当获得 HTTP 服务器的 HTTP 响应头时的回调接口
-	 * @param addr {const char*} 与服务器之间的连接地址，格式：IP:PORT
-	 * @param hdr {const HTTP_HDR_RES*} HTTP 响应头，该结构定义参见：
+	 * Callback interface when HTTP response header from HTTP server is obtained
+	 * @param addr {const char*} Connection address with server, format: IP:PORT
+	 * @param hdr {const HTTP_HDR_RES*} HTTP response header. Structure definition
+	 * see:
 	 *  acl_project/lib_protocol/include/http/lib_http_struct.h
 	 */
 	virtual void on_hdr(const char* addr, const HTTP_HDR_RES* hdr) = 0;
 
 	/**
-	 * 当获得 HTTP 服务器的 HTTP 响应体时的回调接口，当 HTTP 响应体数据
-	 * 比较大时，该回调会被多次调用，直到出错(会调用 on_error)或数据读完
-	 * 时，该回调的两个参数均 0，当 data 及 dlen 均为 0 时，表明读 HTTP
-	 * 响应体结束
-	 * @param data {const char*} 某次读操作时 HTTP 响应体数据
-	 * @param dlen {size_t} 某次读操作时 HTTP 响应体数据长度
-	 * 注：如果 HTTP 响应只有头数据而没有数据体，则也会调用该函数通知用户
-	 *     HTTP 会话结束
+	 * Callback interface when HTTP response body from HTTP server is obtained.
+	 * When HTTP response body data
+	 * is relatively large, this callback will be called multiple times until error
+	 * (will call on_error) or data is read completely.
+	 * When both parameters of this callback are 0, when data and dlen are both 0,
+	 * it indicates reading HTTP
+	 * response body ends
+	 * @param data {const char*} HTTP response body data during a read operation
+	 * @param dlen {size_t} HTTP response body data length during a read operation
+	 * Note: If HTTP response only has header data and no body data, this function
+	 * will also be called to notify user
+	 *     that HTTP session ends
 	 */
 	virtual void on_body(const char* data, size_t dlen) = 0;
 
 	/**
-	 * 在 HTTP 请求或响应过程中如果出错，则会调用此接口，通知子类出错，
-	 * 在调用此接口后
-	 * @param errnum {http_status_t} 出错码
+	 * If error occurs during HTTP request or response process, this interface will
+	 * be called to notify subclass of error.
+	 * After calling this interface
+	 * @param errnum {http_status_t} Error code
 	 */
 	virtual void on_error(http_status_t errnum) = 0;
 
@@ -93,51 +108,61 @@ class aio_socket_stream;
 class ACL_CPP_API http_service : public ipc_service {
 public:
 	/**
-	 * 构造函数
-	 * @param nthread {int} 如果该值 > 1 则内部自动采用线程池，否则
-	 *  则是一个请求一个线程
-	 * @param nwait {int} 当异步引擎采用 ENGINE_WINMSG 时，为了避免
-	 *  因任务线程发送的数据消息过快而阻塞了主线程的 _WIN32 消息循环，
-	 *  在任务线程发送数据消息时自动休眠的毫秒数；对于其它异步引擎，
-	 *  该值也可以用于限速功能
-	 * @param win32_gui {bool} 是否是窗口类的消息，如果是，则内部的
-	 *  通讯模式自动设置为基于 _WIN32 的消息，否则依然采用通用的套接
-	 *  口通讯方式
+	 * Constructor
+	 * @param nthread {int} If this value > 1, internally automatically uses thread
+	 * pool, otherwise
+	 *  it is one request per thread
+	 * @param nwait {int} When asynchronous engine uses ENGINE_WINMSG, to avoid
+	 * blocking main thread's _WIN32 message loop due to task thread sending data
+	 * messages too fast,
+	 * automatically sleeps for milliseconds when task thread sends data messages.
+	 * For other asynchronous engines,
+	 *  this value can also be used for rate limiting function
+	 * @param win32_gui {bool} Whether it is window class message. If yes, then
+	 * internally
+	 * communication mode is automatically set to _WIN32 message based, otherwise
+	 * still uses common socket
+	 *  communication method
 	 */
 	explicit http_service(int nthread = 1, int nwait = 1, bool win32_gui = false);
 	~http_service();
 
 	/**
-	 * 应用调用此函数开始 HTTP 会话过程，由 http_service 类对象负责
-	 * 向服务器异步发出 HTTP 请求，同时异步读取来自于 HTTP 服务器的响应
-	 * @param req {http_service_request*} HTTP 请求类对象
+	 * Application calls this function to start HTTP session process. http_service
+	 * class object is responsible
+	 * for asynchronously sending HTTP request to server, and asynchronously
+	 * reading response from HTTP server
+	 * @param req {http_service_request*} HTTP request class object
 	 */
 	void do_request(http_service_request* req);
 protected:
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * 基类虚函数，当收到来自于子线程的 win32 消息时的回调函数
-	 * @param hWnd {HWND} 窗口句柄
-	 * @param msg {UINT} 用户自定义消息号
-	 * @param wParam {WPARAM} 参数
-	 * @param lParam {LPARAM} 参数
+	 * Base class virtual function. Callback function when win32 message from child
+	 * thread is received
+	 * @param hWnd {HWND} Window handle
+	 * @param msg {UINT} User-defined message number
+	 * @param wParam {WPARAM} Parameter
+	 * @param lParam {LPARAM} Parameter
 	 */
 	virtual void win32_proc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #endif
 	/**
-	 * 基类虚函数，当有新连接到达时基类回调此函数
-	 * @param client {aio_socket_stream*} 接收到的新的客户端连接
+	 * Base class virtual function. Called by base class when new connection
+	 * arrives
+	 * @param client {aio_socket_stream*} Newly received client connection
 	 */
 	virtual void on_accept(aio_socket_stream* client);
 
 	/**
-	 * 基类虚函数，当监听流成功打开后的回调函数
-	 * @param addr {const char*} 实际的监听地址，格式：IP:PORT
+	 * Base class virtual function. Callback function after listening stream is
+	 * successfully opened
+	 * @param addr {const char*} Actual listening address, format: IP:PORT
 	 */
 	virtual void on_open(const char*addr);
 
 	/**
-	 * 基类虚函数，当监听流关闭时的回调函数
+	 * Base class virtual function. Callback function when listening stream closes
 	 */
 	virtual void on_close();
 
@@ -148,3 +173,4 @@ private:
 };
 
 }  // namespace acl
+

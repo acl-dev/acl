@@ -13,27 +13,35 @@ class HttpServletRequest;
 class HttpServletResponse;
 
 /**
- * 处理 HTTP 客户端请求的基类，子类需要继承该类
+ * Base class for handling HTTP client requests. Subclasses need to inherit this
+ * class
  */
 class ACL_CPP_API HttpServlet : public noncopyable {
 public:
 	/**
-	 * 构造函数
-	 * @param stream {socket_stream*} 当在 acl_master 服务器框架控制下
-	 *  运行时，该参数必须非空；当在 apache 下以 CGI 方式运行时，该参数
-	 *  设为 NULL；另外，该函数内部不会关闭流连接，应用应自行处理流对象
-	 *  的关闭情况，这样可以方便与 acl_master 架构结合
-	 * @param session {session*} 每一个 HttpServlet 对象一个 session 对象
+	 * Constructor
+	 * @param stream {socket_stream*} When running under control of acl_master
+	 * server framework,
+	 * this parameter must be non-empty. When running in CGI mode under apache,
+	 * this parameter
+	 * is set to NULL. In addition, this function internally will not close stream
+	 * connection. Application should handle stream object
+	 *  closing itself, which facilitates integration with acl_master architecture
+	 * @param session {session*} One session object per HttpServlet object
 	 */
 	HttpServlet(socket_stream* stream, session* session);
 	explicit HttpServlet(socket_stream* stream);
 
 	/**
-	 * 构造函数（该函数已经废弃，请用其它构造方法）
-	 * @param stream {socket_stream*} 当在 acl_master 服务器框架控制下
-	 *  运行时，该参数必须非空；当在 apache 下以 CGI 方式运行时，该参数
-	 *  设为 NULL；另外，该函数内部不会关闭流连接，应用应自行处理流对象
-	 *  的关闭情况，这样可以方便与 acl_master 架构结合
+	 * Constructor (this function is deprecated, please use other construction
+	 * methods)
+	 * @param stream {socket_stream*} When running under control of acl_master
+	 * server framework,
+	 * this parameter must be non-empty. When running in CGI mode under apache,
+	 * this parameter
+	 * is set to NULL. In addition, this function internally will not close stream
+	 * connection. Application should handle stream object
+	 *  closing itself, which facilitates integration with acl_master architecture
 	 * @param memcache_addr {const char*}
 	 */
 	//@ACL_DEPRECATED
@@ -51,153 +59,175 @@ public:
 	}
 
 	/**
-	 * 设置本地字符集，如果设置了本地字符集，则在接收 HTTP 请求数据时，会
-	 * 自动将请求的字符集转为本地字符集；该函数必须在 doRun 之前调用才有效
-	 * @param charset {const char*} 本地字符集，如果该指针为空，
-	 *  则清除本地字符集
+	 * Set local character set. If local character set is set, when receiving HTTP
+	 * request data, will
+	 * automatically convert request's character set to local character set. This
+	 * function must be called before doRun to be effective
+	 * @param charset {const char*} Local character set. If this pointer is empty,
+	 *  clears local character set
 	 * @return {HttpServlet&}
 	 */
 	HttpServlet& setLocalCharset(const char* charset);
 
 	/**
-	 * 设置 HTTP 会话过程 IO 读写超时时间；该函数必须在 doRun 前调用才有效
-	 * @param rw_timeout {int} 读写超时时间(秒)
+	 * Set HTTP session process IO read/write timeout. This function must be called
+	 * before doRun to be effective
+	 * @param rw_timeout {int} Read/write timeout (seconds)
 	 * @return {HttpServlet&}
 	 */
 	HttpServlet& setRwTimeout(int rw_timeout);
 
 	/**
-	 * 针对 POST 方法，该方法设置是否需要解析 Form 数据体数据，默认为解析，
-	 * 该函数必须在 doRun 之前调用才有效；当数据体为数据流或 MIME 格式，
-	 * 即使调用本方法设置了解析数据，也不会对数据体进行解析
-	 * @param yes {bool} 是否需要解析
+	 * For POST method, this method sets whether to parse Form body data. Default
+	 * is to parse.
+	 * This function must be called before doRun to be effective. When body data is
+	 * data stream or MIME format,
+	 * even if this method is called to set parsing data, body data will not be
+	 * parsed
+	 * @param yes {bool} Whether to parse
 	 * @return {HttpServlet&}
 	 */
 	HttpServlet& setParseBody(bool yes);
 
 	/**
-	 * 针对 POST 方法，该方法设置解析数据体的最大长度，如果数据体，该函数
-	 * 必须在 doRun 之前调用才有效
-	 * @param length {int} 最大长度限制，如果请求的数据体长度过大，则直接
-	 *  返回 false，如果该值 <= 0 则内部不限制数据体长度，调用该函数前
-	 *  内部缺省值为 0
+	 * For POST method, this method sets maximum length for parsing body data. If
+	 * body data exceeds this length, this function
+	 * must be called before doRun to be effective
+	 * @param length {int} Maximum length limit. If request body data length is too
+	 * large, directly
+	 * returns false. If this value <= 0, internally does not limit body data
+	 * length. Internal default value before calling this function is 0
 	 * @return {HttpServlet&}
 	 */
 	HttpServlet& setParseBodyLimit(int length);
 	
 	/**
-	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数，
-	 * @return {bool} 返回处理结果，返回 false 表示处理失败，则应关闭连接，
-	 *  返回 true 表示处理成功，调用此函数后应该继续通过判断请求/响应对象中
-	 *  是否需要保持长连接来确实最终是否保持长连接
+	 * HttpServlet object starts running, receives HTTP requests, and calls
+	 * following doXXX virtual functions.
+	 * @return {bool} Returns processing result. Returns false indicates processing
+	 * failed, should close connection.
+	 * Returns true indicates processing succeeded. After calling this function,
+	 * should continue to determine whether to maintain long connection
+	 * based on whether request/response objects require maintaining long
+	 * connection
 	 */
 	bool start();
 
 	/**
-	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数，
-	 * 该函数首先会调用 start 过程，然后根据 start 的返回结果及请求/响应
-	 * 对象是否要求保持长连接来决定是否需要与客户端保持长连接
-	 * @return {bool} 返回处理结果，返回 false 表示处理失败或处理成功且不保持
-	 *  长连接，应关闭连接
+	 * HttpServlet object starts running, receives HTTP requests, and calls
+	 * following doXXX virtual functions.
+	 * This function first calls start process, then decides whether to maintain
+	 * long connection with client based on start's return result and whether
+	 * request/response
+	 * objects require maintaining long connection
+	 * @return {bool} Returns processing result. Returns false indicates processing
+	 * failed or processing succeeded but not maintaining
+	 *  long connection, should close connection
 	 */
 	virtual bool doRun();
 
 	/**
-	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数
-	 * @param session {session&} 存储 session 数据的对象
-	 * @param stream {socket_stream*} 当在 acl_master 服务器框架控制下
-	 *  运行时，该参数必须非空；当在 apache 下以 CGI 方式运行时，该参数
-	 *  设为 NULL；另外，该函数内部不会关闭流连接，应用应自行处理流对象
-	 *  的关闭情况，这样可以方便与 acl_master 架构结合
-	 * @return {bool} 返回处理结果
+	 * HttpServlet object starts running, receives HTTP requests, and calls
+	 * following doXXX virtual functions
+	 * @param session {session&} Object for storing session data
+	 * @param stream {socket_stream*} When running under control of acl_master
+	 * server framework,
+	 * this parameter must be non-empty. When running in CGI mode under apache,
+	 * this parameter
+	 * is set to NULL. In addition, this function internally will not close stream
+	 * connection. Application should handle stream object
+	 *  closing itself, which facilitates integration with acl_master architecture
+	 * @return {bool} Returns processing result
 	 */
 	virtual bool doRun(session& session, socket_stream* stream = NULL);
 
 	/**
-	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数，
-	 * 调用本函数意味着采用 memcached 来存储 session 数据
-	 * @param memcached_addr {const char*} memcached 服务器地址，格式：IP:PORT
-	 * @param stream {socket_stream*} 含义同上
-	 * @return {bool} 返回处理结果
+	 * HttpServlet object starts running, receives HTTP requests, and calls
+	 * following doXXX virtual functions.
+	 * Calling this function means using memcached to store session data
+	 * @param memcached_addr {const char*} memcached server address, format:
+	 * IP:PORT
+	 * @param stream {socket_stream*} Same meaning as above
+	 * @return {bool} Returns processing result
 	 */
 	virtual bool doRun(const char* memcached_addr, socket_stream* stream);
 
 protected:
 	/**
-	 * 当 HTTP 请求为 GET 方式时调用的虚函数
+	 * Virtual function called when HTTP request is GET method
 	 */
 	virtual bool doGet(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * 当 HTTP 请求为 websocket 方式时调用的虚函数
+	 * Virtual function called when HTTP request is websocket method
 	 */
 	virtual bool doWebSocket(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * 旧的处理 websocket 接口，请重载上面的 doWebSocket 方法
+	 * Old websocket handling interface, please override doWebSocket method above
 	 */
 	virtual bool doWebsocket(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * 当 HTTP 请求为 POST 方式时调用的虚函数
+	 * Virtual function called when HTTP request is POST method
 	 */
 	virtual bool doPost(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * 当 HTTP 请求为 PUT 方式时调用的虚函数
+	 * Virtual function called when HTTP request is PUT method
 	 */
 	virtual bool doPut(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * 当 HTTP 请求为 PATCH 方式时调用的虚函数
+	 * Virtual function called when HTTP request is PATCH method
 	 */
 	virtual bool doPatch(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * 当 HTTP 请求为 CONNECT 方式时调用的虚函数
+	 * Virtual function called when HTTP request is CONNECT method
 	 */
 	virtual bool doConnect(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * 当 HTTP 请求为 PURGE 方式时调用的虚函数，该方法在清除 SQUID 的缓存
-	 * 时会用到
+	 * Virtual function called when HTTP request is PURGE method. This method is
+	 * used when clearing SQUID cache
 	 */
 	virtual bool doPurge(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * 当 HTTP 请求为 DELETE 方式时调用的虚函数
+	 * Virtual function called when HTTP request is DELETE method
 	 */
 	virtual bool doDelete(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * 当 HTTP 请求为 HEAD 方式时调用的虚函数
+	 * Virtual function called when HTTP request is HEAD method
 	 */
 	virtual bool doHead(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * 当 HTTP 请求为 OPTION 方式时调用的虚函数
+	 * Virtual function called when HTTP request is OPTION method
 	 */
 	virtual bool doOptions(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * 当 HTTP 请求为 PROPFIND 方式时调用的虚函数
+	 * Virtual function called when HTTP request is PROPFIND method
 	 */
 	virtual bool doPropfind(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * 当 HTTP 请求方法未知时调用的虚函数
-	 * @param method {const char*} 其它未知的请求方法
+	 * Virtual function called when HTTP request method is unknown
+	 * @param method {const char*} Other unknown request methods
 	 */
 	virtual bool doOther(HttpServletRequest&, HttpServletResponse&,
 		const char* method);
 
 	/**
-	 * 当 HTTP 请求方法未知时调用的虚函数
+	 * Virtual function called when HTTP request method is unknown
 	 */
 	virtual bool doUnknown(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * 当 HTTP 请求出错时调用的虚函数
+	 * Virtual function called when HTTP request error occurs
 	 */
 	virtual bool doError(HttpServletRequest&, HttpServletResponse&);
 
@@ -221,3 +251,4 @@ private:
 } // namespace acl
 
 #endif // ACL_CLIENT_ONLY
+

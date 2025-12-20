@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 //  $Id: vld.h,v 1.27 2006/11/12 18:09:20 dmouldin Exp $
 //
 //  Visual Leak Detector (Version 1.9d) - Import Library Header
@@ -18,9 +18,10 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
-//  See COPYING.txt for the full terms of the GNU Lesser General Public License.
+//  See COPYING.txt for the full terms of the GNU Lesser
+//  General Public License.
 //
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 #pragma once
 
@@ -28,12 +29,13 @@
 
 #pragma comment(lib, "vld.lib")
 
-// Force a symbolic reference to the global VisualLeakDetector class object from
+// Force a symbolic reference to the global VisualLeakDetector
+// class object from
 // the DLL. This enusres that the DLL is loaded and linked with the program,
 // even if no code otherwise imports any of the DLL's exports.
 #pragma comment(linker, "/include:__imp_?vld@@3VVisualLeakDetector@@A")
 
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 //
 //  Visual Leak Detector APIs
 //

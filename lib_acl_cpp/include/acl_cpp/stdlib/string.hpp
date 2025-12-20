@@ -15,49 +15,55 @@ namespace acl {
 class dbuf_pool;
 
 /**
- * 该类为字符串处理类，支持大部分 std::string 中的功能，同时支持其不支持的一些
- * 功能；该类内部自动保证最后一个字符为 \0
+ * This is a string buffer class that supports most functions in std::string,
+ * and also supports some
+ * functions that std::string does not support. Additionally, internally
+ * automatically ensures the last character is \0.
  */
 class ACL_CPP_API string {
 public:
 	/**
-	 * 构造函数
-	 * @param n {size_t} 初始时分配的内存大小
-	 * @param bin {bool} 是否以二进制方式构建缓冲区对象，该值为 true 时，
-	 *  则当调用 += int|int64|short|char 或调用 << int|int64|short|char
-	 *  时，则按二进制方式处理，否则按文本方式处理
+	 * Constructor
+	 * @param n {size_t} Initial allocated memory size.
+	 * @param bin {bool} Whether to automatically use binary mode. When this value
+	 * is true,
+	 *  when calling += int|int64|short|char or << int|int64|short|char
+	 * operations, it will append in binary mode. Otherwise, it will append in text
+	 * format.
 	 */
 	string(size_t n, bool bin);
 	explicit string(size_t n);
 	string();
 
 	/**
-	 * 构造函数
-	 * @param s {const string&} 源字符串对象，初始化后的类对象内部自动复制
-	 *  该字符串
+	 * Constructor
+	 * @param s {const string&} Source string object. Initializes buffer.
+	 * Internally automatically copies
+	 *  string.
 	 */
 	string(const string& s);
 
 	/**
-	 * 构造函数
-	 * @param s {const char*} 内部自动用该字符串初始化类对象，s 必须是
-	 *  以 \0 结尾
+	 * Constructor
+	 * @param s {const char*} Internally automatically uses this string to
+	 * initialize buffer. s must
+	 *  end with \0.
 	 */
 	string(const char* s);
 
 	/**
-	 * 构造函数
-	 * @param s {const char*} 源缓冲内容
-	 * @param n {size_t} s 缓冲区数据长度
+	 * Constructor
+	 * @param s {const char*} Source buffer address.
+	 * @param n {size_t} Data length of s buffer.
 	 */
 	string(const void* s, size_t n);
 
 	/**
-	 * 采用内存映射文件方式构造对象
-	 * @param fd {int} 文件句柄
-	 * @param max {size_t} 所映射的最大空间大小
-	 * @param n {size_t} 初始化大小
-	 * @param offset {size_t} 内存映射文件中的起始位置
+	 * Constructor using memory-mapped file format.
+	 * @param fd {int} File descriptor.
+	 * @param max {size_t} Maximum mapped buffer space size.
+	 * @param n {size_t} Initial buffer size.
+	 * @param offset {size_t} Start position in memory-mapped file.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	string(void* fd, size_t max, size_t n, size_t offset = 0);
@@ -68,121 +74,143 @@ public:
 	~string();
 
 	/**
-	 * 设置字符串类对象为二进制处理模式
-	 * @param bin {bool} 当该值为 true 时，则设置字符串类对象为二进制处理
-	 *  方式；否则为文本方式；为 true 时，则当调用 += int|int64|short|char
-	 *  或调用 << int|int64|short|char 时，则按二进制方式处理，否则按文本
-	 *  方式处理
+	 * Set string buffer to binary append mode.
+	 * @param bin {bool} When this value is true, sets string buffer to binary
+	 * append
+	 * mode. Otherwise, it is text format. When true, when calling +=
+	 * int|int64|short|char
+	 * or << int|int64|short|char operations, it will append in binary mode.
+	 * Otherwise, it will append in text
+	 *  format.
 	 * @return {string&}
 	 */
 	string& set_bin(bool bin);
 
 	/**
-	 * 设置缓冲区的最大长度，以避免缓冲区溢出
+	 * Set user-defined maximum length to avoid buffer overflow.
 	 * @param max {int}
 	 * @return {string&}
 	 */
 	string& set_max(int  max);
 
 	/**
-	 * 判断当前字符串类对象是否为二进制处理方式 
-	 * @return {bool} 返回值为 true 时则表示为二进制方式
+	 * Determine whether current string buffer is in binary append mode.
+	 * @return {bool} Return value is true to indicate binary mode.
 	 */
 	bool get_bin() const;
 
 	/**
-	 * 返回当前缓冲区的最大长度限制，若返回值 <= 0 则表示没有限制
+	 * Get current buffer's maximum length limit. When return value <= 0, it means
+	 * no limit.
 	 * @return {int}
 	 */
 	int get_max() const;
 
 	/**
-	 * 根据字符数组下标获得指定位置的字符，输入参数必须为合法值，否则则
-	 * 内部产生断言
-	 * @param n {size_t} 指定的位置（该值 >= 0 且 < 字符串长度)，如果越界
-	 *  则产生断言
-	 * @return {char} 返回指定位置的字符
+	 * Get character at specified position in string buffer by subscript. When
+	 * subscript value is valid, internally
+	 * automatically checks bounds.
+	 * @param n {size_t} Specified position. This value >= 0 and < string buffer
+	 * length). Cannot exceed
+	 *  bounds, otherwise error occurs.
+	 * @return {char} Character at specified position.
 	 */
 	char operator[](size_t n) const;
 
 	/**
-	 * 根据字符数组下标获得指定位置的字符，输入参数必须为合法值，否则则
-	 * 内部产生断言
-	 * @param n {int} 指定的位置（该值 >= 0 且 < 字符串长度)，如果越界，
-	 *  则产生断言
-	 * @return {char} 返回指定位置的字符
+	 * Get character at specified position in string buffer by subscript. When
+	 * subscript value is valid, internally
+	 * automatically checks bounds.
+	 * @param n {int} Specified position. This value >= 0 and < string buffer
+	 * length). Cannot exceed bounds,
+	 *  otherwise error occurs.
+	 * @return {char} Character at specified position.
 	 */
 	char operator[](int n) const;
 
 	/**
-	 * 左值赋值重载，用户可以直接使用对象的数组下标进行赋值，如果下标组值
-	 * 越界，则内部会自动扩充缓冲区空间
-	 * @param n {size_t} 数组下标位置
+	 * Assignment value operator. Users can directly use this object's subscript
+	 * for assignment. When subscript value
+	 * exceeds bounds, internally automatically expands buffer space.
+	 * @param n {size_t} Target subscript position.
 	 * @return {char&}
 	 */
 	char& operator[](size_t n);
 
 	/**
-	 * 左值赋值重载，用户可以直接使用对象的数组下标进行赋值，如果下标组值
-	 * 越界，则内部会自动扩充缓冲区空间
-	 * @param n {int} 数组下标位置，该值必须 >= 0
+	 * Assignment value operator. Users can directly use this object's subscript
+	 * for assignment. When subscript value
+	 * exceeds bounds, internally automatically expands buffer space.
+	 * @param n {int} Target subscript position. This value must be >= 0.
 	 * @return {char&}
 	 */
 	char& operator[](int n);
 
 	/**
-	 * 对目标字符串类对象赋值
-	 * @param s {const char*} 源字符串
-	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
+	 * Assign value to target string buffer.
+	 * @param s {const char*} Source string.
+	 * @return {string&} Returns reference to current object, convenient for
+	 * chaining operations on this object.
 	 */
 	string& operator=(const char* s);
 
 	/**
-	 * 对目标字符串类对象赋值
-	 * @param s {const string&} 源字符串对象
-	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
+	 * Assign value to target string buffer.
+	 * @param s {const string&} Source string object.
+	 * @return {string&} Returns reference to current object, convenient for
+	 * chaining operations on this object.
 	 */
 	string& operator=(const string& s);
 
 	/**
-	 * 对目标字符串类对象赋值
-	 * @param s {const string*} 源字符串对象
-	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
+	 * Assign value to target string buffer.
+	 * @param s {const string*} Source string object pointer.
+	 * @return {string&} Returns reference to current object, convenient for
+	 * chaining operations on this object.
 	 */
 	string& operator=(const string* s);
 
 	/**
-	 * 对目标字符串类对象赋值
-	 * @param s {const std::string&} 源字符串对象
-	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
+	 * Assign value to target string buffer.
+	 * @param s {const std::string&} Source string object.
+	 * @return {string&} Returns reference to current object, convenient for
+	 * chaining operations on this object.
 	 */
 	string& operator=(const std::string& s);
 
 	/**
-	 * 对目标字符串类对象赋值
-	 * @param s {const std::string*} 源字符串对象
-	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
+	 * Assign value to target string buffer.
+	 * @param s {const std::string*} Source string object pointer.
+	 * @return {string&} Returns reference to current object, convenient for
+	 * chaining operations on this object.
 	 */
 	string& operator=(const std::string* s);
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * 对目标字符串类对象赋值
-	 * @param n {long long int} 源 64 位符号长整数，若当前对象的当前状态为
-	 *  二进制模式，则该函数便会以二进制方式赋值给字符串对象，否则以文本方
-	 *  式赋值给字符串对象；关于二进制模式还是文本方式，其含义参见
+	 * Assign value to target string buffer.
+	 * @param n {long long int} Source 64-bit signed integer. When current buffer's
+	 * current state is
+	 * binary mode, this function automatically appends value to string buffer in
+	 * binary mode. Otherwise, it appends in text
+	 *  format. For details about binary mode and text format, see
 	 *  set_bin(bool)
-	 * @return {string&} 返回当前字对象的引用，便于对该类对象连续进行操作
+	 * @return {string&} Returns reference to current object, convenient for
+	 * chaining operations on this object.
 	 */
 	string& operator=(__int64 n);
 
 	/**
-	 * 对目标字符串类对象赋值
-	 * @param n {unsinged long long int} 源 64 位无符号长整数，若字符串对象
-	 *  的当前状态为二进制模式，则该函数便会以二进制方式赋值给字符串对象，
-	 *  否则以文本方式赋值给字符串对象；关于二进制模式还是文本方式，其含义
-	 *  参见 set_bin(bool)
-	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
+	 * Assign value to target string buffer.
+	 * @param n {unsinged long long int} Source 64-bit unsigned integer. When
+	 * string buffer's
+	 * current state is binary mode, this function automatically appends value to
+	 * string buffer
+	 * in binary mode. Otherwise, it appends in text format. For details about
+	 * binary mode and text format, see
+	 *  set_bin(bool)
+	 * @return {string&} Returns reference to current object, convenient for
+	 * chaining operations on this object.
 	 */
 	string& operator=(unsigned __int64);
 #else
@@ -191,126 +219,155 @@ public:
 #endif
 
 	/**
-	 * 对目标字符串类对象赋值
-	 * @param n {char} 源有符号字符；若字符串对象的当前状态为二进制模式，
-	 *  则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字
-	 *  符串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
+	 * Assign value to target string buffer.
+	 * @param n {char} Source signed character. When string buffer's current state
+	 * is binary mode,
+	 * this function automatically appends value to string buffer in binary mode.
+	 * Otherwise, it appends in text format. For
+	 *  details about binary mode and text format, see set_bin(bool)
+	 * @return {string&} Returns reference to current object, convenient for
+	 * chaining operations on this object.
 	 */
 	string& operator=(char n);
 
 	/**
-	 * 对目标字符串类对象赋值
-	 * @param n {char} 源无符号字符；若对象的当前状态为二进制模式，则该函数
-	 *  便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串对象；
-	 *  关于二进制模式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
+	 * Assign value to target string buffer.
+	 * @param n {char} Source unsigned character. When current state is binary
+	 * mode, this function
+	 * automatically appends value to string buffer in binary mode. Otherwise, it
+	 * appends in text format to string buffer.
+	 *  For details about binary mode and text format, see set_bin(bool)
+	 * @return {string&} Returns reference to current object, convenient for
+	 * chaining operations on this object.
 	 */
 	string& operator=(unsigned char n);
 
 	/**
-	 * 对目标字符串类对象赋值
-	 * @param n {char} 源有符号长整型；若对象当前状态为二进制模式，则该函数
-	 *  便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串对象；
-	 *  关于二进制模式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
+	 * Assign value to target string buffer.
+	 * @param n {char} Source signed long integer. When current state is binary
+	 * mode, this function
+	 * automatically appends value to string buffer in binary mode. Otherwise, it
+	 * appends in text format to string buffer.
+	 *  For details about binary mode and text format, see set_bin(bool)
+	 * @return {string&} Returns reference to current object, convenient for
+	 * chaining operations on this object.
 	 */
 	string& operator=(long n);
 
 	/**
-	 * 对目标字符串类对象赋值
-	 * @param n {char} 源无符号长整型；若字对象的当前状态为二进制模式，
-	 *  则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给
-	 *  字符串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
+	 * Assign value to target string buffer.
+	 * @param n {char} Source unsigned long integer. When current state is binary
+	 * mode,
+	 * this function automatically appends value to string buffer in binary mode.
+	 * Otherwise, it appends in text format to
+	 * string buffer. For details about binary mode and text format, see
+	 * set_bin(bool)
+	 * @return {string&} Returns reference to current object, convenient for
+	 * chaining operations on this object.
 	 */
 	string& operator=(unsigned long n);
 
 	/**
-	 * 对目标字符串类对象赋值
-	 * @param n {char} 源有符号整型；若字符串对象的当前状态为二进制模式，
-	 *  则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符
-	 *  串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
+	 * Assign value to target string buffer.
+	 * @param n {char} Source signed integer. When string buffer's current state is
+	 * binary mode,
+	 * this function automatically appends value to string buffer in binary mode.
+	 * Otherwise, it appends in text format to string
+	 *  buffer. For details about binary mode and text format, see set_bin(bool)
+	 * @return {string&} Returns reference to current object, convenient for
+	 * chaining operations on this object.
 	 */
 	string& operator=(int n);
 
 	/**
-	 * 对目标字符串类对象赋值
-	 * @param n {char} 源无符号整型；若字符串对象的当前状态为二进制模式，
-	 *  则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符
-	 *  串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
+	 * Assign value to target string buffer.
+	 * @param n {char} Source unsigned integer. When string buffer's current state
+	 * is binary mode,
+	 * this function automatically appends value to string buffer in binary mode.
+	 * Otherwise, it appends in text format to string
+	 *  buffer. For details about binary mode and text format, see set_bin(bool)
+	 * @return {string&} Returns reference to current object, convenient for
+	 * chaining operations on this object.
 	 */
 	string& operator=(unsigned int n);
 
 	/**
-	 * 对目标字符串类对象赋值
-	 * @param n {char} 源有符号短整型；若字符串对象的当前状态为二进制模式,
-	 *  则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符
-	 *  串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
+	 * Assign value to target string buffer.
+	 * @param n {char} Source signed short integer. When string buffer's current
+	 * state is binary mode,
+	 * this function automatically appends value to string buffer in binary mode.
+	 * Otherwise, it appends in text format to string
+	 *  buffer. For details about binary mode and text format, see set_bin(bool)
+	 * @return {string&} Returns reference to current object, convenient for
+	 * chaining operations on this object.
 	 */
 	string& operator=(short n);
 
 	/**
-	 * 对目标字符串类对象赋值
-	 * @param n {char} 源无符号短整型；若对象的当前状态为二进制模式，则该
-	 *  函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串
-	 *  对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
+	 * Assign value to target string buffer.
+	 * @param n {char} Source unsigned short integer. When current state is binary
+	 * mode, you
+	 * need to call this function to automatically append value to string buffer in
+	 * binary mode. Otherwise, it appends in text format to string
+	 *  buffer. For details about binary mode and text format, see set_bin(bool)
+	 * @return {string&} Returns reference to current object, convenient for
+	 * chaining operations on this object.
 	 */
 	string& operator=(unsigned short n);
 
 	/**
-	 * 向目标字符串对象尾部添加字符串
-	 * @param s {const char*} 源字符串指针
-	 * @return {string&} 目标字符串对象的引用
+	 * Append string to target string buffer at the end.
+	 * @param s {const char*} Source string pointer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator+=(const char* s);
 
 	/**
-	 * 向目标字符串对象尾部添加字符串
-	 * @param s {const string&} 源字符串对象引用
-	 * @return {string&} 目标字符串对象的引用
+	 * Append string to target string buffer at the end.
+	 * @param s {const string&} Source string object reference.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator+=(const string& s);
 
 	/**
-	 * 向目标字符串对象尾部添加字符串
-	 * @param s {const string*} 源字符串对象指针
-	 * @return {string&} 目标字符串对象的引用
+	 * Append string to target string buffer at the end.
+	 * @param s {const string*} Source string object pointer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator+=(const string* s);
 
 	/**
-	 * 向目标字符串对象尾部添加字符串
-	 * @param s {const std::string&} 源字符串对象引用
-	 * @return {string&} 目标字符串对象的引用
+	 * Append string to target string buffer at the end.
+	 * @param s {const std::string&} Source string object reference.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator+=(const std::string& s);
 
 	/**
-	 * 向目标字符串对象尾部添加字符串
-	 * @param s {const std::string*} 源字符串对象指针
-	 * @return {string&} 目标字符串对象的引用
+	 * Append string to target string buffer at the end.
+	 * @param s {const std::string*} Source string object pointer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator+=(const std::string* s);
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * 向目标字符串对象尾部添加有符号长整型数字，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long long int} 源 64 位有符号整数
-	 * @return {string&} 目标字符串对象的引用
+	 * Append signed integer number to target string buffer at the end. When target
+	 * string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long long int} Source 64-bit signed integer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator+=(__int64 n);
 
 	/**
-	 * 向目标字符串对象尾部添加无符号长整型数字，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long long int} 源 64 位无符号整数
-	 * @return {string&} 目标字符串对象的引用
+	 * Append unsigned integer number to target string buffer at the end. When
+	 * target string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long long int} Source 64-bit unsigned integer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator+=(unsigned __int64 n);
 #else
@@ -319,117 +376,137 @@ public:
 #endif
 
 	/**
-	 * 向目标字符串对象尾部添加有符号长整型数字，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long} 源有符号长整数
-	 * @return {string&} 目标字符串对象的引用
+	 * Append signed integer number to target string buffer at the end. When target
+	 * string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long} Source signed long integer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator+=(long n);
 
 	/**
-	 * 向目标字符串对象尾部添加无符号长整型数字，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long} 源无符号长整数
-	 * @return {string&} 目标字符串对象的引用
+	 * Append unsigned integer number to target string buffer at the end. When
+	 * target string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long} Source unsigned long integer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator+=(unsigned long n);
 
 	/**
-	 * 向目标字符串对象尾部添加有符号整型数字，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long} 源有符号整数
-	 * @return {string&} 目标字符串对象的引用
+	 * Append signed integer number to target string buffer at the end. When target
+	 * string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long} Source signed integer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator+=(int n);
 
 	/**
-	 * 向目标字符串对象尾部添加无符号整型数字，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long} 源无符号整数
-	 * @return {string&} 目标字符串对象的引用
+	 * Append unsigned integer number to target string buffer at the end. When
+	 * target string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long} Source unsigned integer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator+=(unsigned int n);
 
 	/**
-	 * 向目标字符串对象尾部添加有符号短整型数字，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long} 源有符号短整数
-	 * @return {string&} 目标字符串对象的引用
+	 * Append signed integer number to target string buffer at the end. When target
+	 * string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long} Source signed short integer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator+=(short n);
 
 	/**
-	 * 向目标字符串对象尾部添加无符号短整型数字，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long} 源无符号短整数
-	 * @return {string&} 目标字符串对象的引用
+	 * Append unsigned integer number to target string buffer at the end. When
+	 * target string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long} Source unsigned short integer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator+=(unsigned short n);
 
 	/**
-	 * 向目标字符串对象尾部添加有符号字符，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long} 源有符号字符
-	 * @return {string&} 目标字符串对象的引用
+	 * Append signed character to target string buffer at the end. When target
+	 * string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long} Source signed character.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator+=(char n);
 
 	/**
-	 * 向目标字符串对象尾部添加无符号字符，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long} 源无符号字符
-	 * @return {string&} 目标字符串对象的引用
+	 * Append unsigned character to target string buffer at the end. When target
+	 * string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long} Source unsigned character.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator+=(unsigned char n);
 
 	/**
-	 * 向目标字符串对象尾部添加字符串
-	 * @param s {const string&} 源字符串对象引用
-	 * @return {string&} 目标字符串对象的引用
+	 * Append string to target string buffer at the end.
+	 * @param s {const string&} Source string object reference.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator<<(const string& s);
 
 	/**
-	 * 向目标字符串对象尾部添加字符串
-	 * @param s {const string*} 源字符串对象指针
-	 * @return {string&} 目标字符串对象的引用
+	 * Append string to target string buffer at the end.
+	 * @param s {const string*} Source string object pointer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator<<(const string* s);
 
 	/**
-	 * 向目标字符串对象尾部添加字符串
-	 * @param s {const std::string&} 源字符串对象引用
-	 * @return {string&} 目标字符串对象的引用
+	 * Append string to target string buffer at the end.
+	 * @param s {const std::string&} Source string object reference.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator<<(const std::string& s);
 
 	/**
-	 * 向目标字符串对象尾部添加字符串
-	 * @param s {const std::string*} 源字符串对象指针
-	 * @return {string&} 目标字符串对象的引用
+	 * Append string to target string buffer at the end.
+	 * @param s {const std::string*} Source string object pointer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator<<(const std::string* s);
 
 	/**
-	 * 向目标字符串对象尾部添加字符串
-	 * @param s {const char*} 源字符串指针
-	 * @return {string&} 目标字符串对象的引用
+	 * Append string to target string buffer at the end.
+	 * @param s {const char*} Source string pointer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator<<(const char* s);
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * 向目标字符串对象尾部添加有符号长整型数字，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long long int} 源 64 位有符号整数
-	 * @return {string&} 目标字符串对象的引用
+	 * Append signed integer number to target string buffer at the end. When target
+	 * string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long long int} Source 64-bit signed integer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator<<(__int64 n);
 
 	/**
-	 * 向目标字符串对象尾部添加无符号长整型数字，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long long int} 源 64 位无符号整数
-	 * @return {string&} 目标字符串对象的引用
+	 * Append unsigned integer number to target string buffer at the end. When
+	 * target string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long long int} Source 64-bit unsigned integer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator<<(unsigned __int64 n);
 #else
@@ -438,109 +515,131 @@ public:
 #endif
 
 	/**
-	 * 向目标字符串对象尾部添加有符号长整型数字，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long} 源有符号长整数
-	 * @return {string&} 目标字符串对象的引用
+	 * Append signed integer number to target string buffer at the end. When target
+	 * string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long} Source signed long integer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator<<(long n);
 
 	/**
-	 * 向目标字符串对象尾部添加无符号长整型数字，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long} 源无符号长整数
-	 * @return {string&} 目标字符串对象的引用
+	 * Append unsigned integer number to target string buffer at the end. When
+	 * target string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long} Source unsigned long integer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator<<(unsigned long n);
 
 	/**
-	 * 向目标字符串对象尾部添加有符号整型数字，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long} 源有符号整数
-	 * @return {string&} 目标字符串对象的引用
+	 * Append signed integer number to target string buffer at the end. When target
+	 * string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long} Source signed integer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator<<(int n);
 
 	/**
-	 * 向目标字符串对象尾部添加无符号整型数字，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long} 源无符号整数
-	 * @return {string&} 目标字符串对象的引用
+	 * Append unsigned integer number to target string buffer at the end. When
+	 * target string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long} Source unsigned integer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator<<(unsigned int n);
 
 	/**
-	 * 向目标字符串对象尾部添加有符号短整型数字，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long} 源有符号短整数
-	 * @return {string&} 目标字符串对象的引用
+	 * Append signed integer number to target string buffer at the end. When target
+	 * string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long} Source signed short integer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator<<(short n);
 
 	/**
-	 * 向目标字符串对象尾部添加无符号短整型数字，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long} 源无符号短整数
-	 * @return {string&} 目标字符串对象的引用
+	 * Append unsigned integer number to target string buffer at the end. When
+	 * target string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long} Source unsigned short integer.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator<<(unsigned short n);
 
 	/**
-	 * 向目标字符串对象尾部添加有符号字符，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long} 源有符号字符
-	 * @return {string&} 目标字符串对象的引用
+	 * Append signed character to target string buffer at the end. When target
+	 * string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long} Source signed character.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator<<(char n);
 
 	/**
-	 * 向目标字符串对象尾部添加无符号字符，当为目标字符串对象为
-	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
-	 * @param n {long} 源无符号字符
-	 * @return {string&} 目标字符串对象的引用
+	 * Append unsigned character to target string buffer at the end. When target
+	 * string buffer is
+	 * binary mode, it appends in binary character format. Otherwise, it appends in
+	 * text format.
+	 * @param n {long} Source unsigned character.
+	 * @return {string&} Target string buffer reference.
 	 */
 	string& operator<<(unsigned char n);
 
 	/**
-	 * 将字符串对象中的内容赋予目标字符串对象
-	 * @param s {string*} 目标字符串对象
-	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
+	 * Copy data from string buffer to target string buffer.
+	 * @param s {string*} Target string buffer.
+	 * @return {size_t} Returns actual copied byte count. Returns 0 when empty() ==
+	 * true.
 	 */
 	size_t operator>>(string* s);
 
 	/**
-	 * 将字符串对象中的内容赋予目标字符串对象
-	 * @param s {string&} 目标字符串对象
-	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
+	 * Copy data from string buffer to target string buffer.
+	 * @param s {string&} Target string buffer.
+	 * @return {size_t} Returns actual copied byte count. Returns 0 when empty() ==
+	 * true.
 	 */
 	size_t operator>>(string& s);
 
 	/**
-	 * 将字符串对象中的内容赋予目标字符串对象
-	 * @param s {std::string*} 目标字符串对象
-	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
+	 * Copy data from string buffer to target string buffer.
+	 * @param s {std::string*} Target string buffer.
+	 * @return {size_t} Returns actual copied byte count. Returns 0 when empty() ==
+	 * true.
 	 */
 	size_t operator>>(std::string* s);
 
 	/**
-	 * 将字符串对象中的内容赋予目标字符串对象
-	 * @param s {std::string&} 目标字符串对象
-	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
+	 * Copy data from string buffer to target string buffer.
+	 * @param s {std::string&} Target string buffer.
+	 * @return {size_t} Returns actual copied byte count. Returns 0 when empty() ==
+	 * true.
 	 */
 	size_t operator>>(std::string& s);
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * 将字符串对象中的内容赋予目标 64 位有符号整数
-	 * @param n {string*} 目标 64 位有符号整数
-	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
+	 * Copy data from string buffer to target 64-bit signed integer.
+	 * @param n {string*} Target 64-bit signed integer.
+	 * @return {size_t} Returns actual copied byte count. Returns 0 when empty() ==
+	 * true.
 	 */
 	size_t operator>>(__int64& n);
 
 	/**
-	 * 将字符串对象中的内容赋予目标 64 位无符号整数
-	 * @param n {string*} 目标 64 位无符号整数
-	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
+	 * Copy data from string buffer to target 64-bit unsigned integer.
+	 * @param n {string*} Target 64-bit unsigned integer.
+	 * @return {size_t} Returns actual copied byte count. Returns 0 when empty() ==
+	 * true.
 	 */
 	size_t operator>>(unsigned __int64& n);
 #else
@@ -549,168 +648,192 @@ public:
 #endif
 
 	/**
-	 * 将字符串对象中的内容赋予目标 32 位有符号整数
-	 * @param n {string*} 目标 32 位有符号整数
-	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
+	 * Copy data from string buffer to target 32-bit signed integer.
+	 * @param n {string*} Target 32-bit signed integer.
+	 * @return {size_t} Returns actual copied byte count. Returns 0 when empty() ==
+	 * true.
 	 */
 	size_t operator>>(int& n);
 
 	/**
-	 * 将字符串对象中的内容赋予目标 32 位无符号整数
-	 * @param n {string*} 目标 32 位无符号整数
-	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
+	 * Copy data from string buffer to target 32-bit unsigned integer.
+	 * @param n {string*} Target 32-bit unsigned integer.
+	 * @return {size_t} Returns actual copied byte count. Returns 0 when empty() ==
+	 * true.
 	 */
 	size_t operator>>(unsigned int& n);
 
 	/**
-	 * 将字符串对象中的内容赋予目标 16 位有符号整数
-	 * @param n {string*} 目标 16 位有符号整数
-	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
+	 * Copy data from string buffer to target 16-bit signed integer.
+	 * @param n {string*} Target 16-bit signed integer.
+	 * @return {size_t} Returns actual copied byte count. Returns 0 when empty() ==
+	 * true.
 	 */
 	size_t operator>>(short& n);
 
 	/**
-	 * 将字符串对象中的内容赋予目标 16 位无符号整数
-	 * @param n {string*} 目标 16 位无符号整数
-	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
+	 * Copy data from string buffer to target 16-bit unsigned integer.
+	 * @param n {string*} Target 16-bit unsigned integer.
+	 * @return {size_t} Returns actual copied byte count. Returns 0 when empty() ==
+	 * true.
 	 */
 	size_t operator>>(unsigned short& n);
 
 	/**
-	 * 将字符串对象中的内容赋予目标 8 位有符号字符
-	 * @param n {string*} 目标 16 位有符号字符
-	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
+	 * Copy data from string buffer to target 8-bit signed character.
+	 * @param n {string*} Target 16-bit signed character.
+	 * @return {size_t} Returns actual copied byte count. Returns 0 when empty() ==
+	 * true.
 	 */
 	size_t operator>>(char& n);
 
 	/**
-	 * 将字符串对象中的内容赋予目标 8 位无符号字符
-	 * @param n {string*} 目标 16 位无符号字符
-	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
+	 * Copy data from string buffer to target 8-bit unsigned character.
+	 * @param n {string*} Target 16-bit unsigned character.
+	 * @return {size_t} Returns actual copied byte count. Returns 0 when empty() ==
+	 * true.
 	 */
 	size_t operator>>(unsigned char& n);
 
 	/**
-	 * 判断当前对象的内容与所给的字符串对象内容是否相等（内部区分大小写）
-	 * @param s {const string&} 输入的字符串对象引用
-	 * @return {bool} 返回 true 表示字符串内容相同
+	 * Determine whether current buffer's stored data and target string buffer's
+	 * stored data are equal. Internally case-sensitive.
+	 * @param s {const string&} Target string buffer object reference.
+	 * @return {bool} Returns true to indicate string data is the same.
 	 */
 	bool operator==(const string& s) const;
 
 	/**
-	 * 判断当前对象的内容与所给的字符串对象内容是否相等（内部区分大小写）
-	 * @param s {const string&} 输入的字符串对象指针
-	 * @return {bool} 返回 true 表示字符串内容相同
+	 * Determine whether current buffer's stored data and target string buffer's
+	 * stored data are equal. Internally case-sensitive.
+	 * @param s {const string&} Target string buffer object pointer.
+	 * @return {bool} Returns true to indicate string data is the same.
 	 */
 	bool operator==(const string* s) const;
 
 	/**
-	 * 判断当前对象的内容与所给的字符串内容是否相等（内部区分大小写）
-	 * @param s {const string&} 输入的字符串对象指针
-	 * @return {bool} 返回 true 表示字符串内容相同
+	 * Determine whether current buffer's stored data and target string are equal.
+	 * Internally case-sensitive.
+	 * @param s {const string&} Target string buffer object pointer.
+	 * @return {bool} Returns true to indicate string data is the same.
 	 */
 	bool operator==(const char* s) const;
 
 	/**
-	 * 判断当前对象的内容与所给的字符串对象内容是否不等（内部区分大小写）
-	 * @param s {const string&} 输入的字符串对象引用
-	 * @return {bool} 返回 true 表示字符串内容不同
+	 * Determine whether current buffer's stored data and target string buffer's
+	 * stored data are not equal. Internally case-sensitive.
+	 * @param s {const string&} Target string buffer object reference.
+	 * @return {bool} Returns true to indicate string data is different.
 	 */
 	bool operator!=(const string& s) const;
 
 	/**
-	 * 判断当前对象的内容与所给的字符串对象内容是否不等（内部区分大小写）
-	 * @param s {const string&} 输入的字符串对象指针
-	 * @return {bool} 返回 true 表示字符串内容不同
+	 * Determine whether current buffer's stored data and target string buffer's
+	 * stored data are not equal. Internally case-sensitive.
+	 * @param s {const string&} Target string buffer object pointer.
+	 * @return {bool} Returns true to indicate string data is different.
 	 */
 	bool operator!=(const string* s) const;
 
 	/**
-	 * 判断当前对象的内容与所给的字符串内容是否不等（内部区分大小写）
-	 * @param s {const string&} 输入的字符串对象指针
-	 * @return {bool} 返回 true 表示字符串内容不同
+	 * Determine whether current buffer's stored data and target string are not
+	 * equal. Internally case-sensitive.
+	 * @param s {const string&} Target string buffer object pointer.
+	 * @return {bool} Returns true to indicate string data is different.
 	 */
 	bool operator!=(const char* s) const;
 
 	/**
-	 * 判断当前对象的内容是否小于所给的字符串对象内容（内部区分大小写）
-	 * @param s {const string&} 输入的字符串对象引用
-	 * @return {bool} 返回 true 表示当前字符串对象的内容小于输入的字符串
-	 *  对象内容
+	 * Determine whether current buffer's data is less than target string buffer's
+	 * stored data. Internally case-sensitive.
+	 * @param s {const string&} Target string buffer object reference.
+	 * @return {bool} Returns true to indicate current string buffer's stored data
+	 * is less than target string
+	 *  buffer's stored data.
 	 */
 	bool operator<(const string& s) const;
 
 	/**
-	 * 判断当前对象的内容是否大于所给的字符串对象内容（内部区分大小写）
-	 * @param s {const string&} 输入的字符串对象引用
-	 * @return {bool} 返回 true 表示当前字符串对象的内容大于输入的字符串
-	 *  对象内容
+	 * Determine whether current buffer's data is greater than target string
+	 * buffer's stored data. Internally case-sensitive.
+	 * @param s {const string&} Target string buffer object reference.
+	 * @return {bool} Returns true to indicate current string buffer's stored data
+	 * is greater than target string
+	 *  buffer's stored data.
 	 */
 	bool operator>(const string& s) const;
 
 	/**
-	 * 计算当前字符串的哈希值，只为C++11中的 std::unordered_xxx 类容器使用
+	 * Calculate hash value of current string. Only for use with std::unordered_xxx
+	 * containers in C++11.
 	 * @return {size_t}
 	 */
 	size_t hash() const;
 
 	/**
-	 * 将当前对象直接转为字符串指针（即将内部缓冲区直接导出）
-	 * @return {const char*} 返回值永远为非空指针，有可能为空串
+	 * Convert current buffer directly to string pointer (can directly call
+	 * internally).
+	 * @return {const char*} Return value is always non-empty pointer, but may be
+	 * empty string.
 	 */
 	operator const char*() const;
 
 	/**
-	 * 将当前字符串对象直接转为通用指针（即将内部缓冲区直接导出）
-	 * @return {const char*} 返回值永远为非空指针
+	 * Convert current string buffer directly to generic pointer (can directly call
+	 * internally).
+	 * @return {const char*} Return value is always non-empty pointer.
 	 */
 	operator const void*() const;
 
 	/**
-	 * 将 acl::string 转为 std::string
+	 * Convert acl::string to std::string
 	 * @return {const std::string}
 	 */
 	operator const std::string() const;
 
 	/**
-	 * 将一个有符号字符添加进当前字符串对象的尾部
-	 * @param ch {char} 有符号字符
-	 * @param term {bool} 是否需要在尾部追加 \0,追加的 \0 不增加长度
-	 * @return {string&} 当前字符串对象的引用
+	 * Add a signed character to the end of current string buffer.
+	 * @param ch {char} Signed character.
+	 * @param term {bool} Whether to append \0 at the end. Appended \0 will
+	 * increase length.
+	 * @return {string&} Current string buffer reference.
 	 */
 	string& push_back(char ch, bool term = true);
 	string& push_back(unsigned char ch, bool term = true);
 
 	/**
-	 * 返回字符串中尾部字符，如果字符串为空串，则返回值为 -1
-	 * @return {char} 返回尾部字符或-1
+	 * Get last character in string buffer. Returns -1 when string is empty.
+	 * @return {char} Returns last character, -1.
 	 */
 	char back() const;
 
 	/**
-	 * 弹出尾部字符
-	 * @return {bool} 如果字符串非空，则在弹出尾部字符后返回true，否则返回false
+	 * Remove last character.
+	 * @return {bool} When string is not empty, after removing last character,
+	 * returns true. Otherwise returns false.
 	 */
 	bool pop_back();
 
 	/**
-	 * 在缓冲区尾部添加 \0 以便应用使用时的安全性, 添加的 \0 不增加长度
-	 * @return {string&} 当前字符串对象的引用
+	 * Append \0 at buffer end for safety when using. Appended \0 will increase
+	 * length.
+	 * @return {string&} Current string buffer reference.
 	 */
 	string& terminate();
 
 	/**
-	 * 比较两个字符串对象的内容是否相同（区分大小写）
-	 * @param s {const string&} 输入的字符串对象的引用
-	 * @param case_sensitive {bool} 为 true 表示区分大小写
-	 * @return {bool} 返回 true 表示二者相等
+	 * Compare whether two string buffers' stored data are the same.
+	 * Case-sensitive.
+	 * @param s {const string&} Target string buffer object reference.
+	 * @param case_sensitive {bool} When true, means case-sensitive.
+	 * @return {bool} Returns true to indicate they are equal.
 	 */
 	bool equal(const string& s, bool case_sensitive = true) const;
 
 	/**
-	 * 检查当前 string 对象是否以指定的字符串开始
+	 * Check whether current string object starts with specified string.
 	 * @param s {const char*}
-	 * @param case_sensitive {bool} 是否区分大小写
+	 * @param case_sensitive {bool} Whether case-sensitive.
 	 * @return {bool}
 	 */
 	bool begin_with(const char* s, bool case_sensitive = true) const;
@@ -719,9 +842,9 @@ public:
 	bool begin_with(const void* v, size_t len) const;
 
 	/**
-	 * 检查当前 string 对象是否以指定的字符串结束
+	 * Check whether current string object ends with specified string.
 	 * @param s {const char*}
-	 * @param case_sensitive {bool} 是否区分大小写
+	 * @param case_sensitive {bool} Whether case-sensitive.
 	 * @return {bool}
 	 */
 	bool end_with(const char* s, bool case_sensitive = true) const;
@@ -730,583 +853,670 @@ public:
 	bool end_with(const void* v, size_t len) const;
 
 	/**
-	 * 比较两个字符串对象的内容是否相同（区分大小写）
-	 * @param s {const string&} 输入的字符串对象的引用
-	 * @return {int} 0：表示二者相同； > 0：当前字符串内容大于输入的内容；
-	 *  < 0 ：当前字符串内容小于输入的内容
+	 * Compare whether two string buffers' stored data are the same.
+	 * Case-sensitive.
+	 * @param s {const string&} Target string buffer object reference.
+	 * @return {int} 0: Indicates they are the same. > 0: Current string buffer's
+	 * data is greater than target data.
+	 *  < 0: Current string buffer's data is less than target data.
 	 */
 	int compare(const string& s) const;
 
 	/**
-	 * 比较两个字符串对象的内容是否相同（区分大小写）
-	 * @param s {const string&} 输入的字符串对象的指针
-	 * @return {int} 0：表示二者相同； > 0：当前字符串内容大于输入的内容；
-	 *  < 0 ：当前字符串内容小于输入的内容
+	 * Compare whether two string buffers' stored data are the same.
+	 * Case-sensitive.
+	 * @param s {const string&} Target string buffer object pointer.
+	 * @return {int} 0: Indicates they are the same. > 0: Current string buffer's
+	 * data is greater than target data.
+	 *  < 0: Current string buffer's data is less than target data.
 	 */
 	int compare(const string* s) const;
 
 	/**
-	 * 比较两个字符串的内容是否相同
-	 * @param s {const string&} 输入的字符串对象的引用
-	 * @param case_sensitive {bool} 为 true 表示区分大小写
-	 * @return {int} 0：表示二者相同； > 0：当前字符串内容大于输入的内容；
-	 *  < 0 ：当前字符串内容小于输入的内容
+	 * Compare whether two strings are the same.
+	 * @param s {const string&} Target string buffer object reference.
+	 * @param case_sensitive {bool} When true, means case-sensitive.
+	 * @return {int} 0: Indicates they are the same. > 0: Current string buffer's
+	 * data is greater than target data.
+	 *  < 0: Current string buffer's data is less than target data.
 	 */
 	int compare(const char* s, bool case_sensitive = true) const;
 
 	/**
-	 * 比较当前对象的缓冲区内容是否与所给的缓冲区的内容相同
-	 * @param ptr {const void*} 输入的缓冲区地址
-	 * @param len {size_t} ptr 的缓冲区内数据长度
-	 * @return {int} 返回结果含义如下:
-	 *  0：表示二者相同；
-	 *  > 0：当前对象缓冲区内容大于输入的内容；
-	 *  < 0 ：当前对象缓冲内容小于输入的内容
+	 * Compare whether current buffer's buffer data and target buffer's buffer data
+	 * are the same.
+	 * @param ptr {const void*} Target buffer's buffer address.
+	 * @param len {size_t} Data length of ptr buffer.
+	 * @return {int} Returns comparison result:
+	 *  0: Indicates they are the same.
+	 *  > 0: Current buffer's buffer data is greater than target data.
+	 *  < 0: Current buffer's buffer data is less than target data.
 	 */
 	int compare(const void* ptr, size_t len) const;
 
 	/**
-	 * 比较当前对象缓冲区内容是否与所给的缓冲区的内容相同，限定比较数据长度
-	 * @param s {const void*} 输入的缓冲区地址
-	 * @param len {size_t} ptr 的缓冲区内数据长度
-	 * @param case_sensitive {bool} 为 true 表示区分大小写
-	 * @return {int} 0：表示二者相同； > 0：当前对象缓冲区内容大于输入的内容；
-	 *  < 0 ：当前对象缓冲内容小于输入的内容
+	 * Compare whether current buffer's buffer data and target buffer's buffer data
+	 * are the same. Limits comparison data length.
+	 * @param s {const void*} Target buffer's buffer address.
+	 * @param len {size_t} Data length of ptr buffer.
+	 * @param case_sensitive {bool} When true, means case-sensitive.
+	 * @return {int} 0: Indicates they are the same. > 0: Current buffer's buffer
+	 * data is greater than target data.
+	 *  < 0: Current buffer's buffer data is less than target data.
 	 */
 	int ncompare(const char* s, size_t len, bool case_sensitive = true) const;
 
 	/**
-	 * 从尾部向前比较当前对象的缓冲区内容是否与所给的缓冲区的内容相同，
-	 * 限定比较数据长度
-	 * @param s {const void*} 输入的缓冲区地址
-	 * @param len {size_t} ptr 的缓冲区内数据长度
-	 * @param case_sensitive {bool} 为 true 表示区分大小写
-	 * @return {int} 0：表示二者相同；
-	 *  > 0：当前对象缓冲区内容大于输入的内容；
-	 *  < 0 ：当前对象缓冲内容小于输入的内容
+	 * Compare from end forward whether current buffer's buffer data and target
+	 * buffer's buffer data are the same.
+	 * Limits comparison data length.
+	 * @param s {const void*} Target buffer's buffer address.
+	 * @param len {size_t} Data length of ptr buffer.
+	 * @param case_sensitive {bool} When true, means case-sensitive.
+	 * @return {int} 0: Indicates they are the same.
+	 *  > 0: Current buffer's buffer data is greater than target data.
+	 *  < 0: Current buffer's buffer data is less than target data.
 	 */
 	int rncompare(const char* s, size_t len, bool case_sensitive = true) const;
 
 	/**
-	 * 在当前字符串缓冲区中查找空行的位置，可以循环调用本方法以获得所有的
-	 * 符合条件的内容
-	 * @param left_count {int*} 当该指针非空时存储当前字符串剩余的数据长度
-	 * @param buf {string*} 当找到空行时，则将上一次空行(不含该空行)和
-	 *  本次空行(包含该空行)之间的数据存放于该缓冲区内，注：内部并不负责
-	 *  清空该缓冲区，因为采用数据追加方式
-	 * @return {int} 返回 0 表示未找到空行；返回值 > 0 表示空行的下一个
-	 *  位置(因为需要找到一个空行返回的是该空行的下一个位置，所以若找到
-	 *  空行则返回值一定大于 0)；返回值 < 0 表示内部出错
+	 * Find blank line position in current string buffer data. You can call this
+	 * function in a loop to get all
+	 * blank lines in buffer.
+	 * @param left_count {int*} When pointer is not empty, stores remaining data
+	 * length of current string.
+	 * @param buf {string*} When blank line is found, stores one blank line
+	 * (including blank line) or
+	 * next blank line (including blank line) and data between them in this buffer.
+	 * Note: Internally automatically
+	 *  clears this buffer, then uses append method.
+	 * @return {int} Returns 0 to indicate blank line not found. Return value > 0
+	 * indicates blank line's first
+	 * position (because to find first blank line, returned is that blank line's
+	 * first position. If not found,
+	 *  return value is always 0). Return value < 0 indicates internal error.
 	 */
 	int find_blank_line(int* left_count = NULL, string* buf = NULL);
 
 	/**
-	 * 重置内部查询状态，当需要重新开始调用 find_blank_line 时需要调用本
-	 * 方法以重置内部查询状态
+	 * Reset internal query state. When you need to start over, when calling
+	 * find_blank_line, you need to call this
+	 * function to reset internal query state.
 	 * @return {string&}
 	 */
 	string& find_reset();
 
 	/**
-	 * 查找指定字符在当前对象缓冲区的位置（下标从 0 开始）
-	 * @param n {char} 要查找的有符号字符
-	 * @return {int} 字符在缓冲区中的位置，若返回值 < 0 则表示不存在
+	 * Find specified character's position in current buffer buffer. Subscript
+	 * starts from 0.
+	 * @param n {char} Signed character to find.
+	 * @return {int} Character's position in buffer. Return value < 0 indicates not
+	 * found.
 	 */
 	int find(char n) const;
 
 	/**
-	 * 查找指定字符串在当前对象缓冲区的起始位置（下标从 0 开始）
-	 * @param needle {const char*} 要查找的有符号字符串
-	 * @param case_sensitive {bool} 为 true 表示区分大小写
-	 * @return {char*} 字符串在缓冲区中的起始位置，返回空指针则表示不存在
+	 * Find specified string's start position in current buffer buffer. Subscript
+	 * starts from 0.
+	 * @param needle {const char*} Signed string to find.
+	 * @param case_sensitive {bool} When true, means case-sensitive.
+	 * @return {char*} String's start position in buffer. Returns empty pointer to
+	 * indicate not found.
 	 */
 	char* find(const char* needle, bool case_sensitive=true) const;
 
 	/**
-	 * 从尾部向前查找指定字符串在当前对象缓冲区的起始位置（下标从 0 开始）
-	 * @param needle {const char*} 要查找的有符号字符串
-	 * @param case_sensitive {bool} 为 true 表示区分大小写
-	 * @return {char*} 字符串在缓冲区中的起始位置，若返回值为空指针则表示不存在
+	 * Find from end forward specified string's start position in current buffer
+	 * buffer. Subscript starts from 0.
+	 * @param needle {const char*} Signed string to find.
+	 * @param case_sensitive {bool} When true, means case-sensitive.
+	 * @return {char*} String's start position in buffer. Return value is empty
+	 * pointer to indicate not found.
 	 */
 	char* rfind(const char* needle, bool case_sensitive=true) const;
 
 	/**
-	 * 返回从当前字符串对象中缓冲区指定位置以左的内容
-	 * @param n {size_t} 下标位置，当该值大于等于当前字符串的数据长度时，
-	 *  则返回整个字符串对象；返回值不包含该值指定位置的字符内容
-	 * @return {string} 返回值为一完整的对象，不需要单独释放，该函数的效率
-	 *  可能并不太高
+	 * Return substring from current string buffer from start to specified
+	 * position.
+	 * @param n {size_t} Subscript position. When this value is greater than or
+	 * equal to current string buffer's data length,
+	 * returns entire string buffer. Otherwise, returns string from start to
+	 * specified position.
+	 * @return {string} Return value is a new object, does not need to be manually
+	 * released. This function's efficiency
+	 *  may not be too high.
 	 */
 	string left(size_t n);
 
 	/**
-	 * 返回从当前字符串对象中缓冲区指定位置以右的内容
-	 * @param n {size_t} 下标位置，当该值大于等于当前字符串的数据长度时，
-	 *  则返回的字符串对象内容为空；返回值不包含该值指定位置的字符内容
-	 * @return {const string} 返回值为一完整的对象，不需要单独释放，该
-	 *  函数的效率可能并不太高
+	 * Return substring from current string buffer from specified position to end.
+	 * @param n {size_t} Subscript position. When this value is greater than or
+	 * equal to current string buffer's data length,
+	 * returns string buffer object as empty. Otherwise, returns string from
+	 * specified position to end.
+	 * @return {const string} Return value is a new object, does not need to be
+	 * manually released, but
+	 *  this function's efficiency may not be too high.
 	 */
 	string right(size_t n);
 
 	/**
-	 * 将当前对象的缓冲内容拷贝一部分数据至目标缓冲内
-	 * @param buf {void*} 目标缓冲区地址
-	 * @param size {size_t} buf 缓冲区长度
-	 * @param move {bool} 在拷贝完数据后，是否需要将后面的数据向前移动并
-	 *  覆盖前面的已拷贝的数据
-	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
+	 * Copy a certain amount of data from current buffer buffer to target buffer.
+	 * @param buf {void*} Target buffer address.
+	 * @param size {size_t} Buffer size of buf.
+	 * @param move {bool} After copying data, whether to move remaining data
+	 * forward to
+	 *  remove copied data from current buffer.
+	 * @return {size_t} Returns actual copied byte count. Returns 0 when empty() ==
+	 * true.
 	 */
 	size_t scan_buf(void* buf, size_t size, bool move = false);
 
 	/**
-	 * 从当前对象的缓冲区中拷贝一行数据(包含"\r\n")至目标缓冲区内，当数据
-	 * 被拷贝至目标缓冲区后，在源缓冲区内未被拷贝的数据会发生移动并覆盖被
-	 * 拷贝的数据区域
-	 * @param out {string&} 目标缓冲区，函数内部不会先自动清空该缓冲区
-	 * @param nonl {bool} 返回的一行数据是否去掉尾部的 "\r\n" 或 "\n"
-	 * @param n {size_t*} 该参数为非空指针时，则存储拷贝到的数据长度；当读
-	 *  到一个空行且 nonl 为 true 时，则该地址存储 0
-	 * @param move {bool} 在拷贝完数据后，是否需要将后面的数据向前移动并
-	 *  覆盖前面的已拷贝的数据
-	 * @return {bool} 是否拷贝了一个完整行数据，如果返回 false 还需要根据
-	 *  empty() == true 来判断当前缓冲区中是否还有数据
+	 * Copy one line (excluding "\r\n") from current buffer buffer to target
+	 * buffer. After
+	 * copying, remaining data in target buffer and source buffer will move
+	 * forward. This is a
+	 * non-destructive operation.
+	 * @param out {string&} Target buffer object. Internally automatically clears
+	 * this buffer.
+	 * @param nonl {bool} Whether to remove "\r\n" or "\n" at the end when
+	 * returning first line.
+	 * @param n {size_t*} When this parameter is non-empty pointer, stores length
+	 * of copied line data. When
+	 *  reading one line and nonl is true, address stores 0.
+	 * @param move {bool} After copying data, whether to move remaining data
+	 * forward to
+	 *  remove copied data from current buffer.
+	 * @return {bool} Whether one line of data was copied. When this function
+	 * returns false, you need to check
+	 *  empty() == true to determine whether current buffer is empty.
 	 */
 	bool scan_line(string& out, bool nonl = true, size_t* n = NULL,
 		bool move = false);
 
 	/**
-	 * 当使用 scan_xxx 类方法对缓冲区进行操作时未指定 move 动作，则调用本
-	 * 函数可以使缓冲区内剩余的数据向前移动至缓冲区首部
-	 * @return {size_t} 移动的字节数
+	 * When using scan_xxx series functions to operate on buffer data without
+	 * specifying move parameter, you can call this
+	 * function to move remaining data forward to buffer bottom.
+	 * @return {size_t} Number of bytes moved.
 	 */
 	size_t scan_move();
 
 	/**
-	 * 返回当前对象缓冲区中第一个不含数据的尾部地址
-	 * @return {char*} 返回值为 NULL 则说明内部数据为空，即 empty() == true
+	 * Get end address of first line of data in current buffer buffer.
+	 * @return {char*} Return value is NULL to indicate internal buffer is empty,
+	 * i.e., empty() == true.
 	 */
 	char* buf_end();
 
 	/**
-	 * 返回当前对象缓冲区的起始地址
-	 * @return {void*} 返回地址永远非空
+	 * Get start address of current buffer buffer.
+	 * @return {void*} Returned address is always non-empty.
 	 */
 	void* buf() const;
 
 	/**
-	 * 以字符串方式返回当前对象缓冲区的起始地址
-	 * @return {char*} 返回地址永远非空
+	 * Get start address of current buffer buffer in string format.
+	 * @return {char*} Returned address is always non-empty.
 	 */
 	char* c_str() const;
 
 	/**
-	 * 返回当前对象字符串的长度（不含\0）
-	 * @return {size_t} 返回值 >= 0
+	 * Get length of current stored string, excluding \0.
+	 * @return {size_t} Return value >= 0.
 	 */
 	size_t length() const;
 
 	/**
-	 * 返回当前对象字符串的长度（不含\0），功能与 length 相同
-	 * @return {size_t} 返回值 >= 0
+	 * Get length of current stored string, excluding \0. Same as length.
+	 * @return {size_t} Return value >= 0.
 	 */
 	size_t size() const;
 
 	/**
-	 * 返回当前对象的缓冲区的空间长度，该值 >= 缓冲区内数据长度
-	 * @return {size_t} 返回值 > 0
+	 * Get space length of current buffer buffer. This value >= stored data length.
+	 * @return {size_t} Return value > 0.
 	 */
 	size_t capacity() const;
 
 	/**
-	 * 判断当前对象的缓冲区内数据长度是否为 0
-	 * @return {bool} 返回 true 表示数据为空
+	 * Determine whether current buffer buffer's data length is 0.
+	 * @return {bool} Returns true to indicate buffer is empty.
 	 */
 	bool empty() const;
 
 	/**
-	 * 返回当前对象内部所用的 acl C 库中的 ACL_VSTRING 对象地址
-	 * @return {ACL_VSTRING*} 返回值永远非空
+	 * Get ACL_VSTRING object pointer used internally in current object in acl C
+	 * library.
+	 * @return {ACL_VSTRING*} Return value is always non-empty.
 	 */
 	ACL_VSTRING* vstring() const;
 
 	/**
-	 * 将当前对象的缓冲区的下标位置移至指定位置
-	 * @param n {size_t} 目标下标位置，当该值 >= capacity 时，内部会
-	 *  重新分配更大些的内存
-	 * @return {string&} 当前对象的引用
+	 * Set current buffer buffer's subscript position to specified position.
+	 * @param n {size_t} Target subscript position. When this value >= capacity,
+	 * internally
+	 *  will reallocate some memory.
+	 * @return {string&} Current object reference.
 	 */
 	string& set_offset(size_t n);
 
 	/**
-	 * 调用该函数可以预先保证所需要的缓冲区大小
-	 * @param n {size_t} 希望的缓冲区空间大小值
-	 * @return {string&} 当前对象的引用
+	 * Call this function to pre-allocate required buffer size.
+	 * @param n {size_t} Desired buffer space minimum size.
+	 * @return {string&} Current object reference.
 	 */
 	string& space(size_t n);
 	string& reserve(size_t n);
 
 	/**
-	 * 将当前对象存储的字符串进行分割
-	 * @param sep {const char*} 进行分割时的分割符集合，该字符串中的每一个字符都
-	 *  做为分割符，注：内部不是用整个字符串进行分割的
-	 * @param quoted {bool} 当为 true 时，则源串中由单/双引号引起来的字符串内容，
-	 *  不做分割，但此时要求分割串 sep 中不得存在单/双号，如源串为:
-	 *  "abc*|\"cd*ef\"|\'gh|ijk\'|lmn"，分割串为 "*|"，当 quoted 为 true 时
-	 *  分割后结果为："abc", "cd*ef", "gh|ijk", "lmn"，当 quoted 为 false 时
-	 *  分割后结果为："abc", "cd", "ef", "gh", ijk", "lmn"
-	 * @return {std::list<string>&} 返回 list 格式的分割结果，返回的结果
-	 *  不需要释放，其引用了当前对象的一个内部指针
+	 * Split string stored in current buffer.
+	 * @param sep {const char*} Separator string when splitting. Each character in
+	 * this string
+	 * can be used as separator. Note: Internally automatically escapes special
+	 * characters in string when splitting.
+	 * @param quoted {bool} When true, when source string has single/double quotes
+	 * wrapping string data,
+	 * it will not split. Note: Separator string sep should not contain
+	 * single/double quotes. Source is:
+	 * "abc*|\"cd*ef\"|\'gh|ijk\'|lmn", separator string is "*|". When quoted is
+	 * true,
+	 *  split result is: "abc", "cd*ef", "gh|ijk", "lmn". When quoted is false,
+	 *  split result is: "abc", "cd", "ef", "gh", ijk", "lmn"
+	 * @return {std::list<string>&} Returns list format split result. Returned
+	 * result does not need to be released, because it is an internal pointer of
+	 * current object.
 	 */
 	std::list<string>& split(const char* sep, bool quoted = false);
 
 	/**
-	 * 将当前对象存储的字符串进行分割
-	 * @param sep {const char*} 进行分割时的分割标记，含义与split相同
-	 * @param quoted {bool} 当为 true 时，则对于由单/双引号引起来的
-	 *  字符串内容，不做分割，但此时要求 sep 中不得存在单/双号
-	 * @return {std::vector<string>&} 返回 vector 格式的分割结果，返回的
-	 *  结果不需要释放，其引用了当前对象的一个内部指针
+	 * Split string stored in current buffer.
+	 * @param sep {const char*} Separator string when splitting. Same as split.
+	 * @param quoted {bool} When true, when source string has single/double quotes
+	 * wrapping
+	 * string data, it will not split. Note: sep should not contain single/double
+	 * quotes.
+	 * @return {std::vector<string>&} Returns vector format split result.
+	 * Returned result does not need to be released, because it is an internal
+	 * pointer of current object.
 	 */
 	std::vector<string>& split2(const char* sep, bool quoted = false);
 
 	/**
-	 * 以 '=' 为分隔符将当前对象存储的字符串分割成 name/value 对，分割时会
-	 * 自动去掉源字符串的起始处、结尾处以及分隔符 '=' 两边的空格及 TAB
-	 * @param sep {char} 用户可以通过此参数指定自己的分隔符
-	 * @return {std::pair<string, string>&} 如果当前对象存储的字符串
-	 *  不符合分割条件（即不是严格的 name=value格式），则返回的结果中字符
-	 *  串对象为空串,返回的结果不需要释放，其引用了当前对象的一个内部地址
+	 * Use '=' as separator to split string stored in current buffer into
+	 * name/value pairs. When splitting,
+	 * automatically removes spaces TAB at start and end of source string and
+	 * around separator '='.
+	 * @param sep {char} Users can specify their own separator through this
+	 * parameter.
+	 * @return {std::pair<string, string>&} When current buffer stores string
+	 * format is legal (name=value format), returns split result. Otherwise,
+	 * returned result's string
+	 * content is empty. Returned result does not need to be released, because it
+	 * is an internal string of current object.
 	 */
 	std::pair<string, string>& split_nameval(char sep = '=');
 
 	/**
- 	 * 从字符串左边开始将包含给定分隔符在内的右边截断，该方法与split_nameval的不同
- 	 * 之处是，本方法不会先清理所给字符串两边的空格/TAB字符，并且本方法也不会将开头
- 	 * 的分隔符去掉
-	 * @param delimiter {char} 分隔符
-	 * @return {std::pair<string, string>&} 返回name, value对，当未打到分隔符
-	 *  时，返回的 std::pair 里的均为空串
+	 * Start from left side of string, search forward for specified delimiter, and
+	 * cut at right side of delimiter if found. This function's difference from
+	 * split_nameval
+	 * is that it will not remove spaces/TAB characters on left and right sides of
+	 * string, and right side will also remove delimiter at the beginning.
+	 * @param delimiter {char} Delimiter.
+	 * @return {std::pair<string, string>&} Returns name, value pair. When
+	 * delimiter is not found,
+	 *  returned std::pair's both are empty.
 	 */
 	std::pair<string, string>& split_at(char delimiter);
 
 	/**
-	 * 从字符串右边开始将包含给定分隔符在内的右边截断
-	 * @param delimiter {char} 分隔符
-	 * @return {char*} 分隔符以右的字符串，当为NULL时表明未找到指定分隔符
+	 * Start from right side of string, search forward for specified delimiter, and
+	 * cut at right side if found.
+	 * @param delimiter {char} Delimiter.
+	 * @return {char*} Delimiter's found character. Returns NULL when specified
+	 * delimiter is not found.
 	 */
 	std::pair<string, string>& split_at_right(char delimiter);
 
 	/**
-	 * 将字符串拷贝到当前对象的缓冲区中
-	 * @param ptr {const char*} 源字符串地址，需以 '\0' 结束
-	 * @return {string&} 当前对象的引用
+	 * Copy string data to current buffer buffer.
+	 * @param ptr {const char*} Source string address. Must end with '\0'.
+	 * @return {string&} Current object reference.
 	 */
 	string& copy(const char* ptr);
 
 	/**
-	 * 将源数据的定长数据拷贝至当前对象的缓冲区中
-	 * @param ptr {const void*} 源数据地址
-	 * @param len {size_t} ptr 源数据长度
-	 * @return {string&} 当前对象的引用
+	 * Copy source data's binary data to current buffer buffer.
+	 * @param ptr {const void*} Source data address.
+	 * @param len {size_t} Data length of ptr source data.
+	 * @return {string&} Current object reference.
 	 */
 	string& copy(const void* ptr, size_t len);
 
 	/**
-	 * 将源字符串的数据移动至当前对象的缓冲区中，内部会自动判断源数据
-	 * 地址是否就在当前对象的缓冲区中
-	 * @param src {const char*} 源数据地址
-	 * @return {string&} 当前对象的引用
+	 * Move source string data to current buffer buffer. Internally automatically
+	 * determines whether source data
+	 * address is within current buffer buffer.
+	 * @param src {const char*} Source data address.
+	 * @return {string&} Current object reference.
 	 */
 	string& memmove(const char* src);
 
 	/**
-	 * 将源字符串的数据移动至当前对象的缓冲区中，内部会自动判断源数据
-	 * 地址是否就在当前对象的缓冲区中
-	 * @param src {const char*} 源数据地址
-	 * @param len {size_t} 移动数据的长度
-	 * @return {string&} 当前对象的引用
+	 * Move source string data to current buffer buffer. Internally automatically
+	 * determines whether source data
+	 * address is within current buffer buffer.
+	 * @param src {const char*} Source data address.
+	 * @param len {size_t} Length of moved data.
+	 * @return {string&} Current object reference.
 	 */
 	string& memmove(const char* src, size_t len);
 
 	/**
-	 * 将指定字符串添加在当前对象数据缓冲区数据的尾部
-	 * @param s {const string&} 源数据对象引用
-	 * @return {string&} 当前对象的引用
+	 * Append specified string data to current buffer data at the end.
+	 * @param s {const string&} Source data object reference.
+	 * @return {string&} Current object reference.
 	 */
 	string& append(const string& s);
 
 	/**
-	 * 将指定字符串添加在当前对象数据缓冲区数据的尾部
-	 * @param s {const string&} 源数据对象指针
-	 * @return {string&} 当前对象的引用
+	 * Append specified string data to current buffer data at the end.
+	 * @param s {const string&} Source data object pointer.
+	 * @return {string&} Current object reference.
 	 */
 	string& append(const string* s);
 
 	/**
-	 * 将指定字符串添加在当前对象数据缓冲区数据的尾部
-	 * @param s {const string&} 源数据对象指针
-	 * @return {string&} 当前对象的引用
+	 * Append specified string data to current buffer data at the end.
+	 * @param s {const string&} Source data object pointer.
+	 * @return {string&} Current object reference.
 	 */
 	string& append(const char* s);
 
 	/**
-	 * 将指定缓冲区中的数据添加在当前对象数据缓冲区数据的尾部
-	 * @param ptr {const void*} 源数据对象指针
-	 * @param len {size_t} ptr 数据长度
-	 * @return {string&} 当前对象的引用
+	 * Append specified memory buffer's data to current buffer data at the end.
+	 * @param ptr {const void*} Source data object pointer.
+	 * @param len {size_t} Data length of ptr.
+	 * @return {string&} Current object reference.
 	 */
 	string& append(const void* ptr, size_t len);
 
 	/**
-	 * 将指定字符串数据添加在当前对象数据缓冲区数据的首部
-	 * @param s {const char*} 源数据地址
-	 * @return {string&} 当前对象的引用
+	 * Prepend specified string data to current buffer data at the beginning.
+	 * @param s {const char*} Source data address.
+	 * @return {string&} Current object reference.
 	 */
 	string& prepend(const char* s);
 
 	/**
-	 * 将指定内存数据添加在当前对象数据缓冲区数据的首部
-	 * @param ptr {const void*} 源数据地址
-	 * @param len {size_t} ptr 数据长度
-	 * @return {string&} 当前对象的引用
+	 * Prepend specified memory buffer's data to current buffer data at the
+	 * beginning.
+	 * @param ptr {const void*} Source data address.
+	 * @param len {size_t} Data length of ptr.
+	 * @return {string&} Current object reference.
 	 */
 	string& prepend(const void* ptr, size_t len);
 
 	/**
-	 * 将内存数据插入指定下标位置开始的当前对象缓冲区中
-	 * @param start {size_t} 当前对象缓冲区的开始插入下标值
-	 * @param ptr {const void*} 内存数据的地址
-	 * @param len {size_t} 内存数据的长度
-	 * @return {string&} 当前对象的引用
+	 * Insert memory data at specified subscript position starting from current
+	 * buffer buffer.
+	 * @param start {size_t} Start subscript value of current buffer buffer.
+	 * @param ptr {const void*} Memory data address.
+	 * @param len {size_t} Length of memory data.
+	 * @return {string&} Current object reference.
 	 */
 	string& insert(size_t start, const void* ptr, size_t len);
 
 	/**
-	 * 带格式方式的添加数据（类似于 sprintf 接口方式）
-	 * @param fmt {const char*} 格式字符串
-	 * @param ... 变参数据
-	 * @return {string&} 当前对象的引用
+	 * Format and assign data, similar to sprintf interface format.
+	 * @param fmt {const char*} Format string.
+	 * @param ... Variable arguments.
+	 * @return {string&} Current object reference.
 	 */
 	string& format(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
-	 * 带格式方式的添加数据（类似于 vsprintf 接口方式）
-	 * @param fmt {const char*} 格式字符串
-	 * @param ap {va_list} 变参数据
-	 * @return {string&} 当前对象的引用
+	 * Format and assign data, similar to vsprintf interface format.
+	 * @param fmt {const char*} Format string.
+	 * @param ap {va_list} Variable arguments.
+	 * @return {string&} Current object reference.
 	 */
 	string& vformat(const char* fmt, va_list ap);
 
 	/**
-	 * 带格式方式在当前对象的尾部添加数据
-	 * @param fmt {const char*} 格式字符串
-	 * @param ... 变参数据
-	 * @return {string&} 当前对象的引用
+	 * Format and append data at current buffer end.
+	 * @param fmt {const char*} Format string.
+	 * @param ... Variable arguments.
+	 * @return {string&} Current object reference.
 	 */
 	string& format_append(const char* fmt, ...)  ACL_CPP_PRINTF(2, 3);
 
 	/**
-	 * 带格式方式在当前对象的尾部添加数据
-	 * @param fmt {const char*} 格式字符串
-	 * @param ap {va_list} 变参数据
-	 * @return {string&} 当前对象的引用
+	 * Format and append data at current buffer end.
+	 * @param fmt {const char*} Format string.
+	 * @param ap {va_list} Variable arguments.
+	 * @return {string&} Current object reference.
 	 */
 	string& vformat_append(const char* fmt, va_list ap);
 
 	/**
-	 * 将当前对象中的数据的字符进行替换
-	 * @param from {char} 源字符
-	 * @param to {char} 目标字符
-	 * @return {string&} 当前对象的引用
+	 * Replace character data in current buffer with target character.
+	 * @param from {char} Source character.
+	 * @param to {char} Target character.
+	 * @return {string&} Current object reference.
 	 */
 	string& replace(char from, char to);
 
 	/**
-	 * 将当前对象的数据截短，缓冲区内部移动下标指针地址
-	 * @param n {size_t} 数据截短后的数据长度，如果该值 >= 当前缓冲区
-	 *  数据长度，则内部不做任何变化
-	 * @return {string&} 当前对象的引用
+	 * Truncate current buffer data, and internally moves subscript pointer
+	 * forward.
+	 * @param n {size_t} Data length after truncation. When this value >= current
+	 * buffer's
+	 *  data length, internally makes no changes.
+	 * @return {string&} Current object reference.
 	 */
 	string& truncate(size_t n);
 
 	/**
-	 * 在当前对象的缓冲区数据中去掉指定的字符串内容，在处理过程中会发生
-	 * 数据移动情况
-	 * @param needle {const char*} 指定需要去掉的字符串数据
-	 * @param each {bool} 当为 true 时，则每一个出现在 needle 中的字符都
-	 *  会在当前对象的缓存区中去掉；否则，仅在当前对象缓冲区中去掉完整的
-	 *  needle 字符串
-	 * @return {string&} 当前对象的引用
-	 *  如 acl::string s("hello world!");
-	 *  若 s.etrip("hel", true), 则结果为： s == "o word!"
-	 *  若 s.strip("hel", false), 则结果为: s = "lo world!"
+	 * In current buffer buffer, remove specified character string data. Memory
+	 * data in buffer will
+	 * move forward.
+	 * @param needle {const char*} Specified character string to remove.
+	 * @param each {bool} When true, for each character that appears in needle
+	 * string,
+	 * remove it from current buffer buffer. Otherwise, remove needle string from
+	 * current buffer buffer.
+	 * @return {string&} Current object reference.
+	 *  Example: acl::string s("hello world!");
+	 *  Call s.strip("hel", true), result is: s == "o word!"
+	 *  Call s.strip("hel", false), result is: s = "lo world!"
 	 */
 	string& strip(const char* needle, bool each = false);
 
 	/**
-	 * 将当前对象缓冲区左边的空白（包含空格及TAB）去掉
-	 * @return {string&} 当前对象的引用
+	 * Remove whitespace (spaces TAB) on left side of current buffer buffer.
+	 * @return {string&} Current object reference.
 	 */
 	string& trim_left_space();
 
 	/**
-	 * 将当前对象缓冲区右边的空白（包含空格及TAB）去掉
-	 * @return {string&} 当前对象的引用
+	 * Remove whitespace (spaces TAB) on right side of current buffer buffer.
+	 * @return {string&} Current object reference.
 	 */
 	string& trim_right_space();
 
 	/**
-	 * 将当前对象缓冲区中所有的空白（包含空格及TAB）去掉
-	 * @return {string&} 当前对象的引用
+	 * Remove all whitespace (spaces TAB) in current buffer buffer.
+	 * @return {string&} Current object reference.
 	 */
 	string& trim_space();
 
 	/**
-	 * 将当前对象缓冲区左边的回车换行符去掉
-	 * @return {string&} 当前对象的引用
+	 * Remove carriage return and line feed on left side of current buffer buffer.
+	 * @return {string&} Current object reference.
 	 */
 	string& trim_left_line();
 
 	/**
-	 * 将当前对象缓冲区右边的回车换行符去掉
-	 * @return {string&} 当前对象的引用
+	 * Remove carriage return and line feed on right side of current buffer buffer.
+	 * @return {string&} Current object reference.
 	 */
 	string& trim_right_line();
 
 	/**
-	 * 将当前对象缓冲区中所有的回车换行符去掉
-	 * @return {string&} 当前对象的引用
+	 * Remove all carriage return and line feed in current buffer buffer.
+	 * @return {string&} Current object reference.
 	 */
 	string& trim_line();
 
 	/**
-	 * 清空当前对象的数据缓冲区
-	 * @return {string&} 当前对象的引用
+	 * Clear current buffer data buffer.
+	 * @return {string&} Current object reference.
 	 */
 	string& clear();
 
 	/**
-	 * 将当前对象的数据缓冲区中的数据均转为小写
-	 * @return {string&} 当前对象的引用
+	 * Convert all data in current buffer data buffer to lowercase.
+	 * @return {string&} Current object reference.
 	 */
 	string& lower();
 
 	/**
-	 * 将当前对象的数据缓冲区中的数据均转为大写
-	 * @return {string&} 当前对象的引用
+	 * Convert all data in current buffer data buffer to uppercase.
+	 * @return {string&} Current object reference.
 	 */
 	string& upper();
 
 	/**
-	 * 从当前缓冲区中将指定偏移量指定长度的数据拷贝至目标缓冲区中
-	 * @param out {string&} 目标缓冲区，内部采用追加方式，并不清空该对象
-	 * @param p {size_t} 当前缓冲区的起始位置
-	 * @param len {size_t} 从 p 起始位置开始拷贝的数据量，当该值为 0 时
-	 *  则拷贝指定 p 位置后所有的数据，否则拷贝指定长度的数据，若指定的
-	 *  数据长度大于实际要拷贝的长度，则仅拷贝实际存在的数据
-	 * @return {size_t} 返回拷贝的实际数据长度，p 越界时则该返回值为 0
+	 * Copy data of specified offset and specified length from current buffer to
+	 * target buffer.
+	 * @param out {string&} Target buffer. Internally uses append method, and
+	 * automatically clears this object.
+	 * @param p {size_t} Start position in current buffer.
+	 * @param len {size_t} Number of bytes to copy starting from position p. When
+	 * this value is 0,
+	 * copies all data from position p. Otherwise, copies specified length of data.
+	 * When specified
+	 * data length is greater than actual available length, copies actual existing
+	 * data.
+	 * @return {size_t} Returns actual copied data length. When p exceeds bounds,
+	 * return value is 0.
 	 */
 	size_t substr(string& out, size_t p = 0, size_t len = 0) const;
 
 	/**
-	 * 将当前对象的数据缓冲区中的数据进行 base64 转码
-	 * @return {string&} 当前对象的引用
+	 * Encode all data in current buffer data buffer with base64 encoding.
+	 * @return {string&} Current object reference.
 	 */
 	string& base64_encode();
 
 	/**
-	 * 将输入的源数据进行 base64 转码并存入当前对象的缓冲区中
-	 * @param ptr {const void*} 源数据的地址
-	 * @param len {size_t} 源数据长度
-	 * @return {string&} 当前对象的引用
+	 * Encode source data with base64 encoding and append to current buffer buffer.
+	 * @param ptr {const void*} Source data address.
+	 * @param len {size_t} Source data length.
+	 * @return {string&} Current object reference.
 	 */
 	string& base64_encode(const void* ptr, size_t len);
 
 	/**
-	 * 如果当前对象的缓冲区中的数据是经 base64 编码的，则此函数将这些
-	 * 数据进行解码
-	 * @return {string&} 当前对象的引用，如果解码出错，则内部缓冲区会被自动清空，
-	 *  调用 string::empty() 返回 true
+	 * When current buffer buffer's data is base64 encoded, this function decodes
+	 * these
+	 * data.
+	 * @return {string&} Current object reference. When decoding fails, internal
+	 * buffer will be automatically cleared,
+	 *  so string::empty() returns true.
 	 */
 	string& base64_decode();
 
 	/**
-	 * 将输入的 base64 编码的数据进行解码并存入当前对象的缓冲区中
-	 * @param s {const char*} 经 base64 编码的源数据
-	 * @return {string&} 当前对象的引用，如果解码出错，则内部缓冲区会被自动清空，
-	 *  调用 string::empty() 返回 true
+	 * Decode base64 encoded source data and append to current buffer buffer.
+	 * @param s {const char*} Base64 encoded source data.
+	 * @return {string&} Current object reference. When decoding fails, internal
+	 * buffer will be automatically cleared,
+	 *  so string::empty() returns true.
 	 */
 	string& base64_decode(const char* s);
 
 	/**
-	 * 将输入的 base64 编码的数据进行解码并存入当前对象的缓冲区中
-	 * @param ptr {const void*} 经 base64 编码的源数据
-	 * @param len {size_t} ptr 数据长度
-	 * @return {string&} 当前对象的引用，如果解码出错，则内部缓冲区会被自动清空，
-	 *  调用 string::empty() 返回 true
+	 * Decode base64 encoded source data and append to current buffer buffer.
+	 * @param ptr {const void*} Base64 encoded source data.
+	 * @param len {size_t} Data length of ptr.
+	 * @return {string&} Current object reference. When decoding fails, internal
+	 * buffer will be automatically cleared,
+	 *  so string::empty() returns true.
 	 */
 	string& base64_decode(const void* ptr, size_t len);
 
 	/**
-	 * 将输入的源数据进行 url 编码并存入当前对象的缓冲区中
-	 * @param s {const char*} 源数据
-	 * @param dbuf {dbuf_pool*} 内存池对象，如果非空，则内部的动态内存在
-	 *  该对象上分配且当调用者在释放该对象时内部临时动态内存随之被释放，
-	 *  否则使用 acl_mymalloc 分配并自动释放
-	 * @return {string&} 当前对象的引用
+	 * Encode source data with url encoding and append to current buffer buffer.
+	 * @param s {const char*} Source data.
+	 * @param dbuf {dbuf_pool*} Memory pool object. When not empty, internal
+	 * dynamic memory will
+	 * be allocated from this object. When this object is released, internal
+	 * temporary dynamic memory will also be released.
+	 *  Otherwise, uses acl_mymalloc to allocate and automatically release.
+	 * @return {string&} Current object reference.
 	 */
 	string& url_encode(const char* s, dbuf_pool* dbuf = NULL);
 
 	/**
-	 * 将输入的用 url 编码的源数据解码并存入当前对象的缓冲区中
-	 * @param s {const char*} 经 url 编码的源数据
-	 * @param dbuf {dbuf_pool*} 内存池对象，如果非空，则内部的动态内存在
-	 *  该对象上分配且当调用者在释放该对象时内部临时动态内存随之被释放，
-	 * @return {string&} 当前对象的引用
+	 * Decode url encoded source data and append to current buffer buffer.
+	 * @param s {const char*} Url encoded source data.
+	 * @param dbuf {dbuf_pool*} Memory pool object. When not empty, internal
+	 * dynamic memory will
+	 * be allocated from this object. When this object is released, internal
+	 * temporary dynamic memory will also be released.
+	 * @return {string&} Current object reference.
 	 */
 	string& url_decode(const char* s, dbuf_pool* dbuf = NULL);
 
 	/**
-	 * 将源数据进行 H2B 编码并存入当前对象的缓冲区中
-	 * @param s {const void*} 源数据地址
-	 * @param len {size_t} 源数据长度
-	 * @return {string&} 当前对象的引用
+	 * Encode source data with H2B encoding and append to current buffer buffer.
+	 * @param s {const void*} Source data address.
+	 * @param len {size_t} Source data length.
+	 * @return {string&} Current object reference.
 	 */
 	string& hex_encode(const void* s, size_t len);
 
 	/**
-	 * 将源数据进行 H2B 解码并存入当前对象的缓冲区中
-	 * @param s {const char*} 源数据地址
-	 * @param len {size_t} 源数据长度
-	 * @return {string&} 当前对象的引用
+	 * Decode source data with H2B encoding and append to current buffer buffer.
+	 * @param s {const char*} Source data address.
+	 * @param len {size_t} Source data length.
+	 * @return {string&} Current object reference.
 	 */
 	string& hex_decode(const char* s, size_t len);
 
 	/**
-	 * 从文件全路径中提取文件名
-	 * @param path {const char*} 文件全路径字符串，非空字符串
-	 * @return {string&} 当前对象的引用
+	 * Extract file name from file full path.
+	 * @param path {const char*} File full path string, cannot be empty string.
+	 * @return {string&} Current object reference.
 	 */
 	string& basename(const char* path);
 
 	/**
-	 * 从文件全路径中提取文件所在目录
-	 * @param path {const char*} 文件全路径字符串，非空字符串
-	 * @return {string&} 当前对象的引用
+	 * Extract file's directory from file full path.
+	 * @param path {const char*} File full path string, cannot be empty string.
+	 * @return {string&} Current object reference.
 	 */
 	string& dirname(const char* path);
 
 	/**
-	 * 将 32 位有符号整数转为字符串存（内部使用了线程局部变量）
-	 * @param n {int} 32 位有符号整数
-	 * @return {string&} 转换结果对象的引用，其引用了内部的一个线程局部变量
+	 * Convert 32-bit signed integer to string reference (internally uses
+	 * thread-local storage).
+	 * @param n {int} 32-bit signed integer.
+	 * @return {string&} Converted result reference. This reference is valid,
+	 * because internally uses a thread-local buffer.
 	 */
 	static string& parse_int(int n);
 
 	/**
-	 * 将 32 位无符号整数转为字符串存（内部使用了线程局部变量）
-	 * @param n {int} 32 位无符号整数
-	 * @return {string&} 转换结果对象的引用，其引用了内部的一个线程局部变量
+	 * Convert 32-bit unsigned integer to string reference (internally uses
+	 * thread-local storage).
+	 * @param n {int} 32-bit unsigned integer.
+	 * @return {string&} Converted result reference. This reference is valid,
+	 * because internally uses a thread-local buffer.
 	 */
 	static string& parse_int(unsigned int n);
 #if defined(_WIN32) || defined(_WIN64)
@@ -1314,22 +1524,26 @@ public:
 	static string& parse_int64(unsigned __int64 n);
 #else
 	/**
-	 * 将 64 位有符号整数转为字符串存（内部使用了线程局部变量）
-	 * @param n {long long int} 64 位有符号整数
-	 * @return {string&} 转换结果对象的引用，其引用了内部的一个线程局部变量
+	 * Convert 64-bit signed integer to string reference (internally uses
+	 * thread-local storage).
+	 * @param n {long long int} 64-bit signed integer.
+	 * @return {string&} Converted result reference. This reference is valid,
+	 * because internally uses a thread-local buffer.
 	 */
 	static string& parse_int64(long long int n);
 
 	/**
-	 * 将 64 位无符号整数转为字符串存（内部使用了线程局部变量）
-	 * @param n {unsigned long long int} 64 位无符号整数
-	 * @return {string&} 转换结果对象的引用，其引用了内部的一个线程局部变量
+	 * Convert 64-bit unsigned integer to string reference (internally uses
+	 * thread-local storage).
+	 * @param n {unsigned long long int} 64-bit unsigned integer.
+	 * @return {string&} Converted result reference. This reference is valid,
+	 * because internally uses a thread-local buffer.
 	 */
 	static string& parse_int64(unsigned long long int n);
 #endif
 
 	/**
-	 * 模板函数，可用在以下场景:
+	 * Template function, supports the following code:
 	 * string s1, s2;
 	 * T v;
 	 * s1 = s2 + v;
@@ -1362,7 +1576,7 @@ bool operator == (const string* s, const string& str);
 bool operator == (const char* s, const string& str);
 
 /**
- * 模板函数，可用在以下场景:
+ * Template function, supports the following code:
  * string s1, s2;
  * T v;
  * s1 = v + s2;
@@ -1376,7 +1590,7 @@ string operator + (T v, const string& rhs) {
 }
 
 /**
- * 示例:
+ * Examples:
  * string s, s1 = "hello", s2 = "world";
  * s = s1 + " " + s2;
  * s = ">" + s1 + " " + s2;
@@ -1403,28 +1617,31 @@ bool operator == (const acl::string& l, const std::string& r);
 std::ostream& operator << (std::ostream& o, const acl::string& s);
 
 /**
- * 将字符串进行分割
- * @param str {const char*} 待分割的源字符串
- * @param sep {const char*} 分割的字符串，属于该字符串中的任一个字符都可做为分割符
- * @param out {std::vector<std::string>&} 存储分割后的字符串结果集
+ * Split string.
+ * @param str {const char*} Source string to split.
+ * @param sep {const char*} Separator string. Each character in this string can
+ * be used as separator.
+ * @param out {std::vector<std::string>&} Store split string collection.
  */
 void split(const char* str, const char* sep, std::vector<std::string>& out);
 
 /**
- * 将字符串进行分割
- * @param str {const char*} 待分割的源字符串
- * @param sep {const char*} 分割的字符串，属于该字符串中的任一个字符都可做为分割符
- * @param out {std::list<std::string>&} 存储分割后的字符串结果集
- * @return {size_t} 返回分割后结果集中字符串的个数
+ * Split string.
+ * @param str {const char*} Source string to split.
+ * @param sep {const char*} Separator string. Each character in this string can
+ * be used as separator.
+ * @param out {std::list<std::string>&} Store split string collection.
+ * @return {size_t} Returns number of split string elements.
  */
 size_t split(const char* str, const char* sep, std::list<std::string>& out);
 
 } // namespce acl
 
 #if __cplusplus >= 201103L      // Support c++11 ?
+
 namespace std {
 
-// 定义哈希方法，只为方便C++11中的 std::unordered_xxx 类容器使用
+// Hash function, only for use with std::unordered_xxx containers in C++11.
 
 template <>
 struct hash<acl::string> {
@@ -1436,3 +1653,4 @@ struct hash<acl::string> {
 } // namespace std
 
 #endif	// __cplusplus >= 201103L
+

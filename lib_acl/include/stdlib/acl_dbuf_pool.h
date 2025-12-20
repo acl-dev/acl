@@ -5,108 +5,110 @@
 extern "C" {
 #endif
 
+#include "acl_define.h"
+
 typedef struct ACL_DBUF_POOL ACL_DBUF_POOL;
 
 /**
- * 创建内存池对象
- * @param block_size {size_t} 内存池中每个连续内存块的大小（字节）
- * @return {ACL_DBUF_POOL*} 返回非 NULL 对象
+ * Create memory pool object.
+ * @param block_size {size_t} Memory pool's size for each allocated memory block, in bytes.
+ * @return {ACL_DBUF_POOL*} Returns NULL on error
  */
 ACL_API ACL_DBUF_POOL *acl_dbuf_pool_create(size_t block_size);
 
 /**
- * 创建内存池对象
- * @param block_size {size_t} 内存池中每个连续内存块的大小（字节）
- * @param align {size_t} 分配内存时的字节对齐个数
- * @return {ACL_DBUF_POOL*} 返回非 NULL 对象
+ * Create memory pool object.
+ * @param block_size {size_t} Memory pool's size for each allocated memory block, in bytes.
+ * @param align {size_t} Byte alignment when allocating memory
+ * @return {ACL_DBUF_POOL*} Returns NULL on error
  */
 ACL_API ACL_DBUF_POOL *acl_dbuf_pool_create2(size_t block_size, size_t align);
 
 /**
- * 重置内存池状态，会将多余的内存数据块释放
- * @param pool {ACL_DBUF_POOL*} 内存池对象
- * @param off {size_t} 要求保留的最小内存相对偏移位置
- * @return {int} 返回 0 表示操作成功，非 0 表示失败
+ * Reset memory pool state, will free all allocated memory data blocks.
+ * @param pool {ACL_DBUF_POOL*} Memory pool object
+ * @param off {size_t} Offset position of memory block to reset to
+ * @return {int} Return 0 indicates reset succeeded, non-zero indicates failure
  */
 ACL_API int  acl_dbuf_pool_reset(ACL_DBUF_POOL *pool, size_t off);
 
 /**
- * 销毁内存池
- * @param pool {ACL_DBUF_POOL*} 对象池对象
+ * Destroy memory pool.
+ * @param pool {ACL_DBUF_POOL*} Pool object
  */
 ACL_API void acl_dbuf_pool_destroy(ACL_DBUF_POOL *pool);
 
 /**
- * 分配指定长度的内存
- * @param pool {ACL_DBUF_POOL*} 对象池对象
- * @param  len {size_t} 需要分配的内存大小
- * @return {void*} 新分配的内存地址
+ * Allocate memory of specified length.
+ * @param pool {ACL_DBUF_POOL*} Pool object
+ * @param  len {size_t} Required memory size
+ * @return {void*} Newly allocated memory address
  */
 ACL_API void *acl_dbuf_pool_alloc(ACL_DBUF_POOL *pool, size_t len);
 
 /**
- * 分配指定长度的内存并将内存区域清零
- * @param pool {ACL_DBUF_POOL*} 对象池对象
- * @param len {size_t} 需要分配的内存长度
- * @return {void*} 新分配的内存地址
+ * Allocate memory of specified length and initialize memory to zero.
+ * @param pool {ACL_DBUF_POOL*} Pool object
+ * @param len {size_t} Required memory length
+ * @return {void*} Newly allocated memory address
  */
 ACL_API void *acl_dbuf_pool_calloc(ACL_DBUF_POOL *pool, size_t len);
 
 /**
- * 根据输入的字符串动态创建新的内存并将字符串进行复制，类似于 strdup
- * @param pool {ACL_DBUF_POOL*} 对象池对象
- * @param s {const char*} 源字符串
- * @return {char*} 新复制的字符串地址
+ * Dynamically allocate new memory for source string and copy string content, similar to strdup.
+ * @param pool {ACL_DBUF_POOL*} Pool object
+ * @param s {const char*} Source string
+ * @return {char*} Address of newly copied string
  */
 ACL_API char *acl_dbuf_pool_strdup(ACL_DBUF_POOL *pool, const char *s);
 
 /**
- * 根据输入的字符串动态创建新的内存并将字符串进行复制，类似于 strdup
- * @param pool {ACL_DBUF_POOL*} 对象池对象
- * @param s {const char*} 源字符串
- * @param len {size_t} 限定的最大字符串长度
- * @return {char*} 新复制的字符串地址
+ * Dynamically allocate new memory for source string and copy string content, similar to strdup.
+ * @param pool {ACL_DBUF_POOL*} Pool object
+ * @param s {const char*} Source string
+ * @param len {size_t} Maximum string length to copy
+ * @return {char*} Address of newly copied string
  */
 ACL_API char *acl_dbuf_pool_strndup(ACL_DBUF_POOL *pool,
 	const char *s, size_t len);
 
 /**
- * 根据输入的内存数据动态创建内存并将数据进行复制
- * @param pool {ACL_DBUF_POOL*} 对象池对象
- * @param addr {const void*} 源数据内存地址
- * @param len {size_t} 源数据长度
- * @return {void*} 新复制的数据地址
+ * Dynamically allocate memory for source memory data and copy data content.
+ * @param pool {ACL_DBUF_POOL*} Pool object
+ * @param addr {const void*} Source memory data address
+ * @param len {size_t} Source data length
+ * @return {void*} Address of newly copied data
  */
 ACL_API void *acl_dbuf_pool_memdup(ACL_DBUF_POOL *pool,
 		const void *addr, size_t len);
 
 /**
- * 归还由内存池分配的内存
- * @param pool {ACL_DBUF_POOL*} 对象池对象
- * @param addr {const void*} 由内存池分配的内存地址
- * @return {int} 如果该内存地址非内存池分配或释放多次，则返回 -1，操作成功则
- *  返回 0
+ * Return memory to memory pool for reuse.
+ * @param pool {ACL_DBUF_POOL*} Pool object
+ * @param addr {const void*} Memory address allocated from memory pool
+ * @return {int} If memory address is not in memory pool or freed multiple times, returns -1; if operation succeeded,
+ *  returns 0
  */
 ACL_API int acl_dbuf_pool_free(ACL_DBUF_POOL *pool, const void *addr);
 
 /**
- * 保留由内存池分配的某段地址，以免当调用 reset 时被提前释放掉
- * @param pool {ACL_DBUF_POOL*} 对象池对象
- * @param addr {const void*} 由内存池分配的内存地址
- * @return {int} 操作成功则返回 0，如果该内存地址非内存池分配，则返回 -1
+ * Keep a certain address in memory pool, so it will not be freed when calling reset.
+ * @param pool {ACL_DBUF_POOL*} Pool object
+ * @param addr {const void*} Memory address allocated from memory pool
+ * @return {int} If operation succeeded, returns 0; if memory address is not in memory pool, returns -1
  */
 ACL_API int acl_dbuf_pool_keep(ACL_DBUF_POOL *pool, const void *addr);
 
 /**
- * 取消保留由内存池分配的某段地址，以便于调用 dbuf_reset 时被释放掉
- * @param pool {ACL_DBUF_POOL*} 对象池对象
- * @param addr {const void*} 由内存池分配的内存地址
- * @return {int} 操作成功则返回 0，如果该内存地址非内存池分配，则返回 -1
+ * Remove a certain address from memory pool's kept addresses, so it will be freed when calling dbuf_reset.
+ * @param pool {ACL_DBUF_POOL*} Pool object
+ * @param addr {const void*} Memory address allocated from memory pool
+ * @return {int} If operation succeeded, returns 0; if memory address is not in memory pool, returns -1
  */
 ACL_API int acl_dbuf_pool_unkeep(ACL_DBUF_POOL *pool, const void *addr);
 
 /**
- * 内部测试用函数
+ * Internal test function.
  */
 ACL_API void acl_dbuf_pool_test(size_t max);
 

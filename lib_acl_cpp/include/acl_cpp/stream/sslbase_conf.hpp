@@ -13,10 +13,11 @@ public:
 	virtual ~ssl_sni_checker() {}
 
 	/**
-	 * 虚方法用来检查输入的sni host是否合法，子类必须实现
-	 * @param sni {const char*} 客户端传来的 sni 字段
-	 * @param host {acl::string&} 从 sni 中提取的 host 字段
-	 * @return {bool} 检查是否合法
+	 * Virtual method used to check whether input sni host is valid. Subclasses
+	 * must implement
+	 * @param sni {const char*} SNI field sent by client
+	 * @param host {acl::string&} Host field extracted from sni
+	 * @return {bool} Whether check is valid
 	 */
 	virtual bool check(sslbase_io* io, const char* sni, string& host) = 0;
 };
@@ -36,17 +37,20 @@ public:
 	virtual ~sslbase_conf() {}
 
 	/**
-	 * 纯虚方法，创建 SSL IO 对象
-	 * @param nblock {bool} 是否为非阻塞模式
+	 * Pure virtual method, create SSL IO object
+	 * @param nblock {bool} Whether it is non-blocking mode
 	 * @return {sslbase_io*}
 	 */
 	virtual sslbase_io* create(bool nblock) = 0;
 
 	/**
- 	 * 设置SSL/TLS版本
- 	 * @param ver_min {int} 最小版本号，内部默认值为 tls_ver_1_2
- 	 * @param ver_max {int} 最大版本号，内部默认值为 tls_ver_1_3
- 	 * @return {bool} 返回true表示设置成功，否则表示不支持设置版本
+ 	 * Set SSL/TLS version
+ 	 * @param ver_min {int} Minimum version number, internal default value is
+ 	 * tls_ver_1_2
+ 	 * @param ver_max {int} Maximum version number, internal default value is
+ 	 * tls_ver_1_3
+ 	 * @return {bool} Returns true indicates setting was successful, otherwise
+ 	 * indicates version setting is not supported
 	 */
 	virtual bool set_version(int ver_min, int ver_max) {
 		(void) ver_min;
@@ -55,9 +59,9 @@ public:
 	}
 
 	/**
-	 * 获得所设置的SSL版本号
-	 * @param ver_min {int&} 用来存放最小版本号
-	 * @param ver_max {int&} 用来存放最大版本号
+	 * Get set SSL version number
+	 * @param ver_min {int&} Used to store minimum version number
+	 * @param ver_max {int&} Used to store maximum version number
 	 */
 	void get_version(int& ver_min, int& ver_max) {
 		ver_min = ver_min_;
@@ -65,7 +69,7 @@ public:
 	}
 
 	/**
-	 * 将版本号转为字符串
+	 * Convert version number to string
 	 * @param v {int}
 	 * @return {const char*}
 	 */
@@ -87,11 +91,14 @@ public:
 	}
 //public:
 	/**
-	 * 加载 CA 根证书(每个配置实例只需调用一次本方法)
-	 * @param ca_file {const char*} CA 证书文件全路径
-	 * @param ca_path {const char*} 多个 CA 证书文件所在目录
-	 * @return {bool} 加载 CA 根证书是否成功
-	 * 注：如果 ca_file、ca_path 均非空，则会依次加载所有证书
+	 * Load CA root certificate (each configuration instance only needs to call
+	 * this method once)
+	 * @param ca_file {const char*} Full path of CA certificate file
+	 * @param ca_path {const char*} Directory where multiple CA certificate files
+	 * are located
+	 * @return {bool} Whether loading CA root certificate was successful
+	 * Note: If both ca_file and ca_path are non-empty, will load all certificates
+	 * in sequence
 	 */
 	virtual bool load_ca(const char* ca_file, const char* ca_path) {
 		(void) ca_file;
@@ -100,11 +107,13 @@ public:
 	}
 
 	/**
-	 * 添加一个服务端/客户端自己的证书，可以多次调用本方法加载多个证书
-	 * @param crt_file {const char*} 证书文件全路径，非空
-	 * @param key_file {const char*} 密钥文件全路径，非空
-	 * @param key_pass {const char*} 密钥文件的密码，没有密钥密码可写 NULL
-	 * @return {bool} 添加证书是否成功
+	 * Add a server/client's own certificate. Can call this method multiple times
+	 * to load multiple certificates
+	 * @param crt_file {const char*} Full path of certificate file, non-empty
+	 * @param key_file {const char*} Full path of key file, non-empty
+	 * @param key_pass {const char*} Password of key file. Can write NULL if there
+	 * is no key password
+	 * @return {bool} Whether adding certificate was successful
 	 */
 	virtual bool add_cert(const char* crt_file, const char* key_file,
 		const char* key_pass) {
@@ -114,15 +123,16 @@ public:
 		return false;
 	}
 
-	// 仅为了兼容旧的API
+	// Only for compatibility with old API
 	bool add_cert(const char* crt_file, const char* key_file) {
 		return add_cert(crt_file, key_file, NULL);
 	}
 
 	/**
-	 * 添加一个服务端/客户端自己的证书，可以多次调用本方法加载多个证书
-	 * @param crt_file {const char*} 证书文件全路径，非空
-	 * @return {bool} 添加证书是否成功
+	 * Add a server/client's own certificate. Can call this method multiple times
+	 * to load multiple certificates
+	 * @param crt_file {const char*} Full path of certificate file, non-empty
+	 * @return {bool} Whether adding certificate was successful
 	 * @deprecated use add_cert(const char*, const char*, const char*)
 	 */
 	virtual bool add_cert(const char* crt_file) {
@@ -131,10 +141,12 @@ public:
 	}
 
 	/**
-	 * 添加服务端/客户端的密钥(每个配置实例只需调用一次本方法)
-	 * @param key_file {const char*} 密钥文件全路径，非空
-	 * @param key_pass {const char*} 密钥文件的密码，没有密钥密码可写 NULL
-	 * @return {bool} 设置是否成功
+	 * Add server/client's key (each configuration instance only needs to call this
+	 * method once)
+	 * @param key_file {const char*} Full path of key file, non-empty
+	 * @param key_pass {const char*} Password of key file. Can write NULL if there
+	 * is no key password
+	 * @return {bool} Whether setting was successful
 	 * @deprecated use add_cert(const char*, const char*, const char*)
 	 */
 	virtual bool set_key(const char* key_file, const char* key_pass) {
@@ -143,22 +155,23 @@ public:
 		return false;
 	}
 
-	// 仅为了兼容旧的API
+	// Only for compatibility with old API
 	bool set_key(const char* key_file) {
 		return set_key(key_file, NULL);
 	}
 
 	/**
-	 * 当为服务端模式时是否启用会话缓存功能，有助于提高 SSL 握手效率
+	 * When in server mode, whether to enable session cache function, helps improve
+	 * SSL handshake efficiency
 	 * @param on {bool}
-	 * 注：该函数仅对服务端模式有效
+	 * Note: This function is only effective for server mode
 	 */
 	virtual void enable_cache(bool on) {
 		(void) on;
 	}
 
 	/**
-	 * 设置客户端发送的 SNI 校验类对象
+	 * Set SNI checker class object sent by client
 	 * @param checker {ssl_sni_checker*}
 	 */
 	void set_sni_checker(ssl_sni_checker* checker) {
@@ -166,7 +179,7 @@ public:
 	}
 
 	/**
-	 * 获得所设置的 SNI 校验对象
+	 * Get set SNI checker object
 	 * @return {ssl_sni_checker*}
 	 */
 	ssl_sni_checker* get_sni_checker() const {
@@ -180,3 +193,4 @@ protected:
 };
 
 } // namespace acl
+

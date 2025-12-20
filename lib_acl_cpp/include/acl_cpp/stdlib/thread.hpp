@@ -5,7 +5,8 @@
 namespace acl {
 
 /**
- * 纯虚函数：线程任务类，该类实例的 run 方法是在子线程中被执行的
+ * Pure virtual function: Thread task class. The run method of instances of this
+ * class is executed in child threads
  */
 class ACL_CPP_API thread_job : public noncopyable {
 public:
@@ -13,15 +14,19 @@ public:
 	virtual ~thread_job() {}
 
 	/**
-	 * 纯虚函数，子类必须实现此函数，该函数在子线程中执行
-	 * @return {void*} 线程退出前返回的参数
+	 * Pure virtual function, subclasses must implement this function. This
+	 * function executes in child threads
+	 * @return {void*} Parameter returned before thread exits
 	 */
 	virtual void* run() = 0;
 
 	/**
-	 * 虚方法，在新创建的子线程中的 run() 方法被调用前调用，在同步创建
-	 * 线程方式下，子线程被创建后调用该虚方法，然后再通知创建这线程，
-	 * 从而保证在创建线程的 start() 方法返回前子线程执行初始化过程。
+	 * Virtual method, called before run() method is called in newly created child
+	 * thread. In synchronous thread creation
+	 * mode, after child thread is created, this virtual method is called, then the
+	 * creating thread is notified,
+	 * thus ensuring that child thread executes initialization process before
+	 * creating thread's start() method returns.
 	 */
 	virtual void init() {}
 };
@@ -30,8 +35,10 @@ template<typename T> class tbox;
 class atomic_long;
 
 /**
- * 线程纯虚类，该类的接口定义类似于 Java 的接口定义，子类需要实现
- * 基类的纯虚函数，使用者通过调用 thread::start() 启动线程过程
+ * Thread pure virtual class. The interface definition of this class is similar
+ * to Java's interface definition. Subclasses need to implement
+ * pure virtual functions of the base class. Users start the thread process by
+ * calling thread::start()
  */
 class ACL_CPP_API thread : public thread_job {
 public:
@@ -39,47 +46,58 @@ public:
 	virtual ~thread();
 
 	/**
-	 * 开始启动线程过程，一旦该函数被调用，则会立即启动一个新的
-	 * 子线程，在子线程中执行基类 thread_job::run 过程
-	 * @return {bool} 是否成功创建线程
+	 * Start the thread process. Once this function is called, a new
+	 * child thread will be started immediately, executing base class
+	 * thread_job::run process in the child thread
+	 * @return {bool} Whether thread was successfully created
 	 */
 	bool start(bool sync = false);
 
 	/**
-	 * 当创建线程时为非 detachable 状态，则必须调用此函数等待线程结束；
-	 * 若创建线程时为 detachable 状态时，禁止调用本函数
-	 * @param out {void**} 当该参数非空指针时，该参数用来存放
-	 *  线程退出前返回的参数
-	 * @return {bool} 是否成功
+	 * When thread is created in non-detachable state, this function must be called
+	 * to wait for thread to end;
+	 * If thread is created in detachable state, calling this function is
+	 * prohibited
+	 * @param out {void**} When this parameter is not NULL pointer, this parameter
+	 * is used to store
+	 *  parameter returned before thread exits
+	 * @return {bool} Whether successful
 	 */
 	bool wait(void** out = NULL);
 
 	/**
-	 * 在调用 start 前调用此函数可以设置所创建线程是否为分离 (detachable)
-	 * 状态；如果未调用此函数，则所创建的线程默认为非分离状态，在非分离状
-	 * 态下，其它线程可以 wait 本线程对象，否则禁止 wait 本线程对象；在非
-	 * 分离状态下，其它线程必须要 wait 本线程，否则会引起内存泄露。
-	 * @param yes {bool} 是否为分离状态
+	 * Call this function before calling start to set whether the created thread is
+	 * detachable
+	 * state. If this function is not called, the created thread defaults to
+	 * non-detachable state. In non-detachable state,
+	 * other threads can wait on this thread object, otherwise waiting on this
+	 * thread object is prohibited. In non-
+	 * detachable state, other threads must wait on this thread, otherwise it will
+	 * cause memory leak.
+	 * @param yes {bool} Whether it is detachable state
 	 * @return {thread&}
 	 */
 	thread& set_detachable(bool yes);
 
 	/**
-	 * 在调用 start 前调用此函数可以设置所创建线程的堆栈大小
-	 * @param size {size_t} 线程堆栈大小，当该值为 0 或未
-	 *  调用此函数，则所创建的线程堆栈大小为系统的默认值
+	 * Call this function before calling start to set the stack size of the created
+	 * thread
+	 * @param size {size_t} Thread stack size. When this value is 0 or this
+	 * function is not called, the created thread stack size is the system default
+	 * value
 	 * @return {thread&}
 	 */
 	thread& set_stacksize(size_t size);
 
 	/**
-	 * 在调用 start 后调用此函数可以获得所创建线程的 id 号
+	 * Call this function after calling start to get the id number of the created
+	 * thread
 	 * @return {unsigned long}
 	 */
 	unsigned long thread_id() const;
 
 	/**
-	 * 当前调用者所在线程的线程 id 号
+	 * Thread id number of the thread where the current caller is located
 	 * @return {unsigned long}
 	 */
 	static unsigned long thread_self();
@@ -107,3 +125,4 @@ private:
 };
 
 } // namespace acl
+

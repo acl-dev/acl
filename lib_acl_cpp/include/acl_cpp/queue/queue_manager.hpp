@@ -15,176 +15,194 @@ class ACL_CPP_API queue_manager : public noncopyable
 {
 public:
 	/**
-	 * 队列对象的构造函数
-	 * @param home {const char*} 队列的根目录
-	 * @param queueName {const char*} 该队列对象的队列名称
+	 * Queue object constructor
+	 * @param home {const char*} Root directory of queue
+	 * @param queueName {const char*} Queue name of this queue object
 	 */
 	queue_manager(const char* home, const char* queueName,
 		unsigned sub_width = 2);
 	~queue_manager();
 
 	/**
-	 * 获得队列名
+	 * Get queue name
 	 * @return {const char*}
 	 */
 	const char* get_queueName() const;
 
 	/**
-	 * 获得队列根目录
+	 * Get queue root directory
 	 * @return {const char*}
 	 */
 	const char* get_home() const;
 
 	/**
-	 * 创建队列文件
-	 * @param extName {const char*} 队列文件扩展名
-	 * @return {queue_file*} 队列文件对象, 永远非NULL, 该返回值
-	 *  为动态创建的, 所以用完后需要 delete 以释放其所占内存
+	 * Create queue file
+	 * @param extName {const char*} Queue file extension name
+	 * @return {queue_file*} Queue file object. Always non-NULL. This return value
+	 *  is dynamically created, so need to delete after use to release its memory
 	 */
 	queue_file* create_file(const char* extName);
 
 	/**
-	 * 打开磁盘上存在的队列文件用于读/写
-	 * @param path {const char*} 队列文件名
-	 * @param no_cache {bool} 为 true 时，要求在缓存中该文件对应的 KEY
-	 *  必须不存在，如果存在则返回 NULL 表示该文件正被锁定; 当该参数为
-	 *  false 时，则可以直接使用缓存中的对象
-	 * @return {queue_file*} 队列文件对象, 出错或不存在则返回 NULL
+	 * Open existing queue file on disk for read/write
+	 * @param path {const char*} Queue filename
+	 * @param no_cache {bool} When true, requires that KEY corresponding to this
+	 * file in cache
+	 * must not exist. If exists, returns NULL indicating this file is locked. When
+	 * this parameter is
+	 *  false, can directly use object in cache
+	 * @return {queue_file*} Queue file object. Returns NULL if error or does not
+	 * exist
 	 */
 	queue_file* open_file(const char* path, bool no_cache = true);
 
 	/**
-	 * 关闭队列文件句柄, 并释放该文件对象，并不删除文件
-	 * @param fp {queue_file*} 队列文件对象
-	 * @return {bool} 关闭是否成功
+	 * Close queue file handle and release this file object, does not delete file
+	 * @param fp {queue_file*} Queue file object
+	 * @return {bool} Whether closing was successful
 	 */
 	bool close_file(queue_file* fp);
 
 	/**
-	 * 从磁盘上删除队列文件, 并释放该文件对象
-	 * @param fp {queue_file*} 队列文件对象
-	 * @return {bool} 删除文件是否成功
+	 * Delete queue file from disk and release this file object
+	 * @param fp {queue_file*} Queue file object
+	 * @return {bool} Whether file deletion was successful
 	 */
 	bool delete_file(queue_file* fp);
 
 	/**
-	 * 修改文件的扩展名
-	 * @param fp {queue_file*} 队列文件对象
-	 * @param extName {const char*} 新的扩展名
-	 * @return {bool} 修改文件扩展名是否成功
+	 * Modify file's extension name
+	 * @param fp {queue_file*} Queue file object
+	 * @param extName {const char*} New extension name
+	 * @return {bool} Whether modifying file extension name was successful
 	 */
 	bool rename_extname(queue_file* fp, const char* extName);
 
 	/**
-	 * 将队列文件移至目标队列中, 移动成功后, 文件对象内部内容将会发生改变
-	 * @param fp {queue_file*} 队列文件对象
-	 * @param queueName {const char*} 目标队列名
-	 * @param extName {const char*} 文件扩展名
-	 * @return {bool} 移动队列文件是否成功, 如果移动失败, 则调用者应用调用
-	 *  close_file 关闭该队列文件对象, 该文件将会被定时扫描任务移走
+	 * Move queue file to target queue. After move succeeds, file object's internal
+	 * content will change
+	 * @param fp {queue_file*} Queue file object
+	 * @param queueName {const char*} Target queue name
+	 * @param extName {const char*} File extension name
+	 * @return {bool} Whether moving queue file was successful. If move fails,
+	 * caller should call
+	 * close_file to close this queue file object. This file will be moved by
+	 * scheduled scanning task
 	 */
 	bool move_file(queue_file* fp, const char* queueName, const char* extName);
 
 	/**
-	 * 将一个队列文件对象移至目标队列对象中
-	 * @param fp {queue_file*} 队列文件对象
-	 * @param toQueue {queue_manager*} 目标队列对象
-	 * @param extName {const char*} 文件扩展名
-	 * @return {bool} 移动队列文件是否成功, 如果移动失败, 则调用者应用调用
-	 *  close_file 关闭该队列文件对象, 该文件将会被定时扫描任务移走
+	 * Move a queue file object to target queue object
+	 * @param fp {queue_file*} Queue file object
+	 * @param toQueue {queue_manager*} Target queue object
+	 * @param extName {const char*} File extension name
+	 * @return {bool} Whether moving queue file was successful. If move fails,
+	 * caller should call
+	 * close_file to close this queue file object. This file will be moved by
+	 * scheduled scanning task
 	 */
 	bool move_file(queue_file* fp, queue_manager* toQueue, const char* extName);
 
 	/**
-	 * 从磁盘上删除本队列文件, 删除成功后该队列文件句柄已经被删除, 不可再用,
-	 * 即使删除文件失败, 该队列文件对象也被释放, 只是从磁盘上删除该文件失败,
-	 * 所以调用此函数后 fp 不能再次使用
+	 * Delete this queue file from disk. After deletion succeeds, this queue file
+	 * handle has been deleted and cannot be used again.
+	 * Even if file deletion fails, this queue file object is also released, only
+	 * file deletion from disk failed.
+	 * So after calling this function, fp cannot be used again
 	 * @param fp {queue_file*}
-	 * @return {bool} 删除是否成功
+	 * @return {bool} Whether deletion was successful
 	 */
 	bool remove(queue_file* fp);
 
 	/**
-	* 检查所给文件名是否正在被使用
-	* @param fileName {const char*} 文件名
-	* @return {bool} 是否被使用
+	* Check whether given filename is currently being used
+	* @param fileName {const char*} Filename
+	* @return {bool} Whether it is being used
 	*/
 	bool busy(const char* fileName);
 
 	/**
-	* 在队列对象的缓存中查找某个队列文件对象
-	* @param key {const char*} 队列文件的部分文件名(不含路径及扩展名)
-	* @return {queue_file*} 返回 NULL 则表示未查到
+	* Find a queue file object in queue object's cache
+	* @param key {const char*} Partial filename of queue file (excluding path and
+	* extension)
+	* @return {queue_file*} Returns NULL indicates not found
 	*/
 	queue_file* cache_find(const char* key);
 
 	/**
-	* 向队列对象的缓存中添加某个队列文件对象
-	* @param fp {queue_file*} 队列文件对象
-	* @return {bool} 添加是否成功, 若失败则说明该对象或其对应的键值
-	*  已经存在于缓存中
+	* Add a queue file object to queue object's cache
+	* @param fp {queue_file*} Queue file object
+	* @return {bool} Whether adding was successful. If fails, it indicates this
+	* object or its corresponding key value
+	*  already exists in cache
 	*/
 	bool cache_add(queue_file* fp);
 
 	/**
-	* 从队列对象的缓存中删除某个队列文件对象
-	* @param key {const char*} 队列文件对象的键值
-	* @return {bool} 删除是否成功, 若失败则说明该队列文件对象不存在
+	* Delete a queue file object from queue object's cache
+	* @param key {const char*} Key value of queue file object
+	* @return {bool} Whether deletion was successful. If fails, it indicates this
+	* queue file object does not exist
 	*/
 	bool cache_del(const char* key);
 
-	/*-------------------- 与队列扫描相关的函数 ------------------------*/
+	/*-------------------- Functions related to queue scanning ------------------------*/
 
 	/**
-	* 打开磁盘扫描队列
-	* @param scanSub {bool} 是否递归扫描子目录
-	* @return {bool} 打开队列是否成功
+	* Open queue for disk scanning
+	* @param scanSub {bool} Whether to recursively scan subdirectories
+	* @return {bool} Whether opening queue was successful
 	*/
 	bool scan_open(bool scanSub = true);
 
 	/**
-	* 关闭扫描队列
+	* Close scanning queue
 	*/
  	void scan_close();
 
 	/**
-	* 获得磁盘队列中的下一个队列文件, 若扫描完毕则返回空
-	* @return {queue_file*} 扫描的队列文件对象, 返回空则表示扫描完毕
-	*  或出错，非空对象一定要在用完后 delete 以释放内部分配的资源
+	* Get next queue file in disk queue. Returns empty if scanning is complete
+	* @return {queue_file*} Scanned queue file object. Returns empty indicates
+	* scanning complete
+	* or error occurred. Non-empty object must be deleted after use to release
+	* internally allocated resources
 	*/
 	queue_file* scan_next(void);
 
 	/**
-	* 根据文件路径分析出队列名, 文件名(不含路径及扩展名部分), 文件扩展名
-	* @param filePath {const char*} 文件全路径名
-	* @param home {acl::string*} 存储文件所在的根目录
-	* @param queueName {acl::string*} 存储文件所在的队列名
-	* @param queueSub {acl::string*} 存储文件的队列子目录
-	* @param partName {acl::string*} 存储文件的文件名部分(不含路径及扩展名)
-	* @param extName {acl::string*} 存储文件的扩展名部分
+	* Parse queue name, filename (excluding path and extension parts), file
+	* extension name from file path
+	* @param filePath {const char*} Full file path name
+	* @param home {acl::string*} Store root directory where file is located
+	* @param queueName {acl::string*} Store queue name where file is located
+	* @param queueSub {acl::string*} Store queue subdirectory of file
+	* @param partName {acl::string*} Store filename part of file (excluding path
+	* and extension)
+	* @param extName {acl::string*} Store extension name part of file
 	*/
 	static bool parse_filePath(const char* filePath, acl::string* home,
 		string* queueName, string* queueSub,
 		string* partName, string* extName);
 
 	/**
-	* 根据文件名称(含扩展名但不含路径), 分析出文件名(不含路径及扩展名),
-	* 和文件扩展名称
+	* Parse filename (excluding path and extension), file extension name from file
+	* name (including extension but excluding path)
 	*/
 	static bool parse_fileName(const char* fileName, acl::string* partName,
 		string* extName);
 
 	/**
-	* 分析路径, 从中提取出队列名称
+	* Parse path, extract queue name from it
 	*/
 	static bool parse_path(const char* path, acl::string* home,
 		string* queueName, acl::string* queueSub);
 
 	/**
-	* 根据部分文件名(不含目录及扩展名)计算出其队列子目录路径(以数字表示)
-	* @param partName {const char*} 部分文件名
-	* @param width {unsigned} 队列二级目录的个数
-	* @return {unsigned int} 队列子目录路径(以数字表示)
+	* Calculate queue subdirectory path (represented as number) based on partial
+	* filename (excluding directory and extension)
+	* @param partName {const char*} Partial filename
+	* @param width {unsigned} Number of queue second-level directories
+	* @return {unsigned int} Queue subdirectory path (represented as number)
 	*/
 	static unsigned int hash_queueSub(const char* partName, unsigned width);
 
@@ -194,7 +212,7 @@ private:
 
 	//typedef struct ACL_SCAN_DIR ACL_SCAN_DIR;
 
-	// 扫描目录的句柄
+	// Handle for scanning directory
 	ACL_SCAN_DIR* m_scanDir;
 	string m_home;
 	string m_queueName;
@@ -205,3 +223,4 @@ private:
 };
 
 } // namespace acl
+

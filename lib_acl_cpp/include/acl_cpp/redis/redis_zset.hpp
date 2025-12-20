@@ -36,21 +36,22 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 添加对应 key 的有序集
+	 * Add members to corresponding key sorted set.
 	 * add one or more members to a sorted set, or update its score if
 	 * it already exists
-	 * @param key {const char*} 有序集键值
+	 * @param key {const char*} Sorted set key value.
 	 *  the key of a sorted set
-	 * @param members "分值-成员"集合
+	 * @param members "score-member" collection.
 	 *  the set storing values and stores
-	 * @return {int} 新成功添加的 "分值-成员" 对的数量
+	 * @return {int} Number of successfully added "score-member" pairs.
 	 *  the number of elements added to the sorted set, not including
 	 *  elements already existing for which the score was updated
-	 *  0：表示一个也未添加，可能因为该成员已经存在于有序集中
+	 * 0: Indicates nothing was added, possibly because member already exists and
+	 * score was updated.
 	 *     nothing was added to the sorted set
-	 * -1：表示出错或 key 对象非有序集对象
+	 * -1: Indicates error occurred or key is not a sorted set object.
 	 *     error or it was not a sorted set by the key
-	 * >0：新添加的成员数量
+	 * >0: Number of members added.
 	 *     the number of elements added
 	 */
 	int zadd(const char* key, const std::map<string, double>& members,
@@ -81,52 +82,55 @@ public:
 		double score, double* result = NULL);
 
 	/**
-	 * 获得相应键的有序集的成员数量
+	 * Get number of members in corresponding sorted set.
 	 * get the number of elements in a sorted set
-	 * @param key {const char*} 有序集键值
+	 * @param key {const char*} Sorted set key value.
 	 *  the key of a a sorted set
-	 * @return {int} 一个键的有序集的成员数量
+	 * @return {int} Number of members in sorted set.
 	 *  the number of elements of the sorted set
-	 *   0：该键不存在
+	 *   0: Key does not exist.
 	 *      the key doesn't exist
-	 *  -1：出错或该键的数据对象不是有效的有序集对象
+	 * -1: Error occurred or data object corresponding to key is not a valid sorted
+	 * set object.
 	 *      error or it wasn't a sorted set by the key
-	 *  >0：当前键值对应的数据对象中的成员个数
+	 *  >0: Number of members in data object corresponding to current key value.
 	 *      the number of elements in the sorted set
 	 */
 	int zcard(const char* key);
 
 	/**
-	 * 获得 key 的有序集中指定分值区间的成员个数
+	 * Get number of members in key sorted set with scores within specified range.
 	 * get the number of elements in a sorted set with scores within
 	 * the given values
-	 * @param key {const char*} 有序集键值
+	 * @param key {const char*} Sorted set key value.
 	 *  the key of a sorted set
-	 * @param min {double} 最小分值
+	 * @param min {double} Minimum score.
 	 *  the min score specified
-	 * @param max {double} 最大分值
+	 * @param max {double} Maximum score.
 	 *  the max socre specified
-	 * @return {int} 符合条件的成员个数
+	 * @return {int} Number of members in specified range.
 	 *  the number of elements in specified score range
-	 *  0：该键对应的有序集不存在或该 KEY 有序集的对应分值区间成员为空
+	 * 0: No members in specified score range corresponding to this key sorted set,
+	 * or KEY sorted set's corresponding score range members are empty.
 	 *     nothing in the specified score range, or the key doesn't exist
-	 *  -1: 出错或该键的数据对象不是有效的有序集对象
+	 * -1: Error occurred or data object corresponding to key is not a valid sorted
+	 * set object.
 	 *     error or it is not a sorted set by the key
 	 */
 	int zcount(const char* key, double min, double max);
 
 	/**
-	 * 将 key 的有序集中的某个成员的分值加上增量 inc
+	 * Increment score of a certain member in key sorted set by inc.
 	 * increase the score of a memeber in a sorted set
-	 * @param key {const char*} 有序集键值
+	 * @param key {const char*} Sorted set key value.
 	 *  the key of the sorted set
-	 * @param inc {double} 增量值
+	 * @param inc {double} Increment value.
 	 *  the value to be increased
-	 * @param member {const char*} 有序集中成员名
+	 * @param member {const char*} Member name in sorted set.
 	 *  the specified memeber of a sorted set
-	 * @param result {double*} 非空时存储结果值
+	 * @param result {double*} When not empty, stores score result.
 	 *  if not null, it will store the score result after increment
-	 * @return {bool} 操作是否成功
+	 * @return {bool} Whether operation was successful.
 	 *  if successful about the operation
 	 */
 	bool zincrby(const char* key, double inc, const char* member,
@@ -135,50 +139,56 @@ public:
 		size_t len, double* result = NULL);
 
 	/**
-	 * 从 key 的有序集中获得指定位置区间的成员名列表，成员按分值递增方式排序
+	 * Get member list at specified position range in key sorted set. Members are
+	 * sorted by score value in ascending order.
 	 * get the specified range memebers of a sorted set sotred at key
-	 * @param key {const char*} 有序集键值
+	 * @param key {const char*} Sorted set key value.
 	 *  the key of a sorted set
-	 * @param start {int} 起始下标位置
+	 * @param start {int} Start subscript position.
 	 *  the begin index of the sorted set
-	 * @param stop {int} 结束下标位置（结果集同时含该位置）
+	 * @param stop {int} End subscript position (including this position).
 	 *  the end index of the sorted set
-	 * @param result {std::vector<string>*} 非空时存储结果集，内部先调用
-	 *  result.clear() 清除其中的元素
+	 * @param result {std::vector<string>*} When not empty, stores result.
+	 * Internally first calls
+	 *  result.clear() to clear all elements.
 	 *  if not NULL, it will store the memebers result
-	 * @return {int} 结果集中成员的数量
+	 * @return {int} Number of members in result.
 	 *  the number of memebers
-	 *  0: 表示结果集为空或 key 不存在
+	 *  0: Indicates result is empty or key does not exist.
 	 *     the result is empty or the key doesn't exist
-	 * -1: 表示出错或 key 对象非有序集对象
+	 * -1: Indicates error occurred or key is not a sorted set object.
 	 *     error or it's not a sorted set by the key
-	 * >0: 结果集的数量
+	 * >0: Number of result members.
 	 *     the number of the memebers result
-	 *  注：对于下标位置，0 表示第一个成员，1 表示第二个成员；-1 表示最后一个成员，
-	 *     -2 表示倒数第二个成员，以此类推
+	 * Note: About subscript position: 0 indicates first member, 1 indicates second
+	 * member, -1 indicates last member.
+	 *     -2 indicates second-to-last member, and so on.
 	 *  Notice: about the index, element by index 0 is the first
 	 *   of the sorted set, element by index -1 is the last one. 
 	 *
-	 *  操作成功后可以通过以下任一方式获得数据
+	 *  When successful, result can be obtained by one of the following ways:
 	 *  when success, the result can be got by one of the below proccess: 
-	 *  1、在调用方法中传入非空的存储结果对象的地址
+	 *  1. Pass non-empty storage container address in function call.
 	 *     the most easily way is to set a non-NULL result parameter
 	 *     for this function
-	 *  2、基类方法 get_value 获得指定下标的元素数据
+	 *  2. Get specified subscript element value by base class function get_value.
 	 *     get the specified subscript's element by redis_command::get_value
-	 *  3、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
-	 *     redis_result::argv_to_string 方法获得元素数据
-	 *     redis_result::argv_to_string 方法获得元素数据
+	 * 3. Get specified subscript element object (redis_result) by base class
+	 * function get_child, then get
+	 *     element value through redis_result::argv_to_string.
+	 *     redis_result::argv_to_string to get element value.
 	 *     get redis_result object with the given subscript, and get the
 	 *     element by redis_result::argv_to_string
-	 *  4、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
-	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
-	 *     的方法获得该元素的数据
+	 * 4. Get overall result object redis_result by base class function get_result,
+	 * then get
+	 * first element object by redis_result::get_child, then get element value by
+	 * method 2 above.
 	 *     get redis_result object by redis_command::get_result, and get
 	 *     the first element by redis_result::get_child, then get the
 	 *     element by the way same as the way 2 above.
-	 *  5、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
-	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
+	 * 5. Get child array by base class function get_children, then get element
+	 * value from each
+	 * redis_result object in array through redis_result's method argv_to_string.
 	 *     get child array by redis_command::get_children, and get the
 	 *     element from one of redis_result array by argv_to_string
 	 */
@@ -186,126 +196,156 @@ public:
 		std::vector<string>* result);
 
 	/**
-	 * 从 key 的有序集中获得指定位置区间的成员名及分值列表，成员按分值递增方式排序
-	 * @param key {const char*} 有序集键值
-	 * @param start {int} 起始下标位置
-	 * @param stop {int} 结束下标位置（结果集同时含该位置）
-	 * @param out 存储 "成员名-分值对"结果集，内部先调用 out.clear()
-	 * @return {int} 结果集中成员的数量
-	 *  0: 表示结果集为空或 key 不存在
-	 * -1: 表示出错或 key 对象非有序集对象
-	 * >0: 结果集的数量
-	 *  注：对于下标位置，0 表示第一个成员，1 表示第二个成员；-1 表示最后一个成员，
-	 *     -2 表示倒数第二个成员，以此类推
+	 * Get member-score list at specified position range in key sorted set. Members
+	 * are sorted by score value in ascending order.
+	 * @param key {const char*} Sorted set key value.
+	 * @param start {int} Start subscript position.
+	 * @param stop {int} End subscript position (including this position).
+	 * @param out Stores "member-score" pair collection. Internally first calls
+	 * out.clear().
+	 * @return {int} Number of members in result.
+	 *  0: Indicates result is empty or key does not exist.
+	 * -1: Indicates error occurred or key is not a sorted set object.
+	 * >0: Number of result members.
+	 * Note: About subscript position: 0 indicates first member, 1 indicates second
+	 * member, -1 indicates last member.
+	 *     -2 indicates second-to-last member, and so on.
 	 */
 	int zrange_with_scores(const char* key, int start, int stop,
 		std::vector<std::pair<string, double> >& out);
 
 	/**
-	 * 返回有序集 key 中，所有 score 值介于 min 和 max 之间(包括等于 min 或 max )
-	 * 的成员。有序集成员按 score 值递增(从小到大)次序排列
-	 * @param key {const char*} 有序集键值
-	 * @param min {double} 最小分值
-	 * @param max {double} 最大分值
-	 * @param out {std::vector<string>*} 非空时存储“成员名”结果集
-	 * @param offset {const int*} 非空时表示结果集的起始下标
-	 * @param count {const int*} 非空时表示截取的结果集中成员个数
-	 * @return {int} 结果集中成员的数量
-	 *  0: 表示结果集为空或 key 不存在
-	 * -1: 表示出错或 key 对象非有序集对象
-	 * >0: 结果集的数量
-	 *  注：offset 和 count 必须同时为非空指针时才有效
+	 * In sorted set key, get members with score values between min and max
+	 * (including min and max).
+	 * Sorted set members are sorted by score value in ascending (small to large)
+	 * order.
+	 * @param key {const char*} Sorted set key value.
+	 * @param min {double} Minimum score.
+	 * @param max {double} Maximum score.
+	 * @param out {std::vector<string>*} When not empty, stores member result
+	 * collection.
+	 * @param offset {const int*} When not empty, indicates start subscript of
+	 * result collection.
+	 * @param count {const int*} When not empty, indicates number of result members
+	 * to get.
+	 * @return {int} Number of members in result.
+	 *  0: Indicates result is empty or key does not exist.
+	 * -1: Indicates error occurred or key is not a sorted set object.
+	 * >0: Number of result members.
+	 *  Note: offset and count are effective only when both are non-empty pointers.
 	 *
-	 *  操作成功后可以通过以下任一方式获得数据
-	 *  1、在调用方法中传入非空的存储结果对象的地址
-	 *  2、基类方法 get_value 获得指定下标的元素数据
-	 *  3、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
-	 *     redis_result::argv_to_string 方法获得元素数据
-	 *  4、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
-	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
-	 *     的方法获得该元素的数据
-	 *  5、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
-	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
+	 *  When successful, result can be obtained by one of the following ways:
+	 *  1. Pass non-empty storage container address in function call.
+	 *  2. Get specified subscript element value by base class function get_value.
+	 * 3. Get specified subscript element object (redis_result) by base class
+	 * function get_child, then get
+	 *     element value through redis_result::argv_to_string.
+	 * 4. Get overall result object redis_result by base class function get_result,
+	 * then get
+	 * first element object by redis_result::get_child, then get element value by
+	 * method 2 above.
+	 * 5. Get child array by base class function get_children, then get element
+	 * value from each
+	 * redis_result object in array through redis_result's method argv_to_string.
 	 */
 	int zrangebyscore(const char* key, double min, double max,
 		std::vector<string>* out, const int* offset = NULL,
 		const int* count = NULL);
 
 	/**
-	 * 返回有序集 key 中，所有 score 值介于 min 和 max 之间(包括等于 min 或 max )
-	 * 的成员。有序集成员按 score 值递增(从小到大)次序排列
-	 * @param key {const char*} 有序集键值
-	 * @param min {const char*} 以字符串表示最小分值
-	 * @param max {const char*} 以字符串表示最大分值
-	 * @param out {std::vector<string>*} 非空时存储“成员名”结果集
-	 * @param offset {const int*} 非空时表示结果集的起始下标
-	 * @param count {const int*} 非空时表示截取的结果集中成员个数
-	 * @return {int} 结果集中成员的数量
-	 *  0: 表示结果集为空或 key 不存在
-	 * -1: 表示出错或 key 对象非有序集对象
-	 * >0: 结果集的数量
-	 *  注：
-	 * 1）offset 和 count 必须同时为非空指针时才有效
-	 * 2）min 和 max 可以是 -inf 和 +inf 来表示无限区间
-	 * 3）默认情况下，区间的取值使用闭区间 (小于等于或大于等于)，也可以通过给参数前
-	 *   增加 ( 符号来使用可选的开区间 (小于或大于)，如：
-	 * 3.1）"ZRANGEBYSCORE zset (1 5" 返回所有符合条件 1 < score <= 5 的成员
-	 * 3.2）"ZRANGEBYSCORE zset (5 (10" 返回所有符合条件 5 < score < 10 的成员
+	 * In sorted set key, get members with score values between min and max
+	 * (including min and max).
+	 * Sorted set members are sorted by score value in ascending (small to large)
+	 * order.
+	 * @param key {const char*} Sorted set key value.
+	 * @param min {const char*} String representation of minimum score.
+	 * @param max {const char*} String representation of maximum score.
+	 * @param out {std::vector<string>*} When not empty, stores member result
+	 * collection.
+	 * @param offset {const int*} When not empty, indicates start subscript of
+	 * result collection.
+	 * @param count {const int*} When not empty, indicates number of result members
+	 * to get.
+	 * @return {int} Number of members in result.
+	 *  0: Indicates result is empty or key does not exist.
+	 * -1: Indicates error occurred or key is not a sorted set object.
+	 * >0: Number of result members.
+	 *  Note:
+	 * 1. offset and count are effective only when both are non-empty pointers.
+	 * 2. min and max can use -inf and +inf to represent infinity.
+	 * 3. By default, range value uses closed interval (less than or equal to or
+	 * greater than or equal to). You can also add
+	 * opening parenthesis ( before value to use optional open interval (less than
+	 * or greater than). For example:
+	 * 3.1. "ZRANGEBYSCORE zset (1 5" means query members with 1 < score <= 5.
+	 * 3.2. "ZRANGEBYSCORE zset (5 (10" means query members with 5 < score < 10.
 	 *
-	 *  操作成功后可以通过以下任一方式获得数据
-	 *  1、在调用方法中传入非空的存储结果对象的地址
-	 *  2、基类方法 get_value 获得指定下标的元素数据
-	 *  3、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
-	 *     redis_result::argv_to_string 方法获得元素数据
-	 *  4、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
-	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
-	 *     的方法获得该元素的数据
-	 *  5、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
-	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
+	 *  When successful, result can be obtained by one of the following ways:
+	 *  1. Pass non-empty storage container address in function call.
+	 *  2. Get specified subscript element value by base class function get_value.
+	 * 3. Get specified subscript element object (redis_result) by base class
+	 * function get_child, then get
+	 *     element value through redis_result::argv_to_string.
+	 * 4. Get overall result object redis_result by base class function get_result,
+	 * then get
+	 * first element object by redis_result::get_child, then get element value by
+	 * method 2 above.
+	 * 5. Get child array by base class function get_children, then get element
+	 * value from each
+	 * redis_result object in array through redis_result's method argv_to_string.
 	 */
 	int zrangebyscore(const char* key, const char* min, const char* max,
 		std::vector<string>* out, const int* offset = NULL,
 		const int* count = NULL);
 
 	/**
-	 * 返回有序集 key 中，所有 score 值介于 min 和 max 之间(包括等于 min 或 max )
-	 * 的成员及分值。有序集成员按 score 值递增(从小到大)次序排列；分值(min/max)使用
-	 * 浮点数表示
-	 * @param out 存储结果集，内部先调用 out.clear()
-	 * @return {int} 结果集中成员的数量
+	 * In sorted set key, get member-score pairs with score values between min and
+	 * max (including min and max).
+	 * Sorted set members are sorted by score value in ascending (small to large)
+	 * order. Values (min/max) use
+	 * numeric representation.
+	 * @param out Stores result. Internally first calls out.clear().
+	 * @return {int} Number of members in result.
 	 */
 	int zrangebyscore_with_scores(const char* key, double min, double max,
 		std::vector<std::pair<string, double> >& out,
 		const int* offset = NULL, const int* count = NULL);
 
 	/**
-	 * 返回有序集 key 中，所有 score 值介于 min 和 max 之间(包括等于 min 或 max )
-	 * 的成员及分值。有序集成员按 score 值递增(从小到大)次序排列；分值(min/max)使用
-	 * 字符串表示
-	 * @param out 存储结果集，内部先调用 out.clear()
-	 * @return {int} 结果集中成员的数量
+	 * In sorted set key, get member-score pairs with score values between min and
+	 * max (including min and max).
+	 * Sorted set members are sorted by score value in ascending (small to large)
+	 * order. Values (min/max) use
+	 * string representation.
+	 * @param out Stores result. Internally first calls out.clear().
+	 * @return {int} Number of members in result.
 	 */
 	int zrangebyscore_with_scores(const char* key, const char* min,
 		const char* max, std::vector<std::pair<string, double> >& out,
 		const int* offset = NULL, const int* count = NULL);
 
 	/**
-	 * 返回有序集 key 中成员 member 的排名(下标从 0 开始）；其中有序集成员按 score
-	 * 值递增(从小到大)顺序排列
-	 * @param key {const char*} 有序集键值
-	 * @param member {const char*} 成员名
-	 * @param len {size_t} member 的长度
-	 * @return {int} 下标位置值，-1 -- 出错，或 key 非有序集对象，或成员名不存在
+	 * Get rank (subscript starts from 0) of member member in sorted set key.
+	 * Sorted set members are sorted by score
+	 * value in ascending (small to large) order.
+	 * @param key {const char*} Sorted set key value.
+	 * @param member {const char*} Member name.
+	 * @param len {size_t} Length of member.
+	 * @return {int} Subscript position value. -1 -- Error occurred, key is not a
+	 * sorted set object, or member does not exist.
 	 */
 	int zrank(const char* key, const char* member, size_t len);
 	int zrank(const char* key, const char* member);
 
 	/**
-	 * 从有序集中删除某个成员
-	 * @param key {const char*} 有序集键值
-	 * @param first_member {const char*} 要删除的成员列表的第一个
-	 * @return {int} 成功删除的成员的数量，-1 表示出错或该 key 非有序集对象，
-	 *  0 表示该有序集不存在或成员不存在，> 0 表示成功删除的成员数量
+	 * Remove certain members from sorted set.
+	 * @param key {const char*} Sorted set key value.
+	 * @param first_member {const char*} First member in list of members to be
+	 * removed.
+	 * @return {int} Number of successfully removed members. -1 indicates error
+	 * occurred or key is not a sorted set object.
+	 * 0 indicates sorted set does not exist or member does not exist. > 0
+	 * indicates number of successfully removed members.
 	 */
 	int zrem(const char* key, const char* first_member, ...);
 	int zrem(const char* key, const std::vector<string>& members);
@@ -314,101 +354,128 @@ public:
 		size_t argc);
 
 	/**
-	 * 移除有序集 key 中，指定排名(rank)区间内的所有成员；
-	 * 区间分别以下标参数 start 和 stop 指出，包含 start 和 stop 在内；
-	 * 下标参数 start 和 stop 都以 0 为底，也就是说，以 0 表示有序集第一个成员，
-	 * 以 1 表示有序集第二个成员，以此类推；
-	 * 也可以使用负数下标，以 -1 表示最后一个成员， -2 表示倒数第二个成员，以此类推
-	 * @param key {const char*} 有序集键值
-	 * @param start {int} 起始下标位置（从 0 开始）
-	 * @param stop {int} 结束下标位置
-	 * @return {int} 被移除的成员数量
-	 *  0：表示 key 不存在或移除的区间不存在
-	 * -1：表示出错或 key 不是有序集合对象键值
+	 * Remove members at specified rank (range) in sorted set key.
+	 * You can directly use subscripts start and stop to specify range. start and
+	 * stop are included,
+	 * subscript range starts from 0, meaning 0 indicates first member in sorted
+	 * set,
+	 * 1 indicates second member in sorted set, and so on.
+	 * You can also use negative subscripts, where -1 indicates last member, -2
+	 * indicates second-to-last member, and so on.
+	 * @param key {const char*} Sorted set key value.
+	 * @param start {int} Start subscript position, starting from 0.
+	 * @param stop {int} End subscript position.
+	 * @return {int} Number of removed members.
+	 * 0: Indicates key does not exist or no members were removed (range does not
+	 * exist).
+	 * -1: Indicates error occurred or key is not a sorted set object.
 	 */
 	int zremrangebyrank(const char* key, int start, int stop);
 
 	/**
-	 * 移除有序集 key 中，所有 score 值介于 min 和 max 之间(包括等于 min 或 max )
-	 * 的成员；自版本2.1.6开始，score 值等于 min 或 max 的成员也可以不包括在内，
-	 * 详情请参见 ZRANGEBYSCORE 命令
-	 * @param key {const char*} 有序集键值
-	 * @param min {double} 最小分值
-	 * @param max {double} 最大分值
-	 * @return {int} 成功删除的成员的数量，-1 表示出错或该 key 非有序集对象，
-	 *  0 表示该有序集不存在或成员不存在，> 0 表示成功删除的成员数量
+	 * Remove members with score values between min and max (including min and max)
+	 * in sorted set key. Starting from version 2.1.6, members with score values
+	 * equal to min and max can also be excluded. For details, see ZRANGEBYSCORE
+	 * command.
+	 * @param key {const char*} Sorted set key value.
+	 * @param min {double} Minimum score.
+	 * @param max {double} Maximum score.
+	 * @return {int} Number of successfully removed members. -1 indicates error
+	 * occurred or key is not a sorted set object.
+	 * 0 indicates sorted set does not exist or member does not exist. > 0
+	 * indicates number of successfully removed members.
 	 */
 	int zremrangebyscore(const char* key, double min, double max);
 
 	/**
-	 * 移除有序集 key 中，所有 score 值介于 min 和 max 之间(包括等于 min 或 max )
-	 * 的成员；自版本2.1.6开始，score 值等于 min 或 max 的成员也可以不包括在内，
-	 * 详情请参见 ZRANGEBYSCORE 命令
-	 * @param key {const char*} 有序集键值
-	 * @param min {const char*} 字符串形式的最小分值，意义参见：zrangebyscore 注释
-	 * @param max {const char*} 字符串形式的最大分值
-	 * @return {int} 成功删除的成员的数量，-1 表示出错或该 key 非有序集对象，
-	 *  0 表示该有序集不存在或成员不存在，> 0 表示成功删除的成员数量
+	 * Remove members with score values between min and max (including min and max)
+	 * in sorted set key. Starting from version 2.1.6, members with score values
+	 * equal to min and max can also be excluded. For details, see ZRANGEBYSCORE
+	 * command.
+	 * @param key {const char*} Sorted set key value.
+	 * @param min {const char*} String format minimum score. For details, see
+	 * zrangebyscore notes.
+	 * @param max {const char*} String format maximum score.
+	 * @return {int} Number of successfully removed members. -1 indicates error
+	 * occurred or key is not a sorted set object.
+	 * 0 indicates sorted set does not exist or member does not exist. > 0
+	 * indicates number of successfully removed members.
 	 */
 	int zremrangebyscore(const char* key, const char* min, const char* max);
 
 	/**
-	 * 从 key 的有序集中获得指定位置区间的成员名列表，成员按分值递减方式排序
-	 * @param key {const char*} 有序集键值
-	 * @param start {int} 起始下标位置
-	 * @param stop {int} 结束下标位置（结果集同时含该位置）
-	 * @param result {std::vector<string>*} 非空时存储结果集
-	 *  注：对于下标位置，0 表示第一个成员，1 表示第二个成员；-1 表示最后一个成员，
-	 *     -2 表示倒数第二个成员，以此类推
-	 * @return {int} 结果集数量，-1 表示出错
+	 * Get member list at specified position range in key sorted set. Members are
+	 * sorted by score value in descending order.
+	 * @param key {const char*} Sorted set key value.
+	 * @param start {int} Start subscript position.
+	 * @param stop {int} End subscript position (including this position).
+	 * @param result {std::vector<string>*} When not empty, stores result.
+	 * Note: About subscript position: 0 indicates first member, 1 indicates second
+	 * member, -1 indicates last member.
+	 *     -2 indicates second-to-last member, and so on.
+	 * @return {int} Number of result members. -1 indicates error.
 	 */
 	int zrevrange(const char* key, int start, int stop,
 		std::vector<string>* result);
 
 	/**
-	 * 从 key 的有序集中获得指定位置区间的成员名及分值列表，成员按分值递减方式排序
-	 * @param key {const char*} 有序集键值
-	 * @param start {int} 起始下标位置
-	 * @param stop {int} 结束下标位置（结果集同时含该位置）
-	 * @param out 存储 "成员名-分值对"结果集，内部先调用 out.clear()
-	 *  注：对于下标位置，0 表示第一个成员，1 表示第二个成员；-1 表示最后一个成员，
-	 *     -2 表示倒数第二个成员，以此类推
-	 * @return {int} 结果集数量，-1 表示出错
+	 * Get member-score list at specified position range in key sorted set. Members
+	 * are sorted by score value in descending order.
+	 * @param key {const char*} Sorted set key value.
+	 * @param start {int} Start subscript position.
+	 * @param stop {int} End subscript position (including this position).
+	 * @param out Stores "member-score" pair collection. Internally first calls
+	 * out.clear().
+	 * Note: About subscript position: 0 indicates first member, 1 indicates second
+	 * member, -1 indicates last member.
+	 *     -2 indicates second-to-last member, and so on.
+	 * @return {int} Number of result members. -1 indicates error.
 	 */
 	int zrevrange_with_scores(const char* key, int start, int stop,
 		std::vector<std::pair<string, double> >& out);
 
 	/**
-	 * 返回有序集 key 中，所有 score 值介于 min 和 max 之间(包括等于 min 或 max )
-	 * 的成员。有序集成员按 score 值递8减(从小到大)次序排列
-	 * @param key {const char*} 有序集键值
-	 * @param min {const char*} 以字符串表示最小分值
-	 * @param max {const char*} 以字符串表示最大分值
-	 * @param out {std::vector<string>*} 非空时存储“成员名”结果集
-	 * @param offset {const int*} 非空时表示结果集的起始下标
-	 * @param count {const int*} 非空时表示截取的结果集中成员个数
-	 * @return {int} 结果集中成员的数量
-	 *  0: 表示结果集为空或 key 不存在
-	 * -1: 表示出错或 key 对象非有序集对象
-	 * >0: 结果集的数量
-	 *  注：
-	 * 1）offset 和 count 必须同时为非空指针时才有效
-	 * 2）min 和 max 可以是 -inf 和 +inf 来表示无限区间
-	 * 3）默认情况下，区间的取值使用闭区间 (小于等于或大于等于)，也可以通过给参数前
-	 *   增加 ( 符号来使用可选的开区间 (小于或大于)，如：
-	 * 3.1）"ZRANGEBYSCORE zset (1 5" 返回所有符合条件 1 < score <= 5 的成员
-	 * 3.2）"ZRANGEBYSCORE zset (5 (10" 返回所有符合条件 5 < score < 10 的成员
+	 * In sorted set key, get members with score values between min and max
+	 * (including min and max).
+	 * Sorted set members are sorted by score value in descending (large to small)
+	 * order.
+	 * @param key {const char*} Sorted set key value.
+	 * @param min {const char*} String representation of minimum score.
+	 * @param max {const char*} String representation of maximum score.
+	 * @param out {std::vector<string>*} When not empty, stores member result
+	 * collection.
+	 * @param offset {const int*} When not empty, indicates start subscript of
+	 * result collection.
+	 * @param count {const int*} When not empty, indicates number of result members
+	 * to get.
+	 * @return {int} Number of members in result.
+	 *  0: Indicates result is empty or key does not exist.
+	 * -1: Indicates error occurred or key is not a sorted set object.
+	 * >0: Number of result members.
+	 *  Note:
+	 * 1. offset and count are effective only when both are non-empty pointers.
+	 * 2. min and max can use -inf and +inf to represent infinity.
+	 * 3. By default, range value uses closed interval (less than or equal to or
+	 * greater than or equal to). You can also add
+	 * opening parenthesis ( before value to use optional open interval (less than
+	 * or greater than). For example:
+	 * 3.1. "ZRANGEBYSCORE zset (1 5" means query members with 1 < score <= 5.
+	 * 3.2. "ZRANGEBYSCORE zset (5 (10" means query members with 5 < score < 10.
 	 */
 	//int zrevrangebyscore(const char* key, const char* min, const char* max,
 	//	std::vector<string>* out, const int* offset = NULL,
 	//	const int* count = NULL);
 
 	/**
-	 * 返回有序集 key 中，所有 score 值介于 min 和 max 之间(包括等于 min 或 max )
-	 * 的成员及分值。有序集成员按 score 值递减(从小到大)次序排列；分值(min/max)使用
-	 * 浮点数表示
-	 * @param out 存储“分值-成员名”对的结果集，内部先调用 out.clear()
-	 * @param count {const int*} 非空时表示截取的结果集中成员个数
+	 * In sorted set key, get member-score pairs with score values between min and
+	 * max (including min and max).
+	 * Sorted set members are sorted by score value in descending (large to small)
+	 * order. Values (min/max) use
+	 * numeric representation.
+	 * @param out Stores score-member pair result. Internally first calls
+	 * out.clear().
+	 * @param count {const int*} When not empty, indicates number of result members
+	 * to get.
 	 */
 	int zrevrangebyscore_with_scores(const char* key, double min,
 		double max, std::vector<std::pair<string, double> >& out,
@@ -418,43 +485,59 @@ public:
 		const int* offset = NULL, const int* count = NULL);
 
 	/**
-	 * 返回有序集 key 中成员 member 的排名(下标从 0 开始)；其中有序集成员按 score
-	 * 值递减(从大到小)排序
-	 * @param key {const char*} 有序集键值
-	 * @param member {const char*} 成员名
-	 * @param len {size_t} member 的长度
-	 * @return {int} 下标位置值，-1 -- 出错，或 key 非有序集对象，或成员名不存在
+	 * Get rank (subscript starts from 0) of member member in sorted set key.
+	 * Sorted set members are sorted by score
+	 * value in descending (large to small) order.
+	 * @param key {const char*} Sorted set key value.
+	 * @param member {const char*} Member name.
+	 * @param len {size_t} Length of member.
+	 * @return {int} Subscript position value. -1 -- Error occurred, key is not a
+	 * sorted set object, or member does not exist.
 	 */
 	int zrevrank(const char* key, const char* member, size_t len);
 	int zrevrank(const char* key, const char* member);
 
 	/**
-	 * 获得有序集 key 中，成员 member 的 score 值
-	 * @param key {const char*} 有序集键值
-	 * @param member {const char*} 成员名
-	 * @param len {size_t} member 的长度
-	 * @param result {double&} 存储分值结果
-	 * @return {bool} 当不存在或出错时返回 false，否则返回 true
+	 * Get score value of member member in sorted set key.
+	 * @param key {const char*} Sorted set key value.
+	 * @param member {const char*} Member name.
+	 * @param len {size_t} Length of member.
+	 * @param result {double&} Stores score result.
+	 * @return {bool} Returns false when member does not exist or error occurred.
+	 * Otherwise returns true.
 	 */
 	bool zscore(const char* key, const char* member, size_t len,
 		double& result);
 	bool zscore(const char* key, const char* member, double& result);
 
 	/**
-	 * 计算给定的一个或多个有序集的并集，其中给定 key 的数量必须以 numkeys 参数指定，
-	 * 并将该并集(结果集)储存到目标有序集; 默认情况下，结果集中某个成员的 score
-	 * 值是所有给定集下该成员 score 值之和
-	 * @param dst {const char*} 目标有序集键值
-	 * @param keys 源有序集键值-权重集合；使用权重选项，可以为 每个 给定有序集 分别
-	 *  指定一个乘法因子(multiplication factor)，每个给定有序集的所有成员的 score
-	 *  值在传递给聚合函数(aggregation function)之前都要先乘以该有序集的因子；
-	 *  如果没有指定 WEIGHTS 选项，乘法因子默认设置为 1
-	 * @param aggregate {const char*} 聚合方式，默认是 SUM 聚合方式，聚合方式如下：
-	 *  SUM: 将所有集合中某个成员的 score 值之 和 作为结果集中该成员的 score 值
-	 *  MIN: 将所有集合中某个成员的 最小 score 值作为结果集中该成员的 score 值
-	 *  MAX: 将所有集合中某个成员的 最大 score 值作为结果集中该成员的 score 值
-	 * @return {int} 新保存到目标有序集的结果集中的元素(成员)数量，如果源有序集
-	 *  集合中存在相同的成员，则只新增一个成员；返回 -1 表示出错
+	 * Compute union of one or more sorted sets. For given key sorted sets, compute
+	 * union of numkeys specified
+	 * sorted sets and store result (aggregation) in destination sorted set. By
+	 * default, when a member's score
+	 * value exists in multiple sorted sets, sum of scores of this member in all
+	 * sorted sets is used as
+	 * this member's score value in result.
+	 * @param dst {const char*} Destination sorted set key value.
+	 * @param keys Source sorted set key value-weight collection. When using weight
+	 * option, you need to
+	 * specify a multiplication factor for each sorted set respectively. Each
+	 * sorted set's all members' score
+	 * values need to be multiplied by this sorted set's factor before being passed
+	 * to aggregation function.
+	 *  If WEIGHTS option is not specified, multiplication factor defaults to 1.
+	 * @param aggregate {const char*} Aggregation method. Default is SUM
+	 * aggregation method. Aggregation methods are as follows:
+	 * SUM: Sum of score values of a certain member in all sorted sets is used as
+	 * this member's score value in result sorted set.
+	 * MIN: Minimum score value of a certain member in all sorted sets is used as
+	 * this member's score value in result sorted set.
+	 * MAX: Maximum score value of a certain member in all sorted sets is used as
+	 * this member's score value in result sorted set.
+	 * @return {int} Number of elements (members) stored in destination sorted set
+	 * result. When source
+	 * sorted sets have duplicate members, only one member is stored. Returns -1 to
+	 * indicate error.
 	 */
 	int zunionstore(const char* dst, const std::map<string, double>& keys,
 		const char* aggregate = "SUM");
@@ -464,10 +547,15 @@ public:
 		const char* aggregate = "SUM");
 
 	/**
-	 * 计算给定的一个或多个有序集的交集，其中给定 key 的数量必须以 numkeys 参数指定，
-	 * 并将该并集(结果集)储存到目标有序集; 默认情况下，结果集中某个成员的 score
-	 * 值是所有给定集下该成员 score 值之和
-	 * @return {int} 新保存到目标有序集的结果集中的元素(成员)数量
+	 * Compute intersection of one or more sorted sets. For given key sorted sets,
+	 * compute intersection of numkeys specified
+	 * sorted sets and store result (aggregation) in destination sorted set. By
+	 * default, when a member's score
+	 * value exists in multiple sorted sets, sum of scores of this member in all
+	 * sorted sets is used as
+	 * this member's score value in result.
+	 * @return {int} Number of elements (members) stored in destination sorted set
+	 * result.
 	 */
 	int zinterstore(const char* dst, const std::map<string, double>& keys,
 		const char* aggregate = "SUM");
@@ -477,56 +565,71 @@ public:
 		const char* aggregate = "SUM");
 	
 	/**
-	 * 命令用于迭代有序集合中的元素（包括元素成员和元素分值）
-	 * @param cursor {int} 游标值，开始遍历时该值写 0
-	 * @param out 存储结果集，内部以追加方式将本次遍历结果集合添加进该数组中，
-	 *  为防止因总结果集过大导致该数组溢出，用户可在调用本函数前后清理该数组对象
-	 * @param pattern {const char*} 匹配模式，glob 风格，非空时有效
-	 * @param count {const size_t*} 限定的结果集数量，非空指针时有效
-	 * @return {int} 下一个游标位置，含义如下：
-	 *   0：遍历结束
-	 *  -1: 出错
-	 *  >0: 游标的下一个位置，即使这样，具体有多少结果还需要检查 out，因为有可能为空
+	 * Incrementally iterate elements in sorted set, including element members and
+	 * element scores.
+	 * @param cursor {int} Cursor value. Write 0 when starting iteration.
+	 * @param out Stores result. Internally uses append method. Cursor iterates and
+	 * appends results to collection.
+	 * To prevent results from growing too large, users should clear this parameter
+	 * before each call.
+	 * @param pattern {const char*} Matching pattern with glob style, effective
+	 * when not empty.
+	 * @param count {const size_t*} Limit maximum number of results. Effective only
+	 * when pointer is not empty.
+	 * @return {int} Next cursor position, as below:
+	 *   0: Iteration finished.
+	 *  -1: Error occurred.
+	 * >0: Next cursor position. Regardless of how many results are obtained, you
+	 * need to check out, as it may be empty.
 	 */
 	int zscan(const char* key, int cursor,
 		std::vector<std::pair<string, double> >& out,
 		const char* pattern = NULL, const size_t* count = NULL);
 
 	/**
-	 * 当有序集合的所有成员都具有相同的分值时， 有序集合的元素会根据成员的字典序
-	 * （lexicographical ordering）来进行排序， 而这个命令则可以返回给定的
-	 * 有序集合键 key 中， 值介于 min 和 max 之间的成员
-	 * @param min {const char*} 区间最小值
-	 * @param max {const char*} 区间最大值
-	 * @param out {std::vector<string>*} 非空时存储结果集
-	 * @param offset {const int*} 非空时有效，从结果集中选取的下标起始值
-	 * @param count {const int*} 非空时有效，从结果集中的指定下标位置起选取的数量
-	 * @return {int} 结果集中成员的数量
-	 *  0: 表示结果集为空或 key 不存在
-	 * -1: 表示出错或 key 对象非有序集对象
-	 * >0: 结果集的数量
-	 * 注：关于区间的选择规则如下：
-	 * 1）合法的 min 和 max 参数必须包含 ( 或者 [ ， 其中 ( 表示开区间（指定的值
-	 *   不会被包含在范围之内）， 而 [ 则表示闭区间（指定的值会被包含在范围之内）
-	 * 2）特殊值 + 和 - 在 min 参数以及 max 参数中具有特殊的意义， 其中 + 表示
-	 *   正无限， 而 - 表示负无限。因此，向一个所有成员的分值都相同的有序集合发送命令
-	 *   ZRANGEBYLEX <zset> - + ， 命令将返回有序集合中的所有元素
+	 * When all members in sorted set have the same score, sorted set elements will
+	 * be sorted by member name value
+	 * lexicographical ordering (dictionary order). This function queries members
+	 * in sorted set key
+	 * with values between min and max.
+	 * @param min {const char*} Minimum value string.
+	 * @param max {const char*} Maximum value string.
+	 * @param out {std::vector<string>*} When not empty, stores result.
+	 * @param offset {const int*} When not empty, effective. Start subscript value
+	 * for selecting from result.
+	 * @param count {const int*} When not empty, effective. Number of elements to
+	 * select from result at specified subscript position.
+	 * @return {int} Number of members in result.
+	 *  0: Indicates result is empty or key does not exist.
+	 * -1: Indicates error occurred or key is not a sorted set object.
+	 * >0: Number of result members.
+	 * Note: About range selection:
+	 * 1. Legal min and max strings include opening parenthesis ( and closing
+	 * bracket [. Opening parenthesis ( indicates open interval (specified value
+	 * will not be included in range), and [ indicates closed interval (specified
+	 * value will be included in range).
+	 * 2. Special values + and - can be used in min string and max string. + means
+	 * positive infinity, and - means negative infinity. Therefore, when all
+	 * members in a sorted set have the same score, sorted set
+	 *   ZRANGEBYLEX <zset> - + command will return all elements in sorted set.
 	 */
 	int zrangebylex(const char* key, const char* min, const char* max,
 		std::vector<string>* out, const int* offset = NULL,
 		const int* count = NULL);
 
 	/**
-	 * 于一个所有成员的分值都相同的有序集合键 key 来说， 这个命令会返回该集合中， 
-	 * 成员介于 min 和 max 范围内的元素数量
-	 * @return {int} 符合条件的元素数量
+	 * When all members in a sorted set have the same score, for sorted set key,
+	 * this function returns number of
+	 * elements (members) with values between min and max in this set.
+	 * @return {int} Number of elements in result.
 	 */
 	int zlexcount(const char* key, const char* min, const char* max);
 
 	/**
-	 * 对于一个所有成员的分值都相同的有序集合键 key 来说， 这个命令会移除该集合中，
-	 * 成员介于 min 和 max 范围内的所有元素
-	 * @return {int} 被移除的元素数量
+	 * When all members in a sorted set have the same score, for sorted set key,
+	 * this function removes all
+	 * elements (members) with values between min and max in this set.
+	 * @return {int} Number of removed elements.
 	 */
 	int zremrangebylex(const char* key, const char* min, const char* max);
 
@@ -572,3 +675,4 @@ private:
 } // namespace acl
 
 #endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
+

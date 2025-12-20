@@ -25,9 +25,11 @@ struct dirent {
 typedef struct {
     HANDLE        _d_hdir;              /**< directory handle */
     char         *_d_dirname;           /**< directory name */
-    unsigned      _d_magic;             /**< magic cookie for verifying handle */
+    unsigned      _d_magic;             /**< magic cookie for verifying
+					 *   handle */
     unsigned      _d_nfiles;            /**< no. of files remaining in buf */
-    char          _d_buf[sizeof(WIN32_FIND_DATA)];  /**< buffer for a single file */
+    char          _d_buf[sizeof(WIN32_FIND_DATA)];
+					/**< buffer for a single file */
 } DIR;
 
 /**
@@ -58,9 +60,11 @@ struct wdirent {
 typedef struct {
     unsigned long _d_hdir;              /**< directory handle */
     wchar_t      *_d_dirname;           /**< directory name */
-    unsigned      _d_magic;             /**< magic cookie for verifying handle */
+    unsigned      _d_magic;             /**< magic cookie for verifying
+					 *   handle */
     unsigned      _d_nfiles;            /**< no. of files remaining in buf */
-    char          _d_buf[sizeof(WIN32_FIND_DATA)];  /**< buffer for a single file */
+    char          _d_buf[sizeof(WIN32_FIND_DATA)];
+					/**< buffer for a single file */
 } wDIR;
 
 ACL_API wDIR *wopendir(const wchar_t *dirname);

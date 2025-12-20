@@ -18,32 +18,43 @@ class istream;
 class http_header;
 
 /**
- * 该类的用处：1、当 HTTP 客户端向服务器请求数据时；2、当 HTTP 服务端接收
- * 到 HTTP 客户端连接时创建一个对应的 HTTP 客户端流对象
- * 该客户端流对象可以支持长连接
+ * This class has two uses: 1) HTTP client request object, used when client
+ * sends request; 2) HTTP server receives
+ * HTTP client request and responds with HTTP client object.
+ * This client object supports long connections.
  */
 class ACL_CPP_API http_client : public noncopyable {
 public:
 	/**
-	 * 缺省的构造函数，使用此构造函数创建的 HTTP 客户端对象，需要显示地
-	 * 调用 http_client::open 来打开数据流
+	 * Default constructor. When using this constructor to create HTTP client
+	 * object, you need to explicitly
+	 * call http_client::open function to open connection.
 	 */
 	http_client();
 
 	/**
-	 * 根据已经连接成功的连接流对象创建 HTTP 客户端对象，但需要注意的是，
-	 * 当该 http_client 对象销毁时，传入的 client 流对象并不会被销毁，需
-	 * 要应用自己销毁，否则会造成资源泄露
-	 * @param client {socket_stream*} HTTP 连接流对象，可以是请求端的流，
-	 *  也可以是响应端的流；当本对象被销毁时，client 对象是否会被自动销毁，
-	 *  取决于参数 stream_fixed 的值
-	 * @param is_request {bool} 是请求端还是响应端的客户端流
-	 * @param unzip {bool} 当用来读取服务器的响应数据时，如果服务器返回的
-	 *  数据体为压缩数据时，该参数控制在调用下面的函数时是否自动解压缩:
+	 * Constructor using already successfully connected stream object to create
+	 * HTTP client object. Note:
+	 * When http_client object is destroyed, passed client object will not be
+	 * destroyed, and
+	 * you need to destroy it yourself, otherwise resource leak will occur.
+	 * @param client {socket_stream*} HTTP connection object, can be server-side
+	 * connection
+	 * or client-side connection. When object is destroyed, whether client object
+	 * will be automatically destroyed
+	 *  depends on stream_fixed value.
+	 * @param is_request {bool} Whether client or server client.
+	 * @param unzip {bool} When reading server response body, whether to
+	 * automatically decompress compressed data.
+	 * This parameter is effective when server response body is compressed data.
+	 * This parameter affects whether to automatically decompress when calling
+	 * following function:
 	 *  read_body(string&, bool, int*)
-	 * @param stream_fixed {bool} 当该值为 true 时，则当 http_client 对象
-	 *  被销毁时，传入的 client 流对象不会被销毁，需应用自行销毁；如果该
-	 *  值为 false 时，则当本对象销毁时，client 流对象也将被销毁
+	 * @param stream_fixed {bool} When this value is true, when http_client object
+	 * is destroyed, passed client object will not be destroyed, and response
+	 * object will be destroyed. When
+	 * value is false, when this object is destroyed, client object will also be
+	 * destroyed.
 	 */
 	http_client(socket_stream* client, bool is_request = false,
 		bool unzip = true, bool stream_fixed = true);
@@ -51,78 +62,97 @@ public:
 	virtual ~http_client();
 
 	/**
-	 * 在支持长连接的多次请求中，可以手工调用此函数清除中间的数据对象，
-	 * 当然这不是必须的，因为在多次调用 read_head 时，read_head 会自动
-	 * 调用 reset 来清除上次请求过程中的是间对象
+	 * In objects that support long connections, you can call this function to
+	 * reset intermediate data objects.
+	 * This is not necessary, because when calling read_head multiple times,
+	 * read_head will automatically
+	 * call reset to clear last read intermediate data.
 	 */
 	void reset();
 
 	/**
-	 * 连接远程 HTTP 服务器
-	 * @param addr {const char*} 服务器地址，格式：IP|PORT 或 DOMAIN|PORT
-	 * @param conn_timeout {int} 连接超时时间(秒)
-	 * @param rw_timeout {int} 读写超时时间(秒)
-	 * @param unzip {bool} 当服务器返回的数据体为压缩数据时是否自动解压缩
-	 * @return {bool} 连接是否成功
+	 * Connect to remote HTTP server.
+	 * @param addr {const char*} Server address, format: IP|PORT or DOMAIN|PORT
+	 * @param conn_timeout {int} Connection timeout time (seconds)
+	 * @param rw_timeout {int} Read/write timeout time (seconds)
+	 * @param unzip {bool} When server response body is compressed data, whether to
+	 * automatically decompress.
+	 * @return {bool} Whether connection was successful.
 	 */
 	bool open(const char* addr, int conn_timeout = 60, int rw_timeout = 60,
 		bool unzip = true);
 
 	/**
-	 * 写 HTTP 请求头数据至输出流中
+	 * Write HTTP request header and wait for response.
 	 * @param header {http_header&}
-	 * @return {bool} 写头部数据是否成功
+	 * @return {bool} Whether writing header and waiting was successful.
 	 */
 	bool write_head(const http_header& header);
 
 	/**
-	 * 发送 HTTP 数据体，可以循环调用此函数，当在第一次调用 write 函数写入
-	 * HTTP 头时设置了 chunked 传输方式，则内部自动采用 chunked 传输方式; 
-	 * 另外，在使用 chunked 方式传输数据时，应该最后再调用一次本函数，且参
-	 * 数均设为 0 表示数据结束
-	 * @param data {const void*} 数据地址
-	 * @param len {size_t} data 数据长度
-	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
+	 * Write HTTP request body. You can call this function in a loop. When first
+	 * call to write function writes
+	 * HTTP header, if chunked transfer mode is used, internally automatically uses
+	 * chunked transfer mode;
+	 * Additionally, when using chunked format, when sending data, you should call
+	 * this function once more, and data
+	 * parameter should be 0 to indicate data sending is complete.
+	 * @param data {const void*} Data address.
+	 * @param len {size_t} Data length of data.
+	 * @return {bool} Whether writing was successful. Returns false to indicate
+	 * connection closed.
 	 */
 	bool write_body(const void* data, size_t len);
 
 	/**
-	 * 当调用 http_client(socket_stream*, bool) 构造函数创建
-	 * 或用 http_client(void) 构建同时调用 open 打开数据流时
-	 * 可以调用本函数获得输出数据流句柄
-	 * @return {ostream&} 返回输出流的引用，如果该流并不存在，
-	 *  则内部自动会产生断言，提示使用者应先将流打开
+	 * When using http_client(socket_stream*, bool) constructor, or
+	 * using http_client(void) constructor and calling open function at the same
+	 * time,
+	 * you can call this function to get output stream object.
+	 * @return {ostream&} Returns reference to output stream. When stream is not
+	 * initialized,
+	 * internally automatically initializes stream. It is recommended to use it
+	 * after initialization.
 	 */
 	ostream& get_ostream() const;
 
 	/**
-	 * 当调用 http_client(socket_stream*, bool) 构造函数创建
-	 * 或用 http_client(void) 构建同时调用 open 打开数据流时
-	 * 可以调用本函数获得输入数据流句柄
-	 * @return {istream&} 返回输入流的引用，如果该流并不存在，
-	 *  则内部自动会产生断言，提示使用者应先将流打开
+	 * When using http_client(socket_stream*, bool) constructor, or
+	 * using http_client(void) constructor and calling open function at the same
+	 * time,
+	 * you can call this function to get input stream object.
+	 * @return {istream&} Returns reference to input stream. When stream is not
+	 * initialized,
+	 * internally automatically initializes stream. It is recommended to use it
+	 * after initialization.
 	 */
 	istream& get_istream() const;
 
 	/**
-	 * 当调用 http_client(socket_stream*, bool) 构造函数创建
-	 * 或用 http_client(void) 构建同时调用 open 打开数据流时
-	 * 可以调用本函数获得数据流句柄
-	 * @return {socket_stream&} 返回流的引用，如果该流并不存在，
-	 *  则内部自动会产生断言，提示使用者应先将流打开
+	 * When using http_client(socket_stream*, bool) constructor, or
+	 * using http_client(void) constructor and calling open function at the same
+	 * time,
+	 * you can call this function to get stream object.
+	 * @return {socket_stream&} Returns reference to stream. When stream is not
+	 * initialized,
+	 * internally automatically initializes stream. It is recommended to use it
+	 * after initialization.
 	 */
 	socket_stream& get_stream() const;
 
 	/**
-	 * 从 HTTP 服务器读取响应头数据或从 HTTP 客户端读取请求数据，
-	 * 在长连接的多次请求中，后续的请求会自动清除上次的中间数据对象
-	 * @return {bool} 是否成功
+	 * Read response header data from HTTP server or read request data from HTTP
+	 * client.
+	 * In long connection objects, this function automatically clears last read
+	 * intermediate data objects.
+	 * @return {bool} Whether successful.
 	 */
 	bool read_head();
 
 	/**
-	 * 获得 HTTP 请求的数据体或响应的数据体长度
-	 * @return {int64) 返回值若为 -1 则表明 HTTP 头不存在或没有长度字段
+	 * Get HTTP server response body length.
+	 * @return {int64) Return value is -1 when HTTP header does not exist or has no
+	 * Content-Length field.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 body_length(void) const;
@@ -131,14 +161,15 @@ public:
 #endif
 
 	/**
-	 * 当该对象为请求端流对象时，该函数将获得请求头中的长度起始地址及结束地址
-	 * @param range_from {long long int&} 偏移起始位置
-	 * @param range_to {long long int&} 偏移结束位置
-	 * @return {bool} 若出错或非分段请求数据则返回 false；
-	 *  若是分段请求则返回 true，同时给 range_from 和 range_to 赋值
-	 *  注：range_from/range_to 下标从 0 开始
-	 *  数据格式：
-	 *  Range: bytes={range_from}-{range_to} 或
+	 * When object is request client, this function gets start address and end
+	 * address from request header.
+	 * @param range_from {long long int&} Start offset position.
+	 * @param range_to {long long int&} End offset position.
+	 * @return {bool} When request is range data, returns false.
+	 *  When not range data, returns true, and sets range_from and range_to values.
+	 *  Note: range_from/range_to subscript starts from 0.
+	 *  Data format:
+	 *  Range: bytes={range_from}-{range_to} or
 	 *  Range: bytes={range_from}-
 	 */
 #if defined(_WIN32) || defined(_WIN64)
@@ -148,16 +179,18 @@ public:
 #endif
 
 	/**
-	 * 当该对象为响应端流对象时，该函数将获得响应头中的长度起始地址及结束地址
-	 * @param range_from {long long int&} 偏移起始位置
-	 * @param range_to {long long int&} 偏移结束位置
-	 * @param total {long long int} 存放总长度
-	 * @return {bool} 若出错或非分段响应数据则返回 false；
-	 *  若是分段响应则返回 true，同时给 range_from 和 range_to 赋值
-	 *  注：range_from/range_to 下标从 0 开始
-	 *  数据格式：
+	 * When object is response server, this function gets start address and end
+	 * address from response header.
+	 * @param range_from {long long int&} Start offset position.
+	 * @param range_to {long long int&} End offset position.
+	 * @param total {long long int} Total resource length.
+	 * @return {bool} When response is range response, returns false.
+	 * When not range response, returns true, and sets range_from and range_to
+	 * values.
+	 *  Note: range_from/range_to subscript starts from 0.
+	 *  Data format:
 	 *  Content-Range: bytes {range_from}-{range_to}/{total_length}
-	 *  如：Content-Range: bytes 2250000-11665200/11665201
+	 *  e.g.: Content-Range: bytes 2250000-11665200/11665201
 	 */ 
 #if defined(_WIN32) || defined(_WIN64)
 	bool response_range(__int64& range_from, __int64& range_to,
@@ -168,259 +201,300 @@ public:
 #endif
 
 	/**
-	 * 获得 HTTP 头中的版本号
-	 * @param major {unsigned&} 将存放主版本号
-	 * @param minor {unsigned&} 将存放次版本号
-	 * @return {bool} 是否成功获得了版本号
+	 * Get version number in HTTP header.
+	 * @param major {unsigned&} Major version number.
+	 * @param minor {unsigned&} Minor version number.
+	 * @return {bool} Whether successfully got version number.
 	 */
 	bool get_version(unsigned& major, unsigned& minor) const;
 
 	/**
-	 * HTTP 数据流(请求流或响应流是否允许保持长连接)
+	 * HTTP keep-alive (whether response supports long connection).
 	 * @return {bool}
 	 */
 	bool is_keep_alive() const;
 	bool keep_alive() const;
 
 	/**
-	 * 当本对象为客户端请求对象时，本方法用来判断服务端返回的 HTTP 头中
-	 * 是否允许保持长连接
+	 * When object is client request, this function determines whether
+	 * server-returned HTTP header
+	 * supports long connection.
 	 * @return {bool}
 	 */
 	bool is_server_keep_alive() const;
 
 	/**
-	 * 当本对象为服务端响应对象时，本方法用来判断客户端请求的 HTTP 头中
-	 * 是否允许保持长连接
+	 * When object is server response, this function determines whether client
+	 * request HTTP header
+	 * supports long connection.
 	 * @return {bool}
 	 */
 	bool is_client_keep_alive() const;
 
 	/**
-	 * 获得 HTTP 请求头或响应头中某个字段名的字段值
-	 * @param name {const char*} 字段名
-	 * @return {const char*} 字段值，为空时表示不存在
+	 * Get a certain field value in HTTP request header or response header.
+	 * @param name {const char*} Field name.
+	 * @return {const char*} Field value. Returns empty when not found.
 	 */
 	const char* header_value(const char* name) const;
 
 	/**
-	 * 禁止 HTTP 请求/响应头中的某些字段
-	 * @param name {const char*} 字段名
+	 * Disable certain fields in HTTP request/response header.
+	 * @param name {const char*} Field name.
 	 */
 	void header_disable(const char* name);
 
 	/**
-	 * 将 HTTP 头中的某个字段进行替换
-	 * @param name {const char*} HTTP 头的字段名，如：Content-Length，
-	 *   该字段不区分大小写
-	 * @param value {const char*} 该头部字段的值
-	 * @param force_add {bool} 如果该头部字段不存在是否需要强制添加
-	 * @return {bool} 返回 false 表示输入出错，或头部字段名不存在且参数
-	 *  force_add 为 false
+	 * Update or replace a certain field in HTTP header.
+	 * @param name {const char*} HTTP header field name, e.g.: Content-Length.
+	 *   Field name is case-insensitive.
+	 * @param value {const char*} New header field value.
+	 * @param force_add {bool} When header field does not exist, whether to force
+	 * add.
+	 * @return {bool} Returns false to indicate error occurred or header field does
+	 * not exist and
+	 *  force_add is false.
 	 */
 	bool header_update(const char* name, const char* value,
 		bool force_add = true);
 
 	/**
-	 * 将 HTTP 头中的某个字段中包含某个字符串的源字符串进行替换, 可以
-	 * 支持多次匹配替换
-	 * @param name {const char*} HTTP 头的字段名，如：Content-Length，
-	 *   该字段不区分大小写
-	 * @param match {const char*} 字段值中匹配的字符串
-	 * @param to {const char*} 替换成的目标字符串值
-	 * @param case_sensitive {bool} 在查找替换时是否区分大小写
-	 * @return {int} 匹配替换的次数，0 表示未做任何替换，< 0 表示出错
+	 * In a certain field in HTTP header, replace source string with target string.
+	 * Supports
+	 * multiple match replacements.
+	 * @param name {const char*} HTTP header field name, e.g.: Content-Length.
+	 *   Field name is case-insensitive.
+	 * @param match {const char*} Field value matching string.
+	 * @param to {const char*} Target string value to replace with.
+	 * @param case_sensitive {bool} Whether case-sensitive when performing
+	 * replacement internally.
+	 * @return {int} Number of match replacements. 0 indicates no replacement
+	 * occurred. < 0 indicates error.
 	 */
 	int header_update(const char* name, const char* match,
 		const char* to, bool case_sensitive = false);
 
 	/**
-	 * 获得 HTTP 服务器返回的 HTTP 响应状态：
+	 * Get HTTP response status code returned by HTTP server.
 	 * 1xx, 2xx, 3xx, 4xx, 5xx
-	 * @return {int} 若返回值为 -1 则表示出错，或该会话过程
-	 *  不是向 HTTP 服务器请求数据过程
+	 * @return {int} Return value is -1 to indicate error occurred or no session
+	 * exists
+	 *  or HTTP request header data reading process is not complete.
 	 */
 	int response_status() const;
 
 	/**
-	 * 获得 HTTP 客户端请求的 HOST 字段值
-	 * @return {const char*} 返回 NULL 表示不存在该字段
+	 * Get HOST field value in HTTP client request header.
+	 * @return {const char*} Returns NULL to indicate this field does not exist.
 	 */
 	const char* request_host() const;
 
 	/**
-	 * 获得 HTTP 客户端请求的 PORT 端口号
-	 * @return {int} 返回 -1 表示不存在
+	 * Get PORT port number in HTTP client request header.
+	 * @return {int} Returns -1 to indicate error.
 	 */
 	int request_port() const;
 
 	/**
-	 * 获得 HTTP 客户端请求的 HTTP 方法：GET, POST, CONNECT
-	 * @return {const char*} 返回值为空表示不存在
+	 * Get HTTP request method in HTTP client request header: GET, POST, CONNECT
+	 * @return {const char*} Return value is empty to indicate error.
 	 */
 	const char* request_method() const;
 
 	/**
-	 * 获得 HTTP 客户端请求的 URL 中除去 HTTP://domain 后的内容
-	 * 如：对于 http://test.com.cn/cgi-bin/test?name=value，则该
-	 * 函数应该返回：/cgi-bin/test?name=value
-	 * @return {const char*} 返回 NULL 表示不存在
+	 * Get URL in HTTP client request header excluding HTTP://domain part.
+	 * e.g.: For http://test.com.cn/cgi-bin/test?name=value, this function
+	 * should return: /cgi-bin/test?name=value
+	 * @return {const char*} Returns NULL to indicate error.
 	 */
 	const char* request_url() const;
 
 	/**
-	 * 获得 HTTP 客户端请求的 URL 中的相对路径(不包含主机部分)，
-	 * 如：对于 http://test.com.cn/cgi-bin/test?name=value，则该
-	 * 函数应该返回：/path/test.cgi
-	 * @return {const char*} 返回 NULL 表示不存在
+	 * Get path part (excluding parameters) in URL in HTTP client request header.
+	 * e.g.: For http://test.com.cn/cgi-bin/test?name=value, this function
+	 * should return: /path/test.cgi
+	 * @return {const char*} Returns NULL to indicate error.
 	 */
 	const char* request_path() const;
 
 	/**
-	 * 获得 HTTP 客户端请求的 URL 中的所有参数，如：
-	 * http://test.com.cn/cgi-bin/test?name=value，则该函数应该返回：
+	 * Get all parameters in URL in HTTP client request header, e.g.:
+	 * http://test.com.cn/cgi-bin/test?name=value, this function should return:
 	 * name=value
-	 * @return {const char*} 返回 NULL 表示不存在
+	 * @return {const char*} Returns NULL to indicate error.
 	 */
 	const char* request_params() const;
 
 	/**
-	 * 获得 HTTP 客户端请求的 URL 中指定的参数值，如：
-	 * http://test.com.cn/cgi-bin/test?name=value，则通过该函数可以
-	 * 获得 name 参数的值为 value
-	 * @param name {const char*} 参数名
-	 * @return {const char*} 参数值，返回 NULL 表示不存在
+	 * Get specified parameter value in URL in HTTP client request header, e.g.:
+	 * http://test.com.cn/cgi-bin/test?name=value, through this function to get
+	 * name parameter value is value.
+	 * @param name {const char*} Parameter name.
+	 * @return {const char*} Parameter value. Returns NULL to indicate error.
 	 */
 	const char* request_param(const char* name) const;
 
 	/**
-	 * 获得 HTTP 客户端请求头中的 cookie 值
-	 * @param name {const char*} cookie 名
-	 * @return {const char*} cookie 值，返回 NULL 则表示不存在
+	 * Get cookie value in HTTP client request header.
+	 * @param name {const char*} Cookie name.
+	 * @return {const char*} Cookie value. Returns NULL to indicate not found.
 	 */
 	const char* request_cookie(const char* name) const;
 
 	/**
-	 * 从 HTTP 服务器读取响应体数据或从 HTTP 客户端读取请求体数据，
-	 * 此函数将对收到的数据内容进行解压操作
-	 * @param out {string&} 存储数据体的缓冲区
-	 * @param clean {bool} 在接收数据前是否自动清空 buf 缓冲区
-	 * @param real_size {int*} 若该指针非空，则记录真正读到的数据长度，
-	 *  通过该指针返回的数据值永远 >= 0
-	 * @return {int} 返回值含义如下：(应用需要通过 body_finish 函数和
-	 *       disconnected 函数来判断数据体是否读完或连接是否关闭)
-	 *  > 0: 表示已经读到的数据，并且数据还未读完，需要继续读
-	 *  == 0: 有两种原因会返回 0，当数据读完时返回 0，可调用 body_finish
-	 *        函数判断是否已经读完 HTTP 响应数据；当读到压缩数据的尾部时，
-	 *        因压缩数据的8字节尾部数据是控制字段，所以不做为数据体返回，
-	 *        此时也会返回 0；
-	 *        还可以通过 disconnected() 函数判断连接是否已经被关闭
-	 *        如果数据读完且连接半未关闭，则可以继续保持长连接
-	 *  < 0: 表示连接关闭
-	 * 注：read_body 的两个函数不能混用；
-	 *     当为解压缩数据时，则返回的值为解压缩后的数据长度
+	 * Read response body data from HTTP server or read request body data from HTTP
+	 * client.
+	 * This function automatically decompresses received compressed data.
+	 * @param out {string&} Buffer to store result.
+	 * @param clean {bool} Whether to automatically clear buf buffer before reading
+	 * data.
+	 * @param real_size {int*} When pointer is not empty, records uncompressed
+	 * response body length.
+	 *  Usually, value returned through pointer is always >= 0.
+	 * @return {int} Return value as below: (Applications need to determine whether
+	 * response body is finished or connection is closed through body_finish
+	 * function and
+	 *       disconnected function.)
+	 * > 0: Indicates data has been read, but data is not finished yet, need to
+	 * continue reading.
+	 * == 0: For various reasons, 0 will be returned. When data is finished, 0 will
+	 * be returned. You can call body_finish
+	 * function to determine whether HTTP response body has been completely read.
+	 * When decompressing compressed data end, when
+	 * decompressing compressed data's 8-byte end (which is a check field), it may
+	 * not be returned as response body,
+	 *        at this time 0 will also be returned.
+	 * Applications can determine whether connection has been closed through
+	 * disconnected() function.
+	 * When data is finished but connection is not closed, it means long connection
+	 * is supported.
+	 *  < 0: Indicates connection closed.
+	 * Note: read_body function's return value may be inaccurate:
+	 * When decompressing compressed data, returned value is decompressed data
+	 * length.
 	 */
 	int read_body(string& out, bool clean = true, int* real_size = NULL);
 	
 	/**
-	 * 从 HTTP 服务器读取响应体数据或从 HTTP 客户端读取请求体数据，
-	 * 该函数不能对数据进行解压
-	 * @param buf {char*} 存储数据体的缓冲区，不能为空
-	 * @param size {size_t} buf 缓冲区长度
-	 * @return {int} 返回值含义如下：
-	 *  > 0: 表示已经读到的数据，并且数据还未读完，需要继续读
-	 *  == 0: 表示已经读完 HTTP 响应体数据，但连接并未关闭
-	 *  < 0: 表示连接关闭
+	 * Read response body data from HTTP server or read request body data from HTTP
+	 * client.
+	 * This function does not decompress data.
+	 * @param buf {char*} Buffer to store result. Buffer cannot be empty.
+	 * @param size {size_t} Buffer size.
+	 * @return {int} Return value as below:
+	 * > 0: Indicates data has been read, but data is not finished yet, need to
+	 * continue reading.
+	 * == 0: Indicates HTTP response body data has been completely read, but
+	 * connection is not closed.
+	 *  < 0: Indicates connection closed.
 	 */
 	int read_body(char* buf, size_t size);
 
 	/**
-	 * 从 HTTP 服务器响应数据或客户端请求数据中读取一行数据，此函数内部将
-	 * 会对原始数据进行解压操作；可以循环调用此函数直到该函数返回 false
-	 * 或 body_finish() 返回 true 为止；当该函数返回 false 时表示连接已经
-	 * 关闭，当返回 true 时表示读到了一行数据，此时可以通过判断
-	 * body_finish() 返回值来判断是否已经读完了数据体
-	 * @param out {string&} 存储数据体的缓冲区，在该函数内部不会自动清理该
-	 *  缓冲区，用户可在调用该函数前自行清理该缓冲区(可调用:out.clear())
-	 * @param nonl {bool} 读取一行数据时是否自动去掉尾部的 "\r\n" 或 "\n"
-	 * @param size {size_t*} 当读到完整的一行数据时存放该行数据的长度，
-	 *  当读到一个空行且 nonl 为 true 时，则该值为 0
-	 * @return {bool} 是否读到了一行数据，当该函数返回 false 时表示读完毕
-	 *  或读出错，且没有读到完整的一行数据；如果返回 true 表示读到了一行
-	 *  数据，当读到一个空行时该函数也会返回 true，只是 *size = 0
+	 * Read one line of data from HTTP server response body or client request body.
+	 * This function internally
+	 * automatically decompresses original data. You can call this function in a
+	 * loop until it returns false
+	 * or body_finish() returns true. When this function returns false, it means
+	 * connection has been
+	 * closed. When it returns true, it means one line was read. At this time, you
+	 * can determine by checking
+	 * body_finish() function value whether response body has been completely read.
+	 * @param out {string&} Buffer to store result. This function internally
+	 * automatically clears
+	 * buffer. Users do not need to clear it before calling this function (can
+	 * call: out.clear()).
+	 * @param nonl {bool} Whether to automatically remove "\r\n" or "\n" at the end
+	 * when reading one line.
+	 * @param size {size_t*} When reading one line, stores length of read data.
+	 *  When reading one line and nonl is true, this value is 0.
+	 * @return {bool} Whether one line was read. When this function returns false,
+	 * it means connection
+	 * has been closed or no more data to read. When it returns true, it means one
+	 * line was read. When reading one line, this function also returns true, only
+	 * *size = 0.
 	 */
 	bool body_gets(string& out, bool nonl = true, size_t* size = NULL);
 
 	/**
-	 * 判断是否已经读完 HTTP 响应数据体
+	 * Determine whether HTTP response body has been completely read.
 	 * @return {bool}
 	 */
 	bool body_finish() const;
 
 	/**
-	 * 判断网络连接是否已经关闭
+	 * Determine whether connection stream has been closed.
 	 * @return {bool}
 	 */
 	bool disconnected() const;
 
 	/**
-	 * 取得通过 read_head 读到的 HTTP 响应头对象，且当传入缓冲区
-	 * 非空时，将 HTTP 响应头数据拷贝至缓冲区
-	 * @param buf {string*} 非空时用来存储 HTTP 响应头数据
-	 * @return {const HTTP_HDR_RES*} HTTP 响应头对象，如果为空，则说明
-	 *  未读到响应头数据
+	 * Get HTTP response header object found through read_head function and input
+	 * buffer.
+	 * When not empty, HTTP response header data can be obtained.
+	 * @param buf {string*} When not empty, stores HTTP response header data.
+	 * @return {const HTTP_HDR_RES*} HTTP response header object. Returns empty to
+	 * indicate
+	 *  response header data was not read.
 	 */
 	HTTP_HDR_RES* get_respond_head(string* buf);
 
 	/**
-	 * 取得通过 read_head 读到的 HTTP 请求头对象，且当传入缓冲区
-	 * 非空时，将 HTTP 请求头数据拷贝至缓冲区
-	 * @param buf {string*} 非空时用来存储 HTTP 请求头数据
-	 * @return {const HTTP_HDR_REQ*} HTTP 请求头对象，如果为空，则说明
-	 *  未读到请求头数据
+	 * Get HTTP request header object found through read_head function and input
+	 * buffer.
+	 * When not empty, HTTP request header data can be obtained.
+	 * @param buf {string*} When not empty, stores HTTP request header data.
+	 * @return {const HTTP_HDR_REQ*} HTTP request header object. Returns empty to
+	 * indicate
+	 *  request header data was not read.
 	 */
 	HTTP_HDR_REQ* get_request_head(string* buf);
 
 	/**
-	 * 输出服务器返回的 HTTP 响应头信息至标准输出
-	 * @param prompt {const char*} 若非空则随同 HTTP 头信息一起输出
+	 * Print HTTP response header information returned by server to standard
+	 * output.
+	 * @param prompt {const char*} When not empty, same as HTTP header information,
+	 * printed together.
 	 */
 	void print_header(const char* prompt = NULL);
 
 	/**
-	 * 输出服务器返回的 HTTP 响应头信息至输出流中
-	 * @param out {ostream&} 输出流，可以是文件流，也可以是网络流
-	 * @param prompt {const char*} 若非空则随同 HTTP 头信息一起输出
+	 * Print HTTP response header information returned by server to file stream.
+	 * @param out {ostream&} Output stream, can be file stream, can also be
+	 * standard output.
+	 * @param prompt {const char*} When not empty, same as HTTP header information,
+	 * printed together.
 	 */
 	void fprint_header(ostream& out, const char* prompt = NULL);
 
 	/**
-	 * 输出服务器返回的 HTTP 响应头信息至缓冲区中
-	 * @param out {string&} 存储结果的数据缓冲区
-	 * @param prompt {const char*} 若非空则随同 HTTP 头信息一起输出
+	 * Print HTTP response header information returned by server to string buffer.
+	 * @param out {string&} Buffer to store result data.
+	 * @param prompt {const char*} When not empty, same as HTTP header information,
+	 * printed together.
 	 */
 	void sprint_header(string& out, const char* prompt = NULL);
 
 private:
-	socket_stream* stream_;     // HTTP 数据流
-	bool stream_fixed_;         // 是否允许释放 stream_ 流对象
+	socket_stream* stream_;     // HTTP connection stream.
+	bool stream_fixed_;         // Whether to release stream_ object.
 
-	HTTP_HDR_RES* hdr_res_;     // HTTP 头响应对象
-	struct HTTP_RES* res_;      // HTTP 响应对象
-	HTTP_HDR_REQ* hdr_req_;     // HTTP 头请求对象
-	struct HTTP_REQ* req_;      // HTTP 请求对象
-	bool unzip_;                // 是否对压缩数据进行解压缩
-	zlib_stream* zstream_;      // 解压对象
-	bool is_request_;           // 是否是客户请求端
-	int  gzip_header_left_;     // gzip 头剩余的长度
-	int  last_ret_;             // 数据读完后记录最后的返回值
-	bool head_sent_;            // 头部数据是否已经发送完毕
-	bool body_finish_;          // 是否已经读完 HTTP 响应体数据
-	bool disconnected_;         // 网络连接是否已经关闭
-	bool chunked_transfer_;     // 是否为 chunked 传输模式
-	unsigned gzip_crc32_;       // gzip 压缩数据时的检验值
-	unsigned gzip_total_in_;    // gzip 压缩前的总数据长度      
-	string* buf_;               // 内部缓冲区，用在按行读等操作中
+	HTTP_HDR_RES* hdr_res_;     // HTTP response header object.
+	struct HTTP_RES* res_;      // HTTP response object.
+	HTTP_HDR_REQ* hdr_req_;     // HTTP request header object.
+	struct HTTP_REQ* req_;      // HTTP request object.
+	bool unzip_;                // Whether to decompress compressed data.
+	zlib_stream* zstream_;      // Decompression stream.
+	bool is_request_;           // Whether it is client request.
+	int  gzip_header_left_;     // Remaining length of gzip header.
+	int  last_ret_;             // Last data reading recorded return value.
+	bool head_sent_;            // Whether header has been sent.
+	bool body_finish_;          // Whether HTTP response body has been completely read.
+	bool disconnected_;         // Whether connection stream has been closed.
+	bool chunked_transfer_;     // Whether it is chunked transfer mode.
+	unsigned gzip_crc32_;       // CRC32 value when decompressing gzip compressed data.
+	unsigned gzip_total_in_;    // Data length before gzip compression.      
+	string* buf_;               // Internal temporary buffer, used for partial reading.
 
 	bool read_request_head();
 	bool read_response_head();
@@ -440,3 +514,4 @@ public:
 };
 
 }  // namespace acl
+

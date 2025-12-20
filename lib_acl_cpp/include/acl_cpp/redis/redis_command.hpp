@@ -17,35 +17,38 @@ class redis_client_pipeline;
 class redis_pipeline_message;
 
 /**
- * redis 客户端命令类的纯虚父类;
+ * Base virtual class for redis client command classes;
  * the redis command classes's base virtual class, which includes the basic
  * functions for all sub-classes
  */
 class ACL_CPP_API redis_command : public noncopyable {
 public:
 	/**
-	 * 缺省的构造函数，如果使用此构造函数初始化类对象，则必须调用
-	 * set_client 或 set_cluster 设置 redis 客户端命令类对象的通讯方式。
+	 * Default constructor. If you use this constructor to initialize the object,
+	 * you must
+	 * set_client or set_cluster to set the redis client communication method.
 	 * default constructor. You must set the communication method by
 	 * set_client or set_cluster functions.
 	 */
 	redis_command();
 
 	/**
-	 * 当使用非集群模式时，可以使用此构造函数设置 redis 通信对象。
+	 * When not using cluster mode, you can use this constructor to set the redis
+	 * communication object.
 	 * Using this constructor to set the redis communication mode,
 	 * usually in no-cluster mode.
-	 * @param conn {redis_client*} redis 通信类对象
+	 * @param conn {redis_client*} Redis communication object.
 	 *  the redis communication in no-cluster mode
 	 */
 	redis_command(redis_client* conn);
 
 	/**
-	 * 集群模式的构造函数，在构造类对象时指定了集群模式的
-	 * redis_client_cluster 对象。
+	 * Constructor for cluster mode. When constructing the object, specify cluster
+	 * mode.
+	 * redis_client_cluster object.
 	 * Using this constructor to set the redis_client_cluster, usually in
 	 * cluster mode.
-	 * @param cluster {redis_client_cluster*} redis 集群连接对象
+	 * @param cluster {redis_client_cluster*} Redis cluster connection object.
 	 *  redis cluster object in cluster mode
 	 *  the max of every connection pool with all the redis nodes,
 	 *  if be set 0, then there is no connections limit in
@@ -61,21 +64,27 @@ public:
 	virtual ~redis_command();
 
 	/**
-	 * 在进行每个命令处理前，是否要求检查 socket 句柄与地址的匹配情况，当
-	 * 打开该选项时，将会严格检查匹配情况，但会影响一定性能，因此该设置仅
-	 * 用在 DEBUG 时的运行场景
+	 * Whether to check socket connection address matching before processing each
+	 * command.
+	 * When this option is enabled, it will strictly match the connection address,
+	 * which may affect performance, so it is recommended
+	 * to enable this option only during DEBUG.
 	 * @param on {bool}
 	 */
 	void set_check_addr(bool on);
 
 	/**
-	 * 在重复使用一个继承于 redis_command 的子类操作 redis 时，需要在
-	 * 下一次调用前调用本方法以释放上次操作的临时对象;
+	 * When reusing a redis_command subclass object to operate redis, you need to
+	 * call this method first before the next call to release resources from the
+	 * last operation;
 	 * when reusing a redis command sub-class, the reset method should be
 	 * called first to rlease some resources in last command operation
-	 * @param save_slot {bool} 当采用集群模式时，该参数决定是否需要重新
-	 *  计算哈希槽值，如果反复调用 redis 命令过程中的 key 值不变，则可以保
-	 *  留此哈希槽值以减少内部重新进行计算的次数;
+	 * @param save_slot {bool} When using cluster mode, this parameter indicates
+	 * whether to save
+	 * the hash slot value. If all redis operations in the next operation use the
+	 * same key value, you can
+	 * avoid recalculating the hash slot value and reduce the number of internal
+	 * calculations;
 	 *  when in cluster mode, if your operations is on the same key, you
 	 *  can set the param save_slot to false which can reduse the times
 	 *  of compute the same key's hash-slot.
@@ -86,19 +95,21 @@ public:
 	void reset(bool save_slot = false);
 
 	/**
-	 * 在使用非集群方式时，通过本函数将从连接池获得的连接对象;
+	 * When not using cluster mode, this function is used to set the connection
+	 * obtained from the connection pool;
 	 * when not using cluster mode, the function is used
 	 * to set the connection for next redis command operation.
-	 * @param conn {redis_client*} 与 redis 客户端命令进行关联;
+	 * @param conn {redis_client*} Redis client connection object to be set;
 	 *  the redis connection to be set in next redis operation
 	 */
 	void set_client(redis_client* conn);
 
 	/**
-	 * 获得当前 redis 客户端命令的连接对象;
+	 * Get the current redis client connection object;
 	 * get redis connection set by set_client function
-	 * @return {redis_client*} 返回 NULL 表示没有连接对象与当前的命令对象
-	 *  进行绑定;
+	 * @return {redis_client*} Returns NULL to indicate no connection object is set
+	 * in the current command object
+	 *  collection;
 	 *  the internal redis connection be returned, NULL if no redis
 	 *  connection be set 
 	 */
@@ -107,20 +118,22 @@ public:
 	}
 
 	/**
-	 * 获得当前 redis 命令对象所绑定的服务器地址，只有当该对象与 redis_client
-	 * 绑定时（即调用 set_client) 才可以调用本函数
+	 * Get the redis-server address bound to the current redis connection. This
+	 * method can only be called
+	 * when this object is redis_client (i.e., set_client) has been set.
 	 * get the redis-server's addr used by the current command. this
 	 * method can only be used only if the redis_client was set by
 	 * set_client method.
-	 * @return {const char*} 返回空串 "" 表示没有绑定 redis 连接对象
+	 * @return {const char*} Returns empty string "" to indicate no redis
+	 * connection object
 	 *  if "" was resturned, the redis connection was not set
 	 */
 	const char* get_client_addr() const;
 
 	/**
-	 * 设置连接池集群管理器;
+	 * Set connection pool cluster object;
 	 * set the redis cluster object in redis cluster mode
-	 * @param cluster {redis_client_cluster*} redis 集群连接对象;
+	 * @param cluster {redis_client_cluster*} Redis cluster connection object;
 	 *  the redis_cluster connection object which can connect to any
 	 *  redis-server and support connection pool
 	 *  when dynamically creating connection pool to any redis-server, use
@@ -132,7 +145,7 @@ public:
 	void set_cluster(redis_client_cluster* cluster, size_t max_conns);
 
 	/**
-	 * 获得所设置的连接池集群管理器;
+	 * Get the connection pool cluster object that was set;
 	 * get redis_cluster object set by set_cluster function
 	 * @return {redis_client_cluster*}
 	 */
@@ -141,7 +154,7 @@ public:
 	}
 
 	/**
-	 * 设置pipeline通信对象，使用pipeline模式
+	 * Set pipeline communication object to use pipeline mode
 	 * set the redis communication in pipeline mode
 	 * @param pipeline {redis_client_pipeline*} pipeline communication object
 	 */
@@ -156,7 +169,7 @@ public:
 	}
 
 	/**
-	 * 获得内存池句柄，该内存池由 redis_command 内部产生;
+	 * Get memory pool handle set in memory pool redis_command internal;
 	 * get memory pool handle been set
 	 * @return {dbuf_pool*}
 	 */
@@ -165,40 +178,46 @@ public:
 	}
 
 	/**
-	 * 获得当前结果结点的数据类型;
+	 * Get the result type returned from the current operation;
 	 * get the result type returned from redis-server
 	 * @return {redis_result_t}
 	 */
 	redis_result_t result_type() const;
 	/**
-	 * 当返回值为 REDIS_RESULT_STATUS 类型时，本方法返回状态信息;
+	 * When the result value type is REDIS_RESULT_STATUS, the status information
+	 * can be obtained;
 	 * when result type is REDIS_RESULT_STATUS, the status info can be
 	 * got by this function
-	 * @return {const char*} 返回 "" 表示出错;
+	 * @return {const char*} Returns "" to indicate error;
 	 *  "" will be returned on error
 	 */
 	const char* result_status() const;
 
 	/**
-	 * 当出错时返回值为 REDIS_RESULT_ERROR 类型，本方法返回出错信息;
+	 * When the result type is REDIS_RESULT_ERROR, the error information can be
+	 * obtained;
 	 * when result type is REDIS_RESULT_ERROR, the error info can be
 	 * get by this function
-	 * @return {const char*} 返回空串 "" 表示没有出错信息;
+	 * @return {const char*} Returns empty string "" to indicate no error
+	 * information;
 	 *  "" will be returned when no error info
 	 */
 	const char* result_error() const;
 
 	/**
-	 * 获得当前结果结点存储的对象的个数, 该方法可以获得结果为下面两个方法
-	 * (result_child/result_value) 所需要的数组元素的个数;
+	 * Get the number of result objects currently stored. This method can be used
+	 * to get the number of elements
+	 * that need to be iterated for functions (result_child/result_value);
 	 * get number of result objects, just for functions
 	 * result_child/result_value 
-	 * @return {size_t} 返回值与存储类型的对应关系如下：
+	 * @return {size_t} The correspondence between return value and result type is
+	 * as follows:
 	 *  the relation between return value and result type, as below:
 	 *  REDIS_RESULT_ERROR: 1
 	 *  REDIS_RESULT_STATUS: 1
 	 *  REDIS_RESULT_INTEGER: 1
-	 *  REDIS_RESULT_STRING: > 0 时表示该字符串数据被切分成非连接内存块的个数;
+	 * REDIS_RESULT_STRING: > 0 indicates the number of chunks the string data is
+	 * divided into when the string is too large;
 	 *       when the result type is REDIS_RESULT_STRING and the
 	 *       string is too large, the string was being cut into many small
 	 *       chunks, the returned value is the chunks number
@@ -207,9 +226,11 @@ public:
 	size_t result_size() const;
 
 	/**
-	 * 当返回值为 REDIS_RESULT_INTEGER 类型时，本方法返回对应的 32 位整数值;
+	 * When the result value type is REDIS_RESULT_INTEGER, get the corresponding
+	 * 32-bit integer value;
 	 * get 32-bits number value if result type is REDIS_RESULT_INTERGER
-	 * @param success {bool*} 本指针非 NULL 时记录操作过程是否成功;
+	 * @param success {bool*} When this pointer is not NULL, it records whether the
+	 * operation was successful;
 	 *  if the param pointer is not NULL, which will save status of
 	 *  success or not for result from redis-server
 	 * @return {int}
@@ -217,9 +238,11 @@ public:
 	int result_number(bool* success = NULL) const;
 
 	/**
-	 * 当返回值为 REDIS_RESULT_INTEGER 类型时，本方法返回对应的 64 位整数值;
+	 * When the result value type is REDIS_RESULT_INTEGER, get the corresponding
+	 * 64-bit integer value;
 	 * get 64-bits number value if result type is REDIS_RESULT_INTERGER
-	 * @param success {bool*} 本指针非 NULL 时记录操作过程是否成功;
+	 * @param success {bool*} When this pointer is not NULL, it records whether the
+	 * operation was successful;
 	 *  if the param pointer is not NULL, which will save status of
 	 *  success or not for result from redis-server
 	 * @return {long long int}
@@ -227,20 +250,23 @@ public:
 	long long int result_number64(bool* success = NULL) const;
 
 	/**
-	 * 返回对应下标的数据(当数据类型非 REDIS_RESULT_ARRAY 时）;
+	 * Get string result corresponding to subscript (when result type is
+	 * REDIS_RESULT_ARRAY);
 	 * get string result when result type isn't REDIS_RESULT_ARRAY
-	 * @param i {size_t} 数组下标;
+	 * @param i {size_t} Array subscript;
 	 *  the array index
-	 * @param len {size_t*} 当为非 NULL 指针时存储所返回数据的长度;
+	 * @param len {size_t*} When not NULL pointer, stores the length of the result
+	 * data;
 	 *  *len will save the result's length if len is not NULL
-	 * @return {const char*} 返回 NULL 表示下标越界;
+	 * @return {const char*} Returns NULL to indicate subscript out of bounds;
 	 *  NULL will return if i beyonds the array's size
 	 */
 	const char* get_result(size_t i, size_t* len = NULL) const;
 
 	/**
-	 * 判断当前所绑定的 redis 连接流对象(redis_client) 连接是否已经关闭；
-	 * 只有内部的 conn_ 流对象非空时调用此函数才有意义;
+	 * Determine whether the redis connection object (redis_client) bound to the
+	 * current command has been closed.
+	 * This method can only be used when conn_ object is not empty;
 	 * to judge if the redis connection was being closed, only redis_client
 	 * object be set internal
 	 * @return {bool}
@@ -248,39 +274,47 @@ public:
 	bool eof() const;
 
 	/**
-	 * 获得本次 redis 操作过程的结果;
+	 * Get the result of the last redis operation;
 	 * get result object of last redis operation
 	 * @return {redis_result*}
 	 */
 	const redis_result* get_result() const;
 
 	/**
-	 * 当查询结果为数组对象时调用本方法获得一个数组元素对象;
+	 * When the query result is an array type, this method gets one result element
+	 * object;
 	 * get one result ojbect of array if result type is REDIS_RESULT_ARRAY
-	 * @param i {size_t} 数组对象的下标值;
+	 * @param i {size_t} Result array subscript value;
 	 *  the result array's index
-	 * @return {const redis_result*} 当结果非数组对象或结果为空或出错时
-	 *  该方法返回 NULL;
+	 * @return {const redis_result*} This method returns NULL when the result is
+	 * not an array type or
+	 *  array is empty or error;
 	 *  NULL will be resturned when result is not REDIS_RESULT_ARRAY or
 	 *  array empty or error
 	 */
 	const redis_result* result_child(size_t i) const;
 
 	/**
-	 * 当从 redis-server 获得的数据是一组字符串类型的结果集时，可以调用
-	 * 本函数获得某个指定下标位置的数据;
+	 * When the result obtained from redis-server is a string array type, you can
+	 * call
+	 * this method to get the string at a specified subscript position;
 	 * when the reply from redis-serveer are strings array, this
 	 * function can be used to get the string specified by a subscript
-	 * @param i {size_t} 下标（从 0 开始）
+	 * @param i {size_t} Subscript (starting from 0).
 	 *  the subscript of strings array
-	 * @param len {size_t*} 若该指针非空，则存储所返回结果的长度（仅当该
-	 *  方法返回非空指针时有效）
+	 * @param len {size_t*} If the pointer is not empty, it stores the length of
+	 * the returned result. This parameter
+	 *  is only valid when the caller passes a non-empty pointer.
 	 *  if len not a NULL pointer, it will store the length of string
 	 *  specified by the subscript
-	 * @return {const char*} 返回对应下标的值，当返回 NULL 时表示该下标没
-	 *  有值，为了保证使用上的安全性，返回的数据总能保证最后是以 \0 结尾，
-	 *  在计算数据长度时不包含该结尾符，但为了兼容二进制情形，调用者还是
-	 *  应该通过返回的 len 存放的长度值来获得数据的真实长度
+	 * @return {const char*} Returns the value corresponding to the subscript. When
+	 * NULL is returned, it means there is no
+	 * value at this subscript. To ensure usage safety, the returned string cannot
+	 * guarantee ending with \0.
+	 * When calculating data length, the ending character should not be counted. To
+	 * avoid binary data corruption, callers
+	 * should use the length value stored in the returned len to determine the
+	 * actual length of the data.
 	 *  the string will be returned associate with the subscript, if there
 	 *  are nothing with the subscript, NULL will be returned
 	 */
@@ -288,22 +322,24 @@ public:
 
 	/////////////////////////////////////////////////////////////////////
 	/**
-	 * 设置是否对请求数据进行分片处理，如果为 true 则内部在组装请求协议的
-	 * 时候不会将所有数据块重新组装成一个连续的大数据块
+	 * Set whether to slice request data. When set to true, when internally
+	 * packaging protocol
+	 * data, it will not combine all request data into one large data packet.
 	 * just for request package, setting flag for sending data with
 	 * multi data chunks; this is useful when the request data is large
-	 * @param on {bool} 内部默认值为 false
+	 * @param on {bool} Internal default value is false.
 	 *  if true the request data will not be combined one package,
 	 *  internal default is false
 	 */
 	void set_slice_request(bool on);
 
 	/**
-	 * 设置是否对响应数据进行分片处理，如果为 true 则当服务器的返回数据
-	 * 比较大时则将数据进行分片，分成一些不连续的数据块
+	 * Set whether to slice response data. When set to true, when the server's
+	 * response data
+	 * is relatively large, the data will be sliced into some small data chunks.
 	 * just for response package, settint flag for receiving data
 	 * if split the large response data into multi little chunks
-	 * @param on {bool} 内部默认值为 false
+	 * @param on {bool} Internal default value is false.
 	 *  if true the response data will be split into multi little
 	 *  data, which is useful for large response data for avoiding
 	 *  malloc large continuously memory from system.
@@ -313,21 +349,25 @@ public:
 
 public:
 	/**
-	 * 直接组合 redis 协议命令方式，从 redis 服务器获得结果
-	 * @param argc {size_t} 后面数组中数组元素个数
-	 * @param argv {const char*[]} redis 命令组成的数组
-	 * @param lens {const size_t[]} argv 中数组元素的长度
-	 * @param nchild {size_t} 有的 redis 命令需要获取多个结果集，如：subop
-	 * @return {const redis_result*} 返回的结果集
+	 * Directly call redis protocol command method to operate redis and get
+	 * results.
+	 * @param argc {size_t} Number of command parameter elements.
+	 * @param argv {const char*[]} Redis command parameter array.
+	 * @param lens {const size_t[]} Length of each argv array element.
+	 * @param nchild {size_t} Some redis commands need to get multiple results,
+	 * e.g., subop.
+	 * @return {const redis_result*} Returned result.
 	 */
 	const redis_result* request(size_t argc, const char* argv[],
 		const size_t lens[], size_t nchild = 0);
 
 	/**
-	 * 直接组合 redis 协议命令方式，从 redis 服务器获得结果
-	 * @param args {const std::vector<string>&} redis 命令组成的数组
-	 * @param nchild {size_t} 有的 redis 命令需要获取多个结果集，如：subop
-	 * @return {const redis_result*} 返回的结果集
+	 * Directly call redis protocol command method to operate redis and get
+	 * results.
+	 * @param args {const std::vector<string>&} Redis command parameter array.
+	 * @param nchild {size_t} Some redis commands need to get multiple results,
+	 * e.g., subop.
+	 * @return {const redis_result*} Returned result.
 	 */
 	const redis_result* request(const std::vector<string>& args,
 		size_t nchild = 0);
@@ -337,20 +377,21 @@ public:
 	}
 
 	/**
-	 * 根据请求命令字列表创建 redis 请求协议数据
-	 * @param argc {size_t} 命令参数个数
-	 * @param argv {const char* []} 命令参数数组
-	 * @param lens {const size_t []} 每个命令参数长度数组
-	 * @param out {string&} 存放创建结果
+	 * Build redis request protocol from parameter list.
+	 * @param argc {size_t} Number of parameters.
+	 * @param argv {const char* []} Parameter array.
+	 * @param lens {const size_t []} Length of each parameter string.
+	 * @param out {string&} Storage buffer.
 	 */
 	static void build_request(size_t argc, const char* argv[],
 		const size_t lens[], string& out);
 
 	/**
-	 * 根据命令字列表创建 redis 请求协议并存储于 redis_command 中，以备在请求时使用
-	 * @param argc {size_t} 命令参数个数
-	 * @param argv {const char* []} 命令参数数组
-	 * @param lens {const size_t []} 每个命令参数长度数组
+	 * Build redis request protocol from parameter list and store it in
+	 * redis_command for reuse.
+	 * @param argc {size_t} Number of parameters.
+	 * @param argv {const char* []} Parameter array.
+	 * @param lens {const size_t []} Length of each parameter string.
 	 */
 	void build_request(size_t argc, const char* argv[], const size_t lens[]);
 
@@ -528,3 +569,4 @@ protected:
 } // namespace acl
 
 #endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
+

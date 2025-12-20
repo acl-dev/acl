@@ -14,73 +14,78 @@ public:
 	~charset_conv();
 
 	/**
-	 * 设置是否允许将无效的字符集直接拷贝
-	 * @param onoff {bool} 当为 true 时，则转码过程中如果遇到了
-	 *  非法字符集，则直接拷贝，否则则跳过，默认情况下是直接拷贝
+	 * Set whether to allow directly copying invalid character sets
+	 * @param onoff {bool} When true, during transcoding process, if illegal
+	 * character set is encountered, directly copy, otherwise skip. By default,
+	 * directly copy
 	 */
 	void set_add_invalid(bool onoff);
 
 	/**
-	 * 转换函数
-	 * @param fromCharset {const char*} 源字符集
-	 * @param toCharset {const char*} 目标字符集
-	 * @param in {const char*} 输入的源数据地址(非空)
-	 * @param n {size_t} 输入源数据的长度(>0)
-	 * @param out {string*} 存储转换结果
-	 * @return {bool} 转换是否成功
+	 * Conversion function
+	 * @param fromCharset {const char*} Source character set
+	 * @param toCharset {const char*} Target character set
+	 * @param in {const char*} Address of input source data (non-empty)
+	 * @param n {size_t} Length of input source data (>0)
+	 * @param out {string*} Store conversion result
+	 * @return {bool} Whether conversion was successful
 	 */
 	bool convert(const char* fromCharset, const char* toCharset,
 		const char* in, size_t n, string* out);
 
 	/**
-	 * 如果转换失败, 该函数返回出错原因
-	 * @return {const char*} 出错原因
+	 * If conversion fails, this function returns error reason
+	 * @return {const char*} Error reason
 	 */
 	const char* serror() const;
 
 	/**
-	 * 重置转码状态, 该解析器便可重复使用, 但在再次使用前需要调用
-	 * set(from, to) 设置源字符集与目标字符集
+	 * Reset transcoding state. This parser can be reused, but before using again,
+	 * need to call
+	 * set(from, to) to set source character set and target character set
 	 */
 	void reset();
 
-	/* 流式分析过程：update_begin->update->update ... ->update_finish */
+	/* Streaming analysis process: update_begin->update->update ... ->update_finish */
 
 	/**
-	 * 初始化流式分析的相关参数
-	 * @param fromCharset {const char*} 源字符集
-	 * @param toCharset {const char*} 目标字符集
-	 * @return {bool} 初始化是否成功
+	 * Initialize streaming analysis related parameters
+	 * @param fromCharset {const char*} Source character set
+	 * @param toCharset {const char*} Target character set
+	 * @return {bool} Whether initialization was successful
 	 */
 	bool update_begin(const char* fromCharset, const char* toCharset);
 
 	/**
-	 * 以流式方式进行字符集转换
-	 * @param in {const char*} 源字符串
-	 * @param len {size_t} in 字符串长度
-	 * @param out {string*} 存储转换结果
-	 * @return {bool} 当前转换过程是否成功
+	 * Perform character set conversion in streaming mode
+	 * @param in {const char*} Source string
+	 * @param len {size_t} in string length
+	 * @param out {string*} Store conversion result
+	 * @return {bool} Whether current conversion process was successful
 	 */
 	bool update(const char* in, size_t len, string* out);
 
 	/**
-	 * 流式转换结束后需要调用此函数提取最后的转换结果
-	 * @param out {string*} 存储转换结果
+	 * After streaming conversion ends, need to call this function to extract final
+	 * conversion result
+	 * @param out {string*} Store conversion result
 	 */
 	void update_finish(string* out);
 
 	/**
-	 * 创建字符集转换器
-	 * @param fromCharset {const char*} 源字符集
-	 * @param toCharset {const char*} 目标字符集
-	 * @return {charset_conv*} 如果输入参数非法，或源字符集
-	 *  与目标字符集相同，或不支持两个字符集间的转换则返回NULL，
-	 *  用完后需要调用 delete 删除
+	 * Create character set converter
+	 * @param fromCharset {const char*} Source character set
+	 * @param toCharset {const char*} Target character set
+	 * @return {charset_conv*} If input parameters are illegal, or source character
+	 * set
+	 * and target character set are the same, or conversion between two character
+	 * sets is not supported, returns NULL.
+	 *  Need to call delete to delete after use
 	 */
 	static charset_conv* create(const char* fromCharset,
 	                const char* toCharset);
 
-	// pipe_stream 虚函数重载
+	// pipe_stream virtual function override
 
 	virtual int push_pop(const char* in, size_t len,
 		string* out, size_t max = 0);
@@ -90,7 +95,7 @@ public:
 public:
 
 private:
-	bool m_addInvalid;  // 如果遇到无效的字符集，是否直接拷贝
+	bool m_addInvalid;  // If invalid character set is encountered, whether to directly copy
 	string  m_errmsg;
 	string* m_pBuf;
 	char  m_fromCharset[32];
@@ -102,14 +107,17 @@ private:
 };
 
 /**
- * 该 C-like API 可以更方便快捷地方便进行字符集转换
- * @param in {const char*} 输入字符串(非空字符串)
- * @param len {size_t} 输入字符串长度(>0)
- * @param from_charset {const char*} 源字符集编码
- * @param to_charset {constchar*} 目标字符集编码
- * @return {string} 返回的 string 对象非空时(即: !string.empty()) 表示转换成功
+ * This C-like API can more conveniently and quickly perform character set
+ * conversion
+ * @param in {const char*} Input string (non-empty string)
+ * @param len {size_t} Input string length (>0)
+ * @param from_charset {const char*} Source character set encoding
+ * @param to_charset {constchar*} Target character set encoding
+ * @return {string} When returned string object is not empty (i.e.:
+ * !string.empty()), it indicates conversion was successful
  */
 ACL_CPP_API string strconv(const char* in, size_t len,
 	const char* from_charset, const char* to_charset);
 
 } // namespace acl
+

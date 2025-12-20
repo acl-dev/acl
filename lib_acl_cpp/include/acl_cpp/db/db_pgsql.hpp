@@ -19,7 +19,7 @@ public:
 	static bool load(void);
 
 	/********************************************************************/
-	/*         以下为基类 db_handle 的虚接口                            */
+	/* The following are virtual interfaces of the base class db_handle */
 	/********************************************************************/
 
 	const char* dbtype(void) const;
@@ -85,11 +85,11 @@ public:
 	bool rollback(void);
 
 private:
-	char*   dbaddr_;  // 数据库监听地址
-	char*   dbname_;  // 数据库名
-	char*   dbuser_;  // 数据库账号
-	char*   dbpass_;  // 数据库账号密码
-	string  charset_; // 连接数据库采用的字符集
+	char*   dbaddr_;  // Database listening address
+	char*   dbname_;  // Database name
+	char*   dbuser_;  // Database account
+	char*   dbpass_;  // Database account password
+	string  charset_; // Character set used when connecting to database
 
 	int     conn_timeout_;
 	int     rw_timeout_;
@@ -106,3 +106,4 @@ private:
 } // namespace acl
 
 #endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
+

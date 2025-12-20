@@ -15,46 +15,47 @@ struct URL_NV {
 class ACL_CPP_API url_coder : public dbuf_obj {
 public:
 	/**
-	 * 构造函数
-	 * @param nocase {bool} 当为 true 时表示参数名不区别大小写
-	 * @param dbuf {dbuf_guard*} 内存池对象
+	 * Constructor
+	 * @param nocase {bool} When true, parameter names are case-insensitive
+	 * @param dbuf {dbuf_guard*} Memory pool object
 	 */
 	url_coder(bool nocase = true, dbuf_guard* dbuf = NULL);
 
 	/**
-	 * 构造函数，通过类实例对象构造
+	 * Constructor, construct through class instance object
 	 * @param coder {const url_coder&}
-	 * @param dbuf {dbuf_guard*} 内存池对象
+	 * @param dbuf {dbuf_guard*} Memory pool object
 	 */
 	url_coder(const url_coder& coder, dbuf_guard* dbuf = NULL);
 
 	~url_coder();
 
 	/**
-	 * 将存储于 params_ 数组中的数据进行 url 编码
-	 * @param buf {string&} 存储编码后的结果
-	 * @param clean {bool} 是否清空传入的 buf 缓冲区
+	 * URL encode data stored in params_ array
+	 * @param buf {string&} Store encoded result
+	 * @param clean {bool} Whether to clear the passed buf buffer
 	 */
 	void encode(string& buf, bool clean = true) const;
 
 	/**
-	 * 获得将数组对象转换为编码后的字符串对象
+	 * Get string object converted from array object after encoding
 	 * @return {const string&}
 	 */
 	const string& to_string() const;
 
 	/**
-	 * 解析以 URL 编码的字符串
-	 * @param str {const char*} url 编码形式的字符串
+	 * Parse URL-encoded string
+	 * @param str {const char*} String in URL-encoded form
 	 */
 	void decode(const char* str);
 	
 	/**
-	 * 采用 url 编码时，调用此函数添加变量
-	 * @param name {const char*} 变量名
-	 * @param value 变量值
-	 * @param override {bool} 如果存在同名变量是否直接覆盖
-	 * @return 返回 url_coder 对象的引用
+	 * When using URL encoding, call this function to add variables
+	 * @param name {const char*} Variable name
+	 * @param value Variable value
+	 * @param override {bool} If variable with same name exists, whether to
+	 * directly override
+	 * @return Returns reference to url_coder object
 	 */
 	url_coder& set(const char* name, const char* value,
 		bool override = true);
@@ -65,31 +66,34 @@ public:
 		bool override = true);
 
 	/**
-	 * 获得 URL 解码后 params_ 数组中某个变量名的值
-	 * @param name {const char*} 变量名
-	 * @param found {bool*} 该指针非 NULL 时，将存储 name 是否存在，主要
-	 *  用在 name 的值为空的情形
-	 * @return {const char*} 返回 NULL 表示不存在
+	 * Get value of a variable name in params_ array after URL decoding
+	 * @param name {const char*} Variable name
+	 * @param found {bool*} When this pointer is not NULL, will store whether name
+	 * exists, mainly used
+	 *  when name's value is empty
+	 * @return {const char*} Returns NULL indicates does not exist
 	 */
 	const char* get(const char* name, bool* found = NULL) const;
 
 	/**
-	 * 获得 URL 解码后 params_ 数组中某个变量名的值
-	 * @param name {const char*} 变量名
-	 * @return {const char*} 返回 NULL 表示不存在或 name 的值为空
-	 *  注：如果 name 的值为空，则不能正确判断 name 是否存在
+	 * Get value of a variable name in params_ array after URL decoding
+	 * @param name {const char*} Variable name
+	 * @return {const char*} Returns NULL indicates does not exist or name's value
+	 * is empty
+	 * Note: If name's value is empty, cannot correctly determine whether name
+	 * exists
 	 */
 	const char* operator[](const char* name) const;
 
 	/**
-	 * URL 编码器对象的拷贝
-	 * @param coder {const url_coder&} URL 源编码器对象
+	 * Copy of URL encoder object
+	 * @param coder {const url_coder&} Source URL encoder object
 	 * @return {const url_coder&}
 	 */
 	const url_coder& operator =(const url_coder& coder);
 
 	/**
-	 * 获得参数数组对象
+	 * Get parameter array object
 	 * @return {std::vector<URL_NV*>&}
 	 */
 	const std::vector<URL_NV*>& get_params() const {
@@ -97,14 +101,15 @@ public:
 	}
 
 	/**
-	 * 从 params_ 参数数组中删除某个变量
-	 * @param name {const char*} 变量名
-	 * @return {bool} 返回 true 表示删除成功，否则表示不存在
+	 * Delete a variable from params_ parameter array
+	 * @param name {const char*} Variable name
+	 * @return {bool} Returns true indicates delete was successful, otherwise
+	 * indicates does not exist
 	 */
 	bool del(const char* name);
 
 	/**
-	 * 重置解析器状态，清除内部缓存
+	 * Reset parser state, clear internal cache
 	 */
 	void reset();
 
@@ -119,3 +124,4 @@ private:
 };
 
 } // namespace acl end
+

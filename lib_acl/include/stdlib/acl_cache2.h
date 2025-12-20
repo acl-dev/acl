@@ -6,42 +6,43 @@ extern "C" {
 #endif
 #include "acl_define.h"
 #include <time.h>
+#include "acl_iterator.h"
 
 typedef struct ACL_CACHE2 ACL_CACHE2;
 
 /**
- * 缓存池中存储的缓存对象
+ * Cache entry structure for key-value storage.
  */
 typedef struct ACL_CACHE2_INFO {
-	char  *key;		/**< 健值 */
-	void  *value;		/**< 用户动态对象 */
-	int    nrefer;		/**< 引用计数 */
-	time_t when_timeout;	/**< 过期时间截 */
-	ACL_CACHE2* cache;	/**< 引用缓存对象 */
+	char  *key;		/**< Key value */
+	void  *value;		/**< User dynamic data */
+	int    nrefer;		/**< Reference count */
+	time_t when_timeout;	/**< Expiration timestamp */
+	ACL_CACHE2* cache;	/**< Associated cache object */
 } ACL_CACHE2_INFO;
 
 /**
- * 缓冲池
+ * Cache object.
  */
 struct ACL_CACHE2 { 
-	int   max_size;		/**< 缓存池容量大小限制值 */
-	int   size;		/**< 当前缓存池中的缓存对象个数 */
-	void *ctx;		/**< 外部引用对象 */
+	int   max_size;		/**< Maximum cache size limit value */
+	int   size;		/**< Current number of cache entries */
+	void *ctx;		/**< External context object */
 
-	/**< 释放用户动态对象的释放回调函数 */
+	/**< Callback function to free user dynamic data */
 	void  (*free_fn)(const ACL_CACHE2_INFO*, void *);
 
 	/* for acl_iterator */
 
-	/* 取迭代器头函数 */
+	/* Get iterator head pointer */
 	void *(*iter_head)(ACL_ITER*, struct ACL_CACHE2*);
-	/* 取迭代器下一个函数 */
+	/* Get next iterator pointer */
 	void *(*iter_next)(ACL_ITER*, struct ACL_CACHE2*);
-	/* 取迭代器尾函数 */
+	/* Get iterator tail pointer */
 	void *(*iter_tail)(ACL_ITER*, struct ACL_CACHE2*);
-	/* 取迭代器上一个函数 */
+	/* Get previous iterator pointer */
 	void *(*iter_prev)(ACL_ITER*, struct ACL_CACHE2*);
-	/* 取迭代器关联的当前容器成员结构对象 */
+	/* Get the current iterator's member structure object */
 	ACL_CACHE2_INFO *(*iter_info)(ACL_ITER*, struct ACL_CACHE2*);
 };
 
@@ -68,179 +69,188 @@ struct ACL_CACHE2 {
  */
 
 /**
- * 创建一个缓存池，并设置每个缓存对象的最大缓存时长及该缓存池的空间容量限制
- * @param max_size {int} 该缓存池的容量限制，若该值 <= 0，则内部不会限制缓存量
- * @param free_fn {void (*)(void*)} 用户级的释放缓存对象的函数
- * @return {ACL_CACHE2*} 缓存池对象句柄
+ * Create a cache object. When each cache entry expires, the user callback
+ * will be invoked to free the associated memory.
+ * @param max_size {int} User-defined cache size limit; if value <= 0,
+ *  internal size limit will be used instead
+ * @param free_fn {void (*)(void*)} User-defined callback function to free cache entries
+ * @return {ACL_CACHE2*} Cache object pointer
  */
 ACL_API ACL_CACHE2 *acl_cache2_create(int max_size,
 	void (*free_fn)(const ACL_CACHE2_INFO*, void*));
 
 /**
- * 释放一个缓存池
- * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
+ * Free a cache object.
+ * @param cache2 {ACL_CACHE2*} Cache object pointer
  */
 ACL_API void acl_cache2_free(ACL_CACHE2 *cache2);
 
 /**
- * 向缓存池中添加被缓存的对象
- * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
- * @param key {const char*} 缓存对象的健值
- * @param value {void*} 动态缓存对象
- * @param timeout {int} 每个缓存对象的缓存时长
- * @return {ACL_CACHE2_INFO*} 缓存对象所依附的结构对象，其中的 value 与用户的
- *  对象相同, 如果返回 NULL 则表示添加失败，失败原因为：缓存池太大溢出或相同
- *  健值的对象存在且引用计数非0; 如果返回非 NULL 则表示添加成功，如果对同一健
- *  值的重复添加，会用新的数据替换旧的数据，且旧数据调用释放函数进行释放
+ * Add a key-value object to the cache.
+ * @param cache2 {ACL_CACHE2*} Cache object pointer
+ * @param key {const char*} Key value to be stored
+ * @param value {void*} Dynamic data object
+ * @param timeout {int} Cache timeout for each entry (seconds)
+ * @return {ACL_CACHE2_INFO*} Returns the structure object containing the entry;
+ *  the value field is the same as the user-provided value. Returns NULL on failure;
+ *  failure reasons: cache is full, or an object with the same key exists and
+ *  its reference count is 0. Returns non-NULL on success; if the same key
+ *  is added again, the new data replaces the old data, and the old data's
+ *  free callback is invoked to free it.
  */
 ACL_API ACL_CACHE2_INFO *acl_cache2_enter(ACL_CACHE2 *cache2,
 	const char *key, void *value, int timeout);
 
 /**
- * 从缓存池中查找某个被缓存的对象
- * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
- * @param key {const char*} 查询健
- * @return {void*} 被缓存的用户对象的地址，为NULL时表示未找到
+ * Find an object in the cache by key.
+ * @param cache2 {ACL_CACHE2*} Cache object pointer
+ * @param key {const char*} Query key
+ * @return {void*} Returns the user-provided address; NULL if not found
  */
 ACL_API void *acl_cache2_find(ACL_CACHE2 *cache2, const char *key);
 
 /**
- * 从缓存池中查找某个被缓存的对象所依附的缓存信息对象
- * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
- * @param key {const char*} 查询健
- * @return {ACL_CACHE2_INFO*} 缓存信息对象地址，为NULL时表示未找到
+ * Find an object in the cache by key and return its cache info structure.
+ * @param cache2 {ACL_CACHE2*} Cache object pointer
+ * @param key {const char*} Query key
+ * @return {ACL_CACHE2_INFO*} Cache info structure address; NULL if not found
  */
 ACL_API ACL_CACHE2_INFO *acl_cache2_locate(ACL_CACHE2 *cache2, const char *key);
 
 /**
- * 从缓存池中删除某个缓存对象
- * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
- * @param info {ACL_CACHE2_INFO*} 用户对象所依附的缓存信息对象
- * @return {int} 0: 表示删除成功; -1: 表示该对象的引用计数非0或该对象不存在
+ * Delete a cache entry from the cache.
+ * @param cache2 {ACL_CACHE2*} Cache object pointer
+ * @param info {ACL_CACHE2_INFO*} Cache info structure returned by user
+ * @return {int} 0: deletion successful; -1: object reference count is not 0, or object does not exist
  */
 ACL_API int acl_cache2_delete(ACL_CACHE2 *cache2, ACL_CACHE2_INFO *info);
 
 /**
- * 从缓存池中删除某个缓存对象
- * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
- * @param key {const char*} 健值
- * @return {int} 0: 表示删除成功; -1: 表示该对象的引用计数非0或该对象不存在
+ * Delete a cache entry from the cache by key.
+ * @param cache2 {ACL_CACHE2*} Cache object pointer
+ * @param key {const char*} Key value
+ * @return {int} 0: deletion successful; -1: object reference count is not 0,
+ *  or object does not exist
  */
 ACL_API int acl_cache2_delete2(ACL_CACHE2 *cache2, const char *key);
 
 /**
- * 使缓存池中的过期对象被自动删除
- * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
- * @return {int} >= 0: 被自动删除的缓存对象的个数
+ * Automatically delete all expired objects in the cache.
+ * @param cache2 {ACL_CACHE2*} Cache object pointer
+ * @return {int} >= 0: number of automatically deleted cache entries
  */
 ACL_API int acl_cache2_timeout(ACL_CACHE2 *cache2);
 
 /**
- * 使某个缓存对象的缓存时间加长
- * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
- * @param info {ACL_CACHE2_INFO*} 缓存对象
- * @param timeout {int} 缓存时长(秒)
- * @return {ACL_CACHE2_INFO*} 返回非 NULL 表示正常，为 NULL 表示 key 不存在
+ * Extend the cache timeout for a cache entry.
+ * @param cache2 {ACL_CACHE2*} Cache object pointer
+ * @param info {ACL_CACHE2_INFO*} Cache entry
+ * @param timeout {int} New timeout (seconds)
+ * @return {ACL_CACHE2_INFO*} Returns non-NULL on success; NULL if key does not exist
  */
 ACL_API ACL_CACHE2_INFO *acl_cache2_update2(ACL_CACHE2 *cache2,
 	ACL_CACHE2_INFO *info, int timeout);
 
 /**
- * 使某个缓存对象的缓存时间加长
- * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
- * @param key {const char*} 健值
- * @param timeout {int} 缓存时长(秒)
- * @return {ACL_CACHE2_INFO*} 返回非 NULL 表示正常，为 NULL 表示 key 不存在
+ * Extend the cache timeout for a cache entry.
+ * @param cache2 {ACL_CACHE2*} Cache object pointer
+ * @param key {const char*} Key value
+ * @param timeout {int} New timeout (seconds)
+ * @return {ACL_CACHE2_INFO*} Returns non-NULL on success; NULL if key does not exist
  */
 ACL_API ACL_CACHE2_INFO *acl_cache2_update(ACL_CACHE2 *cache2,
 	const char *key, int timeout);
 
 /**
- * 添加或更新缓存中的对象
- * @param key {const char*} 缓存对象的健值
- * @param value {void*} 动态缓存对象
- * @param timeout {int} 每个缓存对象的缓存时长
- * @param exist {int*} 非 NULL 时，如果新 key 存在则被置 1，否则置 0
- * @return {ACL_CACHE2_INFO*} 缓存对象所依附的结构对象，其中的 value 与用户的
- *  对象相同；如果该 key 不存在则添加新对象，如果存在则更新旧对象；返回 NULL
- *  表示更新添加失败；如果是更新方式，则调用者应注意释放临时创建的动态对象
+ * Insert or update an object in the cache.
+ * @param key {const char*} Key value to be stored
+ * @param value {void*} Dynamic data object
+ * @param timeout {int} Cache timeout for each entry (seconds)
+ * @param exist {int*} If non-NULL, indicates whether key existed: 1 if existed, 0 if new
+ * @return {ACL_CACHE2_INFO*} Returns the structure object containing the entry;
+ *  the value field is the same as the user-provided value. If the key existed,
+ *  the new object replaces the old object; returns NULL on failure.
+ *  If this is an update operation, the caller should free the old dynamic data.
  */
 ACL_API ACL_CACHE2_INFO *acl_cache2_upsert(ACL_CACHE2 *cache2,
 	const char *key, void *value, int timeout, int *exist);
 	
 /**
- * 获取按时间排序后的头部对象，调用者可从 ACL_CACHE2_INFO::value 获得应用对象
+ * Get the head entry of the timeout queue; callers can access the corresponding
+ * object via ACL_CACHE2_INFO::value.
  * @param cache2 {ACL_CACHE2*}
- * @return {ACL_CACHE2_INFO*} 返回 NULL 表示缓存对象为空
+ * @return {ACL_CACHE2_INFO*} Returns NULL if cache is empty
  */
 ACL_API ACL_CACHE2_INFO *acl_cache2_head(ACL_CACHE2 *cache2);
 
 /**
- * 获取按时间排序后的尾部对象，调用者可从 ACL_CACHE2_INFO::value 获得应用对象
+ * Get the tail entry of the timeout queue; callers can access the corresponding
+ * object via ACL_CACHE2_INFO::value.
  * @param cache2 {ACL_CACHE2*}
- * @return {ACL_CACHE2_INFO*} 返回 NULL 表示缓存对象为空
+ * @return {ACL_CACHE2_INFO*} Returns NULL if cache is empty
  */
 ACL_API ACL_CACHE2_INFO *acl_cache2_tail(ACL_CACHE2 *cache2);
 
 /**
- * 增加某缓存对象的引用计数，防止被提前删除
- * @param info {ACL_CACHE2_INFO*} 用户对象所依附的缓存信息对象
+ * Increment the reference count for a cache entry to prevent it from being deleted.
+ * @param info {ACL_CACHE2_INFO*} Cache info structure returned by user
  */
 ACL_API void acl_cache2_refer(ACL_CACHE2_INFO *info);
 
 /**
- * 增加某缓存对象的引用计数，防止被提前删除
- * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
+ * Increment the reference count for a cache entry to prevent it from being deleted.
+ * @param cache2 {ACL_CACHE2*} Cache object pointer
  * @param key {const char*}
  */
 ACL_API void acl_cache2_refer2(ACL_CACHE2 *cache2, const char *key);
 
 /**
- * 减少某缓存对象的引用计数
- * @param info {ACL_CACHE2_INFO*} 用户对象所依附的缓存信息对象
+ * Decrement the reference count for a cache entry.
+ * @param info {ACL_CACHE2_INFO*} Cache info structure returned by user
  */
 ACL_API void acl_cache2_unrefer(ACL_CACHE2_INFO *info);
 
 /**
- * 减少某缓存对象的引用计数
- * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
+ * Decrement the reference count for a cache entry.
+ * @param cache2 {ACL_CACHE2*} Cache object pointer
  * @param key {const char*}
  */
 ACL_API void acl_cache2_unrefer2(ACL_CACHE2 *cache2, const char *key);
 
 /**
- * 加锁缓存池对象，在多线程时用
- * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
+ * Lock the cache object for multi-threaded access.
+ * @param cache2 {ACL_CACHE2*} Cache object pointer
  */
 ACL_API void acl_cache2_lock(ACL_CACHE2 *cache2);
 
 /**
- * 解锁缓存池对象，在多线程时用
- * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
+ * Unlock the cache object for multi-threaded access.
+ * @param cache2 {ACL_CACHE2*} Cache object pointer
  */
 ACL_API void acl_cache2_unlock(ACL_CACHE2 *cache2);
 
 /**
- * 遍历缓存中的所有对象
- * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
- * @param walk_fn {void (*)(ACL_CACHE2_INFO*, void*)} 遍历回调函数
- * @param arg {void *} walk_fn()/2 中的第二个参数
+ * Walk through all objects in the cache.
+ * @param cache2 {ACL_CACHE2*} Cache object pointer
+ * @param walk_fn {void (*)(ACL_CACHE2_INFO*, void*)} User callback function
+ * @param arg {void *} Second argument to walk_fn()
  */
 ACL_API void acl_cache2_walk(ACL_CACHE2 *cache2,
 	void (*walk_fn)(ACL_CACHE2_INFO *, void *), void *arg);
 
 /**
- * 清空缓存池中的缓存对象，如果某个缓存对象依然在被引用且非强制性删除，则将不会被清空
- * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
- * @param force {int} 如果非0，则即使某个缓存对象的引用计数非0也会被删除
- * @return {int} 被清除的缓存对象个数
+ * Clean cache entries in the timeout queue that exceed a certain reference count;
+ * if force is set, entries with reference count 0 will also be deleted.
+ * @param cache2 {ACL_CACHE2*} Cache object pointer
+ * @param force {int} If non-zero, entries with reference count 0 will also be deleted
+ * @return {int} Number of cleaned cache entries
  */
 ACL_API int acl_cache2_clean(ACL_CACHE2 *cache2, int force);
 
 /**
- * 当前缓存池中缓存对象的个数
- * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
- * @return {int} 被缓存的对象个数
+ * Get the current number of cache entries.
+ * @param cache2 {ACL_CACHE2*} Cache object pointer
+ * @return {int} Number of cached objects
  */
 ACL_API int acl_cache2_size(ACL_CACHE2 *cache2);
 

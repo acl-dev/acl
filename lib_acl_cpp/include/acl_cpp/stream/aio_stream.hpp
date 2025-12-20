@@ -13,7 +13,7 @@ struct ACL_VSTREAM;
 namespace acl {
 
 /**
- * 异步流回调类
+ * Asynchronous stream callback class.
  */
 class ACL_CPP_API aio_callback : public noncopyable {
 public:
@@ -26,12 +26,15 @@ public:
 	}
 
 	/**
-	 * 读回调虚函数，该回调函数当满足了类 aio_istream 实例中的
-	 * gets/read 的可读条件后被调用，由异步框架内部将符合条件的数
-	 * 据读出，直接传递给用户的子类
-	 * @param data {char*} 读到的数据的指针地址
-	 * @param len {int} 读到的数据长度(> 0)
-	 * @return {bool} 该函数返回 false 通知异步引擎关闭该异步流
+	 * Read callback virtual function. When the callback object is registered in
+	 * aio_istream instance's
+	 * gets/read readable callback, the asynchronous stream internally reads the
+	 * data and
+	 * directly passes it to the user callback.
+	 * @param data {char*} Pointer to the read data
+	 * @param len {int} Length of the read data (> 0)
+	 * @return {bool} This function returns false to notify the asynchronous stream
+	 * to close the asynchronous stream.
 	 */
 	virtual bool read_callback(char* data, int len) {
 		(void) data;
@@ -40,26 +43,31 @@ public:
 	}
 
 	/**
-	 * 读回调虚函数，该回调函数当满足了类 aio_istream 实例中的
-	 * read_wait 的可读条件即异步流中有数据可读时被调用；当超时时会
-	 * 调用 timeout_callback，流异常被关闭时会调用 close_callback
+	 * Read callback virtual function. When the callback object is registered in
+	 * aio_istream instance's
+	 * read_wait readable callback, it is called when the asynchronous stream has
+	 * readable data. On timeout,
+	 * timeout_callback is called. On abnormal close, close_callback is called.
 	 */
 	virtual bool read_wakeup() {
 		return true;
 	}
 
 	/**
-	 * 写成功后的回调虚函数
-	 * @return {bool} 该函数返回 false 通知异步引擎关闭该异步流
+	 * Write success callback virtual function.
+	 * @return {bool} This function returns false to notify the asynchronous stream
+	 * to close the asynchronous stream.
 	 */
 	virtual bool write_callback() {
 		return true;
 	}
 
 	/**
-	 * 读回调虚函数，该回调函数当满足了类 aio_ostream 实例中的
-	 * write_wait 的可写条件即异步流可写时被调用；当超时时会
-	 * 调用 timeout_callback，流异常被关闭时会调用 close_callback
+	 * Write callback virtual function. When the callback object is registered in
+	 * aio_ostream instance's
+	 * write_wait writable callback, it is called when the asynchronous stream is
+	 * writable. On timeout,
+	 * timeout_callback is called. On abnormal close, close_callback is called.
 	 */
 	virtual bool write_wakeup() {
 		return true;
@@ -75,103 +83,125 @@ class aio_handle;
 class stream_hook;
 
 /**
- * 异步流基类，该类为纯虚类，不能被直接实例化，只能被子类继承使用
- * 该类只能在堆上分配，不能在栈上分配
+ * Asynchronous stream base class. This is a base class and cannot be directly
+ * instantiated. It can only be inherited and used.
+ * This class can only be allocated on the heap, not on the stack.
  */
 class ACL_CPP_API aio_stream : public noncopyable {
 public:
 	/**
-	 * 构造函数
+	 * Constructor
 	 * @param handle {aio_handle*}
 	 */
 	aio_stream(aio_handle* handle);
 
 	/**
-	 * 关闭异步流
-	 * @param flush_out {bool} 当为 true 时，则需要等发送缓冲敬的数据写完
-	 *  才可以关闭，否则则不必清理写缓冲区中的数据便可关闭
+	 * Close asynchronous stream.
+	 * @param flush_out {bool} When true, it needs to wait until all buffered data
+	 * is written
+	 * before closing. Otherwise, it does not wait for data in the write buffer to
+	 * be closed.
 	 */
 	void close(bool flush_out = false);
 
 	/**
-	 * 添加关闭时的回调类对象指针，如果该回调类对象已经存在，则只是
-	 * 使该对象处于打开可用状态
-	 * @param callback {aio_callback*} 继承 aio_callback 的子类回调类对象，
-	 *  当异步流关闭前会先调用此回调类对象中的 close_callback 接口
+	 * Add callback object pointer for when closing. If the callback object already
+	 * exists, it will only
+	 * make the object in an open and available state.
+	 * @param callback {aio_callback*} Subclass callback class object inheriting
+	 * from aio_callback.
+	 * Before the asynchronous stream closes, the close_callback interface in this
+	 * callback class object will be called first.
 	 */
 	void add_close_callback(aio_callback* callback);
 
 	/**
-	 * 添加超时时的回调类对象指针，如果该回调类对象已经存在，则只是
-	 * 使该对象处于打开可用状态
-	 * @param callback {aio_callback*} 继承 aio_callback 的子类回调类对象，
-	 *  当异步流关闭前会先调用此回调类对象中的 timeout_callback 接口
+	 * Add callback object pointer for when timeout occurs. If the callback object
+	 * already exists, it will only
+	 * make the object in an open and available state.
+	 * @param callback {aio_callback*} Subclass callback class object inheriting
+	 * from aio_callback.
+	 * Before the asynchronous stream closes, the timeout_callback interface in
+	 * this callback class object will be called first.
 	 */
 	void add_timeout_callback(aio_callback* callback);
 
 	/**
-	 * 删除关闭时的回调类对象指针
-	 * @param callback {aio_callback*} 从 aio_callback 继承的子类对象指针，
-	 *  若该值为空，则删除所有的关闭回调对象
-	 * @return {int} 返回被从回调对象集合中删除的回调对象的个数
+	 * Delete callback object pointer for when closing.
+	 * @param callback {aio_callback*} Subclass object pointer inheriting from
+	 * aio_callback.
+	 *  If this value is empty, all close callback objects will be deleted.
+	 * @return {int} Returns the number of callback objects deleted from the
+	 * callback object collection.
 	 */
 	int del_close_callback(aio_callback* callback = NULL);
 
 	/**
-	 * 删除超时时的回调类对象指针
-	 * @param callback {aio_callback*} 从 aio_callback 继承的子类对象指针，
-	 *  若该值为空，则删除所有的超时回调对象
-	 * @return {int} 返回被从回调对象集合中删除的回调对象的个数
+	 * Delete callback object pointer for when timeout occurs.
+	 * @param callback {aio_callback*} Subclass object pointer inheriting from
+	 * aio_callback.
+	 *  If this value is empty, all timeout callback objects will be deleted.
+	 * @return {int} Returns the number of callback objects deleted from the
+	 * callback object collection.
 	 */
 	int del_timeout_callback(aio_callback* callback = NULL);
 
 	/**
-	 * 禁止关闭的回调类对象，但并不从关闭对象集合中删除
-	 * @param callback {aio_callback*} 从 aio_callback 继承的子类对象指针，
-	 *  若该值为空，则禁止所有的关闭回调对象
-	 * @return {int} 返回被从回调对象集合中禁用的回调对象的个数
+	 * Disable close callback objects, but do not delete them from the close
+	 * callback object collection.
+	 * @param callback {aio_callback*} Subclass object pointer inheriting from
+	 * aio_callback.
+	 *  If this value is empty, all close callback objects will be disabled.
+	 * @return {int} Returns the number of callback objects disabled in the
+	 * callback object collection.
 	 */
 	int disable_close_callback(aio_callback* callback = NULL);
 
 	/**
-	 * 禁止超时的回调类对象，但并不从超时对象集合中删除
-	 * @param callback {aio_callback*} 从 aio_callback 继承的子类对象指针，
-	 *  若该值为空，则禁止所有的超时回调对象
-	 * @return {int} 返回被从回调对象集合中禁用的回调对象的个数
+	 * Disable timeout callback objects, but do not delete them from the timeout
+	 * callback object collection.
+	 * @param callback {aio_callback*} Subclass object pointer inheriting from
+	 * aio_callback.
+	 *  If this value is empty, all timeout callback objects will be disabled.
+	 * @return {int} Returns the number of callback objects disabled in the
+	 * callback object collection.
 	 */
 	int disable_timeout_callback(aio_callback* callback = NULL);
 
 	/**
-	 * 启用所有的回调对象被调用
-	 * @param callback {aio_callback*} 启用指定的回调对象，如果该值为空，
-	 *  则启用所有的关闭回调对象
-	 * @return {int} 返回被启用的回调对象的个数
+	 * Enable all callback objects to be called.
+	 * @param callback {aio_callback*} Specified callback object. If this value is
+	 * empty,
+	 *  all close callback objects will be enabled.
+	 * @return {int} Returns the number of enabled callback objects.
 	 */
 	int enable_close_callback(aio_callback* callback = NULL);
 
 	/**
-	 * 启用所有的回调对象被调用
-	 * @param callback {aio_callback*} 启用指定的回调对象，如果该值为空，
-	 *  则启用所有的超时回调对象
-	 * @return {int} 返回被启用的回调对象的个数
+	 * Enable all callback objects to be called.
+	 * @param callback {aio_callback*} Specified callback object. If this value is
+	 * empty,
+	 *  all timeout callback objects will be enabled.
+	 * @return {int} Returns the number of enabled callback objects.
 	 */
 	int enable_timeout_callback(aio_callback* callback = NULL);
 
 	/**
-	 * 获得异步流对象 ACL_ASTREAM
+	 * Get asynchronous stream's ACL_ASTREAM.
 	 * @return {ACL_ASTREAM*}
 	 */
 	ACL_ASTREAM* get_astream() const;
 
 	/**
-	 * 获得异步流对象中的同步流对象 ACL_VSTREAM
+	 * Get synchronous stream ACL_VSTREAM in asynchronous stream.
 	 * @return {ACL_VSTREAM*}
 	 */
 	ACL_VSTREAM* get_vstream() const;
 
 	/**
-	 * 获得异步流中的 SOCKET 描述符
-	 * @return {ACL_SOCKET} 若不存在则返回 -1(UNIX) 或 INVALID_SOCKET(win32)
+	 * Get SOCKET handle in asynchronous stream.
+	 * @return {ACL_SOCKET} Returns -1(UNIX) or INVALID_SOCKET(win32) if not
+	 * connected.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	SOCKET get_socket(void) const;
@@ -185,54 +215,65 @@ public:
 	}
 
 	/**
-	 * 获得远程连接的地址
-	 * @param full {bool} 是否获得完整地址，即：IP:PORT，如果该参数
-	 *  为 false，则仅返回 IP，否则返回 IP:PORT
-	 * @return {const char*} 远程连接地址，若返回值 == '\0' 则表示
-	 *  无法获得远程连接地址
+	 * Get remote connection address.
+	 * @param full {bool} Whether to return full address format (IP:PORT). If this
+	 * parameter
+	 *  is false, only IP is returned. Otherwise, IP:PORT is returned.
+	 * @return {const char*} Remote connection address. If return value == '\0', it
+	 * means
+	 *  unable to get remote connection address.
 	 */
 	const char* get_peer(bool full = false) const;
 
 	/**
-	 * 获得连接的本地地址
-	 * @param full {bool} 是否获得完整地址，即：IP:PORT，如果该参数
-	 *  为 false，则仅返回 IP，否则返回 IP:PORT
-	 * @return {const char*} 该连接的本地地址，若返回值 == "" 则表示
-	 *  无法获得本地地址
+	 * Get local address of connection.
+	 * @param full {bool} Whether to return full address format (IP:PORT). If this
+	 * parameter
+	 *  is false, only IP is returned. Otherwise, IP:PORT is returned.
+	 * @return {const char*} Local address of connection. If return value == "", it
+	 * means
+	 *  unable to get local address.
 	 */
 	const char* get_local(bool full = false) const;
 
 	/**
-	 * 获得异步流事件句柄
+	 * Get asynchronous event engine.
 	 * @return {aio_handle&}
 	 */
 	aio_handle& get_handle() const;
 
 	/**
-	 * 重新绑定异步事件句柄
+	 * Update asynchronous event engine.
 	 * @param handle {aio_handle&}
-	 * 注：该方法仅可在对象创建后调用一次，一旦进入 IO 过程则禁止调用
+	 * Note: This method should only be called once after object creation.
+	 * Generally, it is used when IO operations are stopped.
 	 */
 	void set_handle(aio_handle& handle);
 
 	/**
-	 * 注册读写流对象，内部自动调用 hook->open 过程，如果成功，则返回之前
-	 * 注册的对象(可能为NULL)，若失败则返回与输入参数相同的指针，应用可以
-	 * 通过判断返回值与输入值是否相同来判断注册流对象是否成功
-	 * xxx: 在调用此方法前必须保证流连接已经创建
-	 * @param hook {stream_hook*} 非空对象指针
-	 * @return {stream_hook*} 返回值与输入值不同则表示成功
+	 * Register read/write hook. Internally automatically calls hook->open process.
+	 * If successful, returns the previously
+	 * registered object (may be NULL). If failed, returns the same pointer as
+	 * input. Applications can
+	 * determine whether registration was successful by checking if return value is
+	 * different from input value.
+	 * xxx: Before calling this method, it must be ensured that the connection has
+	 * been established.
+	 * @param hook {stream_hook*} Non-empty object pointer.
+	 * @return {stream_hook*} Return value. If different from input value, it means
+	 * success.
 	 */
 	stream_hook* setup_hook(stream_hook* hook);
 
 	/**
-	 * 获得当前注册的流读写对象
+	 * Get currently registered read/write hook.
 	 * @return {stream_hook*}
 	 */
 	stream_hook* get_hook() const;
 
 	/**
-	 * 删除当前注册的流读写对象并返回该对象，恢复缺省的读写过程
+	 * Remove currently registered read/write hook and return this object, restore
+	 * default read/write hook.
 	 * @return {stream_hook*}
 	 */
 	stream_hook* remove_hook();
@@ -245,25 +286,27 @@ protected:
 	virtual ~aio_stream();
 
 	/**
-	 * 通过此函数来动态释放只能在堆上分配的异步流类对象
+	 * Through this function, dynamically release asynchronous stream objects that
+	 * are only allocated on the heap.
 	 */
 	virtual void destroy();
 
 	/**
-	 * 子类应在创建成功后调用该函数通知基类增加异步流句柄数,
-	 * 同时注册流关闭及流超时时的回调过程
+	 * This function should be called after connection is successfully established
+	 * to notify the application layer that the asynchronous stream is ready,
+	 * and register close and timeout callback functions at the same time.
 	 */
 	void enable_error();
 
 protected:
 	enum {
-		// 是否调用了 hook_xxx 函数对应的标志位
+		// Flag bits indicating whether hook_xxx functions are registered
 		STATUS_HOOKED_ERROR = 1,
 		STATUS_HOOKED_READ  = 1 << 1,
 		STATUS_HOOKED_WRITE = 1 << 2,
 		STATUS_HOOKED_OPEN  = 1 << 3,
 
-		// 对于 aio_socket_stream 流表示是否连接已建立
+		// For aio_socket_stream, indicates whether connection has been established
 		STATUS_CONN_OPENED  = 1 << 4,
 	};
 	unsigned status_;
@@ -305,3 +348,4 @@ private:
 };
 
 }  // namespace acl
+

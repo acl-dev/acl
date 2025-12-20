@@ -12,76 +12,82 @@ public:
 	~md5();
 
 	/**
-	 * 可以循环调用此函数添加需要被 md5 的数据
-	 * @param dat {const void*} 数据地址
-	 * @param len {size_t} dat 数据长度
+	 * Can call this function in a loop to add data to be md5
+	 * @param dat {const void*} Data address
+	 * @param len {size_t} dat data length
 	 * @return {md5&}
 	 */
 	md5& update(const void* dat, size_t len);
 
 	/**
-	 * 必须调用本函数表示 md5 过程结束
+	 * Must call this function to indicate md5 process ends
 	 * @return {md5&}
 	 */
 	md5& finish();
 
 	/**
-	 * 重置 md5 算法器的状态，从而允许重复使用同一个 md5 对象
+	 * Reset md5 algorithm state, allowing reuse of the same md5 object
 	 * @return {md5&}
 	 */
 	md5& reset();
 
 	/**
-	 * 获得二进制格式的 md5 结果值
-	 * @return {const char*} 返回值永远非空，且缓冲区长度为 16 字节
+	 * Get md5 result value in binary format
+	 * @return {const char*} Return value is always non-empty, and buffer length is
+	 * 16 bytes
 	 */
 	const char* get_digest() const;
 
 	/**
-	 * 获得以字符串形式表示的 m5 结果值
-	 * @return {const char*} 返回值永远非空，且以 \0 结尾，且字符串
-	 *  长度为 32 字节
+	 * Get md5 result value represented as string
+	 * @return {const char*} Return value is always non-empty, ends with \0, and
+	 * string
+	 *  length is 32 bytes
 	 */
 	const char* get_string() const;
 
 	/**
-	 * 将数据用 md5 算法计算签名值，取得 128 位 (即 16 字节) 二进制结果
-	 * @param dat {const void*} 源数据
-	 * @param dlen {size_t} dat 数据长度
-	 * @param key {const char*} 非空时做为键数据
-	 * @param klen {size_t} key 非空时表示 key 的长度
-	 * @param out {void*} 存储 md5 结果
-	 * @param size {size_t} out 大小，至少应该为 16 字节
-	 * @return {const char*} 返回存储结果的地址(即 out 地址)
+	 * Calculate signature value of data using md5 algorithm, get 128-bit (i.e.,
+	 * 16-byte) binary result
+	 * @param dat {const void*} Source data
+	 * @param dlen {size_t} dat data length
+	 * @param key {const char*} When not empty, used as key data
+	 * @param klen {size_t} When key is not empty, indicates length of key
+	 * @param out {void*} Store md5 result
+	 * @param size {size_t} out size, should be at least 16 bytes
+	 * @return {const char*} Returns address storing result (i.e., out address)
 	 */
 	static const char* md5_digest(const void *dat, size_t dlen,
 		const void *key, size_t klen, void* out, size_t size);
 
 	/**
-	 * 将数据用 md5 算法计算签名值，取得字符串形式的结果
-	 * @param dat {const void*} 源数据
-	 * @param dlen {size_t} dat 数据长度
-	 * @param key {const char*} 非空时做为键数据
-	 * @param klen {size_t} key 非空时表示 key 的长度
-	 * @param out {void*} 存储 md5 结果
-	 * @param size {size_t} out 大小，至少应该为 33 字节
-	 * @return {const char*} 返回存储结果的地址(即 out 地址)，
-	 *  且返回值为以 \0 结尾的 32 字节长度(不含 \0)字符串
+	 * Calculate signature value of data using md5 algorithm, get result in string
+	 * form
+	 * @param dat {const void*} Source data
+	 * @param dlen {size_t} dat data length
+	 * @param key {const char*} When not empty, used as key data
+	 * @param klen {size_t} When key is not empty, indicates length of key
+	 * @param out {void*} Store md5 result
+	 * @param size {size_t} out size, should be at least 33 bytes
+	 * @return {const char*} Returns address storing result (i.e., out address),
+	 *  and return value is a 32-byte length (excluding \0) string ending with \0
 	 */
 	static const char* md5_string(const void *dat, size_t dlen,
 		const void *key, size_t klen, char* out, size_t size);
 
 	/**
-	 * 将文件中的内容用 md5 算法计算签名值，并取得字符串形式结果
-	 * @param path {const char*} 文件全路径
-	 * @param key {const char*} 非空时做为键数据
-	 * @param klen {size_t} key 非空时表示 key 的长度
-	 * @param out {void*} 存储 md5 结果
-	 * @param size {size_t} out 大小，至少应该为 33 字节
-	 * @return {int64) 返回所读取的文件数据的长度，下列情况下返回 -1
-	 *  1) 打开文件失败
-	 *  2) 未从文件中读到数据
-	 *  3) out 缓冲区大小 size 小于 33 字节长度
+	 * Calculate signature value of content in file using md5 algorithm, and get
+	 * result in string form
+	 * @param path {const char*} Full file path
+	 * @param key {const char*} When not empty, used as key data
+	 * @param klen {size_t} When key is not empty, indicates length of key
+	 * @param out {void*} Store md5 result
+	 * @param size {size_t} out size, should be at least 33 bytes
+	 * @return {int64) Returns length of file data read. Returns -1 in the
+	 * following cases:
+	 *  1) Failed to open file
+	 *  2) No data read from file
+	 *  3) out buffer size is less than 33 bytes
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	static __int64 md5_file(const char* path, const void *key,
@@ -92,15 +98,17 @@ public:
 #endif
 
 	/**
-	 * 将文件中的内容用 md5 算法计算签名值，并取得字符串形式结果
-	 * @param in {istream&} 输入文件流
-	 * @param key {const char*} 非空时做为键数据
-	 * @param klen {size_t} key 非空时表示 key 的长度
-	 * @param out {void*} 存储 md5 结果
-	 * @param size {size_t} out 大小，至少应该为 33 字节
-	 * @return {int64) 返回所读取的文件数据的长度，下列情况下返回 -1:
-	 *  1) 未从输入流中读取数据时
-	 *  2) out 缓冲区大小 size 小于 33 字节长度
+	 * Calculate signature value of content in file using md5 algorithm, and get
+	 * result in string form
+	 * @param in {istream&} Input file stream
+	 * @param key {const char*} When not empty, used as key data
+	 * @param klen {size_t} When key is not empty, indicates length of key
+	 * @param out {void*} Store md5 result
+	 * @param size {size_t} out size, should be at least 33 bytes
+	 * @return {int64) Returns length of file data read. Returns -1 in the
+	 * following cases:
+	 *  1) No data read from input stream
+	 *  2) out buffer size is less than 33 bytes
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	static __int64 md5_file(istream& in, const void *key,
@@ -111,14 +119,14 @@ public:
 #endif
 
 	/**
-	 * 通过将一个字节变成两个字节, 将二进制数据转换为字符串数据.
-	 * @param in {const void*} 输入的二进制数据地址
-	 * @param len {size_t} in 的长度
-	 * @param out {char*} 存储字符串形式的结果
-	 * @param size {size_t} out 内存大小, 至少为 len * 2 + 1,
-	 *  最后一个字节存 \0
-	 * @return {const char*} 返回存储结果的地址(即 out 地址),
-	 *  且返回值为以 \0 结尾的字符串.
+	 * Convert binary data to string data by converting one byte into two bytes.
+	 * @param in {const void*} Address of input binary data
+	 * @param len {size_t} Length of in
+	 * @param out {char*} Store result in string form
+	 * @param size {size_t} out memory size, should be at least len * 2 + 1,
+	 *  last byte stores \0
+	 * @return {const char*} Returns address storing result (i.e., out address),
+	 *  and return value is a string ending with \0.
 	 */
 	static const char* hex_encode(const void *in, size_t len,
 		char* out, size_t size);
@@ -133,3 +141,4 @@ private:
 };
 
 }  // namespace acl
+

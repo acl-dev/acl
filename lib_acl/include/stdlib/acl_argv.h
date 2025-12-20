@@ -21,26 +21,30 @@ struct ACL_ARGV {
 	int     argc;			/**< array elements in use */
 	char  **argv;			/**< string array */
 
-	/* 添加及弹出 */
+	/* Extended operations */
 
-	/* 向数组尾部添加字符串 (内部动态拷贝该字符串) */
+	/* Append a string at the end (internally duplicates the
+	 * string) */
 	void  (*push_back)(ACL_ARGV*, const char*);
-	/* 向数组头部添加动态对象 (内部动态拷贝该字符串)*/
+	/* Insert a string at the beginning (internally duplicates
+	 * the string) */
 	void  (*push_front)(ACL_ARGV*, const char*);
-	/* 弹出数组尾部字符串 (用完后需调用 acl_myfree 释放) */
+	/* Remove and return the string at the end (caller must
+	 * free with acl_myfree) */
 	char *(*pop_back)(ACL_ARGV*);
-	/* 弹出数组头部字符串 (用完后需调用 acl_myfree 释放) */
+	/* Remove and return the string at the beginning (caller
+	 * must free with acl_myfree) */
 	char *(*pop_front)(ACL_ARGV*);
 
 	/* for acl_iterator */
 
-	/* 取迭代器头函数 */
+	/* Get iterator at the head of the container */
 	void *(*iter_head)(ACL_ITER*, const ACL_ARGV*);
-	/* 取迭代器下一个函数 */
+	/* Get the next iterator position */
 	void *(*iter_next)(ACL_ITER*, const ACL_ARGV*);
-	/* 取迭代器尾函数 */
+	/* Get iterator at the tail of the container */
 	void *(*iter_tail)(ACL_ITER*, const ACL_ARGV*);
-	/* 取迭代器上一个函数 */
+	/* Get the previous iterator position */
 	void *(*iter_prev)(ACL_ITER*, const ACL_ARGV*);
 
 	/* private */
@@ -49,15 +53,15 @@ struct ACL_ARGV {
 
 /* in acl_argv.c */
 /**
- * 分配一个字符串动态数组
- * @param size {int} 动态数组的初始大小
+ * Allocate a dynamic string array.
+ * @param size {int} Initial size of the dynamic array
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_alloc(int size);
 ACL_API ACL_ARGV *acl_argv_alloc2(int size, ACL_DBUF_POOL *dbuf);
 
 /**
- * 设置 ACL_ARGV 对象的遍历函数
+ * Initialize the iterator functions of an ACL_ARGV object.
  * @param argvp {ACL_ARGV*}
  */
 ACL_API void acl_argv_iter_init(ACL_ARGV *argvp);
@@ -68,186 +72,191 @@ ACL_API void *acl_argv_iter_tail(ACL_ITER *iter, const ACL_ARGV *argv);
 ACL_API void *acl_argv_iter_prev(ACL_ITER *iter, const ACL_ARGV *argv);
 
 /**
- * 向字符串动态数组中添加一至多个字符串，最后一个NULL字符串表示结束
- * @param argvp {ACL_ARGV*} 字符串动态数组指针
- * @param ... 字符串列表，最后一个为NULL, 格式如：{s1}, {s2}, ..., NULL
+ * Append multiple strings to the dynamic string array; terminated by a NULL string.
+ * @param argvp {ACL_ARGV*} Pointer to the dynamic string array
+ * @param ... List of strings terminated by NULL, e.g.: {s1}, {s2}, ..., NULL
  */
 ACL_API void acl_argv_add(ACL_ARGV *argvp,...);
 
 /**
- * 在指定位置设置指定的字符串，同时释放旧的字符串
- * @param argvp {ACL_ARGV *} 字符串动态数组
- * @param idx {int} 指定下标位置，不应越界
- * @param value {const char *} 非 NULL 字符串
- * @return {int} 返回 -1 表示下标越界或 value 为 NULL，0 表示成功
+ * Set the string value at a specified index and free the original string.
+ * @param argvp {ACL_ARGV *} Dynamic string array
+ * @param idx {int} Index position; must be within bounds
+ * @param value {const char *} Non-NULL string
+ * @return {int} Returns -1 if index is out of range or value is NULL; 0 on success
  */
 ACL_API int acl_argv_set(const ACL_ARGV *argvp, int idx, const char *value);
 
 /**
- * 向字符串动态数组中添加字符串列表
- * @param argvp {ACL_ARGV*} 字符串动态数组指针
- * @param ap {va_list} 由多个字符串组成的变参列表
+ * Append a variable argument list of strings to the dynamic string array.
+ * @param argvp {ACL_ARGV*} Pointer to the dynamic string array
+ * @param ap {va_list} Variable argument list composed of strings
  */
 ACL_API void acl_argv_addv(ACL_ARGV *argvp, va_list ap);
 
 /**
- * 向字符串动态数组中添加字段长度有限制的字符串列表
- * @param argvp {ACL_ARGV*} 字符串动态数组指针
- * @param ... 一组有长度限制的字符串列表，
- *  如: {s1}, {len1}, {s2}, {len2}, ... NULL
+ * Append a list of strings with explicit lengths to the dynamic string array.
+ * @param argvp {ACL_ARGV*} Pointer to the dynamic string array
+ * @param ... A list of pairs (string, length), for example:
+ *            {s1}, {len1}, {s2}, {len2}, ... NULL
  */
 ACL_API void acl_argv_addn(ACL_ARGV *argvp,...);
 
 /**
- * 向字符串动态数组中添加字段长度有限制的字符串列表
- * @param argvp {ACL_ARGV*} 字符串动态数组指针
- * @param ap {va_list} 一组有长度限制的字符串组成的变参列表
+ * Append a list of strings with explicit lengths to the dynamic string array.
+ * @param argvp {ACL_ARGV*} Pointer to the dynamic string array
+ * @param ap {va_list} Variable argument list composed of (string, length) pairs
  */
 ACL_API void acl_argv_addnv(ACL_ARGV *argvp, va_list ap);
 
 /**
- * 设置字符串动态数组的结束位置
- * @param argvp {ACL_ARGV*} 字符串动态数组指针
+ * Mark the end position of the dynamic string array with a terminating NULL.
+ * @param argvp {ACL_ARGV*} Pointer to the dynamic string array
  */
 ACL_API void acl_argv_terminate(const ACL_ARGV *argvp);
 
 /**
- * 释放字符串动态数组
- * @param argvp {ACL_ARGV*} 字符串动态数组指针
+ * Free the dynamic string array and its internal resources.
+ * @param argvp {ACL_ARGV*} Pointer to the dynamic string array
  */
 ACL_API void acl_argv_free(ACL_ARGV *argvp);
 
 /**
- * 根据数组下标位置返回相对应的字符串指针
- * @param argvp {ACL_ARGV*} 字符串动态数组指针
- * @param idx {int} 下标位置
- * @return {char*} NULL: 下标越界；!= NULL: 字符串指针位置
+ * Return the string pointer at the given index.
+ * @param argvp {ACL_ARGV*} Pointer to the dynamic string array
+ * @param idx {int} Index position
+ * @return {char*} NULL if index is out of range; otherwise pointer to the string
  */
 ACL_API char *acl_argv_index(const ACL_ARGV *argvp, int idx);
 
 /**
- * 返回当前字符串动态数组中已经存放的字符串个数
- * @param argvp {ACL_ARGV*} 字符串动态数组指针
+ * Return the number of strings currently stored in the dynamic string array.
+ * @param argvp {ACL_ARGV*} Pointer to the dynamic string array
  * @return {int}
  */
 ACL_API int acl_argv_size(const ACL_ARGV *argvp);
 
 /* in acl_argv_split.c */
 /**
- * 根据源字符串及分隔字符串生成一个字符串动态数组
- * @param str {const char*} 源字符串
- * @param delim {const char*} 分隔字符串
+ * Split a source string into a dynamic string array using the given delimiter string.
+ * @param str {const char*} Source string
+ * @param delim {const char*} Delimiter string
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_split(const char *str, const char *delim);
 
 /**
- * 根据源字符串及分隔字符串生成一个字符串动态数组，同时将传入的内存池
- * 对象做为内存分配器
- * @param str {const char*} 源字符串
- * @param delim {const char*} 分隔字符串
- * @param dbuf {ACL_DBUF_POOL*} 内存池对象，可以为空，当为空时则采用
- *  缺省的内存分配方式
+ * Split a source string into a dynamic string array using the given delimiter,
+ * while allocating all internal memory from the specified memory pool.
+ * The pool can be NULL, in which case the default allocation strategy is used.
+ * @param str {const char*} Source string
+ * @param delim {const char*} Delimiter string
+ * @param dbuf {ACL_DBUF_POOL*} Memory pool object; can be NULL
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_split3(const char *str, const char *delim,
 	ACL_DBUF_POOL *dbuf);
 
 /**
- * 根据源字符串及分隔字符串生成一个字符串动态数组, 但限定最大分隔次数
- * @param str {const char*} 源字符串
- * @param delim {const char*} 分隔字符串
- * @param n {size_t} 最大分隔次数
+ * Split a source string into a dynamic string array using the given delimiter,
+ * limiting the maximum number of splits.
+ * @param str {const char*} Source string
+ * @param delim {const char*} Delimiter string
+ * @param n {size_t} Maximum number of splits
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_splitn(const char *str, const char *delim, size_t n);
 
 /**
- * 根据源字符串及分隔字符串生成一个字符串动态数组, 但限定最大分隔次数，
- * 同时传入内存池对象做为内存分配器
- * @param str {const char*} 源字符串
- * @param delim {const char*} 分隔字符串
- * @param n {size_t} 最大分隔次数
- * @param dbuf {ACL_DBUF_POOL*} 内存池对象，可以为空，当为空时则采用
- *  缺省的内存分配方式
+ * Split a source string into a dynamic string array using the given delimiter,
+ * limiting the maximum number of splits, and allocate memory from the given pool.
+ * @param str {const char*} Source string
+ * @param delim {const char*} Delimiter string
+ * @param n {size_t} Maximum number of splits
+ * @param dbuf {ACL_DBUF_POOL*} Memory pool object; can be NULL
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_splitn4(const char *str, const char *delim,
 	size_t n, ACL_DBUF_POOL *dbuf);
 
 /**
- * 源字符串经分隔符分解后，其结果被附加至一个字符串动态数组
- * @param argvp {ACL_ARGV*} 字符串动态数组指针
- * @param str {const char*} 源字符串
- * @param delim {const char*} 分隔字符串
+ * Split the source string using the given delimiter and append the result
+ * to an existing dynamic string array.
+ * @param argvp {ACL_ARGV*} Pointer to the dynamic string array
+ * @param str {const char*} Source string
+ * @param delim {const char*} Delimiter string
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_split_append(ACL_ARGV *argvp, const char *str,
 	const char *delim);
 
 /**
- * 源字符串经分隔符分解后，其结果被附加至一个字符串动态数组, 但限定最大分隔次数
- * @param argvp {ACL_ARGV*} 字符串动态数组指针
- * @param str {const char*} 源字符串
- * @param delim {const char*} 分隔字符串
- * @param n {size_t} 最大分隔次数
+ * Split the source string using the given delimiter and append the result
+ * to an existing dynamic string array, limiting the maximum number of splits.
+ * @param argvp {ACL_ARGV*} Pointer to the dynamic string array
+ * @param str {const char*} Source string
+ * @param delim {const char*} Delimiter string
+ * @param n {size_t} Maximum number of splits
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_splitn_append(ACL_ARGV *argvp, const char *str,
 	const char *delim, size_t n);
 
 /**
- * 根据源字符串及分隔字符串生成一个字符串动态数组，针对由 "" 或 '' 引用的
- * 字符串不做分隔
- * @param str {const char*} 源字符串
- * @param delim {const char*} 分隔字符串
+ * Split a source string into a dynamic string array using the given delimiter,
+ * but treat substrings enclosed in \"\" or '' as a single token.
+ * @param str {const char*} Source string
+ * @param delim {const char*} Delimiter string
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_quote_split(const char *str, const char *delim);
 
 /**
- * 根据源字符串及分隔字符串生成一个字符串动态数组，针对由 "" 或 '' 引用的
- * 字符串不做分隔，其中将传入的内存池对象做为内存分配器
- * @param str {const char*} 源字符串
- * @param delim {const char*} 分隔字符串
- * @param dbuf {ACL_DBUF_POOL*} 内存池对象，可以为空，当为空时则采用
- *  缺省的内存分配方式
+ * Split a source string into a dynamic string array using the given delimiter,
+ * treating substrings enclosed in \"\" or '' as a single token, and allocate
+ * memory from the given pool.
+ * @param str {const char*} Source string
+ * @param delim {const char*} Delimiter string
+ * @param dbuf {ACL_DBUF_POOL*} Memory pool object; can be NULL; when NULL,
+ *        the default allocation strategy is used
  * @return {ACL_ARGV*}
  */
 ACL_API	ACL_ARGV *acl_argv_quote_split4(const char *str, const char *delim,
 	ACL_DBUF_POOL *dbuf);
 
 ///////////////////////////////////////////////////////////////////////////////
-// 更高效的字符串分割算法。
+// Efficient string splitting algorithm
 
 typedef struct ACL_ARGV_VIEW ACL_ARGV_VIEW;
 
 struct ACL_ARGV_VIEW {
 	ACL_ARGV argv;
 
-	/* 取迭代器头函数 */
+	/* Get iterator at the head of the view container */
 	void *(*iter_head)(ACL_ITER*, const ACL_ARGV_VIEW*);
-	/* 取迭代器下一个函数 */
+	/* Get the next iterator position */
 	void *(*iter_next)(ACL_ITER*, const ACL_ARGV_VIEW*);
-	/* 取迭代器尾函数 */
+	/* Get iterator at the tail of the view container */
 	void *(*iter_tail)(ACL_ITER*, const ACL_ARGV_VIEW*);
-	/* 取迭代器上一个函数 */
+	/* Get the previous iterator position */
 	void *(*iter_prev)(ACL_ITER*, const ACL_ARGV_VIEW*);
 };
 
 /**
- * 使用分割字符串中的每一个字符做为分割符，对源字符串进行分割，返回的对象只读禁止修改.
- * @param str {const char*} 源字符串
- * @param delim {const char*} 用来对源字符串进行分割的字符串，该字符串中出现的每一个
- *  字符都将做为分割符
- * @return {ACL_ARGV_VIEW*} 分割后的对象（永远非NULL），返回对象只读不能修改，
- *  可以使用 ACL_ITER 进行遍历.
+ * Split the source string in-place using the delimiter characters, where
+ * every character in the delimiter string is treated as an individual separator.
+ * The returned object only provides a read-only view and must not be modified.
+ * @param str {const char*} Source string
+ * @param delim {const char*} Each character appearing in this string is treated
+ *        as a separator when splitting the source
+ * @return {ACL_ARGV_VIEW*} A non-NULL view object on success; the view is
+ *         read-only and should be traversed with ACL_ITER
  */
 ACL_API ACL_ARGV_VIEW *acl_argv_view_split(const char *str, const char *delim);
 
 /**
- *  释放分割对象
- * @param view {ACL_ARGV_VIEW*} 由 acl_argv_view_split 创建的分割对象
+ * Free the view object returned by acl_argv_view_split.
+ * @param view {ACL_ARGV_VIEW*} View returned by acl_argv_view_split
  */
 ACL_API void acl_argv_view_free(ACL_ARGV_VIEW *view);
 

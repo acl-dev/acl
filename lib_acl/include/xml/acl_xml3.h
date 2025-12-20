@@ -18,42 +18,43 @@ typedef struct ACL_XML3_NODE	ACL_XML3_NODE;
 typedef struct ACL_XML3_ATTR	ACL_XML3_ATTR;
 
 struct ACL_XML3_ATTR {
-	ACL_XML3_NODE *node;            /**< 所属节点 */
-	char *name;                     /**< 属性名 */
-	char *value;                    /**< 属性值 */
+	ACL_XML3_NODE *node;            /**< parent node */
+	char *name;                     /**< attribute name */
+	char *value;                    /**< attribute value */
 
-	size_t name_size;               /**< 属性名长度 */
-	size_t value_size;              /**< 属性值长度 */
+	size_t name_size;               /**< attribute name length */
+	size_t value_size;              /**< attribute value length */
 
 	/* private */
-	int   quote;                    /**< 非 0 表示 ' 或 " */
-	int   backslash;                /**< 转义字符 \ */
-	int   slash;                    /**< 是否有 '/' 标志位设定 */
+	int   quote;                    /**< If 0 indicates ' or " */
+	int   backslash;                /**< escape character \ */
+	int   slash;                    /**< whether '/' flag is set */
 };
 
 struct ACL_XML3_NODE {
-	char *ltag;                     /**< 左标签名 */
-	char *rtag;                     /**< 右标签名 */
-	size_t ltag_size;               /**< 左标签名长度 */
-	size_t rtag_size;               /**< 右标签名长度 */
-	const char *id;                 /**< ID标识符, 只有在 xml->id_table
-					  存在的节点的 id 才非空 */
-	char *text;                     /**< 文本显示内容 */
-	size_t text_size;               /**< 文件数据长度 */
+	char *ltag;                     /**< left tag name */
+	char *rtag;                     /**< right tag name */
+	size_t ltag_size;               /**< left tag name length */
+	size_t rtag_size;               /**< right tag name length */
+	const char *id;                 /**< ID identifier, only when xml->id_table
+					  contains the node's id is non-empty */
+	char *text;                     /**< text content representation */
+	size_t text_size;               /**< file data length */
 
-	ACL_ARRAY *attr_list;           /**< 属性(ACL_XML3_ATTR)列表 */
-	ACL_XML3_NODE *parent;          /**< 父节点 */
-	ACL_RING children;              /**< 子节点集合 */
-	int  depth;                     /**< 当前节点的深度 */
+	ACL_ARRAY *attr_list;           /**< attribute (ACL_XML3_ATTR) list */
+	ACL_XML3_NODE *parent;          /**< parent node */
+	ACL_RING children;              /**< child node collection */
+	int  depth;                     /**< current node depth */
 
 	/* private */
-	ACL_XML3 *xml;                  /**< xml 对象 */
-	ACL_RING node;                  /**< 当前节点 */
-	ACL_XML3_ATTR *curr_attr;       /**< 当前正在解析的属性 */
-	int   quote;                    /**< 非 0 表示 ' 或 " */
-	int   last_ch;                  /**< 所记录本节点的前一个字节值 */
-	int   nlt;                      /**< '<' 个数 */
-	char  meta[3];                  /**< 元数据临时缓冲区 */
+	ACL_XML3 *xml;                  /**< xml object */
+	ACL_RING node;                  /**< current node */
+	ACL_XML3_ATTR *curr_attr;       /**< currently being processed attribute */
+	int   quote;                    /**< If 0 indicates ' or " */
+	int   last_ch;                  /**< last character value
+					 *   recorded for the node */
+	int   nlt;                      /**< '<' count */
+	char  meta[3];                  /**< meta data temporary storage */
 
 	unsigned int flag;
 #define	ACL_XML3_F_META_QM	(1 << 0)    /**< '?' flag */
@@ -62,168 +63,190 @@ struct ACL_XML3_NODE {
 #define ACL_XML3_F_SELF_CL	(1 << 3)    /**< self closed flag */
 #define	ACL_XML3_F_LEAF		(1 << 4)    /**< leaf node has no child node */
 
-/**< 是否是元数据 */
+/**< whether it is meta data */
 #define	ACL_XML3_F_META		\
 	(ACL_XML3_F_META_QM | ACL_XML3_F_META_CM | ACL_XML3_F_META_EM)
 
 #define	ACL_XML3_IS_COMMENT(x)	(((x)->flag & ACL_XML3_F_META_CM))
 
-	int   status;                   /**< 状态机当前解析状态 */
-#define ACL_XML3_S_NXT	0               /**< 下一个节点 */
-#define ACL_XML3_S_LLT	1               /**< 左边 '<' */
-#define ACL_XML3_S_LGT	2               /**< 右边 '>' */
-#define	ACL_XML3_S_LCH	3               /**< 左边 '<' 后第一个字节 */
-#define ACL_XML3_S_LEM	4               /**< 左边 '<' 后的 '!' */
-#define ACL_XML3_S_LTAG	5               /**< 左边的标签名 */
-#define ACL_XML3_S_RLT	6               /**< 右边的 '<' */
-#define ACL_XML3_S_RGT	7               /**< 右边的 '>' */
-#define ACL_XML3_S_RTAG	8               /**< 右边的标签名 */
-#define ACL_XML3_S_ATTR	9               /**< 标签属性名 */
-#define ACL_XML3_S_AVAL	10              /**< 标签属性值 */
-#define ACL_XML3_S_TXT	11              /**< 节点文本 */
-#define ACL_XML3_S_MTAG	12              /**< 元数据标签 */
-#define ACL_XML3_S_MTXT	13              /**< 元数据文本 */
-#define ACL_XML3_S_MCMT	14              /**< 元数据注释 */
-#define ACL_XML3_S_MEND	15              /**< 元数据结束 */
+	int   status;                   /**< state machine current state */
+#define ACL_XML3_S_NXT	0               /**< next node */
+#define ACL_XML3_S_LLT	1               /**< left '<' */
+#define ACL_XML3_S_LGT	2               /**< left '>' */
+#define	ACL_XML3_S_LCH	3               /**< left '<' next character */
+#define ACL_XML3_S_LEM	4               /**< left '<' then '!' */
+#define ACL_XML3_S_LTAG	5               /**< left tag name */
+#define ACL_XML3_S_RLT	6               /**< right '<' */
+#define ACL_XML3_S_RGT	7               /**< right '>' */
+#define ACL_XML3_S_RTAG	8               /**< right tag name */
+#define ACL_XML3_S_ATTR	9               /**< tag attribute name */
+#define ACL_XML3_S_AVAL	10              /**< tag attribute value */
+#define ACL_XML3_S_TXT	11              /**< node text */
+#define ACL_XML3_S_MTAG	12              /**< meta data tag */
+#define ACL_XML3_S_MTXT	13              /**< meta data text */
+#define ACL_XML3_S_MCMT	14              /**< meta data comment */
+#define ACL_XML3_S_MEND	15              /**< meta data end */
 
-	/* for acl_iterator, 通过 acl_foreach 列出该节点的一级子节点 */
+	/* for acl_iterator, through acl_foreach to iterate through all child nodes */
 
-	/* 取迭代器头函数 */
+	/* Get the head element of the container */
 	ACL_XML3_NODE *(*iter_head)(ACL_ITER*, ACL_XML3_NODE*);
-	/* 取迭代器下一个函数 */
+	/* Get the next element of the container */
 	ACL_XML3_NODE *(*iter_next)(ACL_ITER*, ACL_XML3_NODE*);
-	/* 取迭代器尾函数 */
+	/* Get the tail element of the container */
 	ACL_XML3_NODE *(*iter_tail)(ACL_ITER*, ACL_XML3_NODE*);
-	/* 取迭代器上一个函数 */
+	/* Get the previous element of the container */
 	ACL_XML3_NODE *(*iter_prev)(ACL_ITER*, ACL_XML3_NODE*);
 };
 
 struct ACL_XML3 {
 	/* public */
 					
-	int   depth;                    /**< 最大深度 */
-	int   node_cnt;                 /**< 节点总数, 包括 root 节点 */
-	int   root_cnt;                 /**< 根节点个数 */
-	ACL_XML3_NODE *root;            /**< XML 根节点 */
+	int   depth;                    /**< maximum depth */
+	int   node_cnt;                 /**< node count, excluding root node */
+	int   root_cnt;                 /**< root node count */
+	ACL_XML3_NODE *root;            /**< XML root node */
 
 	/* private */
 	char  addr[1];
-	ACL_HTABLE *id_table;           /**< id 标识符哈希表 */
-	ACL_XML3_NODE *curr_node;       /**< 当前正在处理的 XML 节点 */
-	ACL_DBUF_POOL *dbuf;            /**< 内存池对象 */
-	ACL_DBUF_POOL *dbuf_inner;      /**< 内部分布的内存池对象 */
-	size_t dbuf_keep;               /**< 内存池中保留的长度 */
+	ACL_HTABLE *id_table;           /**< id identifier hash table */
+	ACL_XML3_NODE *curr_node;       /**< current XML node being processed */
+	ACL_DBUF_POOL *dbuf;            /**< memory pool object */
+	ACL_DBUF_POOL *dbuf_inner;      /**< internal partial memory pool object */
+	size_t dbuf_keep;               /**< memory pool reserved length */
 
-	unsigned flag;                  /**< 标志位: ACL_XML3_FLAG_xxx */ 
+	unsigned flag;                  /**< flag bit: ACL_XML3_FLAG_xxx */ 
 
-	/**< 是否允许一个 xml 文档中有多个根节点，内部缺省为允许 */
+	/**< whether to allow multiple root nodes in one xml
+	 *   document, internal default is allowed */
 #define	ACL_XML3_FLAG_MULTI_ROOT	(1 << 0)
 
-	/**< 是否兼容单节点中没有 '/' 情况 */
+	/**< whether to ignore the '/' flag in the node */
 #define	ACL_XML3_FLAG_IGNORE_SLASH	(1 << 1)
 
-	/* for acl_iterator, 通过 acl_foreach 可以列出所有子节点 */
+	/* for acl_iterator, through acl_foreach to iterate through all child nodes */
 
-	/* 取迭代器头函数 */
+	/* Get the head element of the container */
 	ACL_XML3_NODE *(*iter_head)(ACL_ITER*, ACL_XML3*);
-	/* 取迭代器下一个函数 */
+	/* Get the next element of the container */
 	ACL_XML3_NODE *(*iter_next)(ACL_ITER*, ACL_XML3*);
-	/* 取迭代器尾函数 */
+	/* Get the tail element of the container */
 	ACL_XML3_NODE *(*iter_tail)(ACL_ITER*, ACL_XML3*);
-	/* 取迭代器上一个函数 */
+	/* Get the previous element of the container */
 	ACL_XML3_NODE *(*iter_prev)(ACL_ITER*, ACL_XML3*);
 };
 
 /****************************************************************************/
-/*                  公共函数接口，用户可以放心使用该接口集                  */
+/*                  High-level interfaces, users can directly use
+ *                  these interfaces                  */
 /****************************************************************************/
 
 /*----------------------------- in acl_xml3.c ------------------------------*/
 
 /**
- * 判断 xml 对象是否闭合的, 即是否所解析的数据是否完整, 如果该 xml 对象里的
- * xml 节点元素为空, 则也认为不是闭合的
- * @param xml {ACL_XML3*} xml 对象
- * @return {int} 0: 否; 1: 是
+ * Determine if an xml object is closed, i.e., whether all
+ * tags are matched. If the xml object's xml node elements are
+ * empty, it is also considered closed.
+ * @param xml {ACL_XML3*} xml object
+ * @return {int} 0: No; 1: Yes
  */
 ACL_API int acl_xml3_is_closure(ACL_XML3 *xml);
 
 /**
- * 根据指定标签名判断 xml 解析已经完成, 当该标签与 xml 对象中 root 一级子节点
- * 中的最后一个 xml 节点的标签相同时, 则认为 xml 解析完成, 为保证判断的正确性,
- * 数据源应保证最外层的根节点只有一个, 即 xml->root 的一级子节点只有一个, 否则
- * 会造成误判
- * @param xml {ACL_XML3*} xml 对象
- * @param tag {const char*} 用户给定标签名, 内部在匹配时不区分大小写
- * @return {int} 0: 否; 1: 是
+ * Determine if an xml object is complete based on the specified
+ * tag name. This tag name is a child node of xml object's root.
+ * When the last xml node's tag name matches, it is considered
+ * that the xml object is complete. To ensure the correctness of
+ * the judgment, the caller should ensure that the root node has
+ * only one, and xml->root has only one child node, otherwise
+ * the judgment may be incorrect.
+ * @param xml {ACL_XML3*} xml object
+ * @param tag {const char*} User-specified tag name, internal
+ *  matching is case-insensitive
+ * @return {int} 0: No; 1: Yes
  */
 ACL_API int acl_xml3_is_complete(ACL_XML3 *xml, const char *tag);
 
 /**
- * 创建一个 xml 对象
- * @return {ACL_XML3*} 新创建的 xml 对象
+ * Create an xml object.
+ * @return {ACL_XML3*} The newly created xml object
  */
 ACL_API ACL_XML3 *acl_xml3_alloc(void);
 
 /**
- * 创建一个 xml 对象，该 xml 对象及所有的内部内存分配都在该内存池上进行分配
- * @param dbuf {ACL_DBUF_POOL*} 内存池对象，当该针对非 NULL 时，则 xml 对象
- *  及所属节点内存在其基础上进行分配，否则，内部自动创建隶属于 xml 的内存池
- * @return {ACL_XML3*} 新创建的 xml 对象
+ * Create an xml object, all internal memory allocations for this
+ * xml object are performed on this memory pool.
+ * @param dbuf {ACL_DBUF_POOL*} Memory pool object, when this
+ *  parameter is NULL, the xml object will allocate memory for
+ *  all nodes on the memory pool, otherwise it will
+ *  automatically allocate memory for the xml object.
+ * @return {ACL_XML3*} The newly created xml object
  */
 ACL_API ACL_XML3 *acl_xml3_dbuf_alloc(ACL_DBUF_POOL *dbuf);
 
 /**
- * 将某一个 ACL_XML3_NODE 节点作为一个 XML 对象的根节点，从而可以方便地遍历出该
- * 节点各级子节点(在遍历过程中的所有节点不含本节点自身)，该遍历方式有别于单独
- * 遍历某一个 ACL_XML3_NODE 节点时仅能遍历其一级子节点的情形
- * @param xml {ACL_XML3*} xml 对象
- * @param node {ACL_XML3_NODE*} AXL_XML_NODE 节点
+ * Set a certain ACL_XML3_NODE node as the root node of an XML
+ * object, so that it can be conveniently traversed through the
+ * node's child nodes (in this traversal, all nodes are not the
+ * node's descendants). This traversal-style list node when
+ * traversing a certain ACL_XML3_NODE node may only traverse one
+ * child node.
+ * @param xml {ACL_XML3*} xml object
+ * @param node {ACL_XML3_NODE*} AXL_XML_NODE node
  */
 ACL_API void acl_xml3_foreach_init(ACL_XML3 *xml, ACL_XML3_NODE *node);
 
 /**
- * 设置一个 xml 文档中是否允许有多个根 xml 节点，内部缺省支持多个根节点
- * @param xml {ACL_XML3*} xml 对象
- * @param on {int} 非 0 则允许，为 0 表示不允许，当禁止有多个根 xml 节点时，
- *  则在解析时当遇到第一个根节点结束时便返回剩余的数据
+ * Set whether an xml document allows multiple root xml nodes,
+ * internal default supports multiple root nodes.
+ * @param xml {ACL_XML3*} xml object
+ * @param on {int} If 0, indicates not allowed; if 0, indicates
+ *  allowed. When stopping the judgment of multiple root xml
+ *  nodes, when parsing ends, if there is more than one root node,
+ *  it will return the remaining data.
  */
 ACL_API void acl_xml3_multi_root(ACL_XML3 *xml, int on);
 
 /**
- * 对于 XML 单节点的情况, 是否允许可以没有 /, 如:
- * <test id=111>, <test id=111 />, 当可以允许没有 / 则这两种写法
- * 都是合法的，否则只有第二个写法是合法的，如果允许这种兼容性，则
- * 会造成一定的性能损失
- * @param xml {ACL_XML3*} xml 对象
- * @param ignore {int} 如果非 0 表示单节点必须有 /
+ * Set XML root node parsing, whether to ignore the /, e.g.:
+ * <test id=111>, <test id=111 />, both of these without /
+ * are written are legal, but only the second writing is legal,
+ * this function is for compatibility, if the first writing is
+ * not ignored, parsing will fail.
+ * @param xml {ACL_XML3*} xml object
+ * @param ignore {int} If 0, indicates not to ignore the / in the node
  */
 ACL_API void acl_xml3_slash(ACL_XML3 *xml, int ignore);
 
 /**
- * 释放一个 xml 对象, 同时释放该对象里容纳的所有 xml 节点
- * @param xml {ACL_XML3*} xml 对象
- * @return {int} 返回释放的 xml 节点个数
+ * Free an xml object, and free all xml nodes created by this object.
+ * @param xml {ACL_XML3*} xml object
+ * @return {int} The number of freed xml nodes
  */
 ACL_API int acl_xml3_free(ACL_XML3 *xml);
 
 /**
- * 重置 XML 解析器对象
- * @param xml {ACL_XML3*} xml 对象
+ * Reset XML object state.
+ * @param xml {ACL_XML3*} xml object
  */
 ACL_API void acl_xml3_reset(ACL_XML3 *xml);
 
 /*------------------------- in acl_xml3_parse.c ----------------------------*/
 
 /**
- * 解析 xml 数据, 并持续地自动生成 xml 节点树
- * @param xml {ACL_XML3*} xml 对象
- * @param data {char*} 以 '\0' 结尾的数据字符串, 可以是完整的 xml 数据;
- *  也可以是不完整的 xml 数据, 允许循环调用此函数, 将不完整数据持续地输入
- * @return {char*} 当通过 acl_xml3_multi_root 允许一个 xml 文档中在在
- *  多个根 xml 节点时，该函数返回的地址的字节为 '\0'; 否则返回剩余的数据地址
- *  包含非空字符串
- *  注：也可以通过 acl_xml3_is_complete 判断是否解析完毕
+ * Parse xml data, and automatically create xml nodes.
+ * @param xml {ACL_XML3*} xml object
+ * @param data {char*} A string ending with '\0', which can be a
+ *  complete xml document; it can also be an incomplete xml
+ *  document, and this function can be called in a loop, and the
+ *  data can be parsed incrementally.
+ * @return {char*} If through acl_xml3_multi_root allows multiple
+ *  root xml nodes, when multiple xml nodes are found, the address
+ *  returned by this function will be set to '\0'; otherwise
+ *  return the remaining data address
+ *  which is a non-empty string.
+ *  Note: You can also use acl_xml3_is_complete to determine
+ *  whether it is complete.
  */
 ACL_API char *acl_xml3_update(ACL_XML3 *xml, char *data);
 #define	acl_xml3_parse	acl_xml3_update
@@ -231,309 +254,362 @@ ACL_API char *acl_xml3_update(ACL_XML3 *xml, char *data);
 /*------------------------- in acl_xml3_util.c -----------------------------*/
 
 /**
- * 初始化类似于 input, br, hr 等的自闭合标签, 形成自闭合标签树, 以便于
- * acl_xml3_tag_selfclosed 查询该树, 检查所给标签是否是保留的自闭合标签,
- * 该函数只能被初始化一次, 也可以不初始化
+ * Initialize some self-closing tags such as input, br, hr, forming
+ * a self-closing tag list, for acl_xml3_tag_selfclosed to query,
+ * to determine whether a tag is a built-in self-closing tag,
+ * this function can only be initialized once, or not initialized.
  */
 ACL_API void acl_xml3_tag_init(void);
 
 /**
- * 允许用户自己添加一些非自闭合的标签
- * @param tag {const char*} 标签名，注意标签长度不得大于 254 个字节
+ * Add some self-closing tags defined by the user.
+ * @param tag {const char*} tag name, note that the tag length
+ *  should not exceed 254 bytes
  */
 ACL_API void acl_xml3_tag_add(const char *tag);
 
 /**
- * 当调用 acl_xml3_tag_init 初始化保留的自闭合标签树后, 可以调用此函数判断所给
- * 标签是否属于自闭合标签, 如果未调用 acl_xml3_tag_init, 则该函数永远返回 0
- * @parma tag {const char*} 标签名称
- * @return {int} 0: 表示否, 1: 表示是
+ * Query the self-closing tag list initialized by
+ * acl_xml3_tag_init, you can call this function to determine
+ * whether a tag is a self-closing tag, if acl_xml3_tag_init has
+ * not been called, this function will automatically return 0.
+ * @param tag {const char*} tag name
+ * @return {int} 0: indicates no; 1: indicates yes
  */
 ACL_API int  acl_xml3_tag_selfclosed(const char *tag);
 
 /**
- * 判断标签所属 xml 节点是否是叶节点, 叶节点没有子节点
- * @param tag {const char*} 标签名
- * @return {int} 0: 不是叶节点; 1: 是叶节点
+ * Determine whether a tag name xml node is a leaf node, leaf
+ * nodes have no child nodes.
+ * @param tag {const char*} tag name
+ * @return {int} 0: not a leaf node; 1: is a leaf node
  */
 ACL_API int  acl_xml3_tag_leaf(const char *tag);
 
 /**
- * 释放由 acl_xml3_getElementsByTagName, acl_xml3_getElementsByName,
- * acl_xml3_getElementsByAttr 等函数返回的动态数组对象, 因为该动态数组中的
- * 元素都是 ACL_XML3 对象中元素的引用, 所以释放掉该动态数组后, 只要 ACL_XML3
- * 对象不释放, 则原来存于该数组中的元素依然可以使用.
- * 但并不释放里面的 xml 节点元素
- * @param a {ACL_ARRAY*} 动态数组对象
+ * Free the dynamic array returned by
+ * acl_xml3_getElementsByTagName, acl_xml3_getElementsByName,
+ * acl_xml3_getElementsByAttr and other functions, because the
+ * elements in this dynamic array are all references to ACL_XML3
+ * object elements, so when freeing this dynamic array, as long as
+ * ACL_XML3
+ * is not freed, the elements originally in this array can still be used.
+ * This function does not free the xml node elements.
+ * @param a {ACL_ARRAY*} dynamic array object
  */
 ACL_API void acl_xml3_free_array(ACL_ARRAY *a);
 
 /**
- * 从 xml 对象中获得与所给标签名相同的 xml 第一个节点
- * @param xml {ACL_XML3*} xml 对象
- * @param tag {const char*} 标签名称
- * @return {ACL_XML3_NODE*} 符合条件的 xml 节点, 若返回 NULL 则
- *  表示没有符合条件的 xml 节点
+ * Get the first xml node with the same tag name from the xml object.
+ * @param xml {ACL_XML3*} xml object
+ * @param tag {const char*} tag name
+ * @return {ACL_XML3_NODE*} The found xml node, returns NULL if
+ *  no matching xml node is found.
  */
 ACL_API ACL_XML3_NODE *acl_xml3_getFirstElementByTagName(
 	ACL_XML3 *xml, const char *tag);
 
 /**
- * 从 xml 对象中获得所有的与所给标签名相同的 xml 节点的集合
- * @param xml {ACL_XML3*} xml 对象
- * @param tag {const char*} 标签名称
- * @return {ACL_ARRAY*} 符合条件的 xml 节点集合, 存于 动态数组中, 若返回 NULL 则
- *  表示没有符合条件的 xml 节点, 非空值需要调用 acl_xml3_free_array 释放
+ * Get all xml nodes with the same tag name from the xml object.
+ * @param xml {ACL_XML3*} xml object
+ * @param tag {const char*} tag name
+ * @return {ACL_ARRAY*} The found xml node collection, is a
+ *  dynamic array, returns NULL if no matching xml node is found,
+ *  non-NULL value needs to be freed with acl_xml3_free_array.
  */
 ACL_API ACL_ARRAY *acl_xml3_getElementsByTagName(
 	ACL_XML3 *xml, const char *tag);
 
 /**
- * 从 xml 对象中获得所有的与给定多级标签名相同的 xml 节点的集合
- * @param xml {ACL_XML3*} xml 对象
- * @param tags {const char*} 多级标签名，由 '/' 分隔各级标签名，如针对 xml 数据：
- *  <root> <first> <second> <third name="test1"> text1 </third> </second> </first>
- *  <root> <first> <second> <third name="test2"> text2 </third> </second> </first>
- *  <root> <first> <second> <third name="test3"> text3 </third> </second> </first>
- *  可以通过多级标签名：root/first/second/third 一次性查出所有符合条件的节点
- * @return {ACL_ARRAY*} 符合条件的 xml 节点集合, 存于 动态数组中, 若返回 NULL 则
- *  表示没有符合条件的 xml 节点, 非空值需要调用 acl_xml3_free_array 释放
+ * Get all xml nodes with the same multi-level tag name from the xml object.
+ * @param xml {ACL_XML3*} xml object
+ * @param tags {const char*} Multi-level tag name, separated by
+ *  '/' to form a tag path, e.g. xml data:
+ *  <root> <first> <second> <third name="test1"> text1 </third>
+ *  </second> </first>
+ *  <root> <first> <second> <third name="test2"> text2 </third>
+ *  </second> </first>
+ *  <root> <first> <second> <third name="test3"> text3 </third>
+ *  </second> </first>
+ *  You can use the multi-level tag name root/first/second/third
+ *  to find all matching nodes at once.
+ * @return {ACL_ARRAY*} The found xml node collection, is a
+ *  dynamic array, returns NULL if no matching xml node is found,
+ *  non-NULL value needs to be freed with acl_xml3_free_array.
  */
 ACL_API ACL_ARRAY *acl_xml3_getElementsByTags(ACL_XML3 *xml, const char *tags);
 
 /**
- * 从 xml 对象中获得所有的与给定属性名 name 的属性值相同的 xml 节点元素集合
- * @param xml {ACL_XML3*} xml 对象
- * @param value {const char*} 属性名为 name 的属性值
- * @return {ACL_ARRAY*} 符合条件的 xml 节点集合, 存于 动态数组中, 若返回 NULL 则
- *  表示没有符合条件的 xml 节点, 非空值需要调用 acl_xml3_free_array 释放
+ * Get all xml node elements with the same name attribute value
+ * from the xml object.
+ * @param xml {ACL_XML3*} xml object
+ * @param value {const char*} attribute value with name attribute
+ * @return {ACL_ARRAY*} The found xml node collection, is a
+ *  dynamic array, returns NULL if no matching xml node is found,
+ *  non-NULL value needs to be freed with acl_xml3_free_array.
  */
 ACL_API ACL_ARRAY *acl_xml3_getElementsByName(ACL_XML3 *xml, const char *value);
 
 /**
- * 从 xml 对象中获得所有给定属性名及属性值的 xml 节点元素集合
- * @param xml {ACL_XML3*} xml 对象
- * @param name {const char*} 属性名
- * @param value {const char*} 属性值
- * @return {ACL_ARRAY*} 符合条件的 xml 节点集合, 存于 动态数组中, 若返回 NULL 则
- *  表示没有符合条件的 xml 节点, 非空值需要调用 acl_xml3_free_array 释放
+ * Get all xml node elements with the same attribute name and value
+ * from the xml object.
+ * @param xml {ACL_XML3*} xml object
+ * @param name {const char*} attribute name
+ * @param value {const char*} attribute value
+ * @return {ACL_ARRAY*} The found xml node collection, is a
+ *  dynamic array, returns NULL if no matching xml node is found,
+ *  non-NULL value needs to be freed with acl_xml3_free_array.
  */
 ACL_API ACL_ARRAY *acl_xml3_getElementsByAttr(ACL_XML3 *xml,
 	const char *name, const char *value);
 
 /**
- * 从 xml 对象中获得指定 id 值的 xml 节点元素的某个属性对象
- * @param xml {ACL_XML3*} xml 对象
- * @param id {const char*} id 值
- * @return {ACL_XML3_ATTR*} 某 xml 节点的某个属性对象, 若返回 NULL 则表示
- *  没有符合条件的属性, 返回值不需要释放
+ * Get a certain attribute object of an xml node element with the
+ * specified id value from the xml object.
+ * @param xml {ACL_XML3*} xml object
+ * @param id {const char*} id value
+ * @return {ACL_XML3_ATTR*} A certain attribute object of an
+ *  xml node, returns NULL if
+ *  no matching attribute is found, the return value does not need to be freed.
  */
 ACL_API ACL_XML3_ATTR *acl_xml3_getAttrById(ACL_XML3 *xml, const char *id);
 
 /**
- * 从 xml 对象中获得指定 id 值的 xml 节点元素的某个属性值
- * @param xml {ACL_XML3*} xml 对象
- * @param id {const char*} id 值
- * @return {const char*} 某 xml 节点的某个属性值, 若返回 NULL 则表示没有符合
- *  条件的属性
+ * Get a certain attribute value of an xml node element with the
+ * specified id value from the xml object.
+ * @param xml {ACL_XML3*} xml object
+ * @param id {const char*} id value
+ * @return {const char*} A certain attribute value of an xml
+ *  node, returns NULL if not found
+ *  matching attribute.
  */
 ACL_API const char *acl_xml3_getAttrValueById(ACL_XML3 *xml, const char *id);
 
 /**
- * 从 xml 对象中获得指定 id 值的 xml 节点元素
- * @param xml {ACL_XML3*} xml 对象
- * @param id {const char*} id 值
- * @return {ACL_XML3_NODE*} xml 节点元素, 若返回 NULL 则表示没有符合
- *  条件的 xml 节点, 返回值不需要释放
+ * Get an xml node element with the specified id value from the xml object.
+ * @param xml {ACL_XML3*} xml object
+ * @param id {const char*} id value
+ * @return {ACL_XML3_NODE*} xml node element, returns NULL if not found.
+ *  Returns an xml node, the return value does not need to be freed.
  */
 ACL_API ACL_XML3_NODE *acl_xml3_getElementById(ACL_XML3 *xml, const char *id);
 
 /**
- * 从 xml 对象中提取有在 ? ! 等开头的节点
- * @param xml {ACL_XML3*} xml 对象
- * @param tag {const char*} 标签名
- * @return {ACL_XML3_NODE*} xml 节点元素, 若返回 NULL 则表示没有符合
- *  条件的 xml 节点, 返回值不需要释放
+ * Get a node starting with ? ! etc. from the xml object.
+ * @param xml {ACL_XML3*} xml object
+ * @param tag {const char*} tag name
+ * @return {ACL_XML3_NODE*} xml node element, returns NULL if not found.
+ *  Returns an xml node, the return value does not need to be freed.
  */
 ACL_API ACL_XML3_NODE *acl_xml3_getElementMeta(ACL_XML3 *xml, const char *tag);
 
 /**
- * 获得 xml 的字符集编码格式
- * @param xml {ACL_XML3*} xml 对象
- * @return {const char*} 返回字符集编码格式，返回 NULL 时表示没有该属性
+ * Get the encoding format of the xml object string.
+ * @param xml {ACL_XML3*} xml object
+ * @return {const char*} The encoding format string, returns NULL if not set.
  */
 ACL_API const char *acl_xml3_getEncoding(ACL_XML3 *xml);
 
 /**
- * 获得 xml 数据的类型，如：text/xsl
- * @param xml {ACL_XML3*} xml 对象
- * @return {const char*} 返回 NULL 表示没有该属性
+ * Get the content type of the xml object, e.g., text/xsl.
+ * @param xml {ACL_XML3*} xml object
+ * @return {const char*} Returns NULL if not set.
  */
 ACL_API const char *acl_xml3_getType(ACL_XML3 *xml);
 
 /**
- * 从 xml 节点中获得指定属性名的属性对象
- * @param node {ACL_XML3_NODE*} xml 节点
- * @param name {const char*} 属性名称
- * @return {ACL_XML3_ATTR*} 属性对象, 为空表示不存在, 返回值不需要释放
+ * Get the attribute object of a specific attribute name from an xml node.
+ * @param node {ACL_XML3_NODE*} xml node
+ * @param name {const char*} attribute name
+ * @return {ACL_XML3_ATTR*} attribute object, returns NULL if
+ *  not found, the return value does not need to be freed.
  */
 ACL_API ACL_XML3_ATTR *acl_xml3_getElementAttr(ACL_XML3_NODE *node,
 		const char *name);
 
 /**
- * 从 xml 节点中获得指定属性名的属性值
- * @param node {ACL_XML3_NODE*} xml 节点
- * @param name {const char*} 属性名称
- * @return {const char*} 属性值, 为空表示不存在
+ * Get the attribute value of a specific attribute name from an xml node.
+ * @param node {ACL_XML3_NODE*} xml node
+ * @param name {const char*} attribute name
+ * @return {const char*} attribute value, returns NULL if not found.
  */
 ACL_API const char *acl_xml3_getElementAttrVal(
 			ACL_XML3_NODE *node, const char *name);
 
 /**
- * 从 xml 节点删除某个属性对象, 如果该属性为 id 属性, 则同时会从 xml->id_table 中删除
- * @param node {ACL_XML3_NODE*} xml 节点
- * @param name {const char*} 属性名称
- * @return {int} 0 表示删除成功, -1: 表示删除失败(有可能是该属性不存在)
+ * Delete a specific attribute from an xml node. If the attribute
+ * is an id attribute, it will also be deleted from xml->id_table.
+ * @param node {ACL_XML3_NODE*} xml node
+ * @param name {const char*} attribute name
+ * @return {int} 0 indicates successful deletion, -1 indicates
+ *  deletion failed (possibly due to the attribute not existing).
  */
 ACL_API int acl_xml3_removeElementAttr(ACL_XML3_NODE *node, const char *name);
 
 #if 0
 /**
- * 给 xml 节点添加属性, 如果该属性名已存在, 则用新的属性值替换其属性值, 否则
- * 创建并添加新的属性对象
- * @param node {ACL_XML3_NODE*} xml 节点
- * @param name {const char*} 属性名称
- * @param value {const char*} 属性值
- * @return {ACL_XML3_ATTR*} 返回该属性对象(有可能是原来的, 也有可能是新的), 
- *  返回值不需释放
+ * Add an attribute to an xml node. If the attribute already
+ * exists, the new attribute value will replace the old one,
+ * and a new attribute object will be returned.
+ * @param node {ACL_XML3_NODE*} xml node
+ * @param name {const char*} attribute name
+ * @param value {const char*} attribute value
+ * @return {ACL_XML3_ATTR*} The modified attribute object
+ *  (possibly the original one, or a new one), 
+ *  the return value does not need to be freed.
  */
 ACL_API ACL_XML3_ATTR *acl_xml3_addElementAttr(ACL_XML3_NODE *node,
 		const char *name, const char *value);
 
 /**
- * 将标签名及节点文本做为参数创建 xml 节点，该函数主要用在构建 xml 对象时
- * @param xml {ACL_XML3*} xml 对象，该对象应该是由 acl_xml3_alloc 创建的
- * @param tagname {const char*} 标签名，必须非空且字符串长度大于 0
- * @param text {const char*} 节点的文本内容，可以为空
- * @return {ACL_XML3_NODE*} 新创建的 xml 节点，该返回永远返回非空，如果输入
- *  参数非法则会导致内部自动产生断言
+ * Create a node with the tag name and text content as an xml
+ * node. This function is mainly used when building xml objects.
+ * @param xml {ACL_XML3*} xml object, this object should be
+ *  created by acl_xml3_alloc function.
+ * @param tagname {const char*} tag name, must be a non-empty
+ *  string with length > 0
+ * @param text {const char*} node text content, can be empty
+ * @return {ACL_XML3_NODE*} The newly created xml node, this
+ *  function will never return NULL, and whether the return value
+ *  is NULL will cause internal automatic memory allocation.
  */
 ACL_API ACL_XML3_NODE *acl_xml3_create_node(ACL_XML3 *xml,
 	const char *tagname, const char *text);
 
 /**
- * 给一个 xml 节点添加属性，该函数主要用在构建 xml 对象时
- * @param node {ACL_XML3_NODE*} 由 acl_xml3_create_node 创建的节点
- * @param name {const char*} 属性名，必须为非空字符串且字符串长度大于 0
- * @param value {const char*} 属性值，可以为空
- * @return {ACL_XML3_ATTR*} xml 节点的属性对象，当输入参数非法时该函数
- *  内部自动产生断言
+ * Add an attribute to an xml node. This function is mainly used
+ * when building xml objects.
+ * @param node {ACL_XML3_NODE*} Node created by acl_xml3_create_node
+ * @param name {const char*} attribute name, must be a
+ *  non-empty string with length > 0
+ * @param value {const char*} attribute value, can be empty
+ * @return {ACL_XML3_ATTR*} xml node attribute object, when the
+ *  return value is not NULL, this function
+ *  will automatically allocate memory internally.
  */
 ACL_API ACL_XML3_ATTR *acl_xml3_node_add_attr(ACL_XML3_NODE *node,
 	const char *name, const char *value);
 
 /**
- * 给一个 xml 节点添加一组属性，该函数主要用在构建 xml 对象时
- * @param node {ACL_XML3_NODE*} 由 acl_xml3_create_node 创建的节点
- * @param ... 一组属性，遇到 NULL 时表示结束，如：
+ * Add multiple attributes to an xml node. This function is
+ * mainly used when building xml objects.
+ * @param node {ACL_XML3_NODE*} Node created by acl_xml3_create_node
+ * @param ... Multiple attributes, ending with NULL, e.g.:
  *  {name1}, {value1}, {name2}, {value2}, ... NULL
  */
 ACL_API void acl_xml3_node_add_attrs(ACL_XML3_NODE *node, ...);
 
 /**
- * 给一个 xml 节点添加文本内容，该函数主要用在构建 xml 对象时
- * @param node {ACL_XML3_NODE*} 由 acl_xml3_create_node 创建的节点
- * @param text {const char*} 文本内容
+ * Set the text content of an xml node. This function is mainly
+ * used when building xml objects.
+ * @param node {ACL_XML3_NODE*} Node created by acl_xml3_create_node
+ * @param text {const char*} text content
  */
 ACL_API void acl_xml3_node_set_text(ACL_XML3_NODE *node, const char *text);
 
 /**
- * 将 xml 对象转成字符串内容
- * @param xml {ACL_XML3*} xml 对象
- * @param buf {ACL_VSTRING*} 存储结果集的缓冲区，当该参数为空时则函数内部会
- *  自动分配一段缓冲区，应用用完后需要释放掉；非空函数内部会直接将结果存储其中
- * @return {ACL_VSTRING*} xml 对象转换成字符串后的存储缓冲区，该返回值永远非空，
- *  使用者可以通过 ACL_VSTRING_LEN(x) 宏来判断内容是否为空，返回的 ACL_VSTRING
- *  指针如果为该函数内部创建的，则用户名必须用 acl_vstring_free 进行释放
+ * Convert an xml object to a string.
+ * @param xml {ACL_XML3*} xml object
+ * @param buf {ACL_VSTRING*} Buffer to store the converted
+ *  result. If this parameter is NULL, an internal buffer will be
+ *  automatically created, and the caller needs to free it.
+ *  Otherwise, the internal buffer
+ *  will be used directly to store the result.
+ * @return {ACL_VSTRING*} The buffer storing the string
+ *  converted from the xml object. The return value is always
+ *  non-NULL. The caller can determine if the content is empty
+ *  by ACL_VSTRING_LEN(x). If the returned ACL_VSTRING pointer
+ *  is an internally created one, the user needs to free it
+ *  with acl_vstring_free.
  */
 ACL_API ACL_VSTRING* acl_xml3_build(ACL_XML3* xml, ACL_VSTRING *buf);
 
 /**
- * 将 xml 对象转储于指定流中，注：该转储信息仅为调试用的数据
- * @param xml {ACL_XML3*} xml 对象
- * @param fp {ACL_VSTREAM*} 流对象
+ * Dump an xml object to the specified stream. Note that the
+ * dumped information is for debugging purposes.
+ * @param xml {ACL_XML3*} xml object
+ * @param fp {ACL_VSTREAM*} output stream
  */
 ACL_API void acl_xml3_dump(ACL_XML3 *xml, ACL_VSTREAM *fp);
 
 /**
- * 将 xml 对象转存于指定缓冲区中，注：该转储信息仅为调试用的数据
- * @param xml {ACL_XML3*} xml 对象
- * @param buf {ACL_VSTRING*} 缓冲区, 需要用户自己分配空间
+ * Dump an xml object to the specified buffer. Note that the dumped information
+ * is for debugging purposes.
+ * @param xml {ACL_XML3*} xml object
+ * @param buf {ACL_VSTRING*} output buffer, no need for user to allocate memory.
  */
 ACL_API void acl_xml3_dump2(ACL_XML3 *xml, ACL_VSTRING *buf);
 
 #endif
 
 /***************************************************************************/
-/*          以下为更为低级的接口, 用户可以根据需要调用以下接口             */
+/*          The following are low-level interfaces, users can
+ *          choose to use them as needed             */
 /***************************************************************************/
 
 /*----------------------------- in acl_xml3.c ------------------------------*/
 
 /**
- * 创建 xml 节点的属性
- * @param node {ACL_XML3_NODE*} xml 节点
- * @return {ACL_XML3_ATTR*} 新创建的节点属性
+ * Allocate an xml node attribute object.
+ * @param node {ACL_XML3_NODE*} xml node
+ * @return {ACL_XML3_ATTR*} The newly allocated attribute object
  */
 ACL_API ACL_XML3_ATTR *acl_xml3_attr_alloc(ACL_XML3_NODE *node);
 
 /**
- * 创建一个 xml 节点
- * @param xml {ACL_XML3*} xml 对象
- * @return {ACL_XML3_NODE*} xml 节点对象
+ * Allocate an xml node.
+ * @param xml {ACL_XML3*} xml object
+ * @return {ACL_XML3_NODE*} xml node object
  */
 ACL_API ACL_XML3_NODE *acl_xml3_node_alloc(ACL_XML3 *xml);
 
 /**
- * 将某个 xml 节点及其子节点从 xml 对象中删除, 并释放该节点及其子节点所占空间
- * 函数来释放该 xml 节点所占内存
- * @param node {ACL_XML3_NODE*} xml 节点
- * @return {int} 返回删除的节点个数
+ * Delete a specific xml node and its child nodes from the xml
+ * object, and free the memory occupied by this node and its
+ * child nodes. This function will free the memory occupied by
+ * the xml node.
+ * @param node {ACL_XML3_NODE*} xml node
+ * @return {int} The number of deleted nodes
  */
 ACL_API int acl_xml3_node_delete(ACL_XML3_NODE *node);
 
 /**
- * 向某个 xml 节点添加兄弟节点(该兄弟节点必须是独立的 xml 节点)
- * @param node1 {ACL_XML3_NODE*} 向本节点添加 xml 节点
- * @param node2 {ACL_XML3_NODE*} 新添加的兄弟 xml 节点
+ * Append a sibling node to a specific xml node (the sibling
+ * node can also be an xml node with children).
+ * @param node1 {ACL_XML3_NODE*} The xml node to which the
+ *  sibling node is appended.
+ * @param node2 {ACL_XML3_NODE*} The xml node to be appended as a sibling.
  */
 ACL_API void acl_xml3_node_append(ACL_XML3_NODE *node1, ACL_XML3_NODE *node2);
 
 /**
- * 将某个 xml 节点作为子节点加入某父 xml 节点中
- * @param parent {ACL_XML3_NODE*} 父节点
- * @param child {ACL_XML3_NODE*} 子节点
+ * Add a specific xml node as a child node to another xml node.
+ * @param parent {ACL_XML3_NODE*} parent node
+ * @param child {ACL_XML3_NODE*} child node
  */
 ACL_API void acl_xml3_node_add_child(ACL_XML3_NODE *parent, ACL_XML3_NODE *child);
 
 /**
- * 获得某个 xml 节点的父节点
- * @param node {ACL_XML3_NODE*} xml 节点
- * @return {ACL_XML3_NODE*} 父节点, 如果为 NULL 则表示其父节点不存在
+ * Get the parent node of a specific xml node.
+ * @param node {ACL_XML3_NODE*} xml node
+ * @return {ACL_XML3_NODE*} The parent node. Returns NULL if
+ *  the parent node does not exist.
  */
 ACL_API ACL_XML3_NODE *acl_xml3_node_parent(ACL_XML3_NODE *node);
 
 /**
- * 获得某个 xml 节点的后一个兄弟节点
- * @param node {ACL_XML3_NODE*} xml 节点
- * @return {ACL_XML3_NODE*} 给定 xml 节点的后一个兄弟节点, 若为NULL则表示不存在
+ * Get the next sibling node of a specific xml node.
+ * @param node {ACL_XML3_NODE*} xml node
+ * @return {ACL_XML3_NODE*} The next sibling node of the xml
+ *  node. Returns NULL if it does not exist.
  */
 ACL_API ACL_XML3_NODE *acl_xml3_node_next(ACL_XML3_NODE *node);
 
 /**
- * 获得某个 xml 节点的前一个兄弟节点
- * @param node {ACL_XML3_NODE*} xml 节点
- * @return {ACL_XML3_NODE*} 给定 xml 节点的前一个兄弟节点, 若为NULL则表示不存在
+ * Get the previous sibling node of a specific xml node.
+ * @param node {ACL_XML3_NODE*} xml node
+ * @return {ACL_XML3_NODE*} The previous sibling node of the
+ *  xml node. Returns NULL if it does not exist.
  */
 ACL_API ACL_XML3_NODE *acl_xml3_node_prev(ACL_XML3_NODE *node);
 

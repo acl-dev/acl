@@ -11,7 +11,7 @@ extern "C" {
 typedef struct ACL_RING ACL_RING;
 
 /**
- * 数据环结构类型定义
+ * Ring buffer structure type definition.
  */
 struct ACL_RING {
 	ACL_RING *succ;           /**< successor */
@@ -26,72 +26,75 @@ typedef struct ACL_RING_ITER {
 } ACL_RING_ITER;
 
 /**
- * 初始化数据环
- * @param ring {ACL_RING*} 数据环
+ * Initialize ring buffer.
+ * @param ring {ACL_RING*} Ring buffer
  */
 ACL_API void acl_ring_init(ACL_RING *ring);
 
 /**
- * 获得当前数据环内元素个数
- * @param ring {ACL_RING*} 数据环
- * @return {int} 数据环内元素个数
+ * Get current ring buffer's element count.
+ * @param ring {ACL_RING*} Ring buffer
+ * @return {int} Ring buffer's element count
  */
 ACL_API int  acl_ring_size(const ACL_RING *ring);
 
 /**
- * 将一个新元素添加进环的尾部，在环中后添加的元素位于先添加的元素后面
- * @param ring {ACL_RING*} 数据环
- * @param entry {ACL_RING*} 新的元素
+ * Insert a new element before ring tail. In ring, position after inserted
+ * element is after inserted element.
+ * @param ring {ACL_RING*} Ring buffer
+ * @param entry {ACL_RING*} New element
  */
 ACL_API void acl_ring_prepend(ACL_RING *ring, ACL_RING *entry);
 
 /**
- * 将一个新元素添加进环的头部，在环中后添加的元素位于先添加的元素前面
- * @param ring {ACL_RING*} 数据环
- * @param entry {ACL_RING*} 新的元素
+ * Insert a new element before ring head. In ring, position after inserted
+ * element is before inserted element.
+ * @param ring {ACL_RING*} Ring buffer
+ * @param entry {ACL_RING*} New element
  */
 ACL_API void acl_ring_append(ACL_RING *ring, ACL_RING *entry);
 
 /**
- * 将一个环元素从数据环中删除
- * @param entry {ACL_RING*} 环元素
+ * Remove a certain element from ring buffer.
+ * @param entry {ACL_RING*} Element
  */
 ACL_API void acl_ring_detach(ACL_RING *entry);
 
 /**
- * 从环中弹出头部环元素
- * @param ring {ACL_RING*} 数据环
- * @return {ACL_RING*} 头部环元素，如果返回空则表示该数据环为空
+ * Pop head element from ring.
+ * @param ring {ACL_RING*} Ring buffer
+ * @return {ACL_RING*} Head element, if NULL, indicates ring buffer is empty
  */
 ACL_API ACL_RING *acl_ring_pop_head(ACL_RING *ring);
 
 /**
- * 从环中弹出尾部环元素
- * @param ring {ACL_RING*} 数据环
- * @return {ACL_RING*} 尾部环元素，如果返回空则表示该数据环为空
+ * Pop tail element from ring.
+ * @param ring {ACL_RING*} Ring buffer
+ * @return {ACL_RING*} Tail element, if NULL, indicates ring buffer is empty
  */
 ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 
-/*--------------------  一些方便快捷的宏操作 --------------------------------*/
+/*--------------------  Some helper macros --------------------------------*/
 
 /**
- * 返回当前环元素的下一个环元素
+ * Get current element's next element.
  */
 #define ACL_RING_SUCC(c) ((c)->succ)
 #define	acl_ring_succ	ACL_RING_SUCC
 
 /**
- * 返回当前环元素的前一个环元素
+ * Get current element's previous element.
  */
 #define ACL_RING_PRED(c) ((c)->pred)
 #define	acl_ring_pred	ACL_RING_PRED
 
 /**
- * 将环元素指针转换成应用的自定义类型的指针地址
- * @param ring_ptr {ACL_RING*} 环元素指针
- * @param app_type 应用自定义类型
- * @param ring_member {ACL_RING*} 环元素在应用自定义结构中的成员名称
- * @return {app_type*} 应用自定义结构类型的对象地址
+ * Convert element pointer to application's custom object type pointer address.
+ * @param ring_ptr {ACL_RING*} Element pointer
+ * @param app_type Application's custom type
+ * @param ring_member {ACL_RING*} Element member name in application's custom
+ *  object structure
+ * @return {app_type*} Application's custom object structure type's object address
  */
 #define ACL_RING_TO_APPL(ring_ptr, app_type, ring_member) \
     ((app_type *) (((char *) (ring_ptr)) - offsetof(app_type,ring_member)))
@@ -99,9 +102,9 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 #define	acl_ring_to_appl	ACL_RING_TO_APPL
 
 /**
- * 从头部至尾部遍历数据环中的所有环元素
+ * Iterate from head to tail through all ring elements in ring buffer.
  * @param iter {ACL_RING_ITER}
- * @param head_ptr {ACL_RING*} 数据环的头指针
+ * @param head_ptr {ACL_RING*} Ring buffer's head pointer
  * @example:
  	typedef struct {
 		char  name[32];
@@ -144,9 +147,9 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 #define	acl_ring_foreach		ACL_RING_FOREACH
 
 /**
- * 从尾部至头部遍历数据环中的所有环元素
+ * Iterate from tail to head through all ring elements in ring buffer.
  * @param iter {ACL_RING_ITER}
- * @param head_ptr {ACL_RING*} 数据环的头指针
+ * @param head_ptr {ACL_RING*} Ring buffer's head pointer
  */
 #define	ACL_RING_FOREACH_REVERSE(iter, head_ptr) \
         for ((iter).ptr = acl_ring_pred((head_ptr)); (iter).ptr != (head_ptr);  \
@@ -155,9 +158,9 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 #define	acl_ring_foreach_reverse	ACL_RING_FOREACH_REVERSE
 
 /**
- * 返回数据环中第一个环元素指针
- * @param head {ACL_RING*} 环头指针
- * @return {ACL_RING*} NULL: 环为空
+ * Get first element pointer in ring buffer.
+ * @param head {ACL_RING*} Head pointer
+ * @return {ACL_RING*} NULL: ring is empty
  */
 #define ACL_RING_FIRST(head) \
 	(acl_ring_succ(head) != (head) ? acl_ring_succ(head) : 0)
@@ -165,11 +168,12 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 #define	acl_ring_first		ACL_RING_FIRST
 
 /**
- * 返回数据环中头第一个环元素指针同时将其转换应用自定义结构类型的对象地址
- * @param head {ACL_RING*} 环头指针
- * @param app_type 应用自定义结构类型
- * @param ring_member {ACL_RING*} 环元素在应用自定义结构中的成员名称
- * @return {app_type*} 应用自定义结构类型的对象地址
+ * Get first element pointer in ring buffer and simultaneously convert to
+ * application's custom object structure type's object address.
+ * @param head {ACL_RING*} Head pointer
+ * @param app_type Application's custom object structure type
+ * @param ring_member {ACL_RING*} Element member name in application's custom object structure
+ * @return {app_type*} Application's custom object structure type's object address
  */
 #define ACL_RING_FIRST_APPL(head, app_type, ring_member) \
 	(acl_ring_succ(head) != (head) ? \
@@ -178,9 +182,9 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 #define	acl_ring_first_appl	ACL_RING_FIRST_APPL
 
 /**
- * 返回数据环中最后一个环元素指针
- * @param head {ACL_RING*} 环头指针
- * @return {ACL_RING*} NULL: 环为空
+ * Get last element pointer in ring buffer.
+ * @param head {ACL_RING*} Head pointer
+ * @return {ACL_RING*} NULL: ring is empty
  */
 #define ACL_RING_LAST(head) \
        (acl_ring_pred(head) != (head) ? acl_ring_pred(head) : 0)
@@ -188,11 +192,12 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 #define	acl_ring_last		ACL_RING_LAST
 
 /**
- * 返回数据环中最后一个环元素指针同时将其转换应用自定义结构类型的对象地址
- * @param head {ACL_RING*} 环头指针
- * @param app_type 应用自定义结构类型
- * @param ring_member {ACL_RING*} 环元素在应用自定义结构中的成员名称
- * @return {app_type*} 应用自定义结构类型的对象地址
+ * Get last element pointer in ring buffer and simultaneously convert to
+ * application's custom object structure type's object address.
+ * @param head {ACL_RING*} Head pointer
+ * @param app_type Application's custom object structure type
+ * @param ring_member {ACL_RING*} Element member name in application's custom object structure
+ * @return {app_type*} Application's custom object structure type's object address
  */
 #define ACL_RING_LAST_APPL(head, app_type, ring_member) \
        (acl_ring_pred(head) != (head) ? \
@@ -201,9 +206,9 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 #define	acl_ring_last_appl	ACL_RING_LAST_APPL
 
 /**
- * 将一个新元素添加进环的尾部
- * @param ring {ACL_RING*} 数据环
- * @param entry {ACL_RING*} 新的元素
+ * Insert a new element before ring tail.
+ * @param ring {ACL_RING*} Ring buffer
+ * @param entry {ACL_RING*} New element
  */
 #define	ACL_RING_APPEND(ring_in, entry_in) do {  \
 	ACL_RING *ring_ptr = (ring_in), *entry_ptr = (entry_in);  \
@@ -216,9 +221,9 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 } while (0)
 
 /**
- * 将一个新元素添加进环的头部
- * @param ring {ACL_RING*} 数据环
- * @param entry {ACL_RING*} 新的元素
+ * Insert a new element before ring head.
+ * @param ring {ACL_RING*} Ring buffer
+ * @param entry {ACL_RING*} New element
  */
 #define	ACL_RING_PREPEND(ring_in, entry_in) do {  \
 	ACL_RING *ring_ptr = (ring_in), *entry_ptr = (entry_in);  \
@@ -231,8 +236,8 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 } while (0)
 
 /**
- * 将一个环元素从数据环中删除
- * @param entry {ACL_RING*} 环元素
+ * Remove a certain element from ring buffer.
+ * @param entry {ACL_RING*} Element
  */
 #define	ACL_RING_DETACH(entry_in) do {  \
 	ACL_RING   *succ, *pred, *entry_ptr = (entry_in);  \
@@ -251,4 +256,3 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 #endif
 
 #endif
-

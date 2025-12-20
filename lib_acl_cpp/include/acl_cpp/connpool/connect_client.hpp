@@ -17,7 +17,7 @@ public:
 	virtual ~connect_client() {}
 
 	/**
-	 * 获得该连接对象最近一次被使用的时间截
+	 * Get the timestamp when this connection object was last used
 	 * @return {time_t}
 	 */
 	time_t get_when() const {
@@ -25,21 +25,24 @@ public:
 	}
 
 	/**
-	 * 设置该连接对象当前被使用的时间截
+	 * Set the timestamp when this connection object is currently being used
 	 */
 	void set_when(time_t when) {
 		when_ = when;
 	}
 
 	/**
-	 * 纯虚函数，子类必须实现此函数用于连接服务器
-	 * @return {bool} 是否连接成功
+	 * Pure virtual function, subclasses must implement this function to connect to
+	 * the server
+	 * @return {bool} Whether the connection was successful
 	 */
 	virtual bool open() = 0;
 
 	/**
-	 * 虚函数，子类可实现本方法，用来表明当前连接是否正常，以方便连接池对象在检测
-	 * 连接存活性时自动关闭断开的连接
+	 * Virtual function, subclasses can implement this method to indicate whether
+	 * the current connection is normal,
+	 * so that the connection pool object can automatically close disconnected
+	 * connections when detecting connection liveness
 	 * @return {bool}
 	 */
 	virtual bool alive() {
@@ -47,8 +50,9 @@ public:
 	}
 
 	/**
-	 * 获得连接池对象引用，在 connect_pool 内部创建
-	 * 连接对象会调用 set_pool 设置连接池对象句柄
+	 * Get the connection pool object reference, created inside connect_pool
+	 * The connection object will call set_pool to set the connection pool object
+	 * handle
 	 * @return {connect_pool*}
 	 */
 	connect_pool* get_pool() const {
@@ -57,10 +61,11 @@ public:
 
 //public:
 	/**
-	 * 虚函数，该函数设置网络连接超时时间及网络 IO 超时时间，子类可以重载该虚函数，
-	 * 以便于设置内部的对象超时时间
-	 * @param conn_timeout {int} 网络连接超时时间(秒)
-	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
+	 * Virtual function, this function sets the network connection timeout and
+	 * network IO timeout,
+	 * subclasses can override this virtual function to set internal object timeout
+	 * @param conn_timeout {int} Network connection timeout (seconds)
+	 * @param rw_timeout {int} Network IO timeout (seconds)
 	 */
 	virtual void set_timeout(int conn_timeout, int rw_timeout) {
 		conn_timeout_ = conn_timeout;
@@ -82,3 +87,4 @@ protected:
 };
 
 } // namespace acl
+

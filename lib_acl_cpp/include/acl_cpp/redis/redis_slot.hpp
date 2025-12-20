@@ -9,15 +9,15 @@ namespace acl {
 class ACL_CPP_API redis_slot {
 public:
 	/**
-	 * 构造函数
+	 * Constructor
 	 * constructor
-	 * @param slot_min {size_t} 最小哈希槽值
+	 * @param slot_min {size_t} Minimum hash slot value
 	 *  the min hash-slot
-	 * @param slot_max {size_t} 最大哈希槽值
+	 * @param slot_max {size_t} Maximum hash slot value
 	 *  the max hash-slot
-	 * @param ip {const char*} 当前 redis-server 的 IP 地址
+	 * @param ip {const char*} IP address of the current redis-server
 	 *  the given redis-server's ip
-	 * @param port {int} 当前 redis-server 的监听端口
+	 * @param port {int} Listening port of the current redis-server
 	 *  the listening port of the given redis-server
 	 */
 	redis_slot(size_t slot_min, size_t slot_max, const char* ip, int port);
@@ -26,15 +26,15 @@ public:
 	~redis_slot();
 
 	/**
-	 * 将一个 redis 哈希槽从结点添加至当前结点中
+	 * Add a redis hash slot slave node to the current node
 	 * add a slave slot node to the current node
-	 * @param node {redis_slot*} 一个存储哈希槽的从结点
+	 * @param node {redis_slot*} A slave node storing hash slots
 	 *  the slave slot node
 	 */
 	redis_slot& add_slave(redis_slot* node);
 
 	/**
-	 * 获得当前哈希槽结点的所有从结点
+	 * Get all slave nodes of the current hash slot node
 	 * get the slave nodes of the current node
 	 * @return {const std::vector<redis_slot*>&}
 	 */
@@ -43,7 +43,7 @@ public:
 	}
 
 	/**
-	 * 获得当前结点的 IP 地址
+	 * Get the IP address of the current node
 	 * get the ip of the current node
 	 * @return {const char*}
 	 */
@@ -52,7 +52,7 @@ public:
 	}
 
 	/**
-	 * 获得当前结点的端口号
+	 * Get the port number of the current node
 	 * get the port of the current node
 	 * @return {int}
 	 */
@@ -61,7 +61,7 @@ public:
 	}
 
 	/**
-	 * 获得当前哈希槽结点的最小值
+	 * Get the minimum value of the current hash slot node
 	 * get the min hash slot of the current node
 	 * @return {size_t}
 	 */
@@ -70,7 +70,7 @@ public:
 	}
 
 	/**
-	 * 获得当前哈希槽结点的最大值
+	 * Get the maximum value of the current hash slot node
 	 * get the max hash slot of the current node
 	 * @return {size_t}
 	 */
@@ -90,3 +90,4 @@ private:
 } // namespace acl
 
 #endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
+

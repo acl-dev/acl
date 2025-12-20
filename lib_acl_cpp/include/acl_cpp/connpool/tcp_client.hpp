@@ -15,13 +15,14 @@ public:
 	virtual ~tcp_client();
 
 	/**
-	 * 向服务器发送指定长度的数据包
-	 * @param data {const void*} 要发送的数据包地址
-	 * @param len {unsigned int} 数据长度
-	 * @param out {string*} 当该对象非 NULL 时表明需要从服务器读取响应数据，
-	 *  响应结果将被存放在该缓冲区中，如果该对象为 NULL，则表示无需读取
-	 *  服务器的响应数据
-	 * @return {bool} 发送是否成功
+	 * Send a data packet of specified length to the server
+	 * @param data {const void*} Address of the data packet to send
+	 * @param len {unsigned int} Data length
+	 * @param out {string*} When this object is not NULL, it indicates that
+	 * response data needs to be read from the server.
+	 * The response result will be stored in this buffer. If this object is NULL,
+	 * it means there is no need to read the server's response data
+	 * @return {bool} Whether the send was successful
 	 */
 	bool send(const void* data, unsigned int len, string* out = NULL);
 

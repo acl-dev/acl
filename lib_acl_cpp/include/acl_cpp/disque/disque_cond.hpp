@@ -4,45 +4,38 @@
 
 #ifndef ACL_CLIENT_ONLY
 
-namespace acl
-{
+namespace acl {
 
 /**
- * 在添加任务时，此类指定的任务的添加条件限定
+ * When adding tasks, this class specifies the condition constraints for task
+ * addition
  */
-class ACL_CPP_API disque_cond : public noncopyable
-{
+class ACL_CPP_API disque_cond : public noncopyable {
 public:
 	disque_cond();
 	~disque_cond();
 
-	int get_replicate() const
-	{
+	int get_replicate() const {
 		return replicate_;
 	}
 
-	int get_delay() const
-	{
+	int get_delay() const {
 		return delay_;
 	}
 
-	int get_retry() const
-	{
+	int get_retry() const {
 		return retry_;
 	}
 
-	int get_ttl() const
-	{
+	int get_ttl() const {
 		return ttl_;
 	}
 
-	int get_maxlen() const
-	{
+	int get_maxlen() const {
 		return maxlen_;
 	}
 
-	bool is_async() const
-	{
+	bool is_async() const {
 		return async_;
 	}
 
@@ -65,3 +58,4 @@ private:
 } // namespace acl
 
 #endif // ACL_CLIENT_ONLY
+

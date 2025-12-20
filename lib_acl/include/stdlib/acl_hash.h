@@ -9,9 +9,9 @@ extern "C" {
 #include <stdlib.h>
 
 /**
- * 哈希函数类型定义
- * @param buf 需要被哈希的数据缓冲区地址
- * @param len buf 的长度
+ * Hash function type definition.
+ * @param buf Data buffer or string to hash
+ * @param len buf length
  */
 typedef unsigned (*ACL_HASH_FN)(const void *buf, size_t len);
 
@@ -31,4 +31,3 @@ ACL_API unsigned acl_hash_func6(const void *buf, size_t len);
 #endif
 
 #endif
-

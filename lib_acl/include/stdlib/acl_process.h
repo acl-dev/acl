@@ -8,15 +8,16 @@ extern "C" {
 #include "acl_define.h"
 
 /**
- * 程序运行过程中获得可执行程序存储于文件系统中的全路径
- * @return {const char*} NULL: 无法获得; != NULL: 返回值即是程序在
- *    文件系统上的存储全路径
+ * Get the full path of the currently running executable program stored in the file system.
+ * @return {const char*} NULL: cannot get; != NULL: return value is the executable
+ *  program's full storage path in the file system
  */
 ACL_API const char *acl_process_path(void);
 
 /**
- * 程序运行过程中获得其运行路径
- * @return {const char*} NULL: 无法获得; != NULL: 返回值即为程序的运行路径
+ * Get the current working directory path.
+ * @return {const char*} NULL: cannot get; != NULL: return value is the current
+ *  working directory path
  */
 ACL_API const char *acl_getcwd(void);
 

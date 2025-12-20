@@ -9,21 +9,22 @@ extern "C" {
 #include "../stdlib/acl_vstring.h"
 
 /**
- * BASE64 编码函数
- * @param vp {ACL_VSTRING*} 存储编码后结果
- * @param in {const char*} 源数据
- * @param len {int} in 源数据的长度
- * @return {ACL_VSTRING*} 与 vp 相同
+ * BASE64 encoding function.
+ * @param vp {ACL_VSTRING*} Storage buffer object
+ * @param in {const char*} Source data
+ * @param len {int} in source data length
+ * @return {ACL_VSTRING*} Same as vp
  */
 ACL_API ACL_VSTRING *acl_vstring_base64_encode(ACL_VSTRING *vp,
 	const char *in, int len);
 
 /**
- * BASE64 解码函数
- * @param vp {ACL_VSTRING*} 存储解码后结果
- * @param in {const char*} 编码后的数据
- * @param len {int} in 数据长度
- * @return {ACL_VSTRING*} NULL: 解码失败; !=NULL: 解码成功且与 vp 相同地址
+ * BASE64 decoding function.
+ * @param vp {ACL_VSTRING*} Storage buffer object
+ * @param in {const char*} Encoded data string
+ * @param len {int} in data length
+ * @return {ACL_VSTRING*} NULL: decoding failed; !=NULL:
+ *  decoding succeeded, same address as vp
  */
 ACL_API ACL_VSTRING *acl_vstring_base64_decode(ACL_VSTRING *vp,
 	const char *in, int len);

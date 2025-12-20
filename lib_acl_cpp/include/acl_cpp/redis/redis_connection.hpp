@@ -9,8 +9,8 @@ namespace acl {
 class redis_client;
 
 /**
- * redis Connection 类，包含命令如下：
- * AUTH、ECHO、PING、QUIT、SELECT
+ * redis Connection class, including commands as below:
+ * AUTH, ECHO, PING, QUIT, SELECT
  * redis connection command clss, including as below:
  * AUTH, ECHO, PING, QUIT, SELECT
  */
@@ -41,43 +41,45 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 连接至 redis-server 时进行身份验证
+	 * Authenticate when connecting to redis-server.
 	 * AUTH command to login the redis server.
-	 * @param passwd {const char*} 在 redis 配置文件中指定的认证密码
+	 * @param passwd {const char*} Authentication password specified in redis
+	 * configuration file.
 	 *  the password in redis-server configure
-	 * @return {bool} 身份认证是否成功，返回 false 表示认证失败或操作失败
+	 * @return {bool} Whether authentication was successful. Returns false to
+	 * indicate authentication failed or operation failed.
 	 *  return true if success, or false because auth failed or error.
 	 */
 	bool auth(const char* passwd);
 
 	/**
-	 * 选择 redis-server 中的数据库 ID
+	 * Select database ID in redis-server.
 	 * SELECT command to select the DB id in redis-server
-	 * @param dbnum {int} redis 数据库 ID
+	 * @param dbnum {int} redis database ID.
 	 *  the DB id
-	 * @return {bool} 操作是否成功
+	 * @return {bool} Whether operation was successful.
 	 *  return true if success, or false for failed.
 	 */
 	bool select(int dbnum);
 
 	/**
-	 * 探测 redis 连接是否正常
+	 * Probe whether redis connection is normal.
 	 * PING command for testing if the connection is OK
-	 * @return {bool} 连接是否正常
+	 * @return {bool} Whether connection is normal.
 	 *  return true if success
 	 */
 	bool ping();
 
 	/**
-	 * 测试用命令，让 redis-server 回显给定字符串
+	 * Test command, let redis-server echo given string.
 	 * ECHO command, request redis-server to echo something.
-	 * @return {bool} 操作是否成功
+	 * @return {bool} Whether operation was successful.
 	 *  return true if success
 	 */
 	bool echo(const char* s);
 
 	/**
-	 * 关闭 redis 连接
+	 * Close redis connection.
 	 * QUIT command to close the redis connection
 	 * @return {bool}
 	 *  return true if success

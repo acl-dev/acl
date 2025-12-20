@@ -14,10 +14,11 @@ size_t mbox_nsend(void*);
 size_t mbox_nread(void*);
 
 /**
- * 可用于在线程之间、协程之间进行通信的类，内部实现采用无锁队列 + IO 通信相
- * 结合方式实现
+ * Class that can be used for communication between threads and between
+ * coroutines. Internal implementation uses lock-free queue + IO communication
+ * combined approach
  *
- * 示例:
+ * Example:
  *
  * class myobj {
  * public:
@@ -50,10 +51,11 @@ template<typename T>
 class mbox : public box<T> {
 public:
 	/**
-	 * 构造方法
-	 * @param free_obj {bool} 当 tbox 销毁时，是否自动检查并释放
-	 *  未被消费的动态对象
-	 * @param mpsc {bool} 是否为多生产者-单消费者模式
+	 * Constructor
+	 * @param free_obj {bool} When tbox is destroyed, whether to automatically
+	 * check and release
+	 *  unconsumed dynamic objects
+	 * @param mpsc {bool} Whether it is multi-producer-single-consumer mode
 	 */
 	explicit mbox(bool free_obj = true, bool mpsc = true)
 	: free_obj_(free_obj)
@@ -67,9 +69,9 @@ public:
 	}
 
 	/**
-	 * 发送消息对象
-	 * @param t {T*} 非空消息对象
-	 * @return {bool} 发送是否成功
+	 * Send message object
+	 * @param t {T*} Non-empty message object
+	 * @return {bool} Whether send was successful
 	 * @override
 	 */
 	bool push(T* t, bool dummy = false) {
@@ -78,12 +80,14 @@ public:
 	}
 
 	/**
-	 * 接收消息对象
-	 * @param ms {int} >= 0 时设置读等待超时时间(毫秒级别)，否则
-	 *  永远等待直到读到消息对象或出错
-	 * @param success {bool*} 可以用于辅助确定读操作是否成功
-	 * @return {T*} 非 NULL 表示读到一个消息对象，为 NULL 时，还需通过
-	 *  success 参数的返回值检查操作是否成功
+	 * Receive message object
+	 * @param ms {int} When >= 0, set read wait timeout (milliseconds), otherwise
+	 *  wait forever until message object is read or error occurs
+	 * @param success {bool*} Can be used to help determine whether read operation
+	 * was successful
+	 * @return {T*} Non-NULL indicates a message object was read. When NULL, need
+	 * to check through
+	 *  success parameter return value whether operation was successful
 	 * @override
 	 */
 	T* pop(int ms = -1, bool* success = NULL) {
@@ -110,7 +114,7 @@ public:
 	}
 
 	/**
-	 * mbox 不支持传递空消息
+	 * mbox does not support passing null messages
 	 * @return {bool}
 	 * @override
 	 */
@@ -119,7 +123,7 @@ public:
 	}
 
 	/**
-	 * 统计当前已经发送的消息数
+	 * Count the number of messages currently sent
 	 * @return {size_t}
 	 */
 	size_t push_count() const {
@@ -127,7 +131,7 @@ public:
 	}
 
 	/**
-	 * 统计当前已经接收到的消息数
+	 * Count the number of messages currently received
 	 * @return {size_t}
 	 */
 	size_t pop_count() const {
@@ -145,3 +149,4 @@ private:
 };
 
 } // namespace acl
+

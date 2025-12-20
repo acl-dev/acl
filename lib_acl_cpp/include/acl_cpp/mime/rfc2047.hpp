@@ -11,106 +11,114 @@ class string;
 class mime_code;
 
 struct rfc2047_entry {
-	string* pData;		// 数据内容
-	string* pCharset;	// 字符集
-	char  coding;		// 编码格式，B 表示 BASE64, Q 表示 QP
+	string* pData;		// Data content
+	string* pCharset;	// Character set
+	char  coding;		// Encoding format, B indicates BASE64, Q indicates QP
 };
 
 class ACL_CPP_API rfc2047 : public noncopyable {
 public:
 	/**
-	 * 构造函数
-	 * @param strip_sp {bool} 在解码过程中是否去掉回车换行符及每行开头的
-	 *  空格及TAB
-	 * @param addCrlf {bool} 在编码过程中当数据比较长时是否自动添加 "\r\n"
+	 * Constructor
+	 * @param strip_sp {bool} Whether to remove carriage return line feed and
+	 * spaces and TABs at beginning of each line during decoding process
+	 * @param addCrlf {bool} Whether to automatically add "\r\n" when data is
+	 * relatively long during encoding process
 	 */
 	rfc2047(bool strip_sp = true, bool addCrlf = true);
 	~rfc2047();
 
 	/**
-	 * 流式解析数据, 可以循环调用此函数, 每次添加部分数据
-	 * 直至添加完毕
-	 * @param in {const char*} 输入源字符串
-	 * @param n {int} in 输入串的长度
+	 * Stream parsing data. Can call this function in a loop, adding partial data
+	 * each time
+	 * until adding is complete
+	 * @param in {const char*} Input source string
+	 * @param n {int} Length of in input string
 	 */
 	void decode_update(const char* in, int n);
 
 	/**
-	 * 将 rfc2047 解析结果转换成指定的字符集字符串, 如果不能
-	 * 正确转换则保留源串内容
-	 * @param to_charset {const char*} 目标字符集
-	 * @param out {string*} 存储转换结果
-	 * @param addInvalid {bool} 当为 true 时，则转码过程中如果遇到了
-	 *  非法字符集，则直接拷贝，否则则跳过，默认情况下是直接拷贝
-	 * @return {bool} 转换是否成功
+	 * Convert rfc2047 parsing result to specified character set string. If cannot
+	 * correctly convert, retains source string content
+	 * @param to_charset {const char*} Target character set
+	 * @param out {string*} Store conversion result
+	 * @param addInvalid {bool} When true, during transcoding process, if illegal
+	 * character set is encountered, directly copy, otherwise skip. By default,
+	 * directly copy
+	 * @return {bool} Whether conversion was successful
 	 */
 	bool decode_finish(const char* to_charset, string* out,
 		bool addInvalid = true);
 
 	/**
-	 * rfc2047 编码过程中添加数据
-	 * @param in {const char*} 输入数据
-	 * @param n {int} in 数据长度
-	 * @param out {string*} 存储编码结果
-	 * @param charset {const char*} 输入数据的字符集类型
-	 * @param coding {char} 编码类型，支持的编码类型有:
+	 * Add data during rfc2047 encoding process
+	 * @param in {const char*} Input data
+	 * @param n {int} in data length
+	 * @param out {string*} Store encoding result
+	 * @param charset {const char*} Character set type of input data
+	 * @param coding {char} Encoding type. Supported encoding types:
 	 *   B: base64, Q: quoted_printable
-	 * @return {bool} 检查输入参数是否正确且编码是否成功
+	 * @return {bool} Whether input parameters are correct and encoding was
+	 * successful
 	 */
 	bool encode_update(const char* in, int n, string* out,
 		const char* charset = "gb2312", char coding = 'B');
 
 	/**
-	 * 将 encode_update 添加的数据进行编码后存储于用户指定缓冲区
-	 * @param  out {string*} 存储编码结果的用户缓冲区
-	 * @return {bool} 是否成功
+	 * Encode data added by encode_update and store in user-specified buffer
+	 * @param  out {string*} User buffer for storing encoding result
+	 * @return {bool} Whether successful
 	 */
 	bool encode_finish(string* out);
 
 	/**
-	 * 静态编码器
-	 * @param in {const char*} 输入数据地址
-	 * @param n {int} 数据长度
-	 * @param out {string*} 存储编码结果的缓冲区
-	 * @param charset {const char*} 输入数据的字符集
-	 * @param coding {char} 编码类型，支持的编码类型有:
+	 * Static encoder
+	 * @param in {const char*} Input data address
+	 * @param n {int} Data length
+	 * @param out {string*} Buffer for storing encoding result
+	 * @param charset {const char*} Character set of input data
+	 * @param coding {char} Encoding type. Supported encoding types:
 	 *   B: base64, Q: quoted_printable
-	 * @param addCrlf {bool} 在编码过程中当数据比较长时是否自动添加 "\r\n"
-	 * @return {bool} 编码是否成功
+	 * @param addCrlf {bool} Whether to automatically add "\r\n" when data is
+	 * relatively long during encoding process
+	 * @return {bool} Whether encoding was successful
 	 */
 	static bool encode(const char* in, int n, string* out,
 		const char* charset = "gb2312", char coding = 'B',
 		bool addCrlf = true);
 
 	/**
-	 * 静态解码器
-	 * @param in {const char*} 输入数据地址
-	 * @param n {int} 数据长度
-	 * @param out {string*} 存储解码结果的缓冲区
-	 * @param to_charset {const char*} 目标字符集
-	 * @param strip_sp {bool} 是否去掉回车换行符及每行开头的空格及TAB
-	 * @param addInvalid {bool} 当为 true 时，则转码过程中如果遇到了
-	 *  非法字符集，则直接拷贝，否则则跳过，默认情况下是直接拷贝
-	 * @return {bool} 解码是否成功
+	 * Static decoder
+	 * @param in {const char*} Input data address
+	 * @param n {int} Data length
+	 * @param out {string*} Buffer for storing decoding result
+	 * @param to_charset {const char*} Target character set
+	 * @param strip_sp {bool} Whether to remove carriage return line feed and
+	 * spaces and TABs at beginning of each line
+	 * @param addInvalid {bool} When true, during transcoding process, if illegal
+	 * character set is encountered, directly copy, otherwise skip. By default,
+	 * directly copy
+	 * @return {bool} Whether decoding was successful
 	 */
 	static bool decode(const char* in, int n, string* out,
 		const char* to_charset = "gb2312", bool strip_sp = false,
 		bool addInvalid = true);
 
 	/**
-	 * 将解析结果以链表的形式给出
+	 * Give parsing result in linked list form
 	 * @return {const std::list<rfc2047_entry*>&}
 	 */
 	const std::list<rfc2047_entry*>& get_list() const;
 
 	/**
-	 * 重置解析器状态后, 该解析器可再次使用
-	 * @param strip_sp {bool} 是否去掉回车换行符及每行开头的空格及TAB
+	 * After resetting parser state, this parser can be used again
+	 * @param strip_sp {bool} Whether to remove carriage return line feed and
+	 * spaces and TABs at beginning of each line
 	 */
 	void reset(bool strip_sp = true);
 
 	/**
-	 * 调试输出解析结果
+	 * Debug output parsing result
 	 */
 	void debug_rfc2047() const;
 
@@ -124,7 +132,7 @@ private:
 	char  m_lastCh;
 
 public:
-	// 以下函数仅内部使用
+	// The following functions are only for internal use
 
 	int status_next(const char* s, int n);
 	int status_data(const char* s, int n);
@@ -139,3 +147,4 @@ public:
 } // namespace acl
 
 #endif // !defined(ACL_MIME_DISABLE)
+

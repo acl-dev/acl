@@ -155,44 +155,60 @@ class fstream;
 class ACL_CPP_API xml2 : public xml {
 public:
 	/**
-	 * 构造函数，使 xml 对象树创建在指定内存映射文件上
-	 * @param filepath {const char*} 内存映射文件名
-	 * @param max_len {size_t} 内存映射文件的最大大小，即内存映射文件在自动
-	 *  增长时不应超过此大小
-	 * @param data {const char*} 非空时自动调用解析过程
-	 * @param init_len {size_t} 内存映射文件创建时的初始大小
-	 * @param dbuf_nblock {size_t} 内部所用 dbuf_guard 的初始化参数
-	 * @param dbuf_capacity {size_t} 内部所用 dbuf_guard 的初始化参数
+	 * Constructor, create XML object tree on specified memory-mapped file
+	 * @param filepath {const char*} Memory-mapped filename
+	 * @param max_len {size_t} Maximum size of memory-mapped file, i.e.,
+	 * memory-mapped file should not exceed
+	 *  this size when automatically growing
+	 * @param data {const char*} When not empty, automatically calls parsing
+	 * process
+	 * @param init_len {size_t} Initial size when memory-mapped file is created
+	 * @param dbuf_nblock {size_t} Initialization parameter for internally used
+	 * dbuf_guard
+	 * @param dbuf_capacity {size_t} Initialization parameter for internally used
+	 * dbuf_guard
 	 */
 	xml2(const char* filepath, size_t max_len, const char* data = NULL,
 		size_t init_len = 8192, size_t dbuf_nblock = 2,
 		size_t dbuf_capacity = 100);
 
 	/**
-	 * 构造函数，使 xml 对象树创建在指定内存映射文件上
-	 * @param fp {fstream&} 内存映射文件句柄，该文件句柄应在本 xml 对象
-	 *  释放前一直保持打开状态，即 fp 必须在 xml 对象释放后才可以关闭
-	 * @param max_len {size_t} 内存映射文件的最大大小，即内存映射文件在自动
-	 *  增长时不应超过此大小
-	 * @param data {const char*} 非空时自动调用解析过程
-	 * @param init_len {size_t} 内存映射文件创建时的初始大小
-	 * @param dbuf_nblock {size_t} 内部所用 dbuf_guard 的初始化参数
-	 * @param dbuf_capacity {size_t} 内部所用 dbuf_guard 的初始化参数
+	 * Constructor, create XML object tree on specified memory-mapped file
+	 * @param fp {fstream&} Memory-mapped file handle. This file handle should
+	 * remain open
+	 * until this xml object is released, i.e., fp must be closed only after xml
+	 * object is released
+	 * @param max_len {size_t} Maximum size of memory-mapped file, i.e.,
+	 * memory-mapped file should not exceed
+	 *  this size when automatically growing
+	 * @param data {const char*} When not empty, automatically calls parsing
+	 * process
+	 * @param init_len {size_t} Initial size when memory-mapped file is created
+	 * @param dbuf_nblock {size_t} Initialization parameter for internally used
+	 * dbuf_guard
+	 * @param dbuf_capacity {size_t} Initialization parameter for internally used
+	 * dbuf_guard
 	 */
 	xml2(fstream& fp, size_t max_len, const char* data = NULL,
 		size_t init_len = 8192, size_t dbuf_nblock = 2,
 		size_t dbuf_capacity = 100);
 
 	/**
-	 * 构造函数，使 xml 对象树创建在指定内存映射文件上
-	 * @param fd {ACL_FILE_HANDLE} 内存映射文件句柄，该文件句柄应在本 xml
-	 *  对象释放前一直保持打开状态，即 fp 必须在 xml 对象释放后才可以关闭
-	 * @param max_len {size_t} 内存映射文件的最大大小，即内存映射文件在自动
-	 *  增长时不应超过此大小
-	 * @param data {const char*} 非空时自动调用解析过程
-	 * @param init_len {size_t} 内存映射文件创建时的初始大小
-	 * @param dbuf_nblock {size_t} 内部所用 dbuf_guard 的初始化参数
-	 * @param dbuf_capacity {size_t} 内部所用 dbuf_guard 的初始化参数
+	 * Constructor, create XML object tree on specified memory-mapped file
+	 * @param fd {ACL_FILE_HANDLE} Memory-mapped file handle. This file handle
+	 * should remain open
+	 * until this xml object is released, i.e., fp must be closed only after xml
+	 * object is released
+	 * @param max_len {size_t} Maximum size of memory-mapped file, i.e.,
+	 * memory-mapped file should not exceed
+	 *  this size when automatically growing
+	 * @param data {const char*} When not empty, automatically calls parsing
+	 * process
+	 * @param init_len {size_t} Initial size when memory-mapped file is created
+	 * @param dbuf_nblock {size_t} Initialization parameter for internally used
+	 * dbuf_guard
+	 * @param dbuf_capacity {size_t} Initialization parameter for internally used
+	 * dbuf_guard
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	xml2(void* fd,  size_t max_len, const char* data = NULL,
@@ -353,3 +369,4 @@ private:
 };
 
 } // namespace acl
+

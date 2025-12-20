@@ -10,40 +10,47 @@ class mime_code;
 class ostream;
 
 /**
- * 撰写邮件时，此类用于创建与邮件附件相关的功能
+ * When composing emails, this class is used to create functionality related to
+ * email attachments
  */
 class ACL_CPP_API mail_attach
 {
 public:
 	/**
-	 * 将一个普通文件打包进邮件时的构造函数
-	 * @param filepath {const char*} 附件文件存储路径（含文件名）
-	 * @param content_type {const char*} 附件文件类型
-	 * @param charset {const char*} 若为纯文件，此参数表明纯文本的字符集
+	 * Constructor when packaging a regular file into email
+	 * @param filepath {const char*} Attachment file storage path (including
+	 * filename)
+	 * @param content_type {const char*} Attachment file type
+	 * @param charset {const char*} If it is a plain file, this parameter indicates
+	 * the character set of plain text
 	 */
 	mail_attach(const char* filepath, const char* content_type,
 		const char* charset);
 	~mail_attach();
 
 	/**
-	 * 设置附件的文件名，内部会自动对文件名用 rfc2047 格式进行编码
-	 * @param name {const char*} 非空字符串
-	 * @param charset {const char*} 该参数指定字符集，当非 NULL 时，则内
-	 *  部自动使用 rfc2047 格式对文件名进行编码，否则内部直接存储输入名称
+	 * Set attachment filename. Internally will automatically encode filename in
+	 * rfc2047 format
+	 * @param name {const char*} Non-empty string
+	 * @param charset {const char*} This parameter specifies character set. When
+	 * not NULL, then internally
+	 * automatically uses rfc2047 format to encode filename, otherwise internally
+	 * directly stores input name
 	 * @return {mail_attach&}
 	 */
 	mail_attach& set_filename(const char* name, const char* charset = NULL);
 
 	/**
-	 * 当邮件中的数据体为 multipart/relative 类型时，调用此函数设置其中的
-	 * html 正文中 cid 标识符
-	 * @param id {const char*} cid 标识符
+	 * When email data body is multipart/relative type, call this function to set
+	 * cid identifier
+	 * in html body
+	 * @param id {const char*} cid identifier
 	 * @return {mail_attach&}
 	 */
 	mail_attach& set_content_id(const char* id);
 
 	/**
-	 * 获得构造函数传入的附件文件路径
+	 * Get attachment file path passed in constructor
 	 * @return {const char*}
 	 */
 	const char* get_filepath() const
@@ -52,7 +59,7 @@ public:
 	}
 
 	/**
-	 * 获得附件的文件名部分经 rfc2047 编码后名称
+	 * Get filename part of attachment after rfc2047 encoding
 	 * @return {const char*}
 	 */
 	const char* get_filename() const
@@ -61,7 +68,7 @@ public:
 	}
 
 	/**
-	 * 获得构造函数传入的文件类型
+	 * Get file type passed in constructor
 	 * @return {const char*}
 	 */
 	const char* get_content_type() const
@@ -70,7 +77,7 @@ public:
 	}
 
 	/**
-	 * 获得由 set_content_id 设置的该附件的 cid 标识符
+	 * Get cid identifier of this attachment set by set_content_id
 	 * @return {const char*}
 	 */
 	const char* get_content_id() const
@@ -79,25 +86,27 @@ public:
 	}
 
 	/**
-	 * 将附件内容采用传入的编码器进行编码后存入内存缓冲区
-	 * @param coder {mime_code*} 编码器（base64/qp等）
-	 * @param out {string&} 存储结果，采用 append 方式
-	 * @return {bool} 编码过程是否成功
+	 * Encode attachment content using the passed encoder and store in memory
+	 * buffer
+	 * @param coder {mime_code*} Encoder (base64/qp, etc.)
+	 * @param out {string&} Store result, using append method
+	 * @return {bool} Whether encoding process was successful
 	 */
 	bool save_to(mime_code* coder, string& out);
 
 	/**
-	 * 将附件内容采用传入的编码器进行编码后存入输出流中
-	 * @param coder {mime_code*} 编码器（base64/qp等）
-	 * @param out {out&} 存储结果
-	 * @return {bool} 编码过程是否成功
+	 * Encode attachment content using the passed encoder and store in output
+	 * stream
+	 * @param coder {mime_code*} Encoder (base64/qp, etc.)
+	 * @param out {out&} Store result
+	 * @return {bool} Whether encoding process was successful
 	 */
 	bool save_to(mime_code* coder, ostream& out);
 
 	/**
-	 * 创建该附件在 MIME 邮件中的文件头信息
-	 * @param transfer_encoding {const char*} 编码方式
-	 * @param out {string&} 存储结果，采用 append 方式
+	 * Create file header information for this attachment in MIME email
+	 * @param transfer_encoding {const char*} Encoding method
+	 * @param out {string&} Store result, using append method
 	 */
 	void build_header(const char* transfer_encoding, string& out);
 
@@ -114,3 +123,4 @@ private:
 } // namespace acl
 
 #endif // !defined(ACL_MIME_DISABLE)
+

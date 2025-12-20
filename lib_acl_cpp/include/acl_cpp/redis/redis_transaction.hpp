@@ -35,106 +35,119 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 监视一个(或多个) key ，如果在事务执行之前这个(或这些) key 被其他命令所改动，
-	 * 那么事务将被打断
+	 * Watch one (or more) key(s). If this (or these) key(s) are modified by other
+	 * commands before transaction execution,
+	 * then the transaction will be aborted
 	 * watch the given keys to determine execution of the MULTI/EXEC
 	 * block, before EXEC some of the given keys were changed outer,
 	 * the transaction will break
-	 * @param keys {const std::vector<string>&} key 集合
+	 * @param keys {const std::vector<string>&} Key collection
 	 *  the given keys collection
-	 * @return {bool} 操作是否成功，即使 key 集合中的有 key 不存在也会返回成功
+	 * @return {bool} Whether operation was successful. Even if some keys in key
+	 * collection do not exist, will still return success
 	 *  if success of this operation
 	 */
 	bool watch(const std::vector<string>& keys);
 
 	/**
-	 * 取消 WATCH 命令对所有 key 的监视
+	 * Cancel WATCH command's monitoring of all keys
 	 * forget about all watched keys
-	 * @return {bool} 操作是否成功
+	 * @return {bool} Whether operation was successful
 	 * if success of this operation
 	 */
 	bool unwatch();
 
 	/**
-	 * 标记一个事务块的开始，事务块内的多条命令会按照先后顺序被放进一个队列当中，
-	 * 最后由 EXEC 命令原子性(atomic)地执行
+	 * Mark the start of a transaction block. Multiple commands within the
+	 * transaction block will be placed in a queue in order,
+	 * and finally executed atomically by EXEC command
 	 * mark the start of a transaction block
-	 * @return {bool} 操作是否成功
+	 * @return {bool} Whether operation was successful
 	 *  if success of this operation
 	 */
 	bool multi();
 
 	/**
-	 * 执行所有事务块内的命令，假如某个(或某些) key 正处于 WATCH 命令的监视之下，
-	 * 且事务块中有和这个(或这些) key 相关的命令，那么 EXEC 命令只在这个(或这些)
-	 * key 没有被其他命令所改动的情况下执行并生效，否则该事务被打断(abort)；
-	 * 在执行本条命令成功后，可以调用下面的 get_size()/get_child() 获得每条命令的
-	 * 操作结果
+	 * Execute all commands within the transaction block. If some key(s) are being
+	 * monitored by WATCH command,
+	 * and there are commands related to this (or these) key(s) in the transaction
+	 * block, then EXEC command will only execute and take effect
+	 * when this (or these) key(s) have not been modified by other commands,
+	 * otherwise the transaction is aborted;
+	 * After successfully executing this command, can call get_size()/get_child()
+	 * below to get operation result of each command
 	 * execute all commands issued after MULTI
-	 * @return {bool} 操作是否成功
+	 * @return {bool} Whether operation was successful
 	 *  if success of this operation
 	 */
 	bool exec();
 
 	/**
-	 * 取消事务，放弃执行事务块内的所有命令，如果正在使用 WATCH 命令监视某个(或某些)
-	 * key，那么取消所有监视，等同于执行命令 UNWATCH
+	 * Cancel transaction, abandon execution of all commands within the transaction
+	 * block. If currently using WATCH command to monitor some key(s),
+	 * then cancel all monitoring, equivalent to executing UNWATCH command
 	 * discard all commands issued after MULTI
 	 * @return {bool}
 	 */
 	bool discard();
 
 	/**
-	 * 在 multi 和 exec 之间可多次调用本函数执行多条 redis 客户端命令
+	 * Can call this function multiple times between multi and exec to execute
+	 * multiple redis client commands
 	 * run one command between MULTI and EXEC
-	 * @param cmd {const char*} redis 命令
+	 * @param cmd {const char*} Redis command
 	 *  the command
-	 * @param argv {const char* []} 参数数组
+	 * @param argv {const char* []} Parameter array
 	 *  the args array associate with the command
-	 * @param lens [const size_t []} 参数的长度数组
+	 * @param lens [const size_t []} Length array of parameters
 	 *  the length array of the args array
-	 * @param argc {size_t} 参数数组的长度
+	 * @param argc {size_t} Length of parameter array
 	 *  the length of the array for args
-	 * @return {bool} 操作是否成功
+	 * @return {bool} Whether operation was successful
 	 *  if successful
 	 */
 	bool run_cmd(const char* cmd, const char* argv[],
 		const size_t lens[], size_t argc);
 
 	/**
-	 * 在 multi 和 exec 之间多次调用本函数执行多条 redis 客户端命令
+	 * Call this function multiple times between multi and exec to execute multiple
+	 * redis client commands
 	 * run one command between MULTI and exec, this function can be
 	 * called more than once
-	 * @param cmd {const char*} redis 命令
+	 * @param cmd {const char*} Redis command
 	 *  the redis command
-	 * @param args {const std::vector<string>&} 参数数组
+	 * @param args {const std::vector<string>&} Parameter array
 	 *  the args array for the command
-	 * @return {bool} 操作是否成功
+	 * @return {bool} Whether operation was successful
 	 *  if successful
 	 */
 	bool run_cmd(const char* cmd, const std::vector<string>& args);
 
 	/**
-	 * 在成功调用 exec 后调用本函数获得操作结果数组的长度
+	 * After successfully calling exec, call this function to get the length of
+	 * operation result array
 	 * get the result array's length after EXEC
 	 * @return {size_t}
 	 */
 	size_t get_size() const;
 
 	/**
-	 * 获取指定下标的对应的命令的执行结果对象
+	 * Get execution result object of the command corresponding to the specified
+	 * index
 	 * get the result of the given subscript
-	 * @param i {size_t} 命令执行结果在结果数组中的下标
+	 * @param i {size_t} Index of command execution result in result array
 	 *  the given subscript
-	 * @param cmd {string*} 该参数非空时存放对应的 redis 命令
+	 * @param cmd {string*} When this parameter is not NULL, stores the
+	 * corresponding redis command
 	 *  if not NULL, it will store the command of the given subscript
-	 * @return {const redis_result*} 执行某条命令的结果，当 i 越界时返回 NULL
+	 * @return {const redis_result*} Result of executing a command. Returns NULL
+	 * when i is out of bounds
 	 *  return the result of one command, NULL if i was out of bounds
 	 */
 	const redis_result* get_child(size_t i, string* cmd) const;
 
 	/**
-	 * 获得当前事务所重的命令集合
+	 * Get command collection of current transaction
 	 * get all the commands issued between MULTI and EXEC
 	 * @return {const std::vector<string>&}
 	 */
@@ -149,3 +162,4 @@ private:
 } // namespace acl
 
 #endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
+

@@ -31,8 +31,8 @@ private:
 #endif
 
 /*
- * 提供禁止派生的功能,需要此功能的类可以从final_tpl派生,
- * 并将类名作为模板参数传递
+ * Provides functionality to prevent derivation. Classes that need this functionality can derive from final_tpl,
+ * and pass the class name as a template parameter
  * @example:
  * class my_final_class : public acl::final_tpl <my_final_class>
  * {
@@ -40,7 +40,7 @@ private:
  *   my_final_class() {}
  *   ~my_final_class() {}
  * }
- * 这样就保证了 my_final_class 是不能被继承的
+ * This ensures that my_final_class cannot be inherited
  */
 template<typename TFinalClass>
 class final_tpl : virtual public final_tpl_base<TFinalClass,
@@ -51,3 +51,4 @@ public:
 };
 
 }
+

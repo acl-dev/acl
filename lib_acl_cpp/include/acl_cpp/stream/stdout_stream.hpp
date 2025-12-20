@@ -5,7 +5,8 @@
 namespace acl {
 
 /**
- * 标准输出流，该类对象仅能进行写操作
+ * Standard output stream, objects of this class can only perform write
+ * operations
  */
 class ACL_CPP_API stdout_stream : public ostream {
 public:
@@ -14,3 +15,4 @@ public:
 };
 
 } // namespace acl
+

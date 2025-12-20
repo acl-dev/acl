@@ -115,19 +115,20 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 添加一个指定的地理位置坐标至指定的 key 中
+	 * Add a specified geospatial coordinate to specified key
 	 * Add the specified geospatial item (latitude, logitude, name)
 	 * to the specified key.
-	 * @param key {const char*} 对应的键值
+	 * @param key {const char*} Corresponding key value
 	 *  the specified key
-	 * @param member {const char*} 该地理坐标的标识符
+	 * @param member {const char*} Identifier of this geospatial coordinate
 	 *  the geospatial's identifier
-	 * @param longitude {double} 经度
+	 * @param longitude {double} Longitude
 	 *  the geospatial's loginitude
-	 * @param latitude {double} 纬度
+	 * @param latitude {double} Latitude
 	 *  the geospatial's latitude
-	 * @return {int} 1：添加成功，0：该地理坐标标识符已存在，即使对其值进行了修改，
-	 *  也将返回 0，-1：表示出错。
+	 * @return {int} 1: Add successful, 0: This geospatial coordinate identifier
+	 * already exists. Even if its value was modified,
+	 *  will also return 0. -1: Indicates error.
 	 *  the return value as below:
 	 *  1: add one new member successfully
 	 *  0: the member already existed, and the geospatial may be changed
@@ -137,26 +138,29 @@ public:
 		double longitude, double latitude);
 
 	/**
-	 * 给指定 key 添加一组地址位置坐标数据
+	 * Add a group of geospatial coordinate data to specified key
 	 * Add the specified geospatial items (latitude, logitude, name)
 	 * to the specified key.
-	 * @param key {const char*} 对应的键值
+	 * @param key {const char*} Corresponding key value
 	 *  the specified key
-	 * @param size {size_t} 数组的长度
+	 * @param size {size_t} Array length
 	 *  the array's size
-	 * @param members {const char* []} 成员数组，其长度由 size 指定
+	 * @param members {const char* []} Member array, its length is specified by
+	 * size
 	 *  the members array, which's length was specified by size parameter
-	 * @param longitudes {const double[]} 经度数据数组，其长度由 size 指定
+	 * @param longitudes {const double[]} Longitude data array, its length is
+	 * specified by size
 	 *  the logintitudes array, which's length was specifed by size parameter
-	 * @param latitudes {const double[]} 纬度数据数组，其长度由 size 指定
+	 * @param latitudes {const double[]} Latitude data array, its length is
+	 * specified by size
 	 *  the lattitudes array, which's length was specifed by size parameter
-	 * @return {int} 添加成功的成员数量，返回值含义如下：
+	 * @return {int} Number of successfully added members. Return value meanings:
 	 *  return the successfully added members's count:
-	 *  > 0: 表示成功添加的成员数量；
+	 *  > 0: Indicates number of successfully added members;
 	 *       represent the successfully added members's count
-	 *    0: 这些成员都已经存在
+	 *    0: These members already exist
 	 *       the members's belong the key already existing
-	 *   -1: 表示出错，可以通过 result_error 函数查看出错原因
+	 *   -1: Indicates error. Can check error reason through result_error function
 	 *       some error happened, the result_error function can be used
 	 *       to find the error's reason
 	 */
@@ -164,27 +168,28 @@ public:
 		const double longitudes[], const double latitudes[]);
 
 	/**
-	 * 给指定 key 添加一组地址位置坐标数据
+	 * Add a group of geospatial coordinate data to specified key
 	 * Add the specified geospatial items (latitude, logitude, name)
 	 * to the specified key.
-	 * @param key {const char*} 对应的键值
+	 * @param key {const char*} Corresponding key value
 	 *  the specified key
-	 * @param members {const std::vector<string>&} 成员数组
+	 * @param members {const std::vector<string>&} Member array
 	 *  the members array
-	 * @param longitudes {const std::vector<double>&} 经度数据数组
+	 * @param longitudes {const std::vector<double>&} Longitude data array
 	 *  the logintitudes array
-	 * @param latitudes {const std::vector<double>&} 纬度数据数组
+	 * @param latitudes {const std::vector<double>&} Latitude data array
 	 *  the lattitudes array
-	 * @return {int} 添加成功的成员数量，返回值含义如下：
+	 * @return {int} Number of successfully added members. Return value meanings:
 	 *  return the successfully added members's count:
-	 *  > 0: 表示成功添加的成员数量；
+	 *  > 0: Indicates number of successfully added members;
 	 *       represent the successfully added members's count
-	 *    0: 这些成员都已经存在
+	 *    0: These members already exist
 	 *       the members's belong the key already existing
-	 *   -1: 表示出错，可以通过 result_error 函数查看出错原因
+	 *   -1: Indicates error. Can check error reason through result_error function
 	 *       some error happened, the result_error function can be used
 	 *       to find the error's reason
-	 *  注意：三个数组(members, longitudes, latitudes)的数组长度必须相等
+	 * Note: Three arrays (members, longitudes, latitudes) must have equal array
+	 * lengths
 	 *  Notice: the three array's length must be equal between members,
 	 *    longitudes and latitudes
 	 */
@@ -193,76 +198,77 @@ public:
 		const std::vector<double>& latitudes);
 
 	/**
-	 * 以字符串方式返回指定成员的 GEOHASH 值
+	 * Return GEOHASH value of specified members as strings
 	 * Returns members of a geospatial index as standard geohash strings.
-	 * @param key {const char*} 对应的键值
+	 * @param key {const char*} Corresponding key value
 	 *  the specified key
-	 * @param members {const std::vector<string>&} 成员数组
+	 * @param members {const std::vector<string>&} Member array
 	 *  the members array
-	 * @param results {std::vector<string>&} 存储结果集合
+	 * @param results {std::vector<string>&} Store result set
 	 *  store the result
-	 * @return {bool} 操作是否成功
+	 * @return {bool} Whether operation was successful
 	 *  if the operation was successful.
 	 */
 	bool geohash(const char* key, const std::vector<string>& members,
 		std::vector<string>& results);
 
 	/**
-	 * 以字符串方式返回指定成员的 GEOHASH 值
+	 * Return GEOHASH value of specified member as string
 	 * Returns members of a geospatial index as standard geohash strings.
-	 * @param key {const char*} 对应的键值
+	 * @param key {const char*} Corresponding key value
 	 *  the specified key
-	 * @param member {const char*} 成员名
+	 * @param member {const char*} Member name
 	 *  the member of a geospatial index
-	 * @param result {std::vector<string>&} 存储结果
+	 * @param result {std::vector<string>&} Store result
 	 *  store the result
-	 * @return {bool} 操作是否成功
+	 * @return {bool} Whether operation was successful
 	 *  if the operation was successful.
 	 */
 	bool geohash(const char* key, const char* member, string& result);
 
 	/**
-	 * 获得指定成员的地理位置坐标
+	 * Get geospatial coordinates of specified members
 	 * Returns longitude and latitude of members of a geospatial index
-	 * @param key {const char*} 对应的键值
+	 * @param key {const char*} Corresponding key value
 	 *  the specified key
-	 * @param members {const std::vector<string>&} 成员数组
+	 * @param members {const std::vector<string>&} Member array
 	 *  the members array
-	 * @param results {std::vector<std::pair<double, double> >&} 存储结果集
+	 * @param results {std::vector<std::pair<double, double> >&} Store result set
 	 *  store the results
-	 * @return {bool} 操作是否成功
+	 * @return {bool} Whether operation was successful
 	 *  if the operation was successful. 
 	 */
 	bool geopos(const char* key, const std::vector<string>& members,
 		std::vector<std::pair<double, double> >& results);
 
 	/**
-	 * 获得某个指定成员的地理位置坐标
+	 * Get geospatial coordinates of a specified member
 	 * Returns longitude and latitude of the one member of
 	 * a geospatial index
-	 * @param key {const char*} 指定键值
+	 * @param key {const char*} Specified key value
 	 *  the specifed key
-	 * @param member {const char*} 指定成员名
+	 * @param member {const char*} Specified member name
 	 *  the specified member
-	 * @param result {std::pair<double, double>&} 存储坐标点结果
+	 * @param result {std::pair<double, double>&} Store coordinate point result
 	 *  store the result of longitude and latitude of the member
-	 * @return {bool} 操作是否成功
+	 * @return {bool} Whether operation was successful
 	 *  if the operation was successful.
 	 */
 	bool geopos(const char* key, const char* member,
 		std::pair<double, double>& result);
 
 	/**
-	 * 获得两个地理位置坐标之间的距离
+	 * Get distance between two geospatial coordinates
 	 * Returns the distance between two members of a geospatial index
-	 * @param key {const char*} 对应的键值
+	 * @param key {const char*} Corresponding key value
 	 *  the specified key
-	 * @param member1 {const char*} 地理坐标成员
+	 * @param member1 {const char*} Geospatial coordinate member
 	 *  one member of a geospatial index
-	 * @param member2 {const char*} 地理坐标成员
+	 * @param member2 {const char*} Geospatial coordinate member
 	 *  another member of a geospatial index
-	 * @param unit {int} 返回的距离的单位值
-	 * @return {double} 两个坐标之间的长度，返回值 < 0 表示出错
+	 * @param unit {int} Unit value of returned distance
+	 * @return {double} Length between two coordinates. Return value < 0 indicates
+	 * error
 	 *  returns the distance between two members, which was less than 0
 	 *  if some error happened.
 	 */
@@ -270,24 +276,28 @@ public:
 		const char* member2, int unit = GEO_UNIT_M);
 
 	/**
-	 * 获得距离某指定坐标位置在给定距离范围内的所有坐标点
+	 * Get all coordinate points within given distance range from a specified
+	 * coordinate position
 	 * Query a sorted set representing a geospatial index to fetch
 	 * members matching a given maximum distance from a point
-	 * @param key {const char*} 对应的键值
+	 * @param key {const char*} Corresponding key value
 	 *  the specified key
-	 * @param longitude {double} 指定坐标点的经度值
+	 * @param longitude {double} Longitude value of specified coordinate point
 	 *  the longitude of the specified geospatial coordinate
-	 * @param latitude {double} 指定坐标点的纬度值
+	 * @param latitude {double} Latitude value of specified coordinate point
 	 *  the latitude of the specified geospatial coordinate
-	 * @param radius {double} 限定的距离范围大小
+	 * @param radius {double} Limited distance range size
 	 *  the distance from the specified coordinate
-	 * @param unit {int} radius 距离的单位类型
+	 * @param unit {int} Unit type of radius distance
 	 *  the unit type of the raidus
-	 * @param with {int} 查询条件选项，参见上面的定义：GEO_WITH_XXX
+	 * @param with {int} Query condition options. See definitions above:
+	 * GEO_WITH_XXX
 	 *  the serach operations, defined as GEO_WITH_XXX above
-	 * @param sort {int} 查询结果的排序方式，定义参见：GEO_SORT_XXX
+	 * @param sort {int} Sorting method of query results. See definitions:
+	 * GEO_SORT_XXX
 	 *  the sorted type of the results, defined as GEO_SORT_XXX above
-	 * @return {const std::vector<geo_member>&} 符合条件的坐标点的结果集
+	 * @return {const std::vector<geo_member>&} Result set of coordinate points
+	 * meeting conditions
 	 *  Returns the results according the searching conditions.
 	 */
 	const std::vector<geo_member>& georadius(const char* key,
@@ -297,22 +307,26 @@ public:
 		int sort = GEO_SORT_ASC);
 
 	/**
-	 * 获得距离某指定坐标位置在给定距离范围内的所有坐标点
+	 * Get all coordinate points within given distance range from a specified
+	 * coordinate position
 	 * Query a sorted set representing a geospatial index to fetch
 	 * members matching a given maximum distance from a member
-	 * @param key {const char*} 对应的键值
+	 * @param key {const char*} Corresponding key value
 	 *  the specified key
-	 * @param member {const char*} 某个指定的坐标点成员
+	 * @param member {const char*} A specified coordinate point member
 	 *  the specified member of a geospatial index
-	 * @param radius {double} 限定的距离范围大小
+	 * @param radius {double} Limited distance range size
 	 *  the distance from the specified coordinate
-	 * @param unit {int} radius 距离的单位类型
+	 * @param unit {int} Unit type of radius distance
 	 *  the unit type of the raidus
-	 * @param with {int} 查询条件选项，参见上面的定义：GEO_WITH_XXX
+	 * @param with {int} Query condition options. See definitions above:
+	 * GEO_WITH_XXX
 	 *  the serach operations, defined as GEO_WITH_XXX above
-	 * @param sort {int} 查询结果的排序方式，定义参见：GEO_SORT_XXX
+	 * @param sort {int} Sorting method of query results. See definitions:
+	 * GEO_SORT_XXX
 	 *  the sorted type of the results, defined as GEO_SORT_XXX above
-	 * @return {const std::vector<geo_member>&} 符合条件的坐标点的结果集
+	 * @return {const std::vector<geo_member>&} Result set of coordinate points
+	 * meeting conditions
 	 *  Returns the results according the searching conditions.
 	 */
 	const std::vector<geo_member>& georadiusbymember(const char* key,
@@ -331,3 +345,4 @@ private:
 } // namespace acl
 
 #endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
+

@@ -17,21 +17,23 @@ public:
 	virtual ~ipc_request();
 
 	/**
-	 * 虚接口，子类实现此类用于处理具体的任务，该接口适用
-	 * 于采用 IO 消息的模式
+	 * Virtual interface, subclasses implement this class to handle specific tasks.
+	 * This interface is suitable
+	 * for IO message mode
 	 */
 	virtual void run(ipc_client* ipc);
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * 虚接口，子类实现此类用于处理具体的任务，该接口适用
-	 * 于采用 _WIN32 消息的模式
+	 * Virtual interface, subclasses implement this class to handle specific tasks.
+	 * This interface is suitable
+	 * for _WIN32 message mode
 	 */
 	virtual void run(HWND hWnd);
 
 	/**
-	 * 设置 _WIN32 窗口句柄
-	 * @param hWnd {HWND} 窗口句柄
+	 * Set _WIN32 window handle
+	 * @param hWnd {HWND} Window handle
 	 */
 	void set_hwnd(HWND hWnd)
 	{
@@ -39,8 +41,8 @@ public:
 	}
 
 	/**
-	 * 获得 _WIN32 窗口句柄
-	 * @return {HWND} 窗口句柄
+	 * Get _WIN32 window handle
+	 * @return {HWND} Window handle
 	 */
 	HWND get_hwnd(void) const
 	{
@@ -57,11 +59,13 @@ class ACL_CPP_API ipc_service : public ipc_server
 {
 public:
 	/**
-	 * 构造函数
-	 * @param nthread {int} 如果该值 > 1 则内部自动采用线程池，否则
-	 *  则是一个请求一个线程
-	 * @param ipc_keep {bool} 内部 IPC 消息流是否保持长连接，保持长
-	 *  连接有助于提高消息传递的效率
+	 * Constructor
+	 * @param nthread {int} If this value > 1, internally automatically uses thread
+	 * pool, otherwise
+	 *  it is one request per thread
+	 * @param ipc_keep {bool} Whether internal IPC message stream maintains long
+	 * connection. Maintaining long
+	 *  connection helps improve message passing efficiency
 	 */
 	ipc_service(int nthread, bool ipc_keep = true);
 
@@ -69,26 +73,27 @@ public:
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * 当采用 _WIN32 消息模式时，子类需要实现此虚接口用于处理具体的
-	 * 消息过程，子类必须实现该接口
-	 * @param hWnd {HWND} 窗口句柄
-	 * @param msg {UINT} 用户自定义消息号
-	 * @param wParam {WPARAM} 参数
-	 * @param lParam {LPARAM} 参数
+	 * When using _WIN32 message mode, subclasses need to implement this virtual
+	 * interface to handle specific
+	 * message process. Subclasses must implement this interface
+	 * @param hWnd {HWND} Window handle
+	 * @param msg {UINT} User-defined message number
+	 * @param wParam {WPARAM} Parameter
+	 * @param lParam {LPARAM} Parameter
 	 */
 	virtual void win32_proc(HWND hWnd, UINT msg,
 		WPARAM wParam, LPARAM lParam);
 #endif
 
 	/**
-	 * 从 ipc 消息流连接池中取得一个连接
-	 * @return {ipc_client*} 返回 NULL 表示无法连接消息服务器
+	 * Get a connection from IPC message stream connection pool
+	 * @return {ipc_client*} Returns NULL if unable to connect to message server
 	 */
 	ipc_client* peek_conn();
 
 	/**
-	 * 将用完的 ipc 消息连接放回连接池中
-	 * @param conn {ipc_client*} ipc 消息连接流
+	 * Put used IPC message connection back into connection pool
+	 * @param conn {ipc_client*} IPC message connection stream
 	 */
 	void push_conn(ipc_client* conn);
 protected:
@@ -99,7 +104,7 @@ protected:
 #endif
 
 	/**
-	 * 子类调用此函数发送请求服务
+	 * Subclasses call this function to send request service
 	 * @param req {ipc_request*}
 	 */
 	void request(ipc_request* req);
@@ -111,12 +116,14 @@ private:
 	HINSTANCE hInstance_;
 
 	/**
-	 * 基类虚函数：Windows 消息方式下，创建隐藏窗口句柄
+	 * Base class virtual function: In Windows message mode, create hidden window
+	 * handle
 	 */
 	virtual bool create_window(void);
 
 	/**
-	 * 基类虚函数：Windows 消息方式下，关闭隐藏窗口句柄
+	 * Base class virtual function: In Windows message mode, close hidden window
+	 * handle
 	 */
 	virtual void close_window(void);
 #endif
@@ -126,3 +133,4 @@ private:
 };
 
 }  // namespace acl
+

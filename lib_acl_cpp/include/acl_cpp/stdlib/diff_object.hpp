@@ -7,13 +7,15 @@ namespace acl {
 class diff_manager;
 
 /**
- * 差集比较纯虚类，子类必须继承该类，并实现其中的纯虚方法
- * 该类继承于 dbuf_obj 类，便于由 dbuf_guard 统一管理，统一销毁
+ * Pure virtual class for difference set comparison. Subclasses must inherit
+ * this class and implement its pure virtual methods.
+ * This class inherits from dbuf_obj class, facilitating unified management and
+ * destruction by dbuf_guard
  */
 class diff_object : public dbuf_obj {
 public:
 	/**
-	 * 构造函数
+	 * Constructor
 	 * @param manager {diff_manager&}
 	 */
 	diff_object(diff_manager& manager);
@@ -21,29 +23,30 @@ public:
 	virtual ~diff_object() {}
 
 	/**
-	 * 纯虚接口，获得该对象的键字符串
-	 * @return {const char*} 必须返回非空字符串
+	 * Pure virtual interface, get the key string of this object
+	 * @return {const char*} Must return a non-empty string
 	 */
 	virtual const char* get_key() const = 0;
 
 	/**
-	 * 纯虚接口，获得该对象的值字符串
-	 * @return {const char*} 必须返回非空字符串
+	 * Pure virtual interface, get the value string of this object
+	 * @return {const char*} Must return a non-empty string
 	 */
 	virtual const char* get_val() const = 0;
 
 	/**
-	 * 纯虚接口，用来比较两个对象
+	 * Pure virtual interface, used to compare two objects
 	 * @param obj {const diff_object&}
-	 * @return {bool} 两个对象是否相等
+	 * @return {bool} Whether the two objects are equal
 	 */
 	virtual bool operator== (const diff_object& obj) const = 0;
 
 	/**
-	 * 是否是不在给定区间范围（闭区间）的多余数据
-	 * @param range_from {long long} 起始位置
-	 * @param range_to {long long} 结束位置
-	 * @return {bool} 是否是超过给定区间范围的多余数据对象
+	 * Whether it is redundant data outside the given range (closed interval)
+	 * @param range_from {long long} Start position
+	 * @param range_to {long long} End position
+	 * @return {bool} Whether it is a redundant data object exceeding the given
+	 * range
 	 */
 	virtual bool check_range(long long range_from, long long range_to) const {
 		(void) range_from;
@@ -56,3 +59,4 @@ protected:
 };
 
 } // namespace acl
+

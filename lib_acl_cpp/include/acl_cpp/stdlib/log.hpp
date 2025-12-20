@@ -64,42 +64,48 @@ class string;
 class ACL_CPP_API log {
 public:
 	/**
-	 * 打开日志文件, 在程序初始化里调用本函数一次
-	 * @param recipients {const char*} 日志接收器列表，由 "|" 分隔，接收器
-	 *  可以是本地文件或远程套接口，如:
+	 * Open log file, call this function once during program initialization
+	 * @param recipients {const char*} Log recipient list, separated by "|".
+	 * Recipients
+	 *  can be local files or remote sockets, e.g.:
 	 *  /tmp/test.log|UDP:127.0.0.1:12345|TCP:127.0.0.1:12345|UNIX:/tmp/test.sock
-	 *  该配置要求将所有日志同时发给 /tmp/test.log, UDP:127.0.0.1:12345,
-	 *  TCP:127.0.0.1:12345 和 UNIX:/tmp/test.sock 四个日志接收器对象
-	 * @param procname 程序名, 如: test
-	 * @param cfg 调试日志配置, 格式为: {section}:{level}; {section}:{level}; ...
-	 *  如: 100:2; 101:3; 102: 4, 表示只记录标识为 100/级别 < 2,
-	 *  以及标识为 101/级别 < 3, 以及标识为 102/级别 < 4 的日志项
+	 * This configuration requires sending all logs to four log recipient objects
+	 * simultaneously:
+	 *  /tmp/test.log, UDP:127.0.0.1:12345,
+	 *  TCP:127.0.0.1:12345 and UNIX:/tmp/test.sock
+	 * @param procname Program name, e.g.: test
+	 * @param cfg Debug log configuration, format: {section}:{level};
+	 * {section}:{level}; ...
+	 * e.g.: 100:2; 101:3; 102: 4, means only record logs with identifier 100/level
+	 * < 2,
+	 *  and identifier 101/level < 3, and identifier 102/level < 4
 	 */
 	static void open(const char* recipients, const char* procname = "unknown",
 		const char* cfg = NULL);
 
 	/**
-	 * 程序退出前调用此函数关闭日志
+	 * Call this function to close log before program exits
 	 */
 	static void close();
 
 	/**
-	 * 初始化日志调试调用接口
-	 * @param cfg {const char*} 调试标签及级别字符串, 格式如下:
+	 * Initialize log debug call interface
+	 * @param cfg {const char*} Debug tag and level string, format:
 	 *  {section}:{level}; {section}:{level}; ...
-	 *  如: 1:1, 2:10, 3:8...  or 1:1; 2:10; 3:8... or all:1
+	 *  e.g.: 1:1, 2:10, 3:8...  or 1:1; 2:10; 3:8... or all:1
 	 */
 	static void debug_init(const char* cfg);
 
 	/**
-	 * 当未通过 open 打开日志流而调用记日志等相关函数时是否需要将信息
-	 * 输出至标准输出
+	 * When log stream is not opened through open and logging related functions are
+	 * called, whether to output information
+	 * to standard output
 	 * @param onoff {bool}
 	 */
 	static void stdout_open(bool onoff);
 
 	/**
-	 * 日志记录函数
+	 * Logging functions
 	 */
 
 	static void ACL_CPP_PRINTF(1, 2) msg1(const char* fmt, ...);
@@ -142,7 +148,7 @@ public:
 		const char* fmt, va_list ap);
 
 	/************************************************************************/
-	/*                        示例                                          */
+	/*                        Examples                                      */
 	/************************************************************************/
 
 #ifndef ACL_LOGGER_MACRO_OFF
@@ -156,12 +162,12 @@ public:
 		const char* logfile = "test.log", *procname = "test";
 		const char* cfg = "101:2; 102:3; 103:2";
 
-		// 在程序初始化时打开日志
+		// Open log during program initialization
 		logger_open(logfile, procname, cfg);
 
 # if defined(VC2003) || defined(VC2002) || defined(VC6)
 
-		// 会写日志
+		// Will write log
 
 		logger("%s(%d), %s: %s", __FILE__, __LINE__, __FUNCTION__, "zsx");
 
@@ -172,14 +178,14 @@ public:
 		logger_debug(DEBUG_TEST3, 2, "%s(%d), %s: hello world13(%s)!",
 			__FILE__, __LINE__, __FUNCTION__, "zsx");
 
-		// 不会写日志
+		// Will not write log
 
 		logger_debug(DEBUG_TEST1, 3, "%s(%d), %s: hello world21(%s)!",
 			__FILE__, __LINE__, __FUNCTION__, "zsx");
 
 # else	// VC2005, VC2008, VC2010
 
-		// 会写日志
+		// Will write log
 
 		logger("error(%s)!", "zsx");
 
@@ -187,13 +193,13 @@ public:
 		logger_debug(DEBUG_TEST2, 3, "hello world12(%s)!", "zsx");
 		logger_debug(DEBUG_TEST3, 2, "hello world13(%s)!", "zsx");
 
-		// 不会写日志
+		// Will not write log
 
 		logger_debug(DEBUG_TEST1, 3, "hello world21(%s)!", "zsx");
 
 # endif
 
-		// 程序结束前关闭日志
+		// Close log before program ends
 		logger_close();
 	}
 
@@ -208,3 +214,4 @@ public:
 };
 
 } // namespace acl
+

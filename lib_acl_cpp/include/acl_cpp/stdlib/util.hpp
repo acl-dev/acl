@@ -4,39 +4,41 @@
 namespace acl {
 
 /**
- * 获得上次系统调用出错时的错误号
- * @return {int} 错误号
+ * Get the error number when the last system call failed
+ * @return {int} Error number
  */
 ACL_CPP_API int last_error();
 
 /**
- * 手工设置错误号
- * @param errnum {int} 错误号
+ * Manually set error number
+ * @param errnum {int} Error number
  */
 ACL_CPP_API void set_error(int errnum);
 
 /**
- * 获得上次系统调用出错时的错误描述信息，该函数内部采用了线程局部变量，所以是线程
- * 安全的，但使用起来更简单些
- * @return {const char *} 返回错误提示信息 
+ * Get the error description when the last system call failed. This function
+ * uses thread-local variables internally, so it is thread-safe,
+ * but simpler to use
+ * @return {const char *} Returns error message
  */
 ACL_CPP_API const char* last_serror();
 
 /**
- * 获得上次系统调用出错时的错误描述信息
- * @param buf {char*} 存储错误描述信息的内存缓冲区
- * @param size {int} buffer 的空间大小
- * @return {const char*} 返回的地址应与 buffer 相同
+ * Get the error description when the last system call failed
+ * @param buf {char*} Memory buffer to store error description
+ * @param size {int} Size of buffer space
+ * @return {const char*} Returned address should be the same as buffer
  */
 ACL_CPP_API const char* last_serror(char* buf, size_t size);
 
 /**
- * 类似于标准C的 strerror, 但该函数是跨平台且是线程安全的，获得对应某个错误
- * 号的错误描述信息
- * @param errnum {int} 错误号
- * @param buf {char*} 存储错误描述信息的内存缓冲区
- * @param size {int} buffer 缓冲区的大小
- * @return {const char*} 返回的地址应与 buffer 相同
+ * Similar to standard C's strerror, but this function is cross-platform and
+ * thread-safe, gets the error
+ * description for a specific error number
+ * @param errnum {int} Error number
+ * @param buf {char*} Memory buffer to store error description
+ * @param size {int} Size of buffer
+ * @return {const char*} Returned address should be the same as buffer
 */
 ACL_CPP_API const char* string_error(int errnum, char* buf, size_t size);
 
@@ -48,3 +50,4 @@ ACL_CPP_API double stamp_sub(const struct timeval& from,
 		const struct timeval& sub);
 
 } // namespace acl
+

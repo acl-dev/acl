@@ -9,8 +9,9 @@
 namespace acl {
 
 /**
- * 当异步客户端流异步连接远程服务器时的回调函数类，该类为纯虚类，
- * 要求子类必须实现 open_callback 回调过程
+ * Callback function class when asynchronous client stream asynchronously
+ * connects to remote server. This class is pure virtual class,
+ * requires subclasses to implement open_callback callback process
  */
 class ACL_CPP_API aio_open_callback : public aio_callback {
 public:
@@ -30,25 +31,31 @@ struct AIO_OPEN_CALLBACK {
 class aio_handle;
 
 /**
- * 网络异步流类，该类继承了异步读写流，同时该类只能在堆上分配，
- * 不能在栈上分配，并且该类结束时应用不必释放该类对象，因为异步流
- * 框架内部会自动释放该类对象，应用可以调用 close 主动关闭流
+ * Network asynchronous stream class. This class inherits asynchronous
+ * read/write streams. This class can only be allocated on heap,
+ * cannot be allocated on stack. When this class ends, application does not need
+ * to release this class object, because asynchronous stream
+ * framework internally automatically releases this class object. Application
+ * can call close to actively close stream
  */
 class ACL_CPP_API aio_socket_stream : public aio_istream , public aio_ostream {
 public:
 	/**
-	 * 构造函数，创建网络异步客户端流
-	 * @param handle {aio_handle*} 异步引擎句柄
-	 * @param stream {ACL_ASTREAM*} 非阻塞流
-	 * @param opened {bool} 该流是否已经与服务端正常建立了连接，如果是则自动
-	 *  hook 读写过程及关闭/超时过程，否则仅 hook 关闭/超时过程
+	 * Constructor, create network asynchronous client stream
+	 * @param handle {aio_handle*} Asynchronous engine handle
+	 * @param stream {ACL_ASTREAM*} Non-blocking stream
+	 * @param opened {bool} Whether this stream has already normally established
+	 * connection with server. If yes, automatically
+	 * hooks read/write process and close/timeout process, otherwise only hooks
+	 * close/timeout process
 	 */
 	aio_socket_stream(aio_handle* handle, ACL_ASTREAM* stream, bool opened = false);
 
 	/**
-	 * 构造函数，创建网络异步客户端流，并 hook 读写过程及关闭/超时过程
-	 * @param handle {aio_handle*} 异步引擎句柄
-	 * @param fd {int} 连接套接口句柄
+	 * Constructor, create network asynchronous client stream, and hook read/write
+	 * process and close/timeout process
+	 * @param handle {aio_handle*} Asynchronous engine handle
+	 * @param fd {int} Connection socket handle
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	aio_socket_stream(aio_handle* handle, SOCKET fd);
@@ -57,18 +64,23 @@ public:
 #endif
 
 	/**
-	 * 打开与远程服务器的连接，并自动 hook 流的关闭、超时以及连接成功
-	 * 时的回调处理过程
-	 * @param handle {aio_handle*} 异步引擎句柄
-	 * @param addr {const char*} 远程服务器的地址，地址格式为：
-	 *  针对TCP：IP:Port 或 针对域套接口：{filePath}
- 	 * @param local {const char*} 本地网卡IP地址或网卡名，如果非空时，第一个字母
- 	 *  为 @ 表示后面跟的是 IP 地址，如果为 # 表示后面跟的是网卡名，如：
- 	 *  @127.0.0.1 表示要绑定本地回路 IP 地址，#lo 表示绑定本地回路网卡名
-	 * @param timeout {int} 连接超时时间(秒)
-	 * @return {aio_socket_stream*} 如果连接立即返回失败则该函数返回 NULL，
-	 *  返回非 NULL 对象只是表示正处于连接过程中，至于连接是否超时或连接是否失败
-	 *  应通过回调函数来判断
+	 * Open connection with remote server, and automatically hook stream's close,
+	 * timeout and callback processing process when connection succeeds
+	 * @param handle {aio_handle*} Asynchronous engine handle
+	 * @param addr {const char*} Address of remote server, address format:
+	 *  For TCP: IP:Port or For domain socket: {filePath}
+ 	 * @param local {const char*} Local network card IP address or network card
+ 	 * name. When not empty, if first character
+ 	 * is @, it indicates followed by IP address. If it is #, it indicates
+ 	 * followed by network card name, e.g.:
+ 	 * @127.0.0.1 indicates binding to local loopback IP address, #lo indicates
+ 	 * binding to local loopback network card name
+	 * @param timeout {int} Connection timeout (seconds)
+	 * @return {aio_socket_stream*} If connection immediately returns failure, this
+	 * function returns NULL.
+	 * Returning non-NULL object only indicates it is in connection process.
+	 * Whether connection times out or fails
+	 *  should be judged through callback function
 	 */
 	static aio_socket_stream* open(aio_handle* handle, const char* addr,
 		const char* local, int timeout);
@@ -76,48 +88,53 @@ public:
 	       const char* addr, int timeout);
 
 	/**
-	 * 绑定 UDP 套接字，并创建非阻塞对象
-	 * @param handle {aio_handle*} 异步引擎句柄
-	 * @param addr {const char*} 远程服务器的地址，地址格式为：
-	 *  针对TCP：IP:Port 或 针对域套接口：{filePath}
-	 * @return {aio_socket_stream*} 返回 NULL 表示绑定失败，否则表示成功
+	 * Bind UDP socket and create non-blocking object
+	 * @param handle {aio_handle*} Asynchronous engine handle
+	 * @param addr {const char*} Address of remote server, address format:
+	 *  For TCP: IP:Port or For domain socket: {filePath}
+	 * @return {aio_socket_stream*} Returns NULL indicates binding failed,
+	 * otherwise indicates success
 	 */
 	static aio_socket_stream* bind(aio_handle* handle, const char* addr);
 
 	/**
-	 * 添加针对 open 函数的回调过程
-	 * @param callback {aio_open_callback*} 回调函数
+	 * Add callback process for open function
+	 * @param callback {aio_open_callback*} Callback function
 	 */
 	void add_open_callback(aio_open_callback* callback);
 
 	/**
-	 * 从 open 回调对象集合中删除
-	 * @param callback {aio_open_callback*} 被删除的回调对象，若该
-	 *  值为空，则删除所有的回调对象
-	 * @return {int} 返回被从回调对象集合中删除的回调对象的个数
+	 * Delete from open callback object collection
+	 * @param callback {aio_open_callback*} Callback object to be deleted. If this
+	 *  value is empty, deletes all callback objects
+	 * @return {int} Returns number of callback objects deleted from callback
+	 * object collection
 	 */
 	int del_open_callback(aio_open_callback* callback = NULL);
 
 	/**
-	 * 禁止回调对象类集合中的某个回调类对象，但并不从回调类对象
-	 * 集合中删除，只是不被调用而已
-	 * @param callback {aio_open_callback*} 被禁止的回调对象，若该
-	 *  值为空，则禁止所有的回调对象
-	 * @return {int} 返回被从回调对象集合中禁用的回调对象的个数
+	 * Disable a callback class object in callback object class collection, but
+	 * does not delete from callback class object
+	 * collection, just not called
+	 * @param callback {aio_open_callback*} Callback object to be disabled. If this
+	 *  value is empty, disables all callback objects
+	 * @return {int} Returns number of callback objects disabled from callback
+	 * object collection
 	 */
 	int disable_open_callback(aio_open_callback* callback = NULL);
 
 	/**
-	 * 启用所有的回调对象被调用
-	 * @param callback {aio_open_callback*} 启用指定的回调对象，
-	 * 如果该值为空，则启用所有的回调对象
-	 * @return {int} 返回被启用的回调对象的个数
+	 * Enable all callback objects to be called
+	 * @param callback {aio_open_callback*} Enable specified callback object.
+	 * If this value is empty, enables all callback objects
+	 * @return {int} Returns number of enabled callback objects
 	 */
 	int enable_open_callback(aio_open_callback* callback = NULL);
 
 	/**
-	 * 针对 open 过程，判断是否已经连接成功
-	 * @return {bool} 返回 true 表示连接成功，否则表示还连接成功
+	 * For open process, determine whether connection has already succeeded
+	 * @return {bool} Returns true indicates connection succeeded, otherwise
+	 * indicates connection has not succeeded yet
 	 */
 	bool is_opened() const;
 
@@ -125,12 +142,13 @@ protected:
 	virtual ~aio_socket_stream();
 
 	/**
-	 * 通过此函数来动态释放只能在堆上分配的异步流类对象
+	 * Dynamically release asynchronous stream class objects that can only be
+	 * allocated on heap through this function
 	 */
 	virtual void destroy();
 
 	/**
-	 * 注册流连接成功的回调过程
+	 * Register callback process when stream connection succeeds
 	 */
 	void enable_open();
 
@@ -141,3 +159,4 @@ private:
 };
 
 }  // namespace acl
+

@@ -9,11 +9,11 @@
 namespace acl {
 
 /**
- * 邮件地址
+ * Email address
  */
 struct rfc822_addr {
-	char* addr;	// 邮件地址，格式为： xxx@xxx.xxx
-	char* comment;	// 邮件备注
+	char* addr;	// Email address, format: xxx@xxx.xxx
+	char* comment;	// Email comment
 };
 
 typedef enum {
@@ -27,67 +27,73 @@ public:
 	~rfc822();
 
 	/**
-	 * 解析符合 RFC822 标准的时间格式
-	 * @param in {const char*} 时间字符串，如：
+	 * Parse time format conforming to RFC822 standard
+	 * @param in {const char*} Time string, e.g.:
 	 *  Wed, 11 May 2011 09:44:37 +0800 (CST)
 	 *  Wed, 11 May 2011 16:17:39 GMT
 	 */
 	time_t parse_date(const char *in);
 
 	/**
-	 * 生成符合 RFC822 标准的时间格式
+	 * Generate time format conforming to RFC822 standard
 	 * @param t {time_t}
-	 * @param out {char*} 存储转换结果
-	 * @param size {size_t} out 空间大小
-	 * @param zone {tzone_t} 所在时区
+	 * @param out {char*} Store conversion result
+	 * @param size {size_t} out space size
+	 * @param zone {tzone_t} Time zone
 	 */
 	void mkdate(time_t t, char* out, size_t size, tzone_t  zone = tzone_cst);
 
 	/**
-	 * 生成东八区的时间格式
+	 * Generate time format for UTC+8 time zone
 	 * @param t {time_t}
-	 * @param out {char*} 存储转换结果
-	 * @param size {size_t} out 空间大小
+	 * @param out {char*} Store conversion result
+	 * @param size {size_t} out space size
 	 */
 	void mkdate_cst(time_t t, char* out, size_t size);
 
 	/**
-	 * 生成格林威治时间的时间格式
+	 * Generate time format for Greenwich Mean Time
 	 * @param t {time_t}
-	 * @param out {char*} 存储转换结果
-	 * @param size {size_t} out 空间大小
+	 * @param out {char*} Store conversion result
+	 * @param size {size_t} out space size
 	 */
 	void mkdate_gmt(time_t t, char* out, size_t size);
 
 	/**
-	 * 解析邮件地址列表，将符合 RFC822 标准的邮件地址列表解析成
-	 * 人能正常看懂的邮件地址列表，同时将用户名注释部分进行
-	 * RFC2047解码
-	 * @param in {const char*} RFC822 格式的邮件地址列表，如:
+	 * Parse email address list. Parse email address list conforming to RFC822
+	 * standard into
+	 * email address list that humans can normally read, and decode username
+	 * comment part according to
+	 * RFC2047
+	 * @param in {const char*} Email address list in RFC822 format, e.g.:
 	 *  "=?gb2312?B?1dSx+A==?= <zhaobing@51iker.com>;\r\n"
 	 *  "\t\"=?GB2312?B?t+vBosn6?=\" <fenglisheng@51iker.com>;\r\n"
 	 *  "\t\"zhengshuxin3\";\"zhengshuxin4\" <zhengshuxin2@51iker.com>;"
 	 *  "<xuganghui@51iker.com>;<wangwenquan@51iker.com>;"
-	 * @param to_charset {const char*} 目标字符集，例如：gbk, gb18030, utf-8
-	 * @return {const std::list<rfc822_addr*>&} 解析结果
+	 * @param to_charset {const char*} Target character set, e.g.: gbk, gb18030,
+	 * utf-8
+	 * @return {const std::list<rfc822_addr*>&} Parsing result
 	 */
 	const std::list<rfc822_addr*>& parse_addrs(const char* in,
 		const char* to_charset = "utf-8");
 
 	/**
-	 * 解析一个符合 RFC822 标准的邮件地址，同时将用户名注释部分按
-	 * RFC2047 标准进行解码
-	 * @param in {const char*} RFC822 格式的邮件地址
-	 * @param to_charset {const char*} 目标字符集，例如：gbk, gb18030, utf-8
-	 * @return {const rfc822_addr*} 返回 NULL 表明输入的邮件地址不符合
-	 *  RFC822 规范
+	 * Parse an email address conforming to RFC822 standard, and decode username
+	 * comment part according to
+	 * RFC2047 standard
+	 * @param in {const char*} Email address in RFC822 format
+	 * @param to_charset {const char*} Target character set, e.g.: gbk, gb18030,
+	 * utf-8
+	 * @return {const rfc822_addr*} Returns NULL indicates input email address does
+	 * not conform to
+	 *  RFC822 specification
 	 */
 	const rfc822_addr* parse_addr(const char* in,
 		const char* to_charset = "utf-8");
 
 	/**
-	 * 检查邮件地址是否合法
-	 * @param in {const char*} RFC822 格式的邮件地址
+	 * Check whether email address is valid
+	 * @param in {const char*} Email address in RFC822 format
 	 * @return {bool}
 	 */
 	bool check_addr(const char* in);
@@ -101,3 +107,4 @@ private:
 } // namespace acl
 
 #endif // !defined(ACL_MIME_DISABLE)
+

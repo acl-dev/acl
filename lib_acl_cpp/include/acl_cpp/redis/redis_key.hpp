@@ -8,7 +8,7 @@
 
 namespace acl {
 
-// redis 服务支持的数据类型分类
+// Data types supported by redis.
 // the data type supported by redis
 typedef enum {
 	REDIS_KEY_NONE,		// none
@@ -44,14 +44,16 @@ public:
 	virtual ~redis_key();
 
 	/**
-	 * 删除一个或一组 KEY，对于变参的接口，则要求最后一个参数必须以 NULL 结束
+	 * Delete one or some keys from redis. For variable args interface, the last
+	 * parameter must be NULL.
 	 * delete one or some keys from redis, for deleting a variable
 	 * number of keys, the last key must be NULL indicating the end
 	 * of the variable args
-	 * @return {int} 返回所删除的 KEY 的个数，如下：
-	 *  0: 未删除任何 KEY
-	 *  -1: 出错
-	 *  >0: 真正删除的 KEY 的个数，该值有可能少于输入的 KEY 的个数
+	 * @return {int} Returns number of keys deleted, as below:
+	 *  0: No KEY deleted.
+	 *  -1: Error occurred.
+	 * >0: Number of keys deleted. Return value may be less than actual number of
+	 * keys deleted.
 	 *  return the number of keys been deleted, return value as below:
 	 *  0: none key be deleted
 	 * -1: error happened
@@ -72,122 +74,132 @@ public:
 	int del_keys(const char* keys[], const size_t lens[], size_t argc);
 
 	/**
-	 * 序列化给定 key ，并返回被序列化的值，使用 RESTORE 命令可以将这个值反序列化
-	 * 为 Redis 键
+	 * Serialize object associated with key and get serialized value. RESTORE
+	 * command can be used to deserialize value
+	 * back to Redis.
 	 * serialize the object associate with the given key, and get the
 	 * value after serializing, RESTORE command can be used to
 	 * deserialize by the value
-	 * @param key {const char*} 键值
+	 * @param key {const char*} Key value.
 	 *  the key
-	 * @param len {size_t} key 长度
+	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @param out {string&} 存储序列化的二进制数据
+	 * @param out {string&} Buffer to store serialized object result.
 	 *  buffur used to store the result
-	 * @return {int} 序列化后数据长度
+	 * @return {int} Length of data after serializing.
 	 *  the length of the data after serializing
 	 */
 	int dump(const char* key, size_t len, string& out);
 	int dump(const char* key, string& out);
 
 	/**
-	 * 判断 KEY 是否存在
+	 * Check if the key exists in redis.
 	 * check if the key exists in redis
-	 * @param key {const char*} KEY 值
+	 * @param key {const char*} KEY value.
 	 *  the key
-	 * @param len {size_t} key 长度
+	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @return {bool} 返回 true 表示存在，否则表示出错或不存在
+	 * @return {bool} Returns true to indicate exists. Returns false to indicate
+	 * error or does not exist.
 	 *  true returned if key existing, false if error or not existing
 	 */
 	bool exists(const char* key, size_t len);
 	bool exists(const char* key);
 
 	/**
-	 * 设置 KEY 的生存周期，单位（秒）
+	 * Set KEY expiration time (unit: seconds).
 	 * set a key's time to live in seconds
-	 * @param key {const char*} 键值
+	 * @param key {const char*} Key value.
 	 *  the key
-	 * @param len {size_t} key 长度
+	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @param n {int} 生存周期（秒）
+	 * @param n {int} Survival time (seconds).
 	 *  lief cycle in seconds
-	 * @return {int} 返回值含义如下：
+	 * @return {int} Return value as below:
 	 *  return value as below:
-	 *  > 0: 成功设置了生存周期
+	 *  > 0: Successfully set expiration time.
 	 *       set successfully
-	 *  0：该 key 不存在
+	 *  0: Key does not exist.
 	 *    the key doesn't exist
-	 *  < 0: 出错
+	 *  < 0: Error occurred.
 	 *       error happened
 	 */
 	int expire(const char* key, size_t len, int n);
 	int expire(const char* key, int n);
 
 	/**
-	 * 用 UNIX 时间截设置 KEY 的生存周期
+	 * Set KEY expiration time using UNIX timestamp.
 	 * set the expiration for a key as a UNIX timestamp
-	 * @param key {const char*} 对象键值
+	 * @param key {const char*} Key value.
 	 *  the key
-	 * @param len {size_t} key 长度
+	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @param stamp {time_t} UNIX 时间截，即自 1970 年以来的秒数
+	 * @param stamp {time_t} UNIX timestamp, seconds since January 1, 1970.
 	 *  an absolute Unix timestamp (seconds since January 1, 1970).
-	 * @return {int} 返回值的含义：
+	 * @return {int} Return value meaning:
 	 *  return value:
-	 *  1: 设置成功
+	 *  1: Set successfully.
 	 *     the timeout was set
-	 *  0: 该 key 不存在
+	 *  0: Key does not exist.
 	 *     the key doesn't exist or the timeout couldn't be set
-	 * -1: 出错
+	 * -1: Error occurred.
 	 *     error happened
 	 */
 	int expireat(const char* key, size_t len, time_t stamp);
 	int expireat(const char* key, time_t stamp);
 
 	/**
-	 * 查找所有符合给定模式 pattern 的 key
+	 * Find all keys matching the given pattern.
 	 * find all keys matching the given pattern
-	 * @param pattern {const char*} 匹配模式
+	 * @param pattern {const char*} Matching pattern.
 	 *  the give matching pattern
-	 * @param out {std::vector<string>*} 非 NULL 时用来存储结果集
+	 * @param out {std::vector<string>*} When not NULL, stores matched results.
 	 *  store the matched keys
-	 * @return {int} 结果集的数量，0--为空，<0 -- 表示出错
+	 * @return {int} Returns number of matched keys. 0--empty, <0 -- indicates
+	 * error.
 	 *  return the number of the matched keys, 0 if none, < 0 if error
-	 *  匹配模式举例：
-	 *   KEYS * 匹配数据库中所有 key 。
-	 *   KEYS h?llo 匹配 hello ， hallo 和 hxllo 等。
-	 *   KEYS h*llo 匹配 hllo 和 heeeeello 等。
-	 *   KEYS h[ae]llo 匹配 hello 和 hallo ，但不匹配 hillo 。
+	 *  Matching pattern examples:
+	 *   KEYS * matches all keys in database.
+	 *   KEYS h?llo matches hello, hallo, hxllo, etc.
+	 *   KEYS h*llo matches hllo, heeeeello, etc.
+	 *   KEYS h[ae]llo matches hello and hallo, but not hillo.
 	 *
-	 *  操作成功后可以通过以下任一方式获得数据
-	 *  1、基类方法 get_value 获得指定下标的元素数据
-	 *  2、基类方法 get_child 获得指定下标的元素对象(redis_result），然后
-	 *     再通过 redis_result::argv_to_string 方法获得元素数据
-	 *  3、基类方法 get_result 方法取得总结果集对象 redis_result，然后再
-	 *     通过 redis_result::get_child 获得一个元素对象，然后再通过方式 2
-	 *     中指定的方法获得该元素的数据
-	 *  4、基类方法 get_children 获得结果元素数组对象，再通过 redis_result
-	 *     中的方法 argv_to_string 从每一个元素对象中获得元素数据
-	 *  5、在调用方法中传入非空的存储结果对象的地址
+	 *  When successful, result can be obtained by one of the following ways:
+	 *  1. Get specified subscript element value by base class function get_value.
+	 * 2. Get specified subscript element object (redis_result) by base class
+	 * function get_child, then
+	 *     get element value through redis_result::argv_to_string.
+	 * 3. Get overall result object redis_result by base class function get_result,
+	 * then
+	 * get first element object by redis_result::get_child, then get element value
+	 * by method 2
+	 *     above.
+	 * 4. Get child array by base class function get_children, then get element
+	 * value from each
+	 * redis_result object in array through redis_result's method argv_to_string.
+	 *  5. Pass non-empty storage container address in function call.
 	 */
 	int keys_pattern(const char* pattern, std::vector<string>* out);
 	
 	/**
-	 * 将数据从一个 redis-server 迁移至另一个 redis-server
+	 * Atomically transfer a key from one redis-server to another redis-server.
 	 * atomically transfer a key from a redis instance to another one
-	 * @param key {const char*} 数据对应的键值
+	 * @param key {const char*} Key value corresponding to data.
 	 *  the key
-	 * @param len {size_t} key 长度
+	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @param addr {const char*} 目标 redis-server 服务器地址，格式：ip:port
+	 * @param addr {const char*} Destination redis-server listening address,
+	 * format: ip:port
 	 *  the destination redis instance's address, format: ip:port
-	 * @param dest_db {unsigned} 目标 redis-server 服务器的数据库 ID 号
+	 * @param dest_db {unsigned} Destination database ID in destination
+	 * redis-server.
 	 *  the databases ID in destination redis
-	 * @param timeout {unsigned} 迁移过程的超时时间(毫秒级)
+	 * @param timeout {unsigned} Timeout time for migration process (millisecond
+	 * level)
 	 *  timeout(microseconds) in transfering
 	 * @param options {const char*} COPY/REPLACE/AUTH/AUTH2...
 	 *  transfer option: COPY or REPLACE
-	 * @return {bool} 迁移是否成功
+	 * @return {bool} Whether migration was successful.
 	 *  if transfering successfully
 	 */
 	bool migrate(const char* key, size_t len, const char* addr,
@@ -199,16 +211,17 @@ public:
 		const char* options = NULL);
 
 	/**
-	 * 将数据移至本 redis-server 中的另一个数据库中
+	 * Move a key to another database in the same redis-server.
 	 * move a key to another database
-	 * @param key {const char*} 数据键值
+	 * @param key {const char*} Key value.
 	 *  the key
-	 * @param len {size_t} key 长度
+	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @param dest_db {unsigned} 目标数据库 ID 号
+	 * @param dest_db {unsigned} Destination database ID.
 	 *  the destination database
-	 * @return {int} 迁移是否成功。-1: 表示出错，0：迁移失败，因为目标数据库中存在
-	 *  相同键值，1：迁移成功
+	 * @return {int} Whether migration was successful. -1: indicates error. 0:
+	 * migration failed because
+	 *  same key already exists in destination database. 1: migration successful.
 	 *  if moving succcessfully. -1 if error, 0 if moving failed because
 	 *  the same key already exists, 1 if successful
 	 */
@@ -216,126 +229,131 @@ public:
 	int move(const char* key, unsigned dest_db);
 
 	/**
-	 * 返回给定 key 引用所储存的值的次数。此命令主要用于除错。
+	 * Get referring count of object associated with key. This is only for
+	 * debugging.
 	 * get the referring count of the object, which just for debugging
-	 * @param key {const char*} 数据键值
+	 * @param key {const char*} Key value.
 	 *  the key
-	 * @param len {size_t} key 长度
+	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @return {int} 返回 0 表示该 key 不存在；< 0 表示出错
+	 * @return {int} Returns 0 to indicate key does not exist. < 0 to indicate
+	 * error.
 	 *  0 if key not exists, < 0 if error
 	 */
 	int object_refcount(const char* key, size_t len);
 	int object_refcount(const char* key);
 
 	/**
-	 * 返回给定 key 键储存的值所使用的内部表示
+	 * Get internal storage encoding of object associated with key.
 	 * get the internal storing of the object assosicate with the key
-	 * @param key {const char*} 数据键值
+	 * @param key {const char*} Key value.
 	 *  the key
-	 * @param len {size_t} key 长度
-	 * @param out {string&} 存在结果
+	 * @param len {size_t} Key length.
+	 * @param out {string&} Store result.
 	 *  store the result
-	 * @return {bool} 是否成功
+	 * @return {bool} Whether successful.
 	 *  if successful
 	 */
 	bool object_encoding(const char* key, size_t len, string& out);
 	bool object_encoding(const char* key, string& out);
 
 	/**
-	 * 返回给定 key 自储存以来的空闲时间(idle， 没有被读取也没有被写入)，以秒为单位
+	 * Get idle time (idle: not read or written) of key since first stored, unit is
+	 * seconds.
 	 * get the key's idle time in seconds since its first stored
-	 * @param key {const char*} 数据键值
+	 * @param key {const char*} Key value.
 	 *  the key
-	 * @param len {size_t} key 长度
+	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @return {int} 返回值 < 0 表示出错
+	 * @return {int} Return value < 0 indicates error.
 	 *  0 if error happened
 	 */
 	int object_idletime(const char* key, size_t len);
 	int object_idletime(const char* key);
 
 	/**
-	 * 移除给定 key 的生存时间，将这个 key 从"易失的"(带生存时间 key )转换成
-	 * "持久的"(一个不带生存时间、永不过期的 key )
+	 * Remove expiration time from key, converting key from "volatile" (key with
+	 * expiration time) to
+	 * "persistent" (key without expiration time, never expires).
 	 * remove the expiration from a key
-	 * @param key {const char*} 对象键值
+	 * @param key {const char*} Key value.
 	 *  the key
-	 * @param len {size_t} key 长度
+	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @return {int} 返回值的含义如下：
+	 * @return {int} Return value meaning:
 	 *  the value returned as below:
-	 *  1 -- 设置成功
+	 *  1 -- Set successfully.
 	 *       set ok
-	 *  0 -- 该 key 不存在或未设置过期时间
+	 *  0 -- Key does not exist or expiration time was not set.
 	 *       the key not exists or not be set expiration
-	 * -1 -- 出错
+	 * -1 -- Error occurred.
 	 *       error happened
 	 */
 	int persist(const char* key, size_t len);
 	int persist(const char* key);
 
 	/**
-	 * 设置 KEY 的生存周期，单位（毫秒）
+	 * Set KEY expiration time (unit: milliseconds).
 	 * set a key's time to live in milliseconds
-	 * @param key {const char*} 键值
+	 * @param key {const char*} Key value.
 	 *  the key
-	 * @param len {size_t} key 长度
+	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @param n {int} 生存周期（毫秒）
+	 * @param n {int} Survival time (milliseconds).
 	 *  time to live in milliseconds
-	 * @return {int} 返回值含义如下：
+	 * @return {int} Return value as below:
 	 *  value returned as below:
-	 *  > 0: 成功设置了生存周期
+	 *  > 0: Successfully set expiration time.
 	 *       set successfully
-	 *    0：该 key 不存在
+	 *    0: Key does not exist.
 	 *       the key doesn't exist
-	 *  < 0: 出错
+	 *  < 0: Error occurred.
 	 *       error happened
 	 */
 	int pexpire(const char* key, size_t len, int n);
 	int pexpire(const char* key, int n);
 
 	/**
-	 * 以毫秒为单位设置 key 的过期 unix 时间戳
+	 * Set key expiration time using UNIX timestamp in milliseconds.
 	 * set the expiration for a key as UNIX timestamp specified
 	 * in milliseconds
-	 * @param key {const char*} 键值
+	 * @param key {const char*} Key value.
 	 *  the key
-	 * @param len {size_t} key 长度
+	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @param n {long long int} UNIX 时间截，即自 1970 年以来的毫秒数
+	 * @param n {long long int} UNIX timestamp, milliseconds since January 1, 1970.
 	 *  the UNIX timestamp in milliseconds from 1970.1.1
-	 * @return {int} 返回值含义如下：
+	 * @return {int} Return value as below:
 	 *  value resturned as below:
-	 *  > 0: 成功设置了生存周期
+	 *  > 0: Successfully set expiration time.
 	 *       set successfully
-	 *    0：该 key 不存在
+	 *    0: Key does not exist.
 	 *       the key doesn't exist
-	 *  < 0: 出错
+	 *  < 0: Error occurred.
 	 *       error happened
 	 */
 	int pexpireat(const char* key, size_t len, long long int n);
 	int pexpireat(const char* key, long long int n);
 
 	/**
-	 * 获得 KEY 的剩余生存周期，单位（毫秒）
+	 * Get KEY remaining survival time (unit: milliseconds).
 	 * get the time to live for a key in milliseconds
-	 * @param key {const char*} 键值
+	 * @param key {const char*} Key value.
 	 *  the key
-	 * @param len {size_t} key 长度
+	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @return {int} 返回对应键值的生存周期
+	 * @return {int} Returns corresponding value, as below:
 	 *  value returned as below:
-	 *  >0: 该 key 剩余的生存周期（毫秒）
+	 *  >0: Key remaining survival time (milliseconds).
 	 *      the time to live for a key in milliseconds
-	 *  -3：出错
+	 *  -3: Error occurred.
 	 *      error happened
-	 *  -2：key 不存在
+	 *  -2: Key does not exist.
 	 *      the key doesn't exist
-	 *  -1：当 key 存在但没有设置剩余时间
+	 *  -1: Key exists but has no remaining survival time.
 	 *      th key were not be set expiration
-	 * 注：对于 redis-server 2.8 以前版本，key 不存在或存在但未设置生存期则返回 -1
+	 * Note: For redis-server versions before 2.8, -1 will be returned if key
+	 * does not exist or key was not set expiration.
 	 * notice: for redis version before 2.8, -1 will be returned if the
 	 * key doesn't exist or the key were not be set expiration.
 	 */
@@ -343,17 +361,17 @@ public:
 	long long int pttl(const char* key);
 
 	/**
-	 * 从当前数据库中随机返回(不会删除)一个 key
+	 * Return (but not delete) a random key from current database.
 	 * return a random key from the keyspace
-	 ＊@param buf {string&} 成功获得随机 KEY 时存储结果
+	 * @param buf {string&} Store result when KEY is successfully obtained.
 	 *  store the key
-	 * @return {bool} 操作是否成功，当出错或 key 不存在时返回 false
+	 * @return {bool} Whether successful. Returns false when key space is empty.
 	 *  true on success, or false be returned
 	 */
 	bool randomkey(string& buf);
 
 	/**
-	 * 将 key 改名为 newkey
+	 * Rename key to newkey.
 	 * rename a key
 	 * @return {bool}
 	 *  true on success, or error happened
@@ -361,24 +379,25 @@ public:
 	bool rename_key(const char* key, const char* newkey);
 
 	/**
-	 * 当且仅当 newkey 不存在时，将 key 改名为 newkey
+	 * Rename key to newkey only if newkey does not exist.
 	 * rename a key only if the new key does not exist
-	 * @param key {const char*} 旧 key
-	 * @param newkey {const char*} 新 key
-	 * @return {int} 返回值 > 0: 成功，0： 目标 key 存在，< 0：失败
+	 * @param key {const char*} Old key.
+	 * @param newkey {const char*} New key.
+	 * @return {int} Return value > 0: success. 0: target key exists. < 0: failure.
 	 *  return value > 0 on success, < 0 on error, == 0 when newkey exists
 	 */
 	int renamenx(const char* key, const char* newkey);
 
 	/**
-	 * 反序列化给定的序列化值，并将它和给定的 key 关联
+	 * Create a key using provided serialized value, previously obtained by using
+	 * DUMP.
 	 * create a key using the provided serialized value, previously
 	 * obtained by using DUMP
-	 * @param ttl {int} 以毫秒为单位为 key 设置生存时间，如果 ttl 为 0，
-	 *  那么不设置生存时间
+	 * @param ttl {int} Survival time for key in milliseconds. If ttl is 0,
+	 *  then expiration will not be set.
 	 *  the time to live for the key in milliseconds, if tll is 0,
 	 *  expiration will not be set
-	 * @param replace {bool} 如果 key 存在是否直接覆盖
+	 * @param replace {bool} If key already exists, whether to directly replace.
 	 *  if the key already exists, this parameter decides if replacing
 	 *  the existing key
 	 * @return {bool}
@@ -388,23 +407,24 @@ public:
 		int ttl, bool replace = false);
 
 	/**
-	 * 获得 KEY 的剩余生存周期，单位（秒）
+	 * Get KEY remaining survival time (unit: seconds).
 	 * get the time to live for a key in seconds
-	 * @param key {const char*} 键值
+	 * @param key {const char*} Key value.
 	 *  the key
-	 * @param len {size_t} key 长度
+	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @return {int} 返回对应键值的生存周期
+	 * @return {int} Returns corresponding value, as below:
 	 *  return value as below:
-	 *  > 0: 该 key 剩余的生存周期（秒）
+	 *  > 0: Key remaining survival time (seconds).
 	 *       the time to live for a key in seconds
-	 *   -3：出错
+	 *   -3: Error occurred.
 	 *       error happened
-	 *   -2：key 不存在
+	 *   -2: Key does not exist.
 	 *       the key doesn't exist
-	 *   -1：当 key 存在但没有设置剩余时间
+	 *   -1: Key exists but has no remaining survival time.
 	 *       the key were not be set expiration
-	 * 注：对于 redis-server 2.8 以前版本，key 不存在或存在但未设置生存期则返回 -1
+	 * Note: For redis-server versions before 2.8, -1 will be returned
+	 *  if key does not exist or key was not set expiration.
 	 * notice: for the redis version before 2.8, -1 will be returned
 	 *  if the key doesn't exist or the key were not be set expiration
 	 */
@@ -412,41 +432,48 @@ public:
 	int ttl(const char* key);
 
 	/**
-	 * 获得 KEY 的存储类型
+	 * Get storage type of KEY.
 	 * get the the type stored at key
-	 * @para key {const char*} KEY 值
+	 * @para key {const char*} KEY value.
 	 *  the key
-	 * @param len {size_t} key 长度
+	 * @param len {size_t} Key length.
 	 *  the key's length
-	 * @return {redis_key_t} 返回 KEY 的存储类型
+	 * @return {redis_key_t} Returns storage type of KEY.
 	 *  return redis_key_t defined above as REDIS_KEY_
 	 */
 	redis_key_t type(const char* key, size_t len);
 	redis_key_t type(const char* key);
 
 	/**
-	 * 命令用于迭代当前数据库中的数据库键
+	 * Incrementally iterate the keys space in the specified database.
 	 * incrementally iterate the keys space in the specified database
-	 * @param cursor {int} 游标值，开始遍历时该值写 0
+	 * @param cursor {int} Cursor value. Write 0 when starting iteration.
 	 *  the iterating cursor beginning with 0
-	 * @param out {std::vector<acl::string>&} 存储结果集，内部以追加方式将本次
-	 *  遍历结果集合添加进该数组中，为防止因总结果集过大导致该数组溢出，用户可在
-	 *  调用本函数前后清理该数组对象
+	 * @param out {std::vector<acl::string>&} String array storing results. Array
+	 * will be cleared
+	 * internally and string results will be appended to array. To prevent results
+	 * from growing too large, users should
+	 *  clear this parameter before each iteration.
 	 *  string array storing the results, the array will be cleared
 	 *  internal and the string result will be appened to the array
-	 * @param pattern {const char*} 匹配模式，glob 风格，非空时有效
-	 &  the matching pattern with glob style, only effective if not NULL
-	 * @param count {const size_t*} 限定的结果集数量，非空指针时有效
+	 * @param pattern {const char*} Matching pattern with glob style, effective
+	 * when not empty.
+	 *  the matching pattern with glob style, only effective if not NULL
+	 * @param count {const size_t*} Limit maximum number of results stored in
+	 * array, effective
+	 *  only when not NULL.
 	 *  limit the max number of the results stored in array, only
 	 *  effective when not NULL
-	 * @return {int} 下一个游标位置，含义如下：
+	 * @return {int} Next cursor position, as below:
 	 *  return the next cursor value as follow:
-	 *   0：遍历结束，当遍历结束时还需要检查 out 中的结果集是否为空，如果
-	 *      不为空，则需要继续进行处理
+	 * 0: Iteration is finished. At this time, you need to check if out results are
+	 * empty. If
+	 *      not empty, you need to process them.
 	 *      iterating is finished and the out should be checked if emtpy
-	 *  -1: 出错
+	 *  -1: Error occurred.
 	 *      some error happened
-	 *  >0: 游标的下一个位置，即使这样，具体有多少结果还需要检查 out，因为有可能为空
+	 * >0: Next cursor position. Regardless of how many results are obtained, you
+	 * need to check out, as it may be empty.
 	 *      the next cursor value for iterating
 	 */
 	int scan(int cursor, std::vector<string>& out,
@@ -456,3 +483,4 @@ public:
 } // namespace acl
 
 #endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
+

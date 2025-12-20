@@ -15,32 +15,34 @@ class mail_body;
 class ofstream;
 
 /**
- * 邮件数据构造类，此类可以生成一封完整的邮件，同时还用于构建 SMTP 发送过程
- * 的邮件信封信息
+ * Email data construction class. This class can generate a complete email, and
+ * is also used to build email envelope information
+ * for SMTP sending process
  */
 class ACL_CPP_API mail_message : public noncopyable
 {
 public:
 	/**
-	 * 构造函数
-	 * @param charset {const char*} 字符集
+	 * Constructor
+	 * @param charset {const char*} Character set
 	 */
 	mail_message(const char* charset = "utf-8");
 	~mail_message();
 
 	/**
-	 * 设置 SMTP 发送过程的身份验证信息
-	 * @param user {const char*} 邮箱账号
-	 * @param pass {const char*} 邮箱密码
+	 * Set authentication information for SMTP sending process
+	 * @param user {const char*} Email account
+	 * @param pass {const char*} Email password
 	 * @return {mail_message&}
 	 */
 	mail_message& set_auth(const char* user, const char* pass);
 
 	/**
-	 * 设置邮件的发送都邮箱，此字段可用于 SMTP 发送过程的 MAIL FROM 命令，
-	 * 同时又可作为邮件头中的 From 字段值
-	 * @param from {const char*} 发件人邮件地址
-	 * @param name {const char*} 发件人名称
+	 * Set sender's email address for email. This field can be used for MAIL FROM
+	 * command in SMTP sending process,
+	 * and can also be used as From field value in email header
+	 * @param from {const char*} Sender's email address
+	 * @param name {const char*} Sender's name
 	 * @return {mail_message&}
 	 */
 	mail_message& set_from(const char* from, const char* name = NULL);
@@ -48,104 +50,116 @@ public:
 	mail_message& set_sender(const char* sender, const char* name = NULL);
 
 	/**
-	 * 设置邮件头中的 Reply-To 字段值
-	 * @param reply_to {const char*} Reply-To 邮箱字段值
-	 * @param name {const char*} Reply-To 对应的人员名称
+	 * Set Reply-To field value in email header
+	 * @param reply_to {const char*} Reply-To email field value
+	 * @param name {const char*} Person name corresponding to Reply-To
 	 * @return {mail_message&}
 	 */
 	mail_message& set_reply_to(const char* reply_to, const char* name = NULL);
 
 	/**
-	 * 设置邮件头中的 Return-Path 字段值
-	 * @param return_path {const char*} Return-Path 邮箱字段值
+	 * Set Return-Path field value in email header
+	 * @param return_path {const char*} Return-Path email field value
 	 * @return {mail_message&}
 	 */
 	mail_message& set_return_path(const char* return_path);
 
 	/**
-	 * 设置邮件头中的 Delivered-To 字段值
-	 * @param delivered_to {const char*} Delivered-To 邮箱字段值
+	 * Set Delivered-To field value in email header
+	 * @param delivered_to {const char*} Delivered-To email field value
 	 * @return {mail_message&}
 	 */
 	mail_message& set_delivered_to(const char* delivered_to);
 
 	/**
-	 * 添加收件人地址，该地址仅出现在信封中，不出现在邮件头中
-	 * @param recipients {const char*} 收件人集合，遵守 RFC822 格式
+	 * Add recipient address. This address only appears in envelope, not in email
+	 * header
+	 * @param recipients {const char*} Recipient collection, complies with RFC822
+	 * format
 	 * @return {mail_message&}
 	 */
 	mail_message& add_recipients(const char* recipients);
 
 	/**
-	 * 设置邮件头中的 To 字段值，同时该收件人地址集合被用于信封中作为收件人
-	 * @param to {const char*} 收件人邮箱地址集合，遵守 RFC822 格式
+	 * Set To field value in email header. This recipient address collection is
+	 * also used in envelope as recipients
+	 * @param to {const char*} Recipient email address collection, complies with
+	 * RFC822 format
 	 * @return {mail_message&}
 	 */
 	mail_message& add_to(const char* to);
 
 	/**
-	 * 设置邮件头中的 Cc 字段值，同时该收件人地址集合被用于信封中作为收件人
-	 * @param cc {const char*} 收件人邮箱地址集合，遵守 RFC822 格式
+	 * Set Cc field value in email header. This recipient address collection is
+	 * also used in envelope as recipients
+	 * @param cc {const char*} Recipient email address collection, complies with
+	 * RFC822 format
 	 * @return {mail_message&}
 	 */
 	mail_message& add_cc(const char* cc);
 
 	/**
-	 * 设置邮件发送的暗送地址集合，该地址集合不会出现在邮件头中
-	 * @param bcc {const char*} 暗送邮箱地址集合，遵守 RFC822 格式
+	 * Set blind carbon copy address collection for email sending. This address
+	 * collection will not appear in email header
+	 * @param bcc {const char*} Blind carbon copy email address collection,
+	 * complies with RFC822 format
 	 * @return {mail_message&}
 	 */
 	mail_message& add_bcc(const char* bcc);
 
 	/**
-	 * 设置邮件头中的主题，该主题将采用 rfc2047 编码且采用类构造函数
-	 * 设置的字符集
-	 * @param subject {const char*} 邮件头主题字段值
+	 * Set subject in email header. This subject will use rfc2047 encoding and use
+	 * character set set by class constructor
+	 * @param subject {const char*} Email header subject field value
 	 * @return {mail_message&}
 	 */
 	mail_message& set_subject(const char* subject);
 
 	/**
-	 * 用户可以调用此函数添加邮件头中的头部扩展字段值
-	 * @param name {const char*} 字段名
-	 * @param value {const char*} 字段值
+	 * Users can call this function to add header extension field values in email
+	 * header
+	 * @param name {const char*} Field name
+	 * @param value {const char*} Field value
 	 * @return {mail_message&}
 	 */
 	mail_message& add_header(const char* name, const char* value);
 
 	/**
-	 * 设置邮件的正文对象
-	 * @param body {const mail_body&} 邮件正文对象
+	 * Set email body object
+	 * @param body {const mail_body&} Email body object
 	 * @return {mail_message&}
 	 */
 	mail_message& set_body(const mail_body& body);
 
 	/**
-	 * 给一封邮件添加一个附件
-	 * @param filepath {const char*} 附件全路径（非空）
-	 * @param content_type {const char*} 附件类型（非空）
+	 * Add an attachment to an email
+	 * @param filepath {const char*} Full path of attachment (non-empty)
+	 * @param content_type {const char*} Attachment type (non-empty)
 	 * @return {mail_message&}
 	 */
 	mail_message& add_attachment(const char* filepath,
 		const char* content_type);
 
 	/**
-	 * 构造一封完整的邮件，并将邮件内容存储于给定磁盘文件中，如果该文件
-	 * 存在则首先会清空，否则会创建新的文件
-	 * @param filepath {const char*} 目标文件
-	 * @return {bool} 操作是否成功
+	 * Construct a complete email and store email content in given disk file. If
+	 * this file
+	 * exists, will clear it first, otherwise will create new file
+	 * @param filepath {const char*} Target file
+	 * @return {bool} Whether operation was successful
 	 */
 	bool save_to(const char* filepath);
 
 	/**
-	 * 可以单独调用本函数用来生成邮件头数据
-	 * @param out {string&} 创建的邮件头数据将追加于该缓冲区中
-	 * @return {bool} 操作是否成功
+	 * Can call this function separately to generate email header data
+	 * @param out {string&} Created email header data will be appended to this
+	 * buffer
+	 * @return {bool} Whether operation was successful
 	 */
 	bool build_header(string& out);
 
 	/**
-	 * 获得所创建的邮件在磁盘上的全路径，该函数必须在调用 save_to 成功后调用
+	 * Get full path of created email on disk. This function must be called after
+	 * successfully calling save_to
 	 * @return {const char*}
 	 */
 	const char* get_email() const
@@ -154,7 +168,7 @@ public:
 	}
 
 	/**
-	 * 获得用于 SMTP 身份验证时的邮箱账号
+	 * Get email account for SMTP authentication
 	 * @return {const char*}
 	 */
 	const char* get_auth_user() const
@@ -163,7 +177,7 @@ public:
 	}
 
 	/**
-	 * 获得用于 SMTP 身份验证时的邮箱账号密码
+	 * Get email account password for SMTP authentication
 	 * @return {const char*}
 	 */
 	const char* get_auth_pass() const
@@ -172,7 +186,7 @@ public:
 	}
 
 	/**
-	 * 获得由 set_from 设置的邮箱地址对象
+	 * Get email address object set by set_from
 	 * @return {const rfc822_addr*}
 	 */
 	const rfc822_addr* get_from() const
@@ -181,7 +195,7 @@ public:
 	}
 
 	/**
-	 * 获得由 set_sender 设置的邮箱地址对象
+	 * Get email address object set by set_sender
 	 * @return {const rfc822_addr*}
 	 */
 	const rfc822_addr* get_sender() const
@@ -190,7 +204,7 @@ public:
 	}
 
 	/**
-	 * 获得由 set_reply_to 设置的邮箱地址对象
+	 * Get email address object set by set_reply_to
 	 * @return {const rfc822_addr*}
 	 */
 	const rfc822_addr* get_reply_to() const
@@ -199,7 +213,7 @@ public:
 	}
 
 	/**
-	 * 获得由 set_return_path 设置的邮箱地址对象
+	 * Get email address object set by set_return_path
 	 * @return {const rfc822_addr*}
 	 */
 	const rfc822_addr* get_return_path() const
@@ -208,7 +222,7 @@ public:
 	}
 
 	/**
-	 * 获得由 set_delivered_to 设置的邮箱地址对象
+	 * Get email address object set by set_delivered_to
 	 * @return {const rfc822_addr*}
 	 */
 	const rfc822_addr* get_delivered_to() const
@@ -222,7 +236,7 @@ public:
 	}
 
 	/**
-	 * 获得由 set_cc 设置的邮箱地址对象集合
+	 * Get email address object collection set by set_cc
 	 * @return {const std::vector<rfc822_addr*>&}
 	 */
 	const std::vector<rfc822_addr*>& get_cc() const
@@ -231,7 +245,7 @@ public:
 	}
 
 	/**
-	 * 获得由 set_bcc 设置的邮箱地址对象集合
+	 * Get email address object collection set by set_bcc
 	 * @return {const std::vector<rfc822_addr*>&}
 	 */
 	const std::vector<rfc822_addr*>& get_bcc() const
@@ -240,7 +254,7 @@ public:
 	}
 
 	/**
-	 * 获得所有邮件接收者的地址集合
+	 * Get all email recipient address collection
 	 * @return {const std::vector<rfc822_addr*>&}
 	 */
 	const std::vector<rfc822_addr*>& get_recipients() const
@@ -249,16 +263,16 @@ public:
 	}
 
 	/**
-	 * 获得用户设置的邮件头扩展字段值
-	 * @param name {const char*} 字段名
+	 * Get email header extension field value set by user
+	 * @param name {const char*} Field name
 	 * @return {const char*}
 	 */
 	const char* get_header_value(const char* name) const;
 
 	/**
-	 * 为 MIME 数据创建唯一的分隔符
-	 * @param id {const char*} 调用者填写的 ID 标识
-	 * @param out {string&} 存储结果
+	 * Create unique delimiter for MIME data
+	 * @param id {const char*} ID identifier filled by caller
+	 * @param out {string&} Store result
 	 */
 	static void create_boundary(const char* id, string& out);
 
@@ -301,3 +315,4 @@ private:
 } // namespace acl
 
 #endif // !defined(ACL_MIME_DISABLE)
+

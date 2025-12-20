@@ -17,30 +17,33 @@ struct acl_pthread_mutex_t;
 namespace acl {
 
 /**
- * 互斥锁，可以同时创建文件锁和线程锁，也可以只创建一种锁
+ * Mutex lock, can create both file lock and thread lock simultaneously, or
+ * create only one type of lock
  */
 class ACL_CPP_API locker : public noncopyable {
 public:
 	/**
-	 * 构造函数
-	 * @param use_mutex {bool} 是否创建线程锁
-	 * @param use_spinlock {bool} 内部当使用线程锁时是否需要自旋锁
+	 * Constructor
+	 * @param use_mutex {bool} Whether to create thread lock
+	 * @param use_spinlock {bool} Whether to use spinlock internally when using
+	 * thread lock
 	 */
 	locker(bool use_mutex = true, bool use_spinlock = false);
 	virtual ~locker();
 
 	/**
-	 * 根据文件路径创建文件锁
-	 * @param file_path {const char*} 文件路径，非空
-	 * @return {bool} 是否成功
-	 * 注：此函数与下面的 open 函数仅能同时调用一个
+	 * Create file lock based on file path
+	 * @param file_path {const char*} File path, non-empty
+	 * @return {bool} Whether successful
+	 * Note: This function and the open function below can only be called one at a
+	 * time
 	 */
 	bool open(const char* file_path);
 
 	/**
-	 * 根据文件句柄创建文件锁
-	 * @param fh {int} 文件句柄
-	 * @return {bool} 是否成功
+	 * Create file lock based on file handle
+	 * @param fh {int} File handle
+	 * @return {bool} Whether successful
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	bool open(void* fh);
@@ -49,20 +52,20 @@ public:
 #endif
 
 	/**
-	 * 针对已经打开的锁(包括线程锁和文件锁)进行加锁
-	 * @return {bool} 加锁是否成功
+	 * Lock the already opened lock (including thread lock and file lock)
+	 * @return {bool} Whether locking was successful
 	 */
 	bool lock();
 
 	/**
-	 * 尝试对已经打开的锁(包括线程锁和文件锁)进行加锁
-	 * @return {bool} 加锁是否成功
+	 * Try to lock the already opened lock (including thread lock and file lock)
+	 * @return {bool} Whether locking was successful
 	 */
 	bool try_lock();
 
 	/**
-	 * 针对已经打开的锁(包括线程锁和文件锁)进行解锁
-	 * @return {bool} 解锁是否成功
+	 * Unlock the already opened lock (including thread lock and file lock)
+	 * @return {bool} Whether unlocking was successful
 	 */
 	bool unlock();
 
@@ -94,3 +97,4 @@ private:
 };
 
 }  // namespace acl
+

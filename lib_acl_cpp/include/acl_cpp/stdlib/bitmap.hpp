@@ -7,81 +7,86 @@ namespace acl {
 class ACL_CPP_API bitmap : public noncopyable {
 public:
 	/**
-	 * 构造函数
-	 * @param buf {const void*} 源数据内存位映射区
-	 * @param len {size_} buf 位映射内存区中被置位的数量
+	 * Constructor
+	 * @param buf {const void*} Source data memory bit mapping area
+	 * @param len {size_} Number of bits set in buf bit mapping memory area
 	 */
 	bitmap(const void* buf, size_t len);
 
 	/**
-	 * 构造函数
-	 * @param len {size_t} 最大容纳的位映射的数量
+	 * Constructor
+	 * @param len {size_t} Maximum number of bit mappings that can be accommodated
 	 */
 	bitmap(size_t len);
 
 	~bitmap();
 
 	/**
-	 * 将所给数值映射在位集合中
+	 * Map the given value in the bit set
 	 * @param n {size_t}
-	 * @return {bool} 返回 true 表示添加成功，否则表示该值越界或已经存在
+	 * @return {bool} Returns true indicates add was successful, otherwise
+	 * indicates value is out of bounds or already exists
 	 */
 	bool bit_set(size_t n);
 
 	/**
-	 * 判断所给数据是否已经被设置在位映射中
+	 * Determine whether the given data has been set in the bit mapping
 	 * @param n {size_t}
-	 * @return {bool} 判断指定数值是否存在于位映射集合中
+	 * @return {bool} Determine whether the specified value exists in the bit
+	 * mapping set
 	 */
 	bool bit_isset(size_t n) const;
 
 	/**
-	 * 将指定数值从位集合中去除
+	 * Remove the specified value from the bit set
 	 * @param n {size_t}
-	 * @return {bool} 返回 false 表示该值越界或不存在于位集合中
+	 * @return {bool} Returns false indicates value is out of bounds or does not
+	 * exist in the bit set
 	 */
 	bool bit_unset(size_t n);
 
 	/**
-	 * 将bitmap信息拷贝到buf中
-	 * @param buf {void*}存放拷贝结果
-	 * @param len {size_t} buf的最大长度
-	 * @return {size_t} 返回成功拷贝的内存长度，返回 0 表示 buf 太小
+	 * Copy bitmap information to buf
+	 * @param buf {void*} Store copy result
+	 * @param len {size_t} Maximum length of buf
+	 * @return {size_t} Returns successfully copied memory length. Returns 0
+	 * indicates buf is too small
 	 */
 	size_t tobuf(void* buf, size_t len) const;
 
 	/**
-	 * 从buf中设置当前bitmap信息
-	 * @param buf {const void*} 要设置bitmap信息
-	 * @param len {size_t} buf的长度
-	 * @return true 成功，false失败
+	 * Set current bitmap information from buf
+	 * @param buf {const void*} Bitmap information to set
+	 * @param len {size_t} Length of buf
+	 * @return true on success, false on failure
 	 */
 	bool frombuf(const void* buf, size_t len);
 
 	/**
-	 * 重置当前的bitmap为 0
+	 * Reset current bitmap to 0
 	 */
 	void reset(void);
 
 	/**
-	 * 获取当前位映射存储空间可以存储的位的个数
+	 * Get the number of bits that can be stored in the current bit mapping storage
+	 * space
 	 * @return {size_t}
 	 */
 	size_t size() const;
 
 	/**
-	 * 获得内部存储空间大小（字节）
+	 * Get internal storage space size (bytes)
 	 */
 	size_t space() const;
 
 	/**
-	 * 获取当前已经设置的个数
+	 * Get the number currently set
 	 * @return {size_t}
 	 */
 	size_t count() const;
 
 	/**
-	 * 当前bitmap是否已满
+	 * Whether current bitmap is full
 	 * @return {bool}
 	 */
 	bool full() const;
@@ -100,8 +105,9 @@ private:
 	size_t size_;
 	size_t count_;
 
-	//从新统计count数量
+	// Recalculate count number
 	void recount();
 };
 
 } // namespace acl
+

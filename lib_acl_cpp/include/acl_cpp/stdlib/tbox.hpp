@@ -10,9 +10,10 @@
 namespace acl {
 
 /**
- * 用于线程之间的消息通信，通过线程条件变量及线程锁实现
+ * Used for message communication between threads, implemented through thread
+ * condition variables and thread locks
  *
- * 示例：
+ * Example:
  *
  * class myobj {
  * public:
@@ -40,9 +41,10 @@ template<typename T>
 class tbox : public box<T> {
 public:
 	/**
-	 * 构造方法
-	 * @param free_obj {bool} 当 tbox 销毁时，是否自动检查并释放
-	 *  未被消费的动态对象
+	 * Constructor
+	 * @param free_obj {bool} When tbox is destroyed, whether to automatically
+	 * check and release
+	 *  unconsumed dynamic objects
 	 */
 	explicit tbox(bool free_obj = true)
 	: size_(0), free_obj_(free_obj), cond_(&lock_) {}
@@ -52,8 +54,8 @@ public:
 	}
 
 	/**
-	 * 清理消息队列中未被消费的消息对象
-	 * @param free_obj {bool} 释放调用 delete 方法删除消息对象
+	 * Clear unconsumed message objects in the message queue
+	 * @param free_obj {bool} Release message objects by calling delete method
 	 */
 	void clear(bool free_obj = false) {
 		if (free_obj) {
@@ -67,10 +69,11 @@ public:
 	}
 
 	/**
-	 * 发送消息对象
-	 * @param t {T*} 非空消息对象
-	 * @param notify_first {bool} 如果为 true，则先通知后解锁，否则先解锁
-	 *  后通知，注意二者的区别
+	 * Send message object
+	 * @param t {T*} Non-empty message object
+	 * @param notify_first {bool} If true, notify first then unlock, otherwise
+	 * unlock first
+	 *  then notify. Note the difference between the two
 	 * @return {bool}
 	 * @override
 	 */
@@ -91,17 +94,23 @@ public:
 	}
 
 	/**
-	 * 接收消息对象
-	 * @param ms {int} >= 0 时设置等待超时时间(毫秒级别)，
-	 *  否则永远等待直到读到消息对象或出错
-	 * @param found {bool*} 非空时用来存放是否获得了一个消息对象，主要用在
-	 *  当允许传递空对象时的检查
-	 * @return {T*} 非 NULL 表示获得一个消息对象，返回 NULL 时得需要做进一
-	 *  步检查，生产者如果 push 了一个空对象（NULL），则消费者也会获得 NULL，
-	 *  但此时仍然认为获得了一个消息对象，只不过为空对象；如果 wait_ms 参数
-	 *  为 -1 时返回 NULL 依然认为获得了一个空消息对象，如果 wait_ms 大于
-	 *  等于 0 时返回 NULL，则应该检查 found 参数的值为 true 还是 false 来
-	 *  判断是否获得了一个空消息对象
+	 * Receive message object
+	 * @param ms {int} When >= 0, set wait timeout (milliseconds),
+	 *  otherwise wait forever until message object is read or error occurs
+	 * @param found {bool*} When not NULL, used to store whether a message object
+	 * was obtained, mainly used for
+	 *  checking when passing null objects is allowed
+	 * @return {T*} Non-NULL indicates a message object was obtained. When returns
+	 * NULL, need to do further
+	 * checking. If producer pushes a null object (NULL), consumer will also get
+	 * NULL,
+	 * but it is still considered that a message object was obtained, just that
+	 * it's a null object. If wait_ms parameter
+	 * is -1 and returns NULL, it is still considered that a null message object
+	 * was obtained. If wait_ms is greater than
+	 * or equal to 0 and returns NULL, then should check whether found parameter
+	 * value is true or false to
+	 *  determine whether a null message object was obtained
 	 * @override
 	 */
 	T* pop(int ms = -1, bool* found = NULL) {
@@ -118,7 +127,7 @@ public:
 				return t;
 			}
 
-			// 注意调用顺序，必须先调用 wait 再判断 wait_ms
+			// Note the call order, must call wait first then check wait_ms
 			if (! cond_.wait(us, true) && us >= 0) {
 				if (! lock_.unlock()) { abort(); }
 				if (found) {
@@ -160,7 +169,7 @@ public:
 	}
 
 	/**
-	 * tbox 支持传递空消息
+	 * tbox supports passing null messages
 	 * @return {bool}
 	 * @override
 	 */
@@ -169,7 +178,7 @@ public:
 	}
 
 	/**
-	 * 返回当前存在于消息队列中的消息数量
+	 * Return the number of messages currently in the message queue
 	 * @return {size_t}
 	 */
 	size_t size() const {
@@ -207,3 +216,4 @@ private:
 };
 
 } // namespace acl
+

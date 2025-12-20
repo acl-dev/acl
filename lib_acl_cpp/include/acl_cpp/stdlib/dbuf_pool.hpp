@@ -8,9 +8,12 @@ struct ACL_DBUF_POOL;
 namespace acl {
 
 /**
- * 会话类的内存链管理类，该类仅提供内存分配函数，在整个类对象被析构时该内存链
- * 会被一次性地释放，该类适合于需要频繁分配一些大小不等的小内存的应用；
- * 该类实际上是封装了 lib_acl 中的 ACL_DBUF_POOL 结构及方法
+ * Session-based memory pool management class, which provides memory allocation
+ * functions. When the object is destroyed, memory will
+ * be released all at once. It is suitable for applications that need to
+ * frequently allocate some small-sized small memory blocks.
+ * This implementation is actually a wrapper for the ACL_DBUF_POOL structure in
+ * lib_acl.
  */
 
 #if 0
@@ -22,24 +25,26 @@ namespace acl {
 class ACL_CPP_API dbuf_pool { // : public noncopyable
 public:
 	/**
-	 * 该类对象必须动态创建
-	 * @param nblock {size_t} 4096字节的个数
-	 * @param align {size_t} 分配内存时的字节对齐数
+	 * Constructor, can be dynamically allocated.
+	 * @param nblock {size_t} Number of 4096-byte blocks.
+	 * @param align {size_t} Byte alignment when allocating memory.
 	 */
 	dbuf_pool(size_t nblock = 2, size_t align = 8);
 
 	/**
-	 * 该类对象需要动态创建，所以隐藏了析构函数，使用者需要调用 destroy
-	 * 函数来销毁动态对象
+	 * If the object needs to be dynamically allocated, after use, you need to call
+	 * destroy
+	 * to release the dynamically allocated object.
 	 */
 	void destroy() const;
 
 #ifdef ACL_DBUF_HOOK_NEW
 	/**
-	 * 重载 new/delete 操作符，使 dbuf_pool 对象本身也创建在内存池上，
-	 * 从而减少了 malloc/free 的次数
-	 * @param size {size_t} 由编译传入的 dbuf_pool 对象的长度大小
-	 * @param nblock {size_t} 内部采用的内存块（4096）的倍数
+	 * Override new/delete operators so that dbuf_pool objects can also be
+	 * allocated on the memory pool,
+	 * thereby avoiding malloc/free overhead.
+	 * @param size {size_t} Variable parameter, dbuf_pool object's length size.
+	 * @param nblock {size_t} Internal memory block (4096) multiplier used.
 	 */
 	static void *operator new(size_t size, size_t nblock = 2);
 
@@ -50,75 +55,85 @@ public:
 #endif // ACL_DBUF_HOOK_NEW
 
 	/**
-	 * 重置内存池的状态以便于重复使用该内存池对象
-	 * @param reserve {size_t} 若该值 > 0，则需要指定额外保留的内存大小，
-	 *  该大小必须小于等于已经在该内存池对象分配的大小
-	 * @return {bool} 如果输入参数非法，则返回 false
+	 * Reset memory pool state to reuse this memory pool object.
+	 * @param reserve {size_t} When value > 0, you need to specify the reserved
+	 * memory block size.
+	 * This size should be less than or equal to the size already allocated in this
+	 * memory pool object.
+	 * @return {bool} Whether reset was successful, returns false on error.
 	 */
 	bool dbuf_reset(size_t reserve = 0);
 
 	/**
-	 * 分配指定长度的内存
-	 * @param len {size_t} 需要分配的内存长度，当内存比较小时(小于构造函数
-	 *  中的 block_size)时，所分配的内存是在 dbuf_pool 所管理的内存链上，
-	 *  当内存较大时会直接使用 malloc 进行分配
-	 * @return {void*} 新分配的内存地址
+	 * Allocate memory of specified length.
+	 * @param len {size_t} Memory length to be allocated. When memory is relatively
+	 * small (less than constructor's
+	 * block_size), allocated memory will be allocated on dbuf_pool object's
+	 * internal memory pool.
+	 *  When memory is large, malloc will be used directly for allocation.
+	 * @return {void*} Newly allocated memory address.
 	 */
 	void* dbuf_alloc(size_t len);
 
 	/**
-	 * 分配指定长度的内存并将内存区域清零
-	 * @param len {size_t} 需要分配的内存长度
-	 * @return {void*} 新分配的内存地址
+	 * Allocate memory of specified length and initialize memory to zero.
+	 * @param len {size_t} Memory length to be allocated.
+	 * @return {void*} Newly allocated memory address.
 	 */
 	void* dbuf_calloc(size_t len);
 
 	/**
-	 * 根据输入的字符串动态创建新的内存并将字符串进行复制，类似于 strdup
-	 * @param s {const char*} 源字符串
-	 * @return {char*} 新复制的字符串地址
+	 * Dynamically allocate new memory and copy the string, similar to strdup.
+	 * @param s {const char*} Source string.
+	 * @return {char*} Address of newly copied string.
 	 */
 	char* dbuf_strdup(const char* s);
 
 	/**
-	 * 根据输入的字符串动态创建新的内存并将字符串进行复制，类似于 strdup
-	 * @param s {const char*} 源字符串
-	 * @param len {size_t} 限制所复制字符串的最大长度
-	 * @return {char*} 新复制的字符串地址
+	 * Dynamically allocate new memory and copy the string, similar to strdup.
+	 * @param s {const char*} Source string.
+	 * @param len {size_t} Maximum length of the string to be copied.
+	 * @return {char*} Address of newly copied string.
 	 */
 	char* dbuf_strndup(const char* s, size_t len);
 
 	/**
-	 * 根据输入的内存数据动态创建内存并将数据进行复制
-	 * @param addr {const void*} 源数据内存地址
-	 * @param len {size_t} 源数据长度
-	 * @return {void*} 新复制的数据地址
+	 * Dynamically allocate memory and copy memory data.
+	 * @param addr {const void*} Source memory address.
+	 * @param len {size_t} Source data length.
+	 * @return {void*} Address of newly copied data.
 	 */
 	void* dbuf_memdup(const void* addr, size_t len);
 
 	/**
-	 * 归还由内存池分配的内存
-	 * @param addr {const void*} 由内存池分配的内存地址
-	 * @return {bool} 如果该内存地址非内存池分配或释放多次，则返回 false
+	 * Return memory allocated by memory pool.
+	 * @param addr {const void*} Memory address allocated by memory pool.
+	 * @return {bool} Returns false if memory address is not allocated by memory
+	 * pool or released multiple times.
 	 */
 	bool dbuf_free(const void* addr);
 
 	/**
-	 * 保留由内存池分配的某段地址，以免当调用 dbuf_reset 时被提前释放掉
-	 * @param addr {const void*} 由内存池分配的内存地址
-	 * @return {bool} 如果该内存地址非内存池分配，则返回 false
+	 * Mark a certain address allocated by memory pool to prevent it from being
+	 * released when dbuf_reset is called.
+	 * @param addr {const void*} Memory address allocated by memory pool.
+	 * @return {bool} Returns false if memory address is not allocated by memory
+	 * pool.
 	 */
 	bool dbuf_keep(const void* addr);
 
 	/**
-	 * 取消保留由内存池分配的某段地址，以便于调用 dbuf_reset 时被释放掉
-	 * @param addr {const void*} 由内存池分配的内存地址
-	 * @return {bool} 如果该内存地址非内存池分配，则返回 false
+	 * Remove the mark on a certain address allocated by memory pool, so it will be
+	 * released when dbuf_reset is called.
+	 * @param addr {const void*} Memory address allocated by memory pool.
+	 * @return {bool} Returns false if memory address is not allocated by memory
+	 * pool.
 	 */
 	bool dbuf_unkeep(const void* addr);
 
 	/**
-	 * 获得内部 ACL_DBUF_POOL 对象，以便于操作 C 接口的内存池对象
+	 * Get internal ACL_DBUF_POOL handle to use C interface memory pool object
+	 * internally.
 	 * @return {ACL_DBUF_POOL*}
 	 */
 	ACL_DBUF_POOL *get_dbuf() const {
@@ -143,14 +158,14 @@ public:
  *      }
  *      dbuf->destroy();
  *
- *      // 创建 dbuf 对象时，指定了内部分配内存块的位数
+ *      // When creating dbuf object, specify internal memory block multiplier.
  *      dbuf = new(8) acl::dbuf_pool;
  *      for (int i = 0; i < 1000; i++) {
  *          ptr = dbuf->dbuf_strdup("hello world!");
  *          printf("%s\r\n", p);
  *      }
  *
- *	// 销毁 dbuf 对象
+ *	// Release dbuf object.
  *      dbuf->destroy();
  *  }
  *
@@ -160,31 +175,36 @@ public:
 class dbuf_guard;
 
 /**
- * 在会话内存池对象上分配的对象基础类
+ * Base class for objects allocated on session memory pool.
  */
 class ACL_CPP_API dbuf_obj { //: public noncopyable
 public:
 	/**
-	 * 构造函数
-	 * @param guard {dbuf_guard*} 该参数非空时，则本类的子类对象会被
-	 *  dbuf_guard 类对象自动管理，统一销毁；如果该参数为空，则应用应
-	 *  调用 dbuf_guard::push_back 方法将子类对象纳入统一管理
+	 * Constructor
+	 * @param guard {dbuf_guard*} When this parameter is not empty, this object
+	 * will be
+	 * automatically managed and uniformly destroyed by dbuf_guard object. If this
+	 * parameter is empty, applications should
+	 * call dbuf_guard::push_back to add this object to the object collection for
+	 * unified management.
 	 */
 	dbuf_obj(dbuf_guard* guard = NULL);
 
 	virtual ~dbuf_obj() {}
 
 	/**
-	 * 获得该对象在 dbuf_guard 中的数组中的下标位置
-	 * @return {int} 返回该对象在 dbuf_guard 中的数组中的下标位置，当该
-	 *  对象没有被 dbuf_guard 保存时，则返回 -1，此时有可能会造成内存泄露
+	 * Get this object's index position in dbuf_guard's object collection.
+	 * @return {int} Returns this object's index position in dbuf_guard's object
+	 * collection. If
+	 * this object has not been managed by dbuf_guard, returns -1. At this time,
+	 * there may be a memory leak.
 	 */
 	int pos() const {
 		return pos_;
 	}
 
 	/**
-	 * 返回构造函数中 dbuf_guard 对象
+	 * Get the dbuf_guard object passed in constructor.
 	 * @return {dbuf_guard*}
 	 */
 	dbuf_guard* get_guard() const {
@@ -194,53 +214,57 @@ public:
 private:
 	friend class dbuf_guard;
 
-	// 记录本对象所属的 dbuf_guard 对象
+	// Record which dbuf_guard object manages this object.
 	dbuf_guard* guard_;
 
-	// 该变量便于 dbuf_guard 对象使用，以增加安全性
+	// This field is used by dbuf_guard, for safety.
 	int nrefer_;
 
-	// 该对象在 dbuf_guard 对象中记录的数组的位置
+	// This object's index position recorded in dbuf_guard object collection.
 	int pos_;
 };
 
 /**
- * 会话内存池管理器，由该类对象管理 dbuf_pool 对象及在其上分配的对象，当该类
- * 对象销毁时，dbuf_pool 对象及在上面均被释放。
+ * Session memory pool guard class, manages objects allocated on dbuf_pool. When
+ * the object
+ * is destroyed, dbuf_pool will automatically release all allocated memory.
  */
 class ACL_CPP_API dbuf_guard { // : public noncopyable
 public:
 	/**
-	 * 构造函数
-	 * @param dbuf {dbuf_pool*} 当该内存池对象非空时，dbuf 将由 dbuf_guard
-	 *  接管，如果为空，则本构造函数内部将会自动创建一个 dbuf_pool 对象
-	 * @param capacity {size_t} 内部创建的 objs_ 数组的初始长度
+	 * Constructor
+	 * @param dbuf {dbuf_pool*} Memory pool object. When not empty, dbuf is managed
+	 * by dbuf_guard
+	 * object. If empty, this constructor internally automatically creates a
+	 * dbuf_pool object.
+	 * @param capacity {size_t} Initial capacity of internal objs_ array.
 	 */
 	dbuf_guard(dbuf_pool* dbuf, size_t capacity = 500);
 
 	/**
-	 * 构造函数
-	 * @param nblock {size_t} 本类对象内部创建 dbuf_pool 对象时，本参数
-	 *  指定了内存块(4096)的倍数
-	 * @param capacity {size_t} 内部创建的 objs_ 数组的初始长度
-	 * @param align {size_t} 分配内存时地址对齐字节个数
+	 * Constructor
+	 * @param nblock {size_t} When creating internal dbuf_pool object, you can
+	 *  specify the memory block (4096) multiplier.
+	 * @param capacity {size_t} Initial capacity of internal objs_ array.
+	 * @param align {size_t} Byte alignment when allocating memory.
 	 */
 	dbuf_guard(size_t nblock = 2, size_t capacity = 500, size_t align = 8);
 
 	/**
-	 * 析构函数，在析构函数内部将会自动销毁由构造函数传入的 dbuf_pool 对象
+	 * Destructor. When destroying, internally automatically destroys dbuf_pool
+	 * object created by constructor.
 	 */
 	~dbuf_guard();
 
 	/**
-	 * 调用 dbuf_pool::dbuf_reset
+	 * Call dbuf_pool::dbuf_reset
 	 * @param reserve {size_t}
 	 * @return {bool}
 	 */
 	bool dbuf_reset(size_t reserve = 0);
 
 	/**
-	 * 调用 dbuf_pool::dbuf_alloc
+	 * Call dbuf_pool::dbuf_alloc
 	 * @param len {size_t}
 	 * @return {void*}
 	 */
@@ -249,7 +273,7 @@ public:
 	}
 
 	/**
-	 * 调用 dbuf_pool::dbuf_calloc
+	 * Call dbuf_pool::dbuf_calloc
 	 * @param len {size_t}
 	 * @return {void*}
 	 */
@@ -258,7 +282,7 @@ public:
 	}
 
 	/**
-	 * 调用 dbuf_pool::dbuf_strdup
+	 * Call dbuf_pool::dbuf_strdup
 	 * @param s {const char*}
 	 * @return {char*}
 	 */
@@ -267,7 +291,7 @@ public:
 	}
 
 	/**
-	 * 调用 dbuf_pool::dbuf_strndup
+	 * Call dbuf_pool::dbuf_strndup
 	 * @param s {const char*}
 	 * @param len {size_t}
 	 * @return {char*}
@@ -277,7 +301,7 @@ public:
 	}
 
 	/**
-	 * 调用 dbuf_pool::dbuf_memdup
+	 * Call dbuf_pool::dbuf_memdup
 	 * @param addr {const void*}
 	 * @param len {size_t}
 	 * @return {void*}
@@ -287,7 +311,7 @@ public:
 	}
 
 	/**
-	 * 调用 dbuf_pool::dbuf_free
+	 * Call dbuf_pool::dbuf_free
 	 * @param addr {const void*}
 	 * @return {bool}
 	 */
@@ -296,7 +320,7 @@ public:
 	}
 
 	/**
-	 * 调用 dbuf_pool::dbuf_keep
+	 * Call dbuf_pool::dbuf_keep
 	 * @param addr {const void*}
 	 * @return {bool}
 	 */
@@ -305,7 +329,7 @@ public:
 	}
 
 	/**
-	 * 调用 dbuf_pool::dbuf_unkeep
+	 * Call dbuf_pool::dbuf_unkeep
 	 * @param addr {const void*}
 	 * @return {bool}
 	 */
@@ -314,7 +338,7 @@ public:
 	}
 
 	/**
-	 * 获得 dbuf_pool 对象
+	 * Get dbuf_pool object.
 	 * @return {acl::dbuf_pool&}
 	 */
 	acl::dbuf_pool& get_dbuf() const {
@@ -322,18 +346,24 @@ public:
 	}
 
 	/**
-	 * 可以手动调用本函数，将在 dbuf_pool 上分配的 dbuf_obj 子类对象交给
-	 * dbuf_guard 对象统一进行销毁管理；严禁将同一个 dbuf_obj 子类对象同
-	 * 时将给多个 dbuf_guard 对象进行管理，否则将会产生对象的重复释放
+	 * Add object. This method adds dbuf_obj objects allocated on dbuf_pool to
+	 * dbuf_guard object for unified management and destruction. If the same
+	 * dbuf_obj object is added to the same
+	 * dbuf_guard object multiple times, the dbuf_guard object will have reference
+	 * counting mechanism, which will
+	 * cause repeated releases.
 	 * @param obj {dbuf_obj*}
-	 * @return {int} 返回 obj 被添加后其在 dbuf_obj 对象数组中的下标位置，
-	 *  dbuf_guard 内部对 dbuf_obj 对象的管理具有防重添加机制，所以当多次
-	 *  将同一个 dbuf_obj 对象置入同一个 dbuf_guard 对象时，内部只会放一次
+	 * @return {int} Returns obj object's index position in dbuf_obj object
+	 * collection after adding.
+	 * dbuf_guard internally has reference counting mechanism for dbuf_obj objects,
+	 * so when
+	 * the same dbuf_obj object is added to the same dbuf_guard object multiple
+	 * times, internally only one is recorded.
 	 */
 	int push_back(dbuf_obj* obj);
 
 	/**
-	 * 获得当前内存池中管理的对象数量
+	 * Get the number of objects currently managed in memory pool.
 	 * @return {size_t}
 	 */
 	size_t size() const {
@@ -341,21 +371,24 @@ public:
 	}
 
 	/**
-	 * 返回指定下标的对象
-	 * @param pos {size_t} 指定对象的下标位置，不应越界
-	 * @return {dbuf_obj*} 当下标位置越界时返回 NULL
+	 * Get object at specified index.
+	 * @param pos {size_t} Specified object index position, should not exceed
+	 * bounds.
+	 * @return {dbuf_obj*} Returns NULL when index position exceeds bounds.
 	 */
 	dbuf_obj* operator[](size_t pos) const;
 
 	/**
-	 * 返回指定下标的对象
-	 * @param pos {size_t} 指定对象的下标位置，不应越界
-	 * @return {dbuf_obj*} 当下标位置越界时返回 NULL
+	 * Get object at specified index.
+	 * @param pos {size_t} Specified object index position, should not exceed
+	 * bounds.
+	 * @return {dbuf_obj*} Returns NULL when index position exceeds bounds.
 	 */
 	dbuf_obj* get(size_t pos) const;
 
 	/**
-	 * 设置内建 objs_ 数组对象每次在扩充空间时的增量，内部缺省值为 100
+	 * Set the increment size when expanding objs_ array each time. Internal
+	 * default value is 100.
 	 * @param incr {size_t}
 	 */
 	void set_increment(size_t incr);
@@ -455,20 +488,20 @@ public:
 	}
 
 private:
-	size_t nblock_;			// 内部自建 dbuf_pool 内存块的单位个数
-	size_t incr_;			// 增加新的 dbuf_objs_link 时的
-					// capacity 大小
-	dbuf_pool* dbuf_;		// 内存池对象
-	dbuf_pool* dbuf_internal_;	// 内存池对象
+	size_t nblock_;			// Internal unit multiplier for dbuf_pool memory blocks
+	size_t incr_;			// Capacity size when creating new dbuf_objs_link
+	dbuf_pool* dbuf_;		// Memory pool object
+	dbuf_pool* dbuf_internal_;	// Memory pool object
 
-	// 此处之所以使用自实现的 dbuf_obj 数组对象，而没有使用 std::vector，
-	// 一方面使数组对象也在 dbuf_pool 内存池上创建，另一方面可以避免
-	// std::vector 内部在扩容时的内存不可控性
+	// Here, dbuf_obj objects are used instead of std::vector.
+	// One reason is that objects are also allocated on dbuf_pool memory pool,
+	// which is another reason.
+	// std::vector's internal memory allocation is not controllable.
 
 	struct dbuf_objs_link {
-		dbuf_obj** objs;	// 存储 dbuf_obj 对象的数组对象
-		size_t size;		// 存储于 objs 中的对象个数
-		size_t capacity;	// objs 数组的大小
+		dbuf_obj** objs;	// Array storing dbuf_obj object pointers
+		size_t size;		// Number of objects stored in objs
+		size_t capacity;	// Size of objs array
 
 		struct dbuf_objs_link* next;
 	};
@@ -479,16 +512,17 @@ private:
 
 	void init(size_t capacity);
 
-	// 扩充 objs_ 数组对象的空间
+	// Expand objs_ array space.
 	void extend_objs();
 };
 
 /**
  * sample1:
- * // 继承 acl::dbuf_obj 的子类
+ * // Inherit from acl::dbuf_obj class.
  * class myobj1 : public acl::dbuf_obj {
  * public:
- * 	// 将 guard 对象传递给基类对象，基类将本对象加入 guard 的对象集合中
+ * // Pass guard object to constructor, and the object will be automatically
+ * added to guard's object collection.
  * 	myobj1(acl::dbuf_guard* guard) : dbuf_obj(guard) {}
  *
  * 	void doit() {
@@ -502,14 +536,16 @@ private:
  * void test() {
  * 	acl::dbuf_guard dbuf;
  *
- *	// 在 dbuf_guard 对象上创建动态 100 个 myobj 对象
+ *	// Dynamically create 100 myobj objects on dbuf_guard memory pool.
  * 	for (int i = 0; i < 100; i++) {
- * 		// 在 guard 对象上创建动态 myobj 对象，且将 guard 作为构造参数
+ * // Dynamically create myobj object on guard memory pool and pass guard as
+ * constructor parameter.
  * 		myobj* obj = new (dbuf.dbuf_alloc(sizeof(myobj))) myobj(&dbuf);
  * 		obj->doit();
  * 	}
  *
- *	// 当 dbuf 销毁时，在其上面创建的动态对象自动销毁
+ * // When dbuf is destroyed, all dynamically created objects will be
+ * automatically destroyed.
  * }
  *
  * // sample2
@@ -560,3 +596,4 @@ private:
  * }
  */
 } // namespace acl
+

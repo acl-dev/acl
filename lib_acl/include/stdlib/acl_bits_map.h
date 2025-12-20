@@ -8,7 +8,7 @@ extern "C" {
 #include "acl_define.h"
 
 /**
- * 位映射结构类型定义
+ * Bit map structure type definition.
  */
 typedef struct ACL_BITS_MASK {
 	char   *data;		/**< bit mask */
@@ -28,12 +28,16 @@ typedef struct ACL_BITS_MASK {
 
 /* Memory management. */
 /**
- * 分配位映射对象空间
- * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK 指针
- * @param nmax {size_t/unsigned int/unsigned short/unsigned char} 最大值，以此值来
- *  计算 (mask)->data 占的内存空间大小，如：当 nmax=4294967295, 即最大整数值时，则
- *  (mask)->data_len=536870912, 即 (mask)->data 占用 536870912 Bytes; 当 nmax=65535,
- *  即最大 unsigned short 值时，则 (mask)->data_len=8192, 即 (mask)->data 占用 8192 字节
+ * Allocate bit map memory space.
+ * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK pointer
+ * @param nmax {size_t/unsigned int/unsigned short/unsigned
+ *  char} Maximum value, can be maximum value. Then
+ *  (mask)->data occupies memory space size. E.g., if
+ *  nmax=4294967295, representing maximum unsigned int
+ *  value, then (mask)->data_len=536870912, and (mask)->data
+ *  occupies 536870912 Bytes; if nmax=65535, representing
+ *  unsigned short value, then (mask)->data_len=8192, and
+ *  (mask)->data occupies 8192 bytes
  */
 #define	ACL_BITS_MASK_ALLOC(mask, nmax) do { \
 	size_t _byte_len = ACL_BITS_MASK_BYTES_NEEDED(nmax); \
@@ -43,12 +47,16 @@ typedef struct ACL_BITS_MASK {
 } while (0)
 
 /**
- * 重分配位映射对象空间
- * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK 指针
- * @param nmax {size_t/unsigned int/unsigned short/unsigned char} 最大值，以此值来
- *  计算 (mask)->data 占的内存空间大小，如：当 nmax=4294967295, 即最大整数值时，则
- *  (mask)->data_len=536870912, 即 (mask)->data 占用 536870912 Bytes; 当 nmax=65535,
- *  即最大 unsigned short 值时，则 (mask)->data_len=8192, 即 (mask)->data 占用 8192 字节
+ * Reallocate bit map memory space.
+ * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK pointer
+ * @param nmax {size_t/unsigned int/unsigned short/unsigned
+ *  char} Maximum value, can be maximum value. Then
+ *  (mask)->data occupies memory space size. E.g., if
+ *  nmax=4294967295, representing maximum unsigned int
+ *  value, then (mask)->data_len=536870912, and (mask)->data
+ *  occupies 536870912 Bytes; if nmax=65535, representing
+ *  unsigned short value, then (mask)->data_len=8192, and
+ *  (mask)->data occupies 8192 bytes
  */
 #define	ACL_BITS_MASK_REALLOC(mask, nmax) do { \
 	size_t _byte_len = ACL_BITS_MASK_BYTES_NEEDED(nmax); \
@@ -59,41 +67,41 @@ typedef struct ACL_BITS_MASK {
 } while (0)
 
 /**
- * 释放位映射对象的内部动态空间
- * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK 指针
+ * Free bit map's internal dynamic space.
+ * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK pointer
  */
 #define	ACL_BITS_MASK_FREE(mask)	acl_myfree((mask)->data)
 
 /* Set operations, modeled after FD_ZERO/SET/ISSET/CLR. */
 
 /**
- * 将位映射对象的内部动态空间清零
- * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK 指针
+ * Zero bit map's internal dynamic space.
+ * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK pointer
  */
 #define	ACL_BITS_MASK_ZERO(mask) \
 	memset((mask)->data, 0, (mask)->data_len);
 
 /**
- * 将整数映射为位存储在位映射对象的动态空间中
- * @param number {unsigned int} 整数值
- * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK 指针
+ * Set a number stored in bit map's dynamic space.
+ * @param number {unsigned int} Number value
+ * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK pointer
  */
 #define	ACL_BITS_MASK_SET(number, mask) \
 	(ACL_BITS_MASK_FD_BYTE((number), (mask)) |= ACL_BITS_MASK_FD_BIT(number))
 
 /**
- * 判断某个整数是否存储在位映射对象的动态空间中
- * @param number {unsigned int} 整数值
- * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK 指针
- * @return {int} 0: 不存在；!= 0: 存在
+ * Check whether a certain number is stored in bit map's dynamic space.
+ * @param number {unsigned int} Number value
+ * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK pointer
+ * @return {int} 0: does not exist; != 0: exists
  */
 #define	ACL_BITS_MASK_ISSET(number, mask) \
 	(ACL_BITS_MASK_FD_BYTE((number), (mask)) & ACL_BITS_MASK_FD_BIT(number))
 
 /**
- * 将某个整数从位映射对象的动态空间中清除掉
- * @param number {unsigned int} 整数值
- * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK 指针
+ * Clear a certain number from bit map's dynamic space.
+ * @param number {unsigned int} Number value
+ * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK pointer
  */
 #define	ACL_BITS_MASK_CLR(number, mask) \
 	(ACL_BITS_MASK_FD_BYTE((number), (mask)) &= ~ACL_BITS_MASK_FD_BIT(number))

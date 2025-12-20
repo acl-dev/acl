@@ -14,7 +14,7 @@ class check_timer;
 class aio_socket_stream;
 
 /**
- * 异步连接回调函数处理类
+ * Asynchronous connection callback function handler class
  */
 class ACL_CPP_API check_client : public aio_open_callback {
 public:
@@ -22,7 +22,7 @@ public:
 		aio_socket_stream& conn, struct ::timeval& begin);
 
 	/**
-	 * 获得输入的非阻塞 IO 句柄
+	 * Get the input non-blocking IO handle
 	 * @return {aio_socket_stream&}
 	 */
 	aio_socket_stream& get_conn() const {
@@ -30,7 +30,7 @@ public:
 	}
 
 	/**
-	 * 获得传入的服务端地址
+	 * Get the passed server address
 	 * @return {const char*}
 	 */
 	const char* get_addr() const {
@@ -38,20 +38,20 @@ public:
 	}
 
 	/**
-	 * 设置连接是否是存活的
+	 * Set whether the connection is alive
 	 * @param yesno {bool}
 	 */
 	void set_alive(bool yesno);
 
 	/**
-	 * 关闭非阻塞 IO 句柄
+	 * Close the non-blocking IO handle
 	 */
 	void close();
 
 public:
-	// 以下的函数仅供内部使用
+	// The following functions are for internal use only
 	/**
-	 * 当前检测对象是否处于阻塞模式下
+	 * Whether the current check object is in blocking mode
 	 * @return {bool}
 	 */
 	bool blocked() const {
@@ -59,14 +59,17 @@ public:
 	}
 
 	/**
-	 * 在阻塞检测方式下，调用此函数用来设置检测对象是否处于阻塞状态，
-	 * 处于阻塞状态时该检测对象是禁止通过调用方法 close 来关闭的
-	 * @param on {bool} 设置检测对象是否处于阻塞状态，缺省为处于阻塞状态
+	 * In blocking check mode, call this function to set whether the check object
+	 * is in blocking state.
+	 * When in blocking state, the check object is prohibited from being closed by
+	 * calling the close method
+	 * @param on {bool} Set whether the check object is in blocking state, default
+	 * is blocking state
 	 */
 	void set_blocked(bool on);
 
 private:
-	// 基类虚函数
+	// Base class virtual functions
 	bool open_callback();
 	void close_callback();
 	bool timeout_callback();

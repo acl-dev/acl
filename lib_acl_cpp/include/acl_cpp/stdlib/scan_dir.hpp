@@ -13,127 +13,150 @@ public:
 	virtual ~scan_dir();
 
 	/**
-	 * 打开目录
-	 * @param path {const char*} 目录路径，非空指针
-	 * @param recursive {bool} 是否允许递归扫描目录
-	 * @param rmdir_on {bool} 当目录为空时，是否需要删除该空目录
-	 * @return {bool} 打开目录是否成功
+	 * Open directory
+	 * @param path {const char*} Directory path, non-NULL pointer
+	 * @param recursive {bool} Whether to allow recursive directory scanning
+	 * @param rmdir_on {bool} When directory is empty, whether to delete this empty
+	 * directory
+	 * @return {bool} Whether opening directory was successful
 	 */
 	bool open(const char* path, bool recursive = true, bool rmdir_on = false);
 
 	/**
-	 * 虚方法，当需要删除空目录时，子类可以实现此虚方法来删除传入的目录，
-	 * 本虚方法内部会自动调用 rmdir 删除空目录
-	 * @param path {const char*} 需要被删除的空目录
-	 * @return {bool} 删除目录是否成功
+	 * Virtual method. When need to delete empty directory, subclasses can
+	 * implement this virtual method to delete passed directory.
+	 * This virtual method internally automatically calls rmdir to delete empty
+	 * directory
+	 * @param path {const char*} Empty directory to be deleted
+	 * @return {bool} Whether deleting directory was successful
 	 */
 	virtual bool rmdir_callback(const char* path);
 
 	/**
-	 * 关闭目录，同时释放内部资源
+	 * Close directory, and release internal resources
 	 */
 	void close();
 
 	/**
-	 * 扫描下一个文件(遇到目录会自动跳过)，当在 open 指定了允许递归扫描选项
-	 * (即 recursive = true)，则该函数会递归扫描所打开目录的所有子目录
-	 * @param full {bool} 是否需要返回文件全路径
-	 * @return {const char*} 非 NULL 表示所扫描到的文件名，否则表示扫描完毕
-	 *  或目录还未打开
+	 * Scan next file (automatically skips directories). When recursive scanning
+	 * option is specified in open
+	 * (i.e., recursive = true), this function will recursively scan all
+	 * subdirectories of opened directory
+	 * @param full {bool} Whether to return full file path
+	 * @return {const char*} Non-NULL indicates scanned filename, otherwise
+	 * indicates scanning complete
+	 *  or directory has not been opened yet
 	 */
 	const char* next_file(bool full = false);
 
 	/**
-	 * 扫描下一个目录(遇到文件或 "." 或 ".." 会跳过)，当在 open 指定允许了
-	 * 允许递归扫描项(即 recursive = true)，则该函数会递归扫描所开目录的所
-	 * 有子目录
-	 * @param full {bool} 是否需要返回目录全路径
-	 * @return {const char*} 非 NULL 表示所扫描到的目录名，否则表示扫描完
-	 *  毕或目录还未打开
+	 * Scan next directory (skips files, ".", and ".."). When recursive scanning
+	 * option is specified in open
+	 * (i.e., recursive = true), this function will recursively scan all
+	 * subdirectories of opened directory
+	 * @param full {bool} Whether to return full directory path
+	 * @return {const char*} Non-NULL indicates scanned directory name, otherwise
+	 * indicates scanning complete
+	 *  or directory has not been opened yet
 	 */
 	const char* next_dir(bool full = false);
 
 	/**
-	 * 扫描下一个目录或文件，当在 open 指定了允许递归扫描项(即 resursive
-	 * = true)，则该函数会递归扫描所打开目录的所有子目录及文件
-	 * @param full {bool} 是否需要返回目录或文件的全路径，如果为 true 则返
-	 *  回全路径，否则只返回文件名或目录名且都不含路径
-	 * @param is_file {bool*} 当返回结果非空时，该地址存储的值表示所扫描到
-	 *  的是否是文件，如果为 true 则为文件，否则为目录
-	 * @return {const char*} 非 NULL 表示所扫描到的目录名或文件名，否则表
-	 *  示扫描完毕或目录还未打开 
+	 * Scan next directory or file. When recursive scanning option is specified in
+	 * open (i.e., recursive
+	 * = true), this function will recursively scan all subdirectories and files of
+	 * opened directory
+	 * @param full {bool} Whether to return full path of directory or file. If
+	 * true, returns
+	 * full path, otherwise only returns filename or directory name, both without
+	 * path
+	 * @param is_file {bool*} When return result is not empty, value stored at this
+	 * address indicates whether scanned
+	 *  item is a file. If true, it is a file, otherwise it is a directory
+	 * @return {const char*} Non-NULL indicates scanned directory name or filename,
+	 * otherwise indicates
+	 *  scanning complete or directory has not been opened yet
 	 */
 	const char* next(bool full = false, bool* is_file = NULL);
 
 	/**
-	 * 获得当前扫描过程所在的目录路径，返回的路径尾部不包含路径分隔符 '/'
-	 * 或 '\\' (win32)，如对于路径：/home/zsx/，则会返回 /home/zsx，如果
-	 * 路径为根路径：/ 则该 '/' 将会保留；在 _WIN32 下，返回类似于
-	 * C:\Users\zsx 的路径
-	 * @return {const char*} 当目录打开时该函数返回非空指针，否则返回 NULL
+	 * Get directory path where current scanning process is located. Returned path
+	 * tail does not contain path separator '/' or '\\' (win32).
+	 * For example, for path: /home/zsx/, will return /home/zsx. If path is root
+	 * path: /, then this '/' will be retained.
+	 * On _WIN32, returns path like C:\Users\zsx
+	 * @return {const char*} When directory is open, this function returns non-NULL
+	 * pointer, otherwise returns NULL
 	 */
 	const char* curr_path();
 
 	/**
-	 * 获得当前程序扫描过程所扫到的文件名
-	 * @param full {bool} 是否需要同时返回文件全路径
-	 * @return {bool} 如果目录未找开或当前扫描的不是文件，则返回 NULL
+	 * Get filename scanned by current program scanning process
+	 * @param full {bool} Whether to also return full file path
+	 * @return {bool} Returns NULL if directory is not opened or current scan is
+	 * not a file
 	 */
 	const char* curr_file(bool full = false);
 
 	/**
-	 * 返回当前已经扫描的目录的个数
+	 * Return number of directories already scanned
 	 * @return {size_t}
 	 */
 	size_t dir_count() const;
 
 	/**
-	 * 返回当前已经扫描的文件的个数
+	 * Return number of files already scanned
 	 * @return {size_t}
 	 */
 	size_t file_count() const;
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * 获得当前已经扫描的文件及目录大小的总和
+	 * Get total size of files and directories already scanned
 	 * @return {acl_uint64}
 	 */
 	unsigned __int64 scaned_size() const;
 
 	/**
-	 * open 成功后调用本函数统计根目录下所有文件及目录大小的总和
-	 * @param nfiles {int*} 非空时存储被删除的文件个数
-	 * @param ndirs {int*} 非空时存储被删除的目录个数
-	 * @return {acl_uint64} 根目录下所有文件及目录大小的总和
+	 * After open succeeds, call this function to count total size of all files and
+	 * directories under root directory
+	 * @param nfiles {int*} When not empty, stores number of deleted files
+	 * @param ndirs {int*} When not empty, stores number of deleted directories
+	 * @return {acl_uint64} Total size of all files and directories under root
+	 * directory
 	 */
 	unsigned __int64 all_size(int* nfiles = NULL, int* ndirs = NULL) const;
 
 	/**
-	 * 根目录下所有文件及目录大小的总和
-	 * @param path {const char*} 需要被删除的根目录
-	 * @param recursive {bool} 是否递归扫描所有目录
-	 * @param nfiles {int*} 非空时存储被删除的文件个数
-	 * @param ndirs {int*} 非空时存储被删除的目录个数
-	 * @return {acl_uint64} 根目录下所有文件及目录大小的总和
+	 * Total size of all files and directories under root directory
+	 * @param path {const char*} Root directory to be deleted
+	 * @param recursive {bool} Whether to recursively scan all directories
+	 * @param nfiles {int*} When not empty, stores number of deleted files
+	 * @param ndirs {int*} When not empty, stores number of deleted directories
+	 * @return {acl_uint64} Total size of all files and directories under root
+	 * directory
 	 */
 	static unsigned __int64 all_size(const char* path, bool recursive = true,
 		int* nfiles = NULL, int* ndirs = NULL);
 
 	/**
-	 * open 成功后调用本函数删除根目录下的所有文件及目录
-	 * @param nfiles {int*} 非空时存储被删除的文件个数
-	 * @param ndirs {int*} 非空时存储被删除的目录个数
-	 * @return {acl_unint64} 删除的所有文件及目录大小总和(字节单位)
+	 * After open succeeds, call this function to delete all files and directories
+	 * under root directory
+	 * @param nfiles {int*} When not empty, stores number of deleted files
+	 * @param ndirs {int*} When not empty, stores number of deleted directories
+	 * @return {acl_unint64} Total size of all deleted files and directories (in
+	 * bytes)
 	 */
 	unsigned __int64 remove_all(int* nfiles = NULL, int* ndirs = NULL) const;
 
 	/**
-	 * 删除根目录下的所有文件及目录
-	 * @param path {const char*} 需要被删除的根目录
-	 * @param recursive {bool} 是否递归扫描所有目录
-	 * @param nfiles {int*} 非空时存储被删除的文件个数
-	 * @param ndirs {int*} 非空时存储被删除的目录个数
-	 * @return {acl_unint64} 删除的所有文件及目录大小总和(字节单位)
+	 * Delete all files and directories under root directory
+	 * @param path {const char*} Root directory to be deleted
+	 * @param recursive {bool} Whether to recursively scan all directories
+	 * @param nfiles {int*} When not empty, stores number of deleted files
+	 * @param ndirs {int*} When not empty, stores number of deleted directories
+	 * @return {acl_unint64} Total size of all deleted files and directories (in
+	 * bytes)
 	 */
 	static unsigned __int64 remove_all(const char* path, bool recursive = true,
 		int* nfiles = NULL, int* ndirs = NULL);
@@ -148,9 +171,9 @@ public:
 #endif
 
 	/**
-	 * 获得当前程序运行的路径
-	 * @param out {string&} 存储结果
-	 * @return {bool} 是否成功获得当前程序运行路径
+	 * Get current program's running path
+	 * @param out {string&} Store result
+	 * @return {bool} Whether successfully obtained current program's running path
 	 */
 	static bool get_cwd(string& out);
 
@@ -160,7 +183,7 @@ public:
 	}
 
 	/**
-	 * 设置回调方法，用来删除空目录
+	 * Set callback method for deleting empty directories
 	 * @param fn {int (*)(ACL_SCAN_DIR*, const char*, void*)}
 	 * @param ctx {void*}
 	 */
@@ -176,3 +199,4 @@ private:
 };
 
 }  // namespace acl
+

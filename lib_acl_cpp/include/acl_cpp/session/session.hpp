@@ -8,8 +8,9 @@
 
 namespace acl {
 
-// 用来存储属性值的缓冲区对象定义，这主要是为了兼容属性值
-// 可以为二进制的情形而增加的结构类型
+// Buffer object definition used to store attribute values. This structure type
+// is mainly added
+// to be compatible with the case where attribute values can be binary.
 typedef enum
 {
 	TODO_NUL,
@@ -42,34 +43,40 @@ public:
 };
 
 /**
- * session 类，该类使用 memcached 存储 session 数据
+ * session class, this class uses memcached to store session data.
  */
 class ACL_CPP_API session : public dbuf_obj
 {
 public:
 	/**
-	 * 当构造函数的参数 sid 非空时，则该 session 对象使用该
-	 * sid；否则内部会自动生成一个 sid，用户应该通过 get_sid()
-	 * 获得这个自动生成的 sid 以便于每次查询该 sid 对应的数据
-	 * @param ttl {time_t} 指定 session 的生存周期(秒)
-	 * @param sid {const char*} 非空时，则 session 的 sid 使
-	 *  该值，否则内部会产生一个随机的 session sid，该随机的
-	 *  sid 可以通过调用 get_sid() 获得；当然在使用过程中，用户
-	 *  也可以通过 set_sid() 修改本对象的 session sid；
-	 *  此外，如果该 sid 为空，则如果用户查查找某个 sid 对应的
-	 *  数据，则用户必须先调用 set_sid()
+	 * When the constructor parameter sid is not empty, this session object uses
+	 * that
+	 * sid; otherwise, a sid will be automatically generated internally. The user
+	 * should obtain
+	 * this automatically generated sid through get_sid() in order to query the
+	 * data corresponding
+	 * to this sid each time.
+	 * @param ttl {time_t} Specify the survival period of the session (seconds).
+	 * @param sid {const char*} When not empty, the session's sid uses
+	 * this value. Otherwise, a random session sid will be generated internally.
+	 * This random
+	 *  sid can be obtained by calling get_sid(); of course, during use, the user
+	 *  can also modify this object's session sid through set_sid();
+	 * Additionally, if this sid is empty, if the user wants to look up data
+	 * corresponding to a certain sid,
+	 *  the user must first call set_sid().
 	 */
 	session(time_t ttl = 0, const char* sid = NULL);
 	virtual ~session(void);
 	
 	/**
-	 * 重置内部状态，清理掉一些临时数据
+	 * Reset internal state, clean up some temporary data.
 	 */
 	void reset(void);
 
 	/**
-	 * 获得本 session 对象的唯一 ID 标识
-	 * @return {const char*} 非空
+	 * Get the unique ID identifier of this session object.
+	 * @return {const char*} Non-empty.
 	 */
 	virtual const char* get_sid(void) const
 	{
@@ -77,93 +84,112 @@ public:
 	}
 
 	/**
-	 * 设置本 session 对象的唯一 ID 标识
-	 * @param sid {const char*} 非空
-	 * 注：调用本函数后，会自动清除之前的中间缓存数据
+	 * Set the unique ID identifier of this session object.
+	 * @param sid {const char*} Non-empty.
+	 * Note: After calling this function, the previous intermediate cache data will
+	 * be automatically cleared.
 	 */
 	void set_sid(const char* sid);
 
 	/**
-	 * 当调用 session 类的 set/set_ttl 时，如果最后一个参数 delay 为 true，
-	 * 则必须通过调用本函数将数据真正进行更新
-	 * @return {bool} 数据更新是否成功
+	 * When calling session class's set/set_ttl, if the last parameter delay is
+	 * true,
+	 * the data must be truly updated by calling this function.
+	 * @return {bool} Whether the data update was successful.
 	 */
 	virtual bool flush();
 
 	/**
-	 * 向 session 中添加新的字符串属性，同时设置该
-	 * session 的过期时间间隔(秒)
-	 * @param name {const char*} session 名，非空
-	 * @param value {const char*} session 值，非空
-	 * @return {bool} 返回 false 表示出错
+	 * Add a new string attribute to the session, and set the
+	 * session's expiration time interval (seconds) at the same time.
+	 * @param name {const char*} Session name, non-empty.
+	 * @param value {const char*} Session value, non-empty.
+	 * @return {bool} Returns false to indicate an error.
 	 */
 	virtual bool set(const char* name, const char* value);
 
 	/**
-	 * 向 session 中添加新的属性对象并设置该 session 的过期时间间隔(秒)，
-	 * @param name {const char*} session 属性名，非空
-	 * @param value {const char*} session 属性值，非空
-	 * @param len {size_t} value 值长度
-	 * @return {bool} 返回 false 表示出错
+	 * Add a new attribute object to the session and set the session's expiration
+	 * time interval (seconds).
+	 * @param name {const char*} Session attribute name, non-empty.
+	 * @param value {const char*} Session attribute value, non-empty.
+	 * @param len {size_t} Value length of value.
+	 * @return {bool} Returns false to indicate an error.
 	 */
 	virtual bool set(const char* name, const void* value, size_t len);
 
 	/**
-	 * 延迟向 session 中添加新的属性对象并设置该 session 的过期时间间隔(秒)，
-	 * 当用户调用了 session::flush 后再进行数据更新， 这样可以提高传输效率
-	 * @param name {const char*} session 属性名，非空
-	 * @param value {const char*} session 属性值，非空
-	 * @param len {size_t} value 值长度
-	 * @return {bool} 返回 false 表示出错
+	 * Delayed addition of a new attribute object to the session and set the
+	 * session's expiration time interval (seconds).
+	 * Data update will be performed after the user calls session::flush, which can
+	 * improve transmission efficiency.
+	 * @param name {const char*} Session attribute name, non-empty.
+	 * @param value {const char*} Session attribute value, non-empty.
+	 * @param len {size_t} Value length of value.
+	 * @return {bool} Returns false to indicate an error.
 	 */
 	virtual bool set_delay(const char* name, const void* value, size_t len);
 	
 	/**
-	 * 从 session 中取得字符串类型属性值
-	 * @param name {const char*} session 属性名，非空
-	 * @return {const char*} session 属性值，返回的指针地址永远非空，用户
-	 *  可以通过判断返回的是否是空串(即: "\0")来判断出错或不存在
-	 *  注：该函数返回非空数据后，用户应该立刻保留此返回值，因为下次
-	 *      的其它函数调用可能会清除该临时返回数据
+	 * Get string type attribute value from the session.
+	 * @param name {const char*} Session attribute name, non-empty.
+	 * @return {const char*} Session attribute value. The returned pointer address
+	 * is always non-empty. The user
+	 * can determine whether there is an error or it doesn't exist by checking if
+	 * the return value is an empty string (i.e.: "\0").
+	 * Note: After this function returns non-empty data, the user should
+	 * immediately save this return value, because the next
+	 *      other function call may clear this temporary return data.
 	 */
 	const char* get(const char* name);
 
 	/**
-	 * 从 session 中取得二进制数据类型的属性值
-	 * @param name {const char*} session 属性名，非空
-	 * @return {const session_string*} session 属性值，返回空时
-	 *  表示出错或不存在
-	 *  注：该函数返回非空数据后，用户应该立刻保留此返回值，因为下次
-	 *      的其它函数调用可能会清除该临时返回数据
+	 * Get binary data type attribute value from the session.
+	 * @param name {const char*} Session attribute name, non-empty.
+	 * @return {const session_string*} Session attribute value. Returns empty when
+	 *  it indicates an error or doesn't exist.
+	 * Note: After this function returns non-empty data, the user should
+	 * immediately save this return value, because the next
+	 *      other function call may clear this temporary return data.
 	 */
 	virtual const session_string* get_buf(const char* name);
 
 	/**
-	 * 从 session 中删除指定属性值，当所有的变量都删除
-	 * 时会将整个对象从 memcached 中删除
-	 * @param name {const char*} session 属性名，非空
-	 * @return {bool} true 表示成功(含不存在情况)，false 表示删除失败
-	 *  注：当采用延迟方式删除某个属性时，则延迟发送更新指令到后端的
-	 *  缓存服务器，当用户调用了 session::flush 后再进行数据更新，这
-	 *  样可以提高传输效率；否则，则立刻更新数据
+	 * Delete the specified attribute value from the session. When all variables
+	 * are deleted,
+	 * the entire object will be deleted from memcached.
+	 * @param name {const char*} Session attribute name, non-empty.
+	 * @return {bool} true means success (including non-existence), false means
+	 * deletion failed.
+	 * Note: When using delayed mode to delete an attribute, the update instruction
+	 * is delayed to be sent to the backend
+	 * cache server. Data update will be performed after the user calls
+	 * session::flush, which
+	 * can improve transmission efficiency; otherwise, the data will be updated
+	 * immediately.
 	 */
 	virtual bool del_delay(const char* name);
 	virtual bool del(const char* name);
 
 	/**
-	 * 重新设置 session 在缓存服务器上的缓存时间
-	 * @param ttl {time_t} 生存周期(秒)
-	 * @param delay {bool} 当为 true 时，则延迟发送更新指令到后端的
-	 *  缓存服务器，当用户调用了 session::flush 后再进行数据更新，这
-	 *  样可以提高传输效率；当为 false 时，则立刻更新数据
-	 * @return {bool} 设置是否成功
+	 * Reset the session's cache time on the cache server.
+	 * @param ttl {time_t} Survival period (seconds).
+	 * @param delay {bool} When true, the update instruction is delayed to be sent
+	 * to the backend
+	 * cache server. Data update will be performed after the user calls
+	 * session::flush, which
+	 * can improve transmission efficiency. When false, the data will be updated
+	 * immediately.
+	 * @return {bool} Whether the setting was successful.
 	 */
 	bool set_ttl(time_t ttl, bool delay);
 
 	/**
-	 * 获得本 session 对象中记录的 session 生存周期；该值有可能
-	 * 与真正存储在缓存服务器的时间不一致，因为有可能其它的实例
-	 * 重新设置了 session 在缓存服务器上的生存周期
+	 * Get the session survival period recorded in this session object. This value
+	 * may
+	 * be inconsistent with the time actually stored on the cache server, because
+	 * other instances
+	 * may have reset the session's survival period on the cache server.
 	 * @return {time_t}
 	 */
 	time_t get_ttl(void) const
@@ -172,57 +198,64 @@ public:
 	}
 
 	/**
-	 * 使 session 从服务端的缓存中删除即使 session 失效
-	 * @return {bool} 是否使 session 失效
+	 * Make the session be deleted from the server's cache, making the session
+	 * invalid.
+	 * @return {bool} Whether the session was invalidated.
 	 */
 	virtual bool remove(void) = 0;
 
 	/**
-	 * 从后端缓存中获得对应 sid 的属性对象集合
+	 * Get the attribute object collection corresponding to sid from the backend
+	 * cache.
 	 * @param attrs {std::map<string, session_string>&}
 	 * @return {bool}
 	 */
 	virtual bool get_attrs(std::map<string, session_string>& attrs) = 0;
 
 	/**
-	 * 从后端缓存中获得对应 sid 的指定属性集合
-	 * @param names {const std::vector<string>&} 属性名集合
-	 * @param values {std::vector<session_string>&} 存储对应的属性值结果集
-	 * @return {bool} 操作是否成功
+	 * Get the specified attribute collection corresponding to sid from the backend
+	 * cache.
+	 * @param names {const std::vector<string>&} Attribute name collection.
+	 * @param values {std::vector<session_string>&} Store the corresponding
+	 * attribute value result set.
+	 * @return {bool} Whether the operation was successful.
 	 */
 	virtual bool get_attrs(const std::vector<string>& names,
 		std::vector<session_string>& values);
 
 	/**
-	 * 向后端缓存写入对应 sid 的属性对象集合
+	 * Write the attribute object collection corresponding to sid to the backend
+	 * cache.
 	 * @param attrs {std::map<string, session_string>&}
 	 * @return {bool}
 	 */
 	virtual bool set_attrs(const std::map<string, session_string>& attrs) = 0;
 
 protected:
-	// 设置对应 sid 数据的过期时间
+	// Set the expiration time of data corresponding to sid.
 	virtual bool set_timeout(time_t ttl) = 0;
 
 protected:
-	// 将 session 数据序列化
+	// Serialize session data.
 	static void serialize(const std::map<string, session_string>& attrs,
 		string& out);
 
-	// 将 session 数据反序列化
+	// Deserialize session data.
 	static void deserialize(string& buf,
 		std::map<string, session_string>& attrs);
 
-	// 清空 session 属性集合
+	// Clear session attribute collection.
 	static void attrs_clear(std::map<string, session_string>& attrs);
 
 protected:
 	session_string sid_;
 	time_t ttl_;
 
-	// 该变量主要用在 set_ttl 函数中，如果推测该 sid_ 只是新产生的
-	// 且还没有在后端 cache 服务端存储，则 set_ttl 不会立即更新后端
-	// 的 cache 服务器
+	// This variable is mainly used in the set_ttl function. If it is inferred that
+	// sid_ is only newly generated
+	// and has not been stored on the backend cache server, then set_ttl will not
+	// immediately update the backend
+	// cache server.
 	bool sid_saved_;
 	bool dirty_;
 	std::map<string, session_string> attrs_;
@@ -232,3 +265,4 @@ protected:
 } // namespace acl
 
 #endif // ACL_CLIENT_ONLY
+

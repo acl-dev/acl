@@ -10,70 +10,78 @@ namespace acl {
 class string;
 class hsrow;
 
-class ACL_CPP_API hsproto : public noncopyable
-{
+class ACL_CPP_API hsproto : public noncopyable {
 public:
 	hsproto(bool cache_enable);
 	~hsproto();
 
 	/**
-	 * 创建打开数据库索引的请求协议数据
-	 * @param out {string&} 存储请求协议结果
-	 * @param id {int} 对应打开索引的表ID号
-	 * @param dbn {const char*} 数据库名称
-	 * @param tbl {const char*} 数据库表名
-	 * @param idx {const char*} 索引字段名
-	 * @param flds {const char*} 要打开的数据字段名集合，格式为
-	 *  由分隔符 ",; \t" 分隔的字段名称，如：user_id,user_name,user_mail
-	 * @return {bool} 是否成功
+	 * Build database table opening protocol string.
+	 * @param out {string&} Storage protocol string.
+	 * @param id {int} Corresponding table ID number.
+	 * @param dbn {const char*} Database name.
+	 * @param tbl {const char*} Database table.
+	 * @param idx {const char*} Index field name.
+	 * @param flds {const char*} Field name set to open, format is
+	 * field names separated by separators ",; \t", e.g.,
+	 * user_id,user_name,user_mail
+	 * @return {bool} Whether successful.
 	 */
 	static bool build_open(string& out, int id,
 		const char* dbn, const char* tbl,
 		const char* idx, const char* flds);
 
 	/**
-	 * 创建查询数据库记录的请求协议数据
-	 * @param out {string&} 存储请求协议结果
-	 * @param id {int} 对应打开索引的表ID号
-	 * @param values {const char*[]} 匹配字段值数组，字段值的加入顺序应与打开索引 
-	 *  中各个字段的顺序相同
-	 * @param num {int} values 数组长度，该值不应超过在打开索引时的字段个数
-	 * @param cond {const char*} 匹配条件，可以为：
-	 *  = 等于; >= 大于等于; > 大于; < 小于; <= 小于等于
-	 * @param nlimit {int} 结果集个数限制，0 表示不限制个数
-	 * @param noffset {int} 结果集开始位置(0表示从第一个结果开始)
-	 * @return {bool} 是否成功
+	 * Build query database record protocol string.
+	 * @param out {string&} Storage protocol string.
+	 * @param id {int} Corresponding table ID number.
+	 * @param values {const char*[]} Matching field value array. The order of field
+	 * values should match the order of fields in the constructor.
+	 * @param num {int} Length of values array. This value should correspond to the
+	 * number of fields when creating the table.
+	 * @param cond {const char*} Matching condition operator, default is:
+	 * = equal; >= greater than or equal; > greater than; < less than; <= less than
+	 * or equal
+	 * @param nlimit {int} Maximum number of query results, 0 means no limit on the
+	 * number.
+	 * @param noffset {int} Starting position of query results (0 means starting
+	 * from the first record).
+	 * @return {bool} Whether successful.
 	 */
 	static bool build_get(string& out, int id,
 		const char* values[], int num,
 		const char* cond = "=", int nlimit = 0, int noffset = 0);
 
 	/**
-	 * 创建查询数据库记录的请求协议数据
-	 * @param out {string&} 存储请求协议数据
-	 * @param id {int} 对应打开索引的表ID号
-	 * @param nfld {int} 在打开索引时字段个数
-	 * @param first_value {const char*} 第一个参数
-	 * @param ... {const char*} 参数列表，最后一个参数为 NULL 表示结束
-	 * @return {bool} 是否成功
+	 * Build query database record protocol string.
+	 * @param out {string&} Storage protocol string.
+	 * @param id {int} Corresponding table ID number.
+	 * @param nfld {int} Number of fields when creating the table.
+	 * @param first_value {const char*} First parameter.
+	 * @param ... {const char*} Variable parameter list. The last parameter must be
+	 * NULL to indicate the end.
+	 * @return {bool} Whether successful.
 	 */
 	static bool ACL_CPP_PRINTF(4, 5) build_get(string& out, int id,
 		int nfld, const char* first_value, ...);
 
 	/**
-	 * 创建修改数据库记录的请求协议数据
-	 * @param out {string&} 存储请求协议数据
-	 * @param id {int} 对应打开索引的表ID号
-	 * @param values {const char*[]} 匹配字段值数组，字段值的加入顺序应与打开索引 
-	 *  中各个字段的顺序相同
-	 * @param num {int} values 数组长度，该值不应超过在打开索引时的字段个数
-	 * @param to_values {cosnt *[]} 匹配字段新值，字段值的顺序应与 open 方法中
-	 *  的字段顺序相同
-	 * @param to_num {int} to_values 数组长度
-	 * @param cond {const char*} 匹配条件，可以为：
-	 * @param nlimit {int} 结果集个数限制，0 表示不限制个数
-	 * @param noffset {int} 结果集开始位置(0表示从第一个结果开始)
-	 * @return {bool} 是否成功
+	 * Build modify database record protocol string.
+	 * @param out {string&} Storage protocol string.
+	 * @param id {int} Corresponding table ID number.
+	 * @param values {const char*[]} Matching field value array. The order of field
+	 * values should match the order of fields in the constructor.
+	 * @param num {int} Length of values array. This value should correspond to the
+	 * number of fields when creating the table.
+	 * @param to_values {cosnt *[]} Matching field new values. The order of field
+	 * values should match the open function's field order.
+	 * @param to_num {int} Length of to_values array.
+	 * @param cond {const char*} Matching condition operator, default is:
+	 * @param nlimit {int} Maximum number of query results, 0 means no limit on the
+	 * number.
+	 * @param noffset {int} Starting position of query results (0 means starting
+	 * from the first record).
+	 * @return {bool} Whether successful.
 	 */
 	static bool build_mod(string& out, int id,
 		const char* values[], int num,
@@ -81,74 +89,83 @@ public:
 		const char* cond = "=", int nlimit = 0, int noffset = 0);
 
 	/**
-	 * 创建删除数据库记录的请求协议数据
-	 * @param out {string&} 存储请求协议数据
-	 * @param id {int} 对应打开索引的表ID号
-	 * @param values {const char*[]} 匹配字段值数组，字段值的加入顺序应与打开索引 
-	 *  中各个字段的顺序相同
-	 * @param num {int} values 数组长度，该值不应超过在打开索引时的字段个数
-	 * @param cond {const char*} 匹配条件，可以为：
-	 * @param nlimit {int} 结果集个数限制，0 表示不限制个数
-	 * @param noffset {int} 结果集开始位置(0表示从第一个结果开始)
-	 * @return {bool} 是否成功
+	 * Build delete database record protocol string.
+	 * @param out {string&} Storage protocol string.
+	 * @param id {int} Corresponding table ID number.
+	 * @param values {const char*[]} Matching field value array. The order of field
+	 * values should match the order of fields in the constructor.
+	 * @param num {int} Length of values array. This value should correspond to the
+	 * number of fields when creating the table.
+	 * @param cond {const char*} Matching condition operator, default is:
+	 * @param nlimit {int} Maximum number of query results, 0 means no limit on the
+	 * number.
+	 * @param noffset {int} Starting position of query results (0 means starting
+	 * from the first record).
+	 * @return {bool} Whether successful.
 	 */
 	static bool build_del(string& out, int id, const char* values[],
 		int num, const char* cond = "=",
 		int nlimit = 0, int noffset = 0);
 
 	/**
-	 * 创建删除数据库记录的请求协议数据
-	 * @param out {string&} 存储请求协议数据
-	 * @param id {int} 对应打开索引的表ID号
-	 * @param nfld {int} 在打开索引时字段个数
-	 * @param first_value {const char*} 第一个参数
-	 * @param ... {const char*} 参数列表，最后一个参数为 NULL 表示结束
-	 * @return {bool} 是否成功
+	 * Build delete database record protocol string.
+	 * @param out {string&} Storage protocol string.
+	 * @param id {int} Corresponding table ID number.
+	 * @param nfld {int} Number of fields when creating the table.
+	 * @param first_value {const char*} First parameter.
+	 * @param ... {const char*} Variable parameter list. The last parameter must be
+	 * NULL to indicate the end.
+	 * @return {bool} Whether successful.
 	 */
 	static bool ACL_CPP_PRINTF(4, 5) build_del(string& out, int id,
 		int nfld, const char* first_value, ...);
 
 	/**
-	 * 创建添加数据库记录的请求协议数据
-	 * @param out {string&} 存储请求协议数据
-	 * @param id {int} 对应打开索引的表ID号
-	 * @param values {const char*[]} 匹配字段值数组，字段值的加入顺序应与打开索引 
-	 *  中各个字段的顺序相同
-	 * @param num {int} values 数组长度，该值不应超过在打开索引时的字段个数
-	 * @return {bool} 是否成功
+	 * Build add database record protocol string.
+	 * @param out {string&} Storage protocol string.
+	 * @param id {int} Corresponding table ID number.
+	 * @param values {const char*[]} Matching field value array. The order of field
+	 * values should match the order of fields in the constructor.
+	 * @param num {int} Length of values array. This value should correspond to the
+	 * number of fields when creating the table.
+	 * @return {bool} Whether successful.
 	 */
 	static bool build_add(string& out, int id,
 		const char* values[], int num);
 
 	/**
-	 * 创建添加数据库记录的请求协议数据
-	 * @param out {string&} 存储请求协议数据
-	 * @param id {int} 对应打开索引的表ID号
-	 * @param nfld {int} 在打开索引时字段个数
-	 * @param first_value {const char*} 第一个参数
-	 * @param ... {const char*} 参数列表，最后一个参数为 NULL 表示结束
-	 * @return {bool} 是否成功
+	 * Build add database record protocol string.
+	 * @param out {string&} Storage protocol string.
+	 * @param id {int} Corresponding table ID number.
+	 * @param nfld {int} Number of fields when creating the table.
+	 * @param first_value {const char*} First parameter.
+	 * @param ... {const char*} Variable parameter list. The last parameter must be
+	 * NULL to indicate the end.
+	 * @return {bool} Whether successful.
 	 */
 	static bool ACL_CPP_PRINTF(4, 5) build_add(string& out, int id,
 		int nfld, const char* first_value, ...);
 
 	/**
-	 * 通用的创建数据库处理的请求协议数据
-	 * @param out {string&} 存储请求协议数据
-	 * @param id {int} 对应打开索引的表ID号
-	 * @param oper {const char*} 操作方式，对应的操作符为：
-	 *  添加: +
-	 *  查询: =, >, >=, <, <=
-	 *  修改: =, >, >=, <, <=
-	 *  删除: =, >, >=, <, <=
-	 * @param values {const char*[]} 匹配字段值数组，字段值的加入顺序应与打开索引 
-	 *  中各个字段的顺序相同
-	 * @param num {int} values 数组长度，该值不应超过在打开索引时的字段个数
-	 * @param limit_offset {const char*} 要求的查询范围
-	 * @param mop {char} 仅针对删除，修改操作有效，其对应的操作符分别为:
-	 *  D: 删除, U: 修改
-	 * @param to_values {const char*[]} 目标值指针数组
-	 * @param to_num {int} to_values 数组的长度
+	 * Generic build database operation protocol string.
+	 * @param out {string&} Storage protocol string.
+	 * @param id {int} Corresponding table ID number.
+	 * @param oper {const char*} Operation type. Corresponding operators are:
+	 *  Add: +
+	 *  Query: =, >, >=, <, <=
+	 *  Modify: =, >, >=, <, <=
+	 *  Delete: =, >, >=, <, <=
+	 * @param values {const char*[]} Matching field value array. The order of field
+	 * values should match the order
+	 *  of fields in the constructor.
+	 * @param num {int} Length of values array. This value should correspond to the
+	 * number of fields when creating the table.
+	 * @param limit_offset {const char*} Query range to be requested.
+	 * @param mop {char} Operation type for delete/modify operations. Corresponding
+	 * operations are:
+	 *  D: delete, U: modify
+	 * @param to_values {const char*[]} Target value pointer array.
+	 * @param to_num {int} Length of to_values array.
 	 */
 	static void build_request(string& out, int id, const char* oper,
 		const char* values[], int num,
@@ -156,26 +173,31 @@ public:
 		const char* to_values[], int to_num);
 
 	/**
-	 * 分析数据库的返回数据
-	 * @param nfld {int} 打开的表的元素个数
-	 * @param in {string&} 从数据库读到的数据行, 尾部应该不包含 "\r\n"
-	 * @param errnum_out {int&} 存储处理过程的出错号，参见: hserror.hpp
-	 * @param serror_out {const char*&} 存储处理过程的出错描述信息
-	 * @return {bool} 分析是否成功
+	 * Parse database server response.
+	 * @param nfld {int} Number of table elements opened.
+	 * @param in {string&} Database server response data, tail should not contain
+	 * "\r\n".
+	 * @param errnum_out {int&} Store error code from operation process, see:
+	 * hserror.hpp
+	 * @param serror_out {const char*&} Store error message string from operation
+	 * process.
+	 * @return {bool} Whether operation was successful.
 	 */
 	bool parse_respond(int nfld, string& in,
-                int& errnum_out, const char*& serror_out);
+			int& errnum_out, const char*& serror_out);
 
 	/**
-	 * 当执行查询语句时，可以通过此函数获得查询的结果集
+	 * When executing query operation, get query results through this method.
 	 * @return {const std::vector<hsrow*>&}
 	 */
 	const std::vector<hsrow*>& get();
 
 	/**
-	 * 当用户用完查询结果集后进行第二次查询时调用此函数清理上次查询结果
+	 * When user needs to perform a second query operation, call this method to
+	 * clear the last query result.
 	 */
 	void reset();
+
 private:
 	bool  debugOn_;
 	bool  cache_enable_;
@@ -183,20 +205,23 @@ private:
 	int   ntoken_;
 	char* buf_ptr_;
 
-	// 查询结果集
+	// Query results
 	std::vector<hsrow*> rows_;
 
-	// 行记录对象缓存，当行记录对象用完后，为了保证内存
-	// 复用，将不再使用的行记录对象进行缓存，以备后用
+	// Intermediate result cache. Intermediate results are serialized to ensure
+	// memory
+	// safety. The intermediate results are serialized and cached to avoid
+	// memory leaks.
 	std::vector<hsrow*> rows_cache_;
 
-	// 清除行缓存对象集合
+	// Clear serialized result collection.
 	void clear_cache();
 
-	// 获得下一个查询结果
+	// Get next query result.
 	hsrow* get_next_row();
 };
 
 }  // namespace acl
 
 #endif // ACL_CLIENT_ONLY
+

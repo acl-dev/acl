@@ -9,13 +9,13 @@ struct ACL_VSTREAM;
 namespace acl {
 
 /**
- * 时间单位类型
+ * Time unit type
  */
 typedef enum {
-	time_unit_s,	// 秒
-	time_unit_ms,	// 毫秒
-	time_unit_us,	// 微秒
-	time_unit_ns,	// 纳秒
+	time_unit_s,	// Seconds
+	time_unit_ms,	// Milliseconds
+	time_unit_us,	// Microseconds
+	time_unit_ns,	// Nanoseconds
 } time_unit_t;
 
 class stream_hook;
@@ -27,136 +27,157 @@ public:
 	virtual ~stream() = 0;
 
 	/**
-	 * 调用本函数关闭流连接
-	 * @return {bool} true: 关闭成功; false: 关闭失败
+	 * Call this function to close stream connection
+	 * @return {bool} true: Close successful; false: Close failed
 	 */
 	bool close();
 
 	/**
-	* 判断流是否已经结束
-	* @return {bool} true: 流已经结束; false: 流未结束
+	* Determine whether stream has ended
+	* @return {bool} true: Stream has ended; false: Stream has not ended
 	*/
 	bool eof() const;
 
 	/**
-	 * 清除流结束标志位，即将 eof_ 标志位置为 false
+	 * Clear stream end flag, i.e., set eof_ flag to false
 	 */
 	void clear_eof();
 
 	/**
-	* 当前流是否处理打开状态
-	* @return {bool} true: 流已经打开; false: 流未打开
+	* Whether current stream is in open state
+	* @return {bool} true: Stream is open; false: Stream is not open
 	*/
 	bool opened() const;
 
 	/**
-	 * 获得当前流的 ACL_VSTREAM 流对象
+	 * Get ACL_VSTREAM stream object of current stream
 	 * @return {ACL_VSTREAM*}
 	 */
 	ACL_VSTREAM* get_vstream() const;
 
 	/**
-	 * 解绑 ACL_VSTREAM 与流对象的绑定关系，同时将 ACL_VSTREAM 返回
-	 * 给用户，即将该 ACL_VSTREAM的管理权交给用户，本流对象在释放时
-	 * 不会关闭该 ACL_VSTREAM ，但用户接管该 ACL_VSTREAM 后用完后
-	 * 必须将其关闭；解绑后除了 close/open 的调用有意义外，其它的调用
-	 * (包括流对象读写在内)都无意义
-	 * @return {ACL_VSTREAM} 返回 NULL 表示流对象已经将 ACL_VSTREAM 解绑
+	 * Unbind binding relationship between ACL_VSTREAM and stream object, and
+	 * return ACL_VSTREAM
+	 * to user, i.e., hand over management of this ACL_VSTREAM to user. This stream
+	 * object will
+	 * not close this ACL_VSTREAM when released, but user must close this
+	 * ACL_VSTREAM after taking over and using it.
+	 * After unbinding, except for close/open calls, other calls
+	 * (including stream object read/write) are meaningless
+	 * @return {ACL_VSTREAM} Returns NULL indicates stream object has already
+	 * unbound ACL_VSTREAM
 	 */
 	ACL_VSTREAM* unbind();
 
 	/**
-	 * 设置流的绑定对象
+	 * Set bound object of stream
 	 * @param ctx {void*}
-	 * @param key {const char* } 标识该 ctx 的键
-	 * @param replace {bool} 当对应的 KEY 存在时是否允许覆盖
-	 * @return {bool} 当 replace 为 false 且 key 已经存在时则返回 false
+	 * @param key {const char* } Key identifying this ctx
+	 * @param replace {bool} Whether to allow overwrite when corresponding KEY
+	 * exists
+	 * @return {bool} When replace is false and key already exists, returns false
 	 */
 	bool set_ctx(void* ctx, const char* key = NULL, bool replace = true);
 
 	/**
-	 * 获得与流绑定的对象
-	 * @param key {const char* key} 非空时使用该 key 查询对应的 ctx 对象，
-	 *  否则返回缺省的 ctx 对象
+	 * Get object bound to stream
+	 * @param key {const char* key} When not empty, uses this key to query
+	 * corresponding ctx object,
+	 *  otherwise returns default ctx object
 	 * @return {void*}
 	 */
 	void* get_ctx(const char* key = NULL) const;
 
 	/**
-	 * 删除流中绑定的对象
-	 * @param key {const char*} 非空时删除对应该 key 的 ctx 对象，否则删除
-	 *  缺省的 ctx 对象
-	 * @return {void*} 当对象不存在时返回 NULL，成功删除后返回该对象
+	 * Delete bound object in stream
+	 * @param key {const char*} When not empty, deletes ctx object corresponding to
+	 * this key, otherwise deletes
+	 *  default ctx object
+	 * @return {void*} Returns NULL when object does not exist. After successful
+	 * deletion, returns this object
 	 */
 	void* del_ctx(const char* key = NULL);
 
 	/**
-	 * 设置流的读写超时时间，只有当内部流对象建立后调用本方法才有效
-	 * @param n {int} 超时时间，该值 >= 0 则启用超时检测过程，否则将会一直
-	 *  阻塞直到可读或出错，该值的单位取决 于第二个参数
-	 * @param use_sockopt {bool} 是否使用 setsockopt 设置超时时间
+	 * Set read/write timeout of stream. Only effective when called after internal
+	 * stream object is established
+	 * @param n {int} Timeout time. When this value >= 0, enables timeout detection
+	 * process, otherwise will
+	 * block until readable or error occurs. Unit of this value depends on second
+	 * parameter
+	 * @param use_sockopt {bool} Whether to use setsockopt to set timeout
 	 * @return {bool}
 	 */
 	bool set_rw_timeout(int n, bool use_sockopt = false);
 
 	/**
-	 * 设置内部超时时间单位类型，只有当内部流对象建立后调用本方法才有效
-	 * @param unit {time_unit_t} 时间单位类型
+	 * Set internal timeout unit type. Only effective when called after internal
+	 * stream object is established
+	 * @param unit {time_unit_t} Time unit type
 	 */
 	void set_time_unit(time_unit_t unit);
 
 	/**
-	 * 获得当前流的读写超时时间
-	 * @param use_sockopt {bool} 是否获得由 setsockopt 设置的超时时间
-	 * @return {int} 获得流的读写超时时间(秒)
+	 * Get read/write timeout of current stream
+	 * @param use_sockopt {bool} Whether to get timeout set by setsockopt
+	 * @return {int} Get read/write timeout of stream (seconds)
 	 */
 	int get_rw_timeout(bool use_sockopt = false) const;
 
 	/**
-	 * 注册读写流对象，内部会自动调用 hook->open 过程，如果成功，则返回NULL
-	 * 表明该注册的对象已经与stream绑定，将会在stream释放时解绑并被释放;
-	 * 若失败则返回与输入参数相同的指针，应用可以通过判断返回值与输入值是否
-	 * 相同来判断注册流对象是否成功，且在失败时返回的注册对象应由调用者释放.
-	 * xxx: 在调用此方法前必须保证流连接已经创建
-	 * @param hook {stream_hook*} 非空对象指针
-	 * @return {stream_hook*} 返回值与输入值不同则表示成功
+	 * Register read/write stream object. Internally automatically calls hook->open
+	 * process. If successful, returns NULL
+	 * indicating this registered object has been bound to stream, will be unbound
+	 * and released when stream is released;
+	 * If failed, returns pointer same as input parameter. Application can
+	 * determine whether stream object registration was successful
+	 * by checking whether return value is same as input value, and returned
+	 * registered object should be released by caller on failure.
+	 * xxx: Before calling this method, must ensure stream connection has been
+	 * created
+	 * @param hook {stream_hook*} Non-empty object pointer
+	 * @return {stream_hook*} Return value different from input value indicates
+	 * success
 	 */
 	stream_hook* setup_hook(stream_hook* hook);
 
 	/**
-	 * 获得当前注册的流读写对象
+	 * Get currently registered stream read/write object
 	 * @return {stream_hook*}
 	 */
 	stream_hook* get_hook() const;
 
 	/**
-	 * 删除当前注册的流读写对象并返回该对象，恢复缺省的读写过程
+	 * Delete currently registered stream read/write object and return this object,
+	 * restore default read/write process
 	 * @return {stream_hook*}
 	 */
 	stream_hook* remove_hook();
 
 public:
 	/**
-	 * 因为 stream 的生命周期较长，使用者使用 stream 对象中的内部缓存区可以
-	 * 适当减少缓存区的频繁创建与释放
+	 * Because stream has long lifecycle, users using internal buffer in stream
+	 * object can
+	 * appropriately reduce frequent creation and release of buffers
 	 * @return {string&}
 	 */
 	string& get_buf();
 
 	/**
-	 * 获得与 stream 生命周期相同的 dbuf 内存分配器
+	 * Get dbuf memory allocator with same lifecycle as stream
 	 * @return {dbuf_pool&}
 	 */
 	dbuf_pool& get_dbuf();
 
 protected:
 	/**
-	 * 打开流对象，如果流已经打开，则不会重复打开
+	 * Open stream object. If stream is already open, will not open again
 	 */
 	void open_stream(bool is_file = false);
 
 	/**
-	 * 重新打开流对象，如果流已经打开则先释放流对象再打开
+	 * Reopen stream object. If stream is already open, releases stream object
+	 * first then opens
 	 */
 	void reopen_stream(bool is_file = false);
 
@@ -197,3 +218,4 @@ private:
 };
 
 } // namespace acl
+

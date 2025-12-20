@@ -5,67 +5,73 @@
 
 namespace acl {
 
-class ACL_CPP_API pgsql_conf
-{
+class ACL_CPP_API pgsql_conf {
 public:
 	/**
-	 * 构造函数
-	 * @param dbaddr {const char*} 服务器地址，地址格式为：ip:port，或
-	 *  unix_domain_path，当为 unix 域套接口时，应为 unix 域套接口文件
-	 *  所在目录且不包含文件名，假设 postgresql 正在监听 unix 域套接口
-	 *  的文件为：/tmp/.s.PGSQL.5432，则 dbaddr 地址应设为 /tmp
-	 *  注意：注意在连接 unix 域套接口的与 mysql 的不同，mysql 的域套接
-	 *  口为全路径
-	 * @param dbname {const char*} 数据库名
+	 * Constructor
+	 * @param dbaddr {const char*} Server address, address format: ip:port, or
+	 * unix_domain_path. When it is a unix domain socket, it should be the
+	 * directory where the unix domain socket file is located and does not
+	 * include the filename. Assuming postgresql is listening on unix domain
+	 * socket file: /tmp/.s.PGSQL.5432, then dbaddr address should be set to /tmp
+	 * Note: Note the difference from mysql when connecting to unix domain socket.
+	 * mysql's domain socket is the full path
+	 * @param dbname {const char*} Database name
 	 */
 	pgsql_conf(const char* dbaddr, const char* dbname);
 
 	/**
-	 * 拷贝构造函数
-	 * @param conf {const pgsql_conf&} 内部将会创建新配置对象并拷贝该参数
-	 *  里的内容项
+	 * Copy constructor
+	 * @param conf {const pgsql_conf&} Internally will create a new configuration
+	 * object and copy the content items
+	 *  from this parameter
 	 */
 	pgsql_conf(const pgsql_conf& conf);
 
 	~pgsql_conf(void);
 
 	/**
-	 * 设置连接数据库时的用户账号，当不调用此方法时则不需账号
-	 * @param dbuser {const char*} 用户账号，为非空字符串时才有效
+	 * Set user account when connecting to database. When this method is not
+	 * called, no account is needed
+	 * @param dbuser {const char*} User account, only valid when it is a non-empty
+	 * string
 	 * @return {pgsql_conf&}
 	 */
 	pgsql_conf& set_dbuser(const char* dbuser);
 
 	/**
-	 * 设置连接数据库时的账号密码，当不调用此方法时则不设密码
-	 * @param dbpass {const char*} 账号密码，为非空字符串时才有效
+	 * Set account password when connecting to database. When this method is not
+	 * called, no password is set
+	 * @param dbpass {const char*} Account password, only valid when it is a
+	 * non-empty string
 	 * @return {pgsql_conf&}
 	 */
 	pgsql_conf& set_dbpass(const char* dbpass);
 
 	/**
-	 * 设置数据库连接池最大连接上限
-	 * @param dblimit {size_t} 连接池最大连接数限制，当为 0 时则不限制
+	 * Set maximum connection limit for database connection pool
+	 * @param dblimit {size_t} Connection pool maximum connection limit, when 0
+	 * there is no limit
 	 * @return {pgsql_conf&}
 	 */
 	pgsql_conf& set_dblimit(size_t dblimit);
 
 	/**
-	 * 设置连接数据库的超时时间
+	 * Set timeout for connecting to database
 	 * @param timeout {int}
 	 * @return {pgsql_conf&}
 	 */
 	pgsql_conf& set_conn_timeout(int timeout);
 
 	/**
-	 * 设置读取数据库结果的超时时间
+	 * Set timeout for reading database results
 	 * @param timeout {int}
 	 * @return {pgsql_conf&}
 	 */
 	pgsql_conf& set_rw_timeout(int timeout);
 
 	/**
-	 * 设置数据库连接的字符集
+	 * Set character set for database connection
 	 * @param charset {const char*}
 	 * @return {pgsql_conf&}
 	 */
@@ -122,3 +128,4 @@ private:
 } // namespace acl
 
 #endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
+

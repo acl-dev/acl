@@ -11,103 +11,115 @@ namespace acl {
 class session;
 
 /**
- * 服务端 HttpSession 类，目前该类的数据存储只能支持存在 memcached 上
+ * Server-side HttpSession class. Currently data storage of this class can only
+ * support storage on memcached
  */
 class ACL_CPP_API HttpSession : public dbuf_obj {
 public:
 	/**
-	 * 构造函数
-	 * @param session {session&} 缓存对象
+	 * Constructor
+	 * @param session {session&} Cache object
 	 */
 	explicit HttpSession(session& session);
 	virtual ~HttpSession();
 
 	/**
-	 * 获得客户端在服务端存储的 session 的字符串属性值
-	 * @param name {const char*} session 属性名，非空
-	 * @return {const char*} session 属性值，返回地址永远非空指针，用户
-	 *  可以通过判断返回地址是否为空串("\0")来判断是否存在或出错
-	 *  注：该函数返回非空数据后，用户应该立刻保留此返回值，因为下次
-	 *      的其它函数调用可能会清除该临时返回数据
+	 * Get string attribute value of session stored on server side by client
+	 * @param name {const char*} Session attribute name, non-empty
+	 * @return {const char*} Session attribute value. Return address is always
+	 * non-NULL pointer. Users
+	 * can determine whether it exists or error occurred by checking whether return
+	 * address is empty string ("\0")
+	 * Note: After this function returns non-empty data, users should immediately
+	 * save this return value, because next
+	 *      other function calls may clear this temporary return data
 	 */
 	virtual const char* getAttribute(const char* name) const;
 
 	/**
-	 * 获得客户端在服务端存储的 session 的二进制属性值
-	 * @param name {const char*} session 属性名，非空
-	 * @param size {size_t*} 该参数非空且属性值非空时，该指针地址
-	 *  存储返回属性值的大小
-	 * @return {const void*} session 属性值，为空指针时说明不存在
-	 *  或内部查询失败
-	 *  注：该函数返回非空数据后，用户应该立刻保留此返回值，因为下次
-	 *      的其它函数调用可能会清除该临时返回数据
+	 * Get binary attribute value of session stored on server side by client
+	 * @param name {const char*} Session attribute name, non-empty
+	 * @param size {size_t*} When this parameter is not empty and attribute value
+	 * is not empty, this pointer address
+	 *  stores size of returned attribute value
+	 * @return {const void*} Session attribute value. When it is NULL pointer, it
+	 * indicates does not exist
+	 *  or internal query failed
+	 * Note: After this function returns non-empty data, users should immediately
+	 * save this return value, because next
+	 *      other function calls may clear this temporary return data
 	 */
 	virtual const void* getAttribute(const char* name, size_t* size) const;
 
 	/**
-	 * 从服务端获得对应客户端的所有会话属性对象，这样可以减少与服务端的交互次数
+	 * Get all session attribute objects corresponding to client from server side,
+	 * reducing number of interactions with server
 	 * @param attrs {std::map<string, session_string>&}
-	 * @return {bool} 是否成功
+	 * @return {bool} Whether successful
 	 */
 	virtual bool getAttributes(std::map<string, session_string>& attrs) const;
 
 	/**
-	 * 从服务端获得对应客户端的相应属性集合
-	 * @param names {const std::vector<string>&} 属性名集合
-	 * @param values {std::vector<session_string>&} 存储对应的属性值结果集
-	 * @return {bool} 是否成功
+	 * Get corresponding attribute collection of client from server side
+	 * @param names {const std::vector<string>&} Attribute name collection
+	 * @param values {std::vector<session_string>&} Store corresponding attribute
+	 * value result set
+	 * @return {bool} Whether successful
 	 */
 	virtual bool getAttributes(const std::vector<string>& names,
 		std::vector<session_string>& values) const;
 
 	/**
-	 * 在设置服务端设置 session 的字符串属性值
-	 * @param name {const char*} session 属性名，非空
-	 * @param value {const char*} session 属性值，非空
-	 * @return {bool} 返回 false 说明设置失败
+	 * Set string attribute value of session on server side
+	 * @param name {const char*} Session attribute name, non-empty
+	 * @param value {const char*} Session attribute value, non-empty
+	 * @return {bool} Returns false indicates setting failed
 	 */
 	virtual bool setAttribute(const char* name, const char* value);
 
 	/**
-	 * 在设置服务端设置 session 的二进制属性值
-	 * @param name {const char*} session 属性名，非空
-	 * @param value {const void*} session 属性值，非空
-	 * @param len {size_t} value 数据长度
-	 * @return {bool} 返回 false 说明设置失败
+	 * Set binary attribute value of session on server side
+	 * @param name {const char*} Session attribute name, non-empty
+	 * @param value {const void*} Session attribute value, non-empty
+	 * @param len {size_t} value data length
+	 * @return {bool} Returns false indicates setting failed
 	 */
 	virtual bool setAttribute(const char* name, const void* value, size_t len);
 
 	/**
-	 * 在服务端设置 session 属性集合，这样可以减少与后端的交互次数
-	 * @param attrs {const std::map<string, session_string>&} 属性集合对象
-	 * @return {bool} 设置是否成功
+	 * Set session attribute collection on server side, reducing number of
+	 * interactions with backend
+	 * @param attrs {const std::map<string, session_string>&} Attribute collection
+	 * object
+	 * @return {bool} Whether setting was successful
 	 */
 	virtual bool setAttributes(const std::map<string, session_string>& attrs);
 
 	/**
-	 * 删除客户端 session 中的某个属性值
-	 * @param name {const char*} session 属性名，非空
-	 * @return {bool} 删除是否成功
+	 * Delete an attribute value in client session
+	 * @param name {const char*} Session attribute name, non-empty
+	 * @return {bool} Whether deletion was successful
 	 */
 	virtual bool removeAttribute(const char* name);
 
 	/**
-	 * 设置 session 在缓存服务器上的生存周期
-	 * @param ttl {time_t} 生存周期(秒)
-	 * @return {bool} 是否成功
+	 * Set lifetime of session on cache server
+	 * @param ttl {time_t} Lifetime (seconds)
+	 * @return {bool} Whether successful
 	 */
 	virtual bool setMaxAge(time_t ttl);
 
 	/**
-	 * 使 session 从服务端的缓存中删除即使 session 失效
-	 * @return {bool} 是否使 session 失效
+	 * Delete session from server-side cache, i.e., invalidate session
+	 * @return {bool} Whether session was invalidated
 	 */
 	virtual bool invalidate();
 
 	/**
-	 * 获得所产生的 session ID 标识
-	 * @return {const char*} 永远返回以 '\0' 结尾的非空指针，可根据返回
-	 *  值是否为空串("\0")来判断 sid 是否存在
+	 * Get generated session ID identifier
+	 * @return {const char*} Always returns non-NULL pointer ending with '\0'. Can
+	 * determine whether
+	 *  sid exists based on whether return value is empty string ("\0")
 	 */
 	const char* getSid() const;
 
@@ -118,3 +130,4 @@ protected:
 } // namespace acl
 
 #endif // ACL_CLIENT_ONLY
+

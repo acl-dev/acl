@@ -9,27 +9,30 @@ namespace acl {
 class ACL_CPP_API mime_base64 : public mime_code {
 public:
 	/**
-	 * 构造函数
-	 * @param addCrlf {bool} 非流式编码时是否在末尾添加 "\r\n"
-	 * @param addInvalid {bool} 流式解码时是否遇到非法字符是否原样拷贝
+	 * Constructor
+	 * @param addCrlf {bool} Whether to add "\r\n" at the end when non-streaming
+	 * encoding
+	 * @param addInvalid {bool} Whether to copy invalid characters as-is when
+	 * streaming decoding
 	 */
 	mime_base64(bool addCrlf = false, bool addInvalid = false);
 	~mime_base64();
 
 	/**
-	 * 静态编码函数，直接将输入数据进行编码同时存入用户缓冲区
-	 * 用户缓冲区
-	 * @param in {const char*} 输入数据地址
-	 * @param n {int} 输入数据长度
-	 * @param out {string*} 存储结果的缓冲区
+	 * Static encoding function, directly encode input data and store in user
+	 * buffer
+	 * User buffer
+	 * @param in {const char*} Input data address
+	 * @param n {int} Input data length
+	 * @param out {string*} Buffer to store results
 	 */
 	static void encode(const char* in, int n, string* out);
 
 	/**
-	 * 静态解码函数，直接将输入数据进行解析并存入用户缓冲区
-	 * @param in {const char*} 输入数据地址
-	 * @param n {int} 数据长度
-	 * @param out {string*} 存储解析结果
+	 * Static decoding function, directly parse input data and store in user buffer
+	 * @param in {const char*} Input data address
+	 * @param n {int} Data length
+	 * @param out {string*} Buffer to store parsing results
 	 */
 	static void decode(const char* in, int n, string* out);
 };
@@ -37,3 +40,4 @@ public:
 } // namespace acl
 
 #endif // !defined(ACL_MIME_DISABLE)
+

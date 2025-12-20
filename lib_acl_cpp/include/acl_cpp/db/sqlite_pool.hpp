@@ -8,27 +8,28 @@ namespace acl {
 
 class db_handle;
 
-class ACL_CPP_API sqlite_pool : public db_pool
-{
+class ACL_CPP_API sqlite_pool : public db_pool {
 public:
 	/**
-	 * 构造函数
-	 * @param dbfile {const char*} sqlite 数据库的数据文件
-	 * @param dblimit {size_t} 数据库连接池最大连接数限制
-	 * @param charset {const char*} 数据文件名字符集
+	 * Constructor
+	 * @param dbfile {const char*} SQLite database data file
+	 * @param dblimit {size_t} Maximum connection limit for database connection
+	 * pool
+	 * @param charset {const char*} Character set of the data filename
 	 */
 	sqlite_pool(const char* dbfile, size_t dblimit = 64,
 		const char* charset = "utf-8");
 	~sqlite_pool();
 
 protected:
-	// 基类 connect_pool 纯虚函数：创建数据库连接句柄
+	// Base class connect_pool pure virtual function: create database connection
+	// handle
 	connect_client* create_connect();
 
 private:
-	// sqlite 数据文件名
+	// SQLite data filename
 	char* dbfile_;
-	// sqlite 数据文件名的字符集
+	// Character set of SQLite data filename
 	char* charset_;
 };
 

@@ -16,10 +16,10 @@ extern "C" {
 #include "acl_xinetd_cfg.h"
 
 /**
- * 从配置对象中取得某个配置项的值
- * @param _xcp_ {ACL_XINETD_CFG_PARSER*} 配置对象
- * @param _name_ {const char*} 配置项名
- * @param _obj_ {char*} 存储配置项的字符串类型的值
+ * Get a certain configuration item's string value from configuration object.
+ * @param _xcp_ {ACL_XINETD_CFG_PARSER*} Configuration object
+ * @param _name_ {const char*} Configuration item name
+ * @param _obj_ {char*} Storage address for configuration item's string type value
  */
 #define ACL_CFG_SET_ITEM_STR(_xcp_, _name_, _obj_) do {  \
 	ACL_XINETD_CFG_PARSER *_tmp_xcp_ = _xcp_; \
@@ -35,11 +35,11 @@ extern "C" {
 } while (0);
 
 /**
- * 从配置对象中取得某个配置项的值
- * @param _xcp_ {ACL_XINETD_CFG_PARSER*} 配置对象
- * @param _name_ {const char*} 配置项名
- * @param _obj_ {int} 存储配置项的整数类型的值
- * @param _def_ {int} 如果配置项不存在，则用此缺省值
+ * Get a certain configuration item's integer value from configuration object.
+ * @param _xcp_ {ACL_XINETD_CFG_PARSER*} Configuration object
+ * @param _name_ {const char*} Configuration item name
+ * @param _obj_ {int} Storage address for configuration item's integer type value
+ * @param _def_ {int} If configuration item does not exist, use this default value
  */
 #define ACL_CFG_SET_ITEM_INT(_xcp_, _name_, _obj_, _def_) do {  \
 	ACL_XINETD_CFG_PARSER *_tmp_xcp_ = _xcp_; \

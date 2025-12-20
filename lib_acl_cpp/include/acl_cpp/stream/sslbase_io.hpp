@@ -13,51 +13,56 @@ class atomic_long;
 class ACL_CPP_API sslbase_io : public stream_hook {
 public:
 	/**
-	 * 构造函数
-	 * @param conf {sslbase_conf&} 对每一个 SSL 连接进行配置的类对象
-	 * @param server_side {bool} 是否为服务端模式，因为客户端模式与服务端
-	 *  模式的握手方法不同，所以通过此参数来进行区分
-	 * @param nblock {bool} 是否为非阻塞模式
+	 * Constructor
+	 * @param conf {sslbase_conf&} Class object for configuring each SSL connection
+	 * @param server_side {bool} Whether it is server mode. Because handshake
+	 * methods differ between client mode and server
+	 *  mode, this parameter is used to distinguish them
+	 * @param nblock {bool} Whether it is non-blocking mode
 	 */
 	sslbase_io(sslbase_conf& conf, bool server_side, bool nblock = false);
 	virtual ~sslbase_io();
 
 	/**
-	 * ssl 握手纯虚方法
+	 * SSL handshake pure virtual method
 	 * @return {bool}
 	 */
 	virtual bool handshake() = 0;
 
 	/**
-	 * 获得当前连接的 SSL 版本，定义参考 sslbase_conf.hpp 中.
-	 * @return 0 表示无法获得
+	 * Get SSL version of current connection. Definition reference see
+	 * sslbase_conf.hpp.
+	 * @return 0 indicates cannot obtain
 	 */
 	virtual int get_version() const {
 		return 0;
 	}
 
 	/**
-	 * 获得当前连接的 SSL 版本,以字符串表示
-	 * @return {const char*} 返回非空版本字符串
+	 * Get SSL version of current connection, represented as string
+	 * @return {const char*} Returns non-empty version string
 	 */
 	const char* get_version_s() const;
 
 	/**
-	 * 设置套接字为阻塞模式/非阻塞模式
-	 * @param yes {bool} 当为 false 时则设为阻塞模式，否则设为非阻塞模式
+	 * Set socket to blocking mode/non-blocking mode
+	 * @param yes {bool} When false, set to blocking mode, otherwise set to
+	 * non-blocking mode
 	 */
 	void set_non_blocking(bool yes);
 
 	/**
-	 * 判断当前设置的 SSL IO 是否阻塞模式还是非阻塞模式
-	 * @return {bool} 返回 true 则表示为非阻塞模式，否则为阻塞模式
+	 * Determine whether the currently set SSL IO is blocking mode or non-blocking
+	 * mode
+	 * @return {bool} Returns true indicates non-blocking mode, otherwise blocking
+	 * mode
 	 */
 	bool is_non_blocking() const {
 		return nblock_;
 	}
 
 	/**
-	 * 判断 SSL 握手是否成功
+	 * Determine whether SSL handshake was successful
 	 * @return {bool}
 	 */
 	bool handshake_ok() const {
@@ -65,20 +70,20 @@ public:
 	}
 
 	/**
-	 * 客户端用来设置 SNI HOST 字段
+	 * Client uses this to set SNI HOST field
 	 * @param host {const char*}
 	 */
 	void set_sni_host(const char* host, const char* prefix = NULL,
 		const char* suffix = NULL);
 
 	/**
-	 * 服务端设置客户端是否发送了 SNI 信息
+	 * Server sets whether client sent SNI information
 	 * @param yes {bool}
 	 */
 	void set_has_sni(bool yes);
 
 	/**
-	 * 服务端判断客户端是否发送了 SNI 信息
+	 * Server determines whether client sent SNI information
 	 * @return {bool}
 	 */
 	bool has_sni() const {
@@ -86,13 +91,14 @@ public:
 	}
 
 	/**
-	 * 设置本 SSL IO 对象的绑定对象，方便应用处理自身业务逻辑
+	 * Set binding object for this SSL IO object, convenient for applications to
+	 * handle their own business logic
 	 * @param ctx {void*}
 	 */
 	void set_ctx(void* ctx);
 
 	/**
-	 * 获得由 set_ctx() 设置的绑定对象
+	 * Get binding object set by set_ctx()
 	 * @return {void*}
 	 */
 	void* get_ctx() const {
@@ -100,7 +106,7 @@ public:
 	}
 
 	/**
-	 * 获得传入的SSL配置项
+	 * Get passed SSL configuration item
 	 * @return {sslbase_conf&}
 	 */
 	sslbase_conf& get_conf() {
@@ -120,3 +126,4 @@ protected:
 };
 
 } // namespace acl
+

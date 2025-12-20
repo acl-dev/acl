@@ -14,8 +14,9 @@ class sslbase_conf;
 class redis_client_pool;
 
 /**
- * redis 客户端集群类，通过将此类对象注册入 redis 客户端命令类(redis_command)，
- * 则使所有的客户端命令自动支持集群版 redis 命令。
+ * Redis client cluster class. By registering objects of this class into redis
+ * client command class (redis_command),
+ * all client commands automatically support cluster version redis commands.
  * redis client cluster class. The class's object is set in the redis_command
  * using redis_command::set_cluster(redis_cluster*), and all the redis client
  * command will support the redis cluster mode.
@@ -23,64 +24,71 @@ class redis_client_pool;
 class ACL_CPP_API redis_client_cluster : public connect_manager {
 public:
 	/**
-	 * 构造函数;
+	 * Constructor;
 	 * constructor
-	 * @param max_slot {int} 哈希槽最大值; the max hash-slot value of keys
+	 * @param max_slot {int} Maximum hash slot value;
+	 * the max hash-slot value of keys
 	 */
 	explicit redis_client_cluster(int max_slot = 16384);
 	~redis_client_cluster();
 
 	/**
-	 * 根据哈希槽值获得对应的连接池;
+	 * Get corresponding connection pool based on hash slot value;
 	 * get one connection pool with the given slot
-	 * @param slot {int} 哈希槽值;
+	 * @param slot {int} Hash slot value;
 	 *  the hash-slot value of key
-	 * @return {redis_client_pool*} 如果对应的哈希槽不存在则返回 NULL;
+	 * @return {redis_client_pool*} Returns NULL if corresponding hash slot does
+	 * not exist;
 	 *  return the connection pool of the hash-slot, and return NULL
 	 *  when the slot not exists
 	 */
 	redis_client_pool* peek_slot(int slot);
 
 	/**
-	 * 动态设置哈希槽值对应的 redis 服务地址，该函数被调用时内部有线程锁保护;
+	 * Dynamically set redis service address corresponding to hash slot value. When
+	 * this function is called, internally has thread lock protection;
 	 * dynamicly set redis-server addr with one slot, which is protected
 	 * by thread mutex internal, no one will be set if the slot were
 	 * beyyond the max hash-slot
-	 * @param slot {int} 哈希槽值;
+	 * @param slot {int} Hash slot value;
 	 *  the hash-slot
-	 * @param addr {const char*} redis 服务器地址;
+	 * @param addr {const char*} Redis server address;
 	 *  one redis-server addr
 	 */
 	void set_slot(int slot, const char* addr);
 
 	/**
-	 * 给定 redis 集群中的一个结点，自动发现所有的哈希槽对应的结点地址
+	 * Given a node in redis cluster, automatically discover node addresses
+	 * corresponding to all hash slots
 	 * according one node of the cluster, auto find all nodes with all
 	 * slots range
-	 * @param addr {const char*} 集群中的一个服务结点地址，格式 ip:port
+	 * @param addr {const char*} Address of a service node in cluster, format
+	 * ip:port
 	 *  on server node's addr of the cluster, addr format is "ip:port"
-	 * @param max_conns {size_t} 集群中与每个结点所建连接池的最大连接限制
+	 * @param max_conns {size_t} Maximum connection limit for connection pool built
+	 * with each node in cluster
 	 *  the max connections limit for each connection pool
-	 * @param conn_timeout {int} 连接超时时间
+	 * @param conn_timeout {int} Connection timeout
 	 *  set the connection timeout
-	 * @param rw_timeout {int} IO 读写超时时间
+	 * @param rw_timeout {int} IO read/write timeout
 	 *  set the network io timeout
 	 */
 	void set_all_slot(const char* addr, size_t max_conns,
 		int conn_timeout = 30, int rw_timeout = 30);
 
 	/**
-	 * 动态清除哈希槽对应的 redis 服务地址，以便于重新计算位置，
-	 * 内部有线程锁保护机制;
+	 * Dynamically clear redis service address corresponding to hash slot, to
+	 * facilitate recalculating position.
+	 * Internally has thread lock protection mechanism;
 	 * dynamicly remove one slot and redis-server addr mapping, which is
 	 * protected by thread mutex
-	 * @param slot {int} 哈希槽值;
+	 * @param slot {int} Hash slot value;
 	 *  hash-slot value
 	 */
 	void clear_slot(int slot);
 
 	/**
-	 * 获得哈希槽最大值;
+	 * Get maximum hash slot value;
 	 * get the max hash-slot
 	 * @return {int}
 	 */
@@ -90,15 +98,16 @@ public:
 
 	//////////////////////////////////////////////////////////////////////
 	/**
-	 * 设置协议重定向次数的阀值，默认值为 15;
+	 * Set threshold for protocol redirect count. Default value is 15;
 	 * set redirect limit for MOVE/ASK, default is 15
-	 * @param max {int} 重定向次数阀值，只有当该值 > 0 时才有效;
+	 * @param max {int} Redirect count threshold. Only effective when this value >
+	 * 0;
 	 *  the redirect times limit for MOVE/ASK commands
 	 */
 	void set_redirect_max(int max);
 
 	/**
-	 * 设置协议重定向次数的阀值;
+	 * Set threshold for protocol redirect count;
 	 * get redirect limit of MOVE/ASK commands in one redis redirect process
 	 * @return {int}
 	 */
@@ -107,24 +116,28 @@ public:
 	}
 
 	/**
-	 * 当重定向次数 >= 2 时允许休眠的时间(毫秒)，默认值为 100 毫秒，这样做的
-	 * 好处是当一个 redis 服务主结点掉线后，其它从结点升级为主结点是需要
-	 * 时间的(由 redis.conf 中的 cluster-node-timeout 配置项决定)，所以
-	 * 为了在重定向的次数范围内不报错需要等待从结点升级为主结点;
+	 * Allowed sleep time (milliseconds) when redirect count >= 2. Default value is
+	 * 100 milliseconds. Benefit of this is
+	 * when a redis service master node goes offline, it takes time for other slave
+	 * nodes to upgrade to master node (determined
+	 * by cluster-node-timeout configuration item in redis.conf). So to avoid
+	 * errors within redirect count range, need to wait
+	 * for slave nodes to upgrade to master node;
 	 * if redirect happenning more than 2 in one redis command process,
 	 * the process can sleep for a one avoiding redirect too fast, you
 	 * can set the waiting time with microsecond here, default value is
 	 * 100 microseconds; this only happends when redis-server died.
-	 * @param n {int} 每次重定向时的休息时间(毫秒)，默认值为 100 毫秒;
+	 * @param n {int} Rest time during each redirect (milliseconds), default value
+	 * is 100 milliseconds;
 	 * microseonds to sleep when redirect times are more than 2,
 	 * default is 100 ms
 	 */
 	void set_redirect_sleep(int n);
 
 	/**
-	 * 获得 set_redirect_sleep 设置的或默认的时间;
+	 * Get time set by set_redirect_sleep or default time;
 	 * get sleep time set by set_redirect_sleep function
-	 * @return {int} 单位为毫秒;
+	 * @return {int} Unit is milliseconds;
 	 *  return sleep value in microsecond
 	 */
 	int get_redirect_sleep() const {
@@ -132,8 +145,9 @@ public:
 	}
 
 	/**
-	 * 设置 SSL 通信方式下的配置句柄，内部缺省值为 NULL，如果设置了 SSL 连
-	 * 接配置对象，则内部切换成 SSL 通信方式
+	 * Set SSL communication configuration handle. Internal default value is NULL.
+	 * If SSL connection
+	 * configuration object is set, internally switches to SSL communication mode
 	 * set SSL communication with Redis-server if ssl_conf not NULL
 	 * @param ssl_conf {sslbase_conf*}
 	 * @return {redis_client_cluster&}
@@ -141,20 +155,21 @@ public:
 	redis_client_cluster& set_ssl_conf(sslbase_conf* ssl_conf);
 
 	/**
-	 * 设置某个 redis 服务相应的连接密码
+	 * Set connection password for a redis service
 	 * set the password of one redis-server
-	 * @param addr {const char*} 指定的某 redis 服务器地址，当该参数的值为
-	 *  default 时，则指定了集群中所有 redis 服务器的缺省连接密码
+	 * @param addr {const char*} Address of a specified redis server. When value of
+	 * this parameter is
+	 *  default, sets default connection password for all redis servers in cluster
 	 *  the specified redis-server's addr, the default password of all
 	 *  redis-server will be set when the addr's value is 'default'
-	 * @param pass {const char*} 指定的 redis 服务器连接密码
+	 * @param pass {const char*} Connection password of specified redis server
 	 *  the password of the specified redis-server
 	 * @return {redis_client_cluster&}
 	 */
 	redis_client_cluster& set_password(const char* addr, const char* pass);
 
 	/**
-	 * 获得 redis 集群中服务节点与连接密码的对照表
+	 * Get mapping table of service nodes and connection passwords in redis cluster
 	 * get all passwords of the redis cluster
 	 * @return {const std::map<string, string>&}
 	 */
@@ -163,7 +178,8 @@ public:
 	}
 
 	/**
-	 * 获得给定地址的 redis 节点的连接密码，返回 NULL 表示未设置
+	 * Get connection password of redis node at given address. Returns NULL
+	 * indicates not set
 	 * get the connection password of the specified addr for one redis,
 	 * NULL will be returned if password wasn't set
 	 * @param addr {const char*}
@@ -173,31 +189,38 @@ public:
 	const char* get_password(const char* addr) const;
 
 	/**
-	 * 重定向至目标 redis 节点
-	 * @param addr {const char*} 目标 redis 服务地址
-	 * @param max_conns {size_t} 连接池最大连接数
-	 * @return {redis_client*} 获得与目标 redis 节点的连接通信对象
+	 * Redirect to target redis node
+	 * @param addr {const char*} Target redis service address
+	 * @param max_conns {size_t} Maximum connection count in connection pool
+	 * @return {redis_client*} Get connection communication object with target
+	 * redis node
 	 */
 	redis_client* redirect(const char* addr, size_t max_conns);
 
 	/**
-	 * 根据 redis 集群的槽号获得连接对象
-	 * @param slot {int} redis 集群键值对应的存储槽槽号
-	 * @return {redis_client*} 获得与目标 redis 节点的连接通信对象
+	 * Get connection object based on slot number of redis cluster
+	 * @param slot {int} Storage slot number corresponding to redis cluster key
+	 * value
+	 * @return {redis_client*} Get connection communication object with target
+	 * redis node
 	 */
 	redis_client* peek_conn(int slot);
 
 protected:
 	/**
-	 * 基类纯虚函数，用来创建连接池对象，该函数返回后由基类设置网络连接及IO 超时时间
+	 * Base class pure virtual function, used to create connection pool object.
+	 * After this function returns, base class sets network connection and IO
+	 * timeout
 	 * virtual function of base class, which is used to create
 	 * the connection pool
-	 * @param addr {const char*} 服务器监听地址，格式：ip:port;
+	 * @param addr {const char*} Server listening address, format: ip:port;
 	 * the server addr for the connection pool, such as ip:port
-	 * @param count {size_t} 连接池的大小限制，该值没有 0 时则没有限制
+	 * @param count {size_t} Size limit of connection pool. When this value is 0,
+	 * there is no limit
 	 * the max connections in one connection pool, if it's 0 there
 	 * is no limit of the connections pool.
-	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始);
+	 * @param idx {size_t} Index position of this connection pool object in
+	 * collection (starts from 0);
 	 * the index of the connection pool in pool array
 	 */
 	connect_pool* create_pool(const char* addr, size_t count, size_t idx);
@@ -226,3 +249,4 @@ public:
 } // namespace acl
 
 #endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
+

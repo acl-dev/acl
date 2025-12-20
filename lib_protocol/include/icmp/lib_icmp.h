@@ -26,97 +26,101 @@ extern "C" {
 
 /* in icmp_chat.c */
 /**
- * 创建ICMP会话对象
- * @param aio {ACL_AIO*} 如果该项不为空，则内部在通信过程中采用非阻塞模式，
- *  否则采用阻塞模式
- * @param check_tid {int} 是否在校验响应包时检查数据中的线程号字段
- * @return {ICMP_CHAT*} ICMP会话对象句柄
+ * Create ICMP session object
+ * @param aio {ACL_AIO*} If not NULL, communication will use async mode
+ *  internally; otherwise uses sync mode
+ * @param check_tid {int} Whether to check thread ID when response arrives
+ * @return {ICMP_CHAT*} ICMP session object
  */
 ICMP_API ICMP_CHAT *icmp_chat_create(ACL_AIO *aio, int check_tid);
 
 /**
- * 释放ICMP会话对象
- * @param chat {ICMP_CHAT*} ICMP会话对象句柄
+ * Free ICMP session object
+ * @param chat {ICMP_CHAT*} ICMP session object
  */
 ICMP_API void icmp_chat_free(ICMP_CHAT *chat);
 
 /**
- * 开始与某个目的主机进行会话
- * @param host {ICMP_HOST*} 调用 icmp_host_new 返回的对象
+ * Start session for probing a target host
+ * @param host {ICMP_HOST*} Object returned by icmp_host_new
  */
 ICMP_API void icmp_chat(ICMP_HOST* host);
 
 /**
- * 当前的ICMP会话对象中被探测的主机个数
- * @param chat {ICMP_CHAT*} 会话对象句柄
- * @return {int} 被探测主机个数
+ * Get number of hosts being probed in current ICMP session list
+ * @param chat {ICMP_CHAT*} Session object
+ * @return {int} Number of hosts being probed
  */
 ICMP_API int icmp_chat_size(ICMP_CHAT *chat);
 
 /**
- * 当前的ICMP会话对象中已经完成的探测的主机个数
- * @param chat {ICMP_CHAT*} 会话对象句柄
- * @return {int} 已完成的被探测主机个数
+ * Get number of completed probes in current ICMP session
+ * @param chat {ICMP_CHAT*} Session object
+ * @return {int} Number of completed probes
  */
 ICMP_API int icmp_chat_count(ICMP_CHAT *chat);
 
 /**
- * 判断当前的ICMP会话对象中所有探测任务是否已经完成
- * @param chat {ICMP_CHAT*} 会话对象句柄
- * @return {int} != 0: 表示完成; 0: 表示未完成
+ * Check if all probe tasks in current ICMP session have completed
+ * @param chat {ICMP_CHAT*} Session object
+ * @return {int} != 0: indicates complete; 0: indicates incomplete
  */
 ICMP_API int icmp_chat_finish(ICMP_CHAT *chat);
 
 /**
- * 取得当前ICMP会话对象中的当前会话序列号值
- * @param chat {ICMP_CHAT*} 会话对象句柄
- * @return {unsigned short} 会话序列号值
+ * Get current session sequence number value in ICMP session
+ * @param chat {ICMP_CHAT*} Session object
+ * @return {unsigned short} Session sequence number value
  */
 ICMP_API unsigned short icmp_chat_seqno(ICMP_CHAT *chat);
 
 /* in icmp_stat.c */
 /**
- * 输出当前ICMP的会话状态
- * @param chat {ICMP_CHAT*} 会话对象句柄
+ * Print current ICMP session status
+ * @param chat {ICMP_CHAT*} Session object
  */
 ICMP_API void icmp_stat(ICMP_CHAT *chat);
 
 /**
- * 计算某个主机的ICMP会话状态
- * @param host {ICMP_HOST*} 被探测主机对象
- * @param show_flag {int} 是否输出结果至日志文件
+ * Print ICMP session status for a specific host
+ * @param host {ICMP_HOST*} Probe host object
+ * @param show_flag {int} Whether to print to standard log file
  */
 ICMP_API void icmp_stat_host(ICMP_HOST *host, int show_flag);
 
 /* in icmp_host.c */
 /**
- * 创建一个新的被探测的主机对象
- * @param chat {ICMP_CHAT*} 会话对象句柄
- * @param domain {const char*} 域名标识字符串，可以为空
- * @param ip {const char*} 主机IP地址，不能为空
- * @param npkt {size_t} 对该主机发送的数据包个数
- * @param dlen {size_t} 每个探测数据包的长度
- * @param delay {int} 发送探测数据包的时间间隔(毫秒)
- * @param timeout {int} 被探测主机的响应包超时时间(毫秒)
- * @return {ICMP_HOST*} 被探测主机对象, 如果为空则表示出错
+ * Create a new probe host object
+ * @param chat {ICMP_CHAT*} Session object
+ * @param domain {const char*} Host identifier string, not NULL
+ * @param ip {const char*} Host IP address, not NULL
+ * @param npkt {size_t} Number of packets to send to this host
+ * @param dlen {size_t} Length of each probe packet
+ * @param delay {int} Interval between packets (milliseconds)
+ * @param timeout {int} Response timeout for probe packets (milliseconds)
+ * @return {ICMP_HOST*} Probe host object, NULL indicates error
  */
 ICMP_API ICMP_HOST* icmp_host_new(ICMP_CHAT *chat, const char *domain,
 	const char *ip, size_t npkt, size_t dlen, int delay, int timeout);
 
 /**
- * 释放一个被探测主机对象
- * @param host {ICMP_HOST*} 被探测主机对象
+ * Free a probe host object
+ * @param host {ICMP_HOST*} Probe host object
  */
 ICMP_API void icmp_host_free(ICMP_HOST *host);
 
 /**
- * 设置探测结果的回调函数
- * @param host {ICMP_HOST*} 被探测主机对象
- * @param arg {void*} 回调函数的参数之一
- * @param stat_respond {void (*)(ICMP_PKT_STATUS*)} 正常响应时的回调函数
- * @param stat_timeout {void (*)(ICMP_PKT_STATUS*)} 超时响应时的回调函数
- * @param stat_unreach {void (*)(ICMP_PKT_STATUS*}} 主机不可达时的回调函数
- * @param stat_finish {void (*)(ICMP_HOST*)} 针对该主机的探测任务时的回调函数
+ * Set callback functions for probe host
+ * @param host {ICMP_HOST*} Probe host object
+ * @param arg {void*} One of the callback function parameters
+ * @param stat_respond {void (*)(ICMP_PKT_STATUS*)} Callback when packet
+ *  receives response
+ * @param stat_timeout {void (*)(ICMP_PKT_STATUS*)} Callback when response
+ *  times out
+ * @param stat_unreach {void (*)(ICMP_PKT_STATUS*}} Callback when host
+ *  unreachable
+ * @param stat_finish {void (*)(ICMP_HOST*)} Callback when all probes
+ *  complete for this host
  */
 ICMP_API void icmp_host_set(ICMP_HOST *host, void *arg,
 	void (*stat_respond)(ICMP_PKT_STATUS*, void*),
@@ -126,13 +130,13 @@ ICMP_API void icmp_host_set(ICMP_HOST *host, void *arg,
 
 /* in icmp_ping.c */
 /**
- * ping 一台主机(内部默认每个探测包长度为64个字节)
- * @param chat {ICMP_CHAT*} 会话对象句柄
- * @param domain {const char*} 域名标识字符串，可以为空
- * @param ip {const char*} 主机IP地址，不能为空
- * @param npkt {size_t} 对该主机发送的数据包个数
- * @param delay {int} 发送探测数据包的时间间隔(毫秒)
- * @param timeout {int} 被探测主机的响应包超时时间(毫秒)
+ * Ping a host (internally defaults each probe packet to 64 bytes)
+ * @param chat {ICMP_CHAT*} Session object
+ * @param domain {const char*} Host identifier string, not NULL
+ * @param ip {const char*} Host IP address, not NULL
+ * @param npkt {size_t} Number of packets to send to this host
+ * @param delay {int} Interval between packets (milliseconds)
+ * @param timeout {int} Response timeout for probe packets (milliseconds)
  */
 ICMP_API void icmp_ping_one(ICMP_CHAT *chat, const char *domain,
 	const char *ip, size_t npkt, int delay, int timeout);
@@ -193,3 +197,4 @@ ICMP_API void icmp_pkt_set_data(ICMP_PKT *pkt, void *data, size_t size);
 #endif
 
 #endif
+

@@ -38,9 +38,10 @@ void*  tbox_pop(void*, int);
 size_t tbox_size(void*);
 
 /**
- * 用于线程之间的消息通信，通过线程条件变量及线程锁实现
+ * Thread-safe message communication between threads, implemented through thread
+ * queue.
  *
- * 示例：
+ * Example:
  *
  * class myobj
  * {
@@ -82,9 +83,9 @@ public:
 	}
 
 	/**
-	 * 发送消息对象
-	 * @param t {T*} 非空消息对象
-	 * @return {bool} 发送是否成功
+	 * Push message object.
+	 * @param t {T*} Non-empty message object.
+	 * @return {bool} Whether push was successful.
 	 */
 	bool push(T* t)
 	{
@@ -92,10 +93,11 @@ public:
 	}
 
 	/**
-	 * 接收消息对象
-	 * @param wait_ms {int} >= 0 时设置读等待超时时间(毫秒级别)，否则
-	 *  永远等待直到读到消息对象或出错
-	 * @return {T*} 非 NULL 表示获得一个消息对象
+	 * Pop message object.
+	 * @param wait_ms {int} When >= 0, wait timeout time (millisecond level).
+	 * Otherwise,
+	 *  wait forever until message is available.
+	 * @return {T*} Returns NULL to indicate no message object was obtained.
 	 */
 	T* pop(int wait_ms = -1)
 	{
@@ -103,7 +105,7 @@ public:
 	}
 
 	/**
-	 * 返回当前存在于消息队列中的消息数量
+	 * Get number of message objects in current message queue.
 	 * @return {size_t}
 	 */
 	size_t size(void) const

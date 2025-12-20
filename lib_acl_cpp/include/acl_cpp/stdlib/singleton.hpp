@@ -42,7 +42,6 @@ namespace acl {
 // http://lists.boost.org/Archives/boost/2006/05/105286.php for
 // details.
 //
-
 // singletons created by this code are guarenteed to be unique
 // within the executable or shared library which creates them.
 // This is sufficient and in fact ideal for the serialization library.
@@ -99,11 +98,14 @@ template<class T>
 bool singleton_wrapper< T >::destroyed_ = false;
 
 /**
- * 单例模板类，用VC2010或GCC编译时，单例对象在 main 函数之前被执行，
- * 所以它是线程安全的；但在 VC2003 编译成 release 版本时且打开了优化
- * 开关，则有可能是线程不安全的，此时不能保证单例对象的构造函数在
- * main 之前执行.
- * 使用举例如下：
+ * Singleton template class. When compiled with VC2010 or GCC, singleton objects
+ * are executed before the main function,
+ * so it is thread-safe; but when compiled with VC2003 in release mode with
+ * optimization enabled,
+ * it may be thread-unsafe, and the constructor of singleton objects cannot be
+ * guaranteed to execute
+ * before main.
+ * Usage example:
  * class singleton_test : public acl::singleton<singlegon_test> {
  * public:
  *   singleton_test() {}
@@ -146,9 +148,13 @@ T& singleton< T >::instance_ = singleton< T >::get_instance();
 //////////////////////////////////////////////////////////////////////////
 
 /**
- * 上面的实现在 VC2003 的 release 编译时如果打开了优化开关，则不能保证单例
- * 的构造函数先于 main 执行，如果是在 VC2003 下编译单例程序且在多个线程下
- * 都用单例对象时，建议使用如下的单例模板类，示例如下：
+ * The above implementation cannot guarantee that the singleton constructor
+ * executes before main
+ * when compiled with VC2003 release mode with optimization enabled. If
+ * compiling singleton programs
+ * under VC2003 and using singleton objects in multiple threads, it is
+ * recommended to use the following
+ * singleton template class. Example:
  * class singleton_test {
  * public:
  *   singleton_test() {}

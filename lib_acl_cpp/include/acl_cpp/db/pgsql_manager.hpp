@@ -10,14 +10,13 @@ namespace acl {
 
 class pgsql_conf;
 
-class ACL_CPP_API pgsql_manager : public connect_manager
-{
+class ACL_CPP_API pgsql_manager : public connect_manager {
 public:
 	pgsql_manager(time_t idle_ttl = 120);
 	~pgsql_manager();
 
 	/**
-	 * 添加一个数据库实例方法二
+	 * Add a database instance method two
 	 * @param conf {const pgsql_conf&}
 	 * @return {pgsql_manager&}
 	 */
@@ -25,16 +24,18 @@ public:
 
 protected:
 	/**
-	 * 基类 connect_manager 虚函数的实现
-	 * @param addr {const char*} 服务器监听地址，格式：ip:port
-	 * @param count {size_t} 连接池的大小限制，该值为 0 时则没有限制
-	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
-	 * @return {connect_pool*} 返回创建的连接池对象
+	 * Implementation of base class connect_manager virtual function
+	 * @param addr {const char*} Server listening address, format: ip:port
+	 * @param count {size_t} Connection pool size limit, when this value is 0 there
+	 * is no limit
+	 * @param idx {size_t} Index position of this connection pool object in the
+	 * collection (starting from 0)
+	 * @return {connect_pool*} Returns the created connection pool object
 	 */
 	connect_pool* create_pool(const char* addr, size_t count, size_t idx);
 
 private:
-	time_t idle_ttl_;       // 数据库连接的空闲过期时间
+	time_t idle_ttl_;       // Idle expiration time for database connections
 	std::map<string, pgsql_conf*> dbs_;
 };
 

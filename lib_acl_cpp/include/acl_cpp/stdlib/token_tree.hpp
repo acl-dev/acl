@@ -12,24 +12,24 @@ namespace acl {
 class token_tree;
 
 /**
- * 256 叉匹配树中的节点对象，为纯私有类
+ * Node object in 256-way matching tree, pure private class
  */
 class ACL_CPP_API token_node : public noncopyable {
 public:
 	/**
-	 * 获得该节点对应的键值
+	 * Get key value corresponding to this node
 	 * @return {const char*}
 	 */
 	const char* get_key() const;
 
 	/**
-	 * 获得该节点所绑定的对象地址
+	 * Get object address bound to this node
 	 * @return {void*}
 	 */
 	void* get_ctx() const;
 
 	/**
-	 * 获得该节点所属的匹配树对象
+	 * Get matching tree object this node belongs to
 	 * @return {token_tree*}
 	 */
 	token_tree* get_tree() const {
@@ -37,7 +37,7 @@ public:
 	}
 
 	/**
-	 * 获得 C 版本的节点对象
+	 * Get C version node object
 	 * @return {ACL_TOKEN*}
 	 */
 	ACL_TOKEN* get_token() const {
@@ -45,7 +45,7 @@ public:
 	}
 
 private:
-	friend class token_tree;	// 仅允许 token_tree 构造/析构本类对象
+	friend class token_tree;	// Only token_tree is allowed to construct/destruct objects of this class
 
 	token_node();
 	~token_node();
@@ -60,8 +60,9 @@ private:
 };
 
 /**
- * 256 叉树最大匹配查找算法，该算法具有通用性及非常高的性能(比哈希性能还高)，
- * 通过将字符串映射到 256 叉树上进行匹配查找
+ * 256-way tree maximum matching search algorithm. This algorithm is universal
+ * and has very high performance (higher than hash performance).
+ * Performs matching search by mapping strings to 256-way tree
  */
 class ACL_CPP_API token_tree : public noncopyable {
 public:
@@ -69,72 +70,84 @@ public:
 	~token_tree();
 
 	/**
-	 * 添加一个新的项
-	 * @param key {const char*} 键值
-	 * @param ctx {void*} 该 key 所绑定的对象，可以为空
-	 * @return {bool} 添加是否成功，返回 false 表明相同 key 已存在
+	 * Add a new item
+	 * @param key {const char*} Key value
+	 * @param ctx {void*} Object bound to this key, can be empty
+	 * @return {bool} Whether add was successful. Returns false indicates same key
+	 * already exists
 	 */
 	bool insert(const char* key, void* ctx = NULL);
 
 	/**
-	 * 从匹配树中删除指定的 key 项
-	 * @param key {const char*} 键值
-	 * @return {void*} 返回添加时绑定的对象地址
+	 * Delete specified key item from matching tree
+	 * @param key {const char*} Key value
+	 * @return {void*} Returns object address bound when adding
 	 */
 	void* remove(const char* key);
 
 	/**
-	 * 根据键值精确查找匹配的节点
-	 * @param key {const char*} 键值
-	 * @return {const token_node*} 返回 NULL 表示未找到匹配项
+	 * Find matching node exactly based on key value
+	 * @param key {const char*} Key value
+	 * @return {const token_node*} Returns NULL indicates matching item not found
 	 */
 	const token_node* find(const char* key);
 
 	/**
-	 * 按字符串最大匹配模式从匹配中查找与所给文本字符串相匹配的节点，同时
-	 * 移动文本字符串的指针位置
-	 * @param text {const char**} 要匹配查找的文本字符串，在匹配过程中，该
-	 *  地址指针会被移动至下一位置
-	 * @param delimiters {const char*} 非 NULL 时指定的截止符字符串，即查
-	 *  找过程中只要遇到的字符在该截止字符串中，则返回本次查找的结果
-	 * @param delimiters_tab {const char*} 非 NULL 时指定的截止符字符数组，
-	 *  即查找过程中只要遇到的字符在该截止字符数组中，则返回本次查找的结果，该数组
-	 *  必须由 create_delimiters_tab 创建，由 free_delimiters_tab 释放
-	 * @return {token_node*} 返回 NULL 表示本次查找未找到匹配项，通过检查
-	 *  *text 是否为 '\0' 表示是否匹配完毕目标文本字符串
-	 *  注：当 delimiters 非空时优先使用 delimiters 做为截止符，否则再检查
-	 *  delimiters_tab 是否非空，如果非空则使用其做为截止符
+	 * Search matching tree in maximum string matching mode to find node matching
+	 * given text string, and
+	 * move text string pointer position
+	 * @param text {const char**} Text string to match and search. During matching
+	 * process, this
+	 *  address pointer will be moved to next position
+	 * @param delimiters {const char*} When not NULL, specifies delimiter string,
+	 * i.e., during
+	 * search process, as long as encountered character is in this delimiter
+	 * string, returns result of this search
+	 * @param delimiters_tab {const char*} When not NULL, specifies delimiter
+	 * character array,
+	 * i.e., during search process, as long as encountered character is in this
+	 * delimiter character array, returns result of this search. This array
+	 * must be created by create_delimiters_tab and released by free_delimiters_tab
+	 * @return {token_node*} Returns NULL indicates this search did not find
+	 * matching item. Check
+	 * whether *text is '\0' to determine if target text string matching is
+	 * complete
+	 * Note: When delimiters is not empty, delimiters is used as delimiter first,
+	 * otherwise check
+	 *  whether delimiters_tab is not empty, if not empty, use it as delimiter
 	 */
 	const token_node* search(const char** text, const char* delimiters = NULL,
 		const char* delimiters_tab = NULL);
 
 	/**
-	 * 创建截止符数组
-	 * @param delimiters {const char*} 截止符字符串
-	 * @return {char*} 根据截止符字符串创建的截止符数组
+	 * Create delimiter array
+	 * @param delimiters {const char*} Delimiter string
+	 * @return {char*} Delimiter array created based on delimiter string
 	 */
 	static char* create_delimiters_tab(const char* delimiters);
 
 	/**
-	 * 释放由 create_delimiters_tab 创建的截止符数组
+	 * Release delimiter array created by create_delimiters_tab
 	 * @param delimiters_tab {char*}
 	 */
 	static void free_delimiters_tab(char* delimiters_tab);
 
 	/**
-	 * 遍历 256 匹配树时需先调用本方法获得第一个节点对象
+	 * When traversing 256 matching tree, need to call this method first to get
+	 * first node object
 	 * @return {token_node*}
 	 */
 	const token_node* first_node();
 
 	/**
-	 * 遍历 256 匹配树时需先调用本方法获得下一个节点对象
+	 * When traversing 256 matching tree, need to call this method to get next node
+	 * object
 	 * @return {token_node*}
 	 */
 	const token_node* next_node();
 
 	/**
-	 * 获得 C 版本的 256 叉树对象
+	 * Get C version 256-way tree object
 	 * @return {ACL_TOKEN*}
 	 */
 	ACL_TOKEN* get_tree() const {
@@ -148,3 +161,4 @@ private:
 };
 
 } // namespace acl
+

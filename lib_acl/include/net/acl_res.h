@@ -15,54 +15,58 @@ extern "C" {
 #endif
 
 /**
- * DNS返回结果的存储结构
+ * DNS query result storage structure.
  */
 typedef struct ACL_RES {
-	char dns_ip[64];                /**< DNS的IP地址 */
-	unsigned short dns_port;        /**< DNS的Port */
-	unsigned short cur_qid;         /**< 内部变量，数据包的标识 */
-	time_t tm_spent;                /**< 查询时间耗费(秒) */
+	char dns_ip[64];                /**< DNS server IP address */
+	unsigned short dns_port;        /**< DNS server Port */
+	unsigned short cur_qid;         /**< Internal query request packet identifier */
+	time_t tm_spent;                /**< Query time spent (seconds) */
 	int   errnum;
-#define ACL_RES_ERR_SEND	-100    /**< 写出错 */
-#define ACL_RES_ERR_READ	-101    /**< 读出错 */
-#define ACL_RES_ERR_RTMO	-102    /**< 读超时 */
-#define ACL_RES_ERR_NULL	-103    /**< 空结果 */
-#define ACL_RES_ERR_CONN	-104    /**< TCP方式时连接失败 */
+#define ACL_RES_ERR_SEND	-100    /**< Send error */
+#define ACL_RES_ERR_READ	-101    /**< Read error */
+#define ACL_RES_ERR_RTMO	-102    /**< Receive timeout */
+#define ACL_RES_ERR_NULL	-103    /**< Empty result */
+#define ACL_RES_ERR_CONN	-104    /**< TCP mode connection failure */
 
-	int transfer;                   /**< TCP/UDP 传输模式 */
-#define ACL_RES_USE_UDP		0       /**< UDP 传输模式 */
-#define ACL_RES_USE_TCP		1       /**< TCP 传输模式 */
+	int transfer;                   /**< TCP/UDP transfer mode */
+#define ACL_RES_USE_UDP		0       /**< UDP transfer mode */
+#define ACL_RES_USE_TCP		1       /**< TCP transfer mode */
 
-	int   conn_timeout;             /**< TCP 传输时的连接超时时间, 默认为10秒 */
-	int   rw_timeout;               /**< TCP/UDP 传输的IO超时时间, 默认为10秒 */
+	int   conn_timeout;             /**< TCP connection
+					 *   establishment timeout,
+					 *   default is 10 seconds */
+	int   rw_timeout;               /**< TCP/UDP read/write IO
+					 *   timeout, default is 10
+					 *   seconds */
 } ACL_RES;
 
 /**
- * 创建一个DNS查询对象
- * @param dns_ip {const char*} DNS的IP地址
- * @param dns_port {unsigned short} DNS的Port
- * @return {ACL_RES*} 新创建的查询对象
+ * Create a DNS query object.
+ * @param dns_ip {const char*} DNS server IP address
+ * @param dns_port {unsigned short} DNS server Port
+ * @return {ACL_RES*} Newly created query object
  */
 ACL_API ACL_RES *acl_res_new(const char *dns_ip, unsigned short dns_port);
 
 /**
- * 设置DNS查询的超时时间
- * @param conn_timeout {int} TCP 传输时的连接超时时间
- * @param rw_timeout {int} TCP/UDP 传输的IO超时时间
+ * Set DNS query timeout.
+ * @param conn_timeout {int} TCP connection establishment timeout
+ * @param rw_timeout {int} TCP/UDP read/write IO timeout
  */
 ACL_API void acl_res_set_timeout(int conn_timeout, int rw_timeout);
 
 /**
- * 释放一个DNS查询对象
- * @param res {ACL_RES*} DNS查询对象
+ * Free a DNS query object.
+ * @param res {ACL_RES*} DNS query object
  */
 ACL_API void acl_res_free(ACL_RES *res);
 
 /**
- * 查询某个域名的IP地址
- * @param res {ACL_RES*} DNS查询对象
- * @param domain {const char*} 要查询的域名
- * @return {ACL_DNS_DB*} 查询的结果集
+ * Query IP address list for a certain domain name.
+ * @param res {ACL_RES*} DNS query object
+ * @param domain {const char*} Domain name to query
+ * @return {ACL_DNS_DB*} Query result
  */
 ACL_API ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain);
 
@@ -71,16 +75,16 @@ ACL_API ACL_DNS_DB *acl_res_lookup6(ACL_RES *res, const char *domain);
 #endif
 
 /**
- * 根据错误号获得查询失败的原因
- * @param errnum {int} 错误号
- * @return {const char*} 错误信息
+ * Get query failure reason based on error number.
+ * @param errnum {int} Error number
+ * @return {const char*} Error message
  */
 ACL_API const char *acl_res_strerror(int errnum);
 
 /**
- * 获得当前查询的错误信息
- * @param res {ACL_RES*} DNS查询对象
- * @return {const char*} 错误信息
+ * Get current query error message.
+ * @param res {ACL_RES*} DNS query object
+ * @return {const char*} Error message
  */
 ACL_API const char *acl_res_errmsg(const ACL_RES *res);
 
@@ -89,4 +93,3 @@ ACL_API const char *acl_res_errmsg(const ACL_RES *res);
 #endif
 
 #endif
-

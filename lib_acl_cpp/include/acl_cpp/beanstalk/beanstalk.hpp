@@ -13,68 +13,79 @@ struct ACL_ARGV;
 namespace acl {
 
 /**
- * 消息 ID 号从 1 开始递增(参加 beanstalkd 的 job.c 源程序中的如下内容：
- *     static uint64 next_id = 1; 及 make_job_with_id() 中的
+ * Message ID starts from 1 and increments (see beanstalkd source code job.c for
+ * details:
+ *     static uint64 next_id = 1; and in make_job_with_id():
  *     if (id) {
  *         j->r.id = id;
  *         if (id >= next_id) next_id = id + 1;
  *     } else {
  *         j->r.id = next_id++;
  *     }
- * 消息优先级 pri 的取值范围为 0 ~ 4,294,968,295(最大无符号整数值)，值越小
- * 则优先级别越高，最高级别为 0 级
- * 消息体默认最大长度为 65,535(最大无符号 short 值)，该值可以在启动 beanstalkd 指定
- * 更多内容请参考本项目 doc/ 目录下的 <beanstalk协议介绍.pdf>
- * 本类中的命令过程内部会自动进行连接操作，在重连过程中，如果之前设置了 watch 及 use
- * 队列，则会自动重试这些命令过程，所以一般来说不用显式调用 open 过程；当用户调用了
- * close 函数后，不仅断开了与 beanstalkd 服务器的连接，同时会清除本类对象中存储的
- * use 及 watch 队列
+ * Message priority pri value range is 0 ~ 4,294,968,295 (maximum unsigned
+ * value). Smaller value
+ * means higher priority. Highest priority is 0.
+ * Message default maximum length is 65,535 (maximum short value). This value
+ * can be modified by beanstalkd command
+ * line parameters. For details, see <beanstalk protocol specification.pdf> in
+ * doc/ directory.
+ * All operations internally automatically reconnect and retry. Before
+ * operations, you need to call watch or use
+ * operations. Internally automatically manages these operations. Generally, you
+ * need to call open process explicitly, and users should
+ * call close after use, which will disconnect from beanstalkd server
+ * connection, and internally automatically releases
+ * use and watch operations.
  */
-class ACL_CPP_API beanstalk : public noncopyable
-{
+class ACL_CPP_API beanstalk : public noncopyable {
 public:
 	/**
-	 * 构造函数
-	 * @param addr {const char*} beanstalkd 地址，格式：ip:port/domain:port
-	 * @param conn_timeout {int} 连接服务器的超时时间(秒)
-	 * @param retry {bool} 如果连接断了是否自动重连
+	 * Constructor
+	 * @param addr {const char*} beanstalkd address, format: ip:port/domain:port
+	 * @param conn_timeout {int} Connection server timeout time (seconds)
+	 * @param retry {bool} Whether connection object automatically reconnects.
 	 */
 	beanstalk(const char* addr, int conn_timeout, bool retry = true);
 	~beanstalk();
 
 	/////////////////////////////////////////////////////////////////////
-	// 生产者调用的接口
+	// Producer interfaces
 
 	/**
-	 * 选择所用的发送管道
-	 * @param tube {const char*} 管道名称
-	 * @return {bool} 是否成功
+	 * Select sending tube to use.
+	 * @param tube {const char*} Tube name.
+	 * @return {bool} Whether successful.
 	 */
 	bool use(const char* tube);
 
 	/**
-	 * 向所选管道或缺省管理中发送消息
-	 * @param data {const void*} 消息数据地址，可以是二进制
-	 * @param len {size_t} data 数据体长度
-	 * @param pri {unsigned} 优先级，值越小，优先级越高
-	 * @param delay {unsigned} 表示将job放入ready队列需要等待的秒数
-	 * @param ttr {unsigned} 表示允许一个worker执行该消息的秒数
-	 * @return {unsigned long long} 返回所添加消息的消息号，
-	 *  如果返回值 > 0 则表示添加成功，若 == 0 则表示添加失败
-	 *  (查看 beanstalkd 源码，可以看出消息号从 1 开始增加)
+	 * Send message to selected tube (default tube if not selected).
+	 * @param data {const void*} Message data address. Can be binary data.
+	 * @param len {size_t} Data buffer length.
+	 * @param pri {unsigned} Priority. Smaller value means higher priority.
+	 * @param delay {unsigned} Indicates how many seconds job needs to wait before
+	 * entering ready state.
+	 * @param ttr {unsigned} Indicates how many seconds a worker has to execute
+	 * this message.
+	 * @return {unsigned long long} Returns created message job number,
+	 *  return value > 0 means successful, == 0 means failure.
+	 *  (Check beanstalkd source code, you can see message number starts from 1)
 	 */
 	unsigned long long put(const void* data, size_t len,
 		unsigned pri = 1024, unsigned delay = 0, unsigned ttr = 60);
 
 	/**
-	 * 以格式字符串方式向所选管道或缺省管理中发送消息
-	 * @param pri {unsigned} 优先级，值越小，优先级越高
-	 * @param delay {unsigned} 表示将job放入ready队列需要等待的秒数
-	 * @param ttr {unsigned} 表示允许一个worker执行该消息的秒数
-	 * @param fmt {const char*} 格式字符串
-	 * @return {unsigned long long} 返回所添加消息的消息号，
-	 *  如果返回值 > 0 则表示添加成功，若 == 0 则表示添加失败
-	 *  (查看 beanstalkd 源码，可以看出消息号从 1 开始增加)
+	 * Send message to selected tube (default tube if not selected) in formatted
+	 * string format.
+	 * @param pri {unsigned} Priority. Smaller value means higher priority.
+	 * @param delay {unsigned} Indicates how many seconds job needs to wait before
+	 * entering ready state.
+	 * @param ttr {unsigned} Indicates how many seconds a worker has to execute
+	 * this message.
+	 * @param fmt {const char*} Format string.
+	 * @return {unsigned long long} Returns created message job number,
+	 *  return value > 0 means successful, == 0 means failure.
+	 *  (Check beanstalkd source code, you can see message number starts from 1)
 	 */
 	unsigned long long format_put(unsigned pri, unsigned delay, unsigned ttr,
 		const char* fmt, ...) ACL_CPP_PRINTF(5, 6);
@@ -83,208 +94,238 @@ public:
 		unsigned pri = 1024, unsigned delay = 0, unsigned ttr = 60);
 
 	/**
-	 * 以格式字符串方式向所选管道或缺省管理中发送消息，其中的
-	 * 的 pri, delay, ttr 采用默认值
-	 * @param fmt {const char*} 格式字符串
-	 * @return {unsigned long long} 返回所添加消息的消息号，
-	 *  如果返回值 > 0 则表示添加成功，若 == 0 则表示添加失败
-	 *  (查看 beanstalkd 源码，可以看出消息号从 1 开始增加)
+	 * Send message to selected tube (default tube if not selected) in formatted
+	 * string format. All
+	 * pri, delay, ttr parameters use default values.
+	 * @param fmt {const char*} Format string.
+	 * @return {unsigned long long} Returns created message job number,
+	 *  return value > 0 means successful, == 0 means failure.
+	 *  (Check beanstalkd source code, you can see message number starts from 1)
 	 */
 	unsigned long long format_put(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
 
 	/////////////////////////////////////////////////////////////////////
-	// 消费者调用的接口
+	// Consumer interfaces
 
 	/**
-	 * 选择读取消息的管道，将其加入监控管理列表中，
-	 * 不调用本函数，则使用缺省的管道(default)
-	 * @param tube {const char*} 消息管道名称
-	 * @return {unsigned} 返回值为关注的消息管道数, 返回值 > 0 则表示成功
+	 * Select tube to get messages from. Add to watch list,
+	 * if you don't call this function, default tube (default) will be used.
+	 * @param tube {const char*} Message tube name.
+	 * @return {unsigned} Return value is number of watched message tubes. Return
+	 * value > 0 means success.
 	 */
 	unsigned watch(const char* tube);
 
 	/**
-	 * 取消关注(watch)一个接收消息的管道(tube)
-	 * @param tube {const char*} 消息管道名称
-	 * @return {unsigned} 返回值为剩余的消息关注管道数, 返回值 > 0 则表示
-	 *  成功(因至少要关注一个缺省消息管道，所以正确情况下该返回值至少为 1)，
-	 *  如果返回值为 0 则说明输入的管道并未被关注或取消关注失败
+	 * Remove one tube from watched (watch) message tubes.
+	 * @param tube {const char*} Message tube name.
+	 * @return {unsigned} Return value is number of remaining watched message
+	 * tubes. Return value > 0 means
+	 * success (if you need to watch a default message tube, after correctly
+	 * calling this function, return value will be 1).
+	 *  Return value 0 means this tube was not watched or removal failed.
 	 */
 	unsigned ignore(const char* tube);
 
 	/**
-	 * 取消关注所有的接收消息的管道
-	 * @return {unsigned} 返回值为剩余的消息关注管道数, 返回值 > 0 则表示
-	 *  成功(因至少要关注一个缺省消息管道，所以正确情况下该返回值至少为 1)，
-	 *  返回 0 表示取消关注失败
+	 * Remove all watched message tubes.
+	 * @return {unsigned} Return value is number of remaining watched message
+	 * tubes. Return value > 0 means
+	 * success (if you need to watch a default message tube, after correctly
+	 * calling this function, return value will be 1).
+	 *  Otherwise 0 means removal failed.
 	 */
 	unsigned ignore_all();
 
 	/**
-	 * 从消息输出管道中获取一条消息，但并不删除消息，可以设置
-	 * 等待超时，如果设为 -1 则永远阻塞等待消息可用
-	 * @param buf {string&} 存储获得的一条消息，函数内部会先清空该缓冲区
-	 * @param timeout {int} 等待队列服务器返回消息的超时值，当为 -1
-	 *  时，则无限期等待，当 > 0 时，则在该时间内若没有消息，则返回，
-	 *  当 == 0 时，则立即返回一条消息或返回超时
-	 * @return {unsigned long long} 返回所取得的消息号，若返回值 > 0
-	 *  表示正确取到一个消息，否则说明出错或超时没有消息可用，其中当
-	 *  返回 0 时，如果调用 get_error() 获得的内容为 TIMED_OUT 则表示
-	 *  超时了，当为 DEADLINE_SOON 时则表示该消息已经被读取但在规定的 ttr
-	 *  (事务时间内) 没有被 delete_id
+	 * Get a message from watched tubes and delete it. This operation
+	 * waits for timeout. When timeout is -1, it waits indefinitely for messages.
+	 * @param buf {string&} Buffer to store obtained message. Internally first
+	 * clears this buffer.
+	 * @param timeout {int} Timeout value for waiting for available messages. When
+	 * -1,
+	 * it waits indefinitely. When > 0, if no message is available within this
+	 * time, returns.
+	 *  When == 0, immediately returns if no message is available.
+	 * @return {unsigned long long} Returns obtained message number. Return value >
+	 * 0
+	 * means correctly got a message. Otherwise means timeout or no message
+	 * available. When
+	 * return value is 0, you can call get_error() to get error. When TIMED_OUT, it
+	 * means
+	 * timeout. When DEADLINE_SOON, it means message has been reserved and within
+	 * specified ttr
+	 *  (timeout time) has not been delete_id.
 	 */
 	unsigned long long reserve(string& buf, int timeout = -1);
 
 	/**
-	 * 从队列服务器中删除指定 ID 号的消息
-	 * @param id {unsigned long long} 消息号
-	 * @return {bool} 是否成功删除
+	 * Delete message with specified ID number from queue.
+	 * @param id {unsigned long long} Message number.
+	 * @return {bool} Whether deletion was successful.
 	 */
 	bool delete_id(unsigned long long id);
 
 	/**
-	 * 将一个已经被获取的消息重新放回ready队列(并将job状态置为 "ready")，
-	 * 让该消息可以被其它连接获得
-	 * @param id {unsigned long long} 消息号
-	 * @param pri {unsigned} 优先级别
-	 * @param delay {unsigned} 在该消息被放入ready队列之前需要等待的秒数
-	 * @return {bool} 是否成功
+	 * Put a message that has been reserved back to ready state (change job state
+	 * to "ready").
+	 * This message can be obtained by other workers.
+	 * @param id {unsigned long long} Message number.
+	 * @param pri {unsigned} Priority.
+	 * @param delay {unsigned} How many seconds to wait before this message enters
+	 * ready state.
+	 * @return {bool} Whether successful.
 	 */
 	bool release(unsigned long long id, unsigned pri = 1024,
 		unsigned delay = 0);
 
 	/**
-	 * 将一个消息的状态置为 "buried", Buried 消息被放在一个FIFO的链表中，
-	 * 在客户端调用kick命令之前，这些消息将不会被服务端处理
-	 * @param id {unsigned long long} 消息号
-	 * @param pri {unsigned int} 优先级别
-	 * @return {bool} 是否成功
+	 * Change a message state to "buried". Buried messages are stored in a FIFO
+	 * queue,
+	 * and these messages will not be processed by workers until client calls kick
+	 * function.
+	 * @param id {unsigned long long} Message number.
+	 * @param pri {unsigned int} Priority.
+	 * @return {bool} Whether successful.
 	 */
 	bool bury(unsigned long long id, unsigned pri = 1024);
 
 	/**
-	 * 允许一个worker请求在一个消息获取更多执行的时间。这对于那些需要
-	 * 长时间完成的消息是非常有用的，但同时也可能利用TTR的优势将一个消息
-	 * 从一个无法完成工作的worker处移走。一个worker可以通过该命令来告诉
-	 * 服务端它还在执行该job (比如：在收到DEADLINE_SOON是可以发生给命令)
-	 * @param id {unsigned long long} 消息号
-	 * @return {bool} 是否成功
+	 * Extend time for a worker to reserve a message for execution. This is very
+	 * useful for messages that need
+	 * long time to complete. It can also be used to transfer a message from one
+	 * worker that cannot complete it
+	 * to another worker. A worker can extend time by calling this function
+	 * multiple times
+	 * during job execution (e.g., when receiving DEADLINE_SOON, you can call this
+	 * function to extend time).
+	 * @param id {unsigned long long} Message number.
+	 * @return {bool} Whether successful.
 	 */
 	bool touch(unsigned long long id);
 
 	/////////////////////////////////////////////////////////////////////
-	// 其它接口
+	// Common interfaces
 
 	/**
-	 * 连接 beanstalkd 服务器，通常情况下不需要显示地调用该函数，上述命令
-	 * 会自动根据需要自动调用本函数
-	 * @return {bool}  否成功
+	 * Open beanstalkd server connection. Generally, you don't need to explicitly
+	 * call this function to open connection, because
+	 * it automatically connects. You need to call this function to enable
+	 * automatic reconnection.
+	 * @return {bool}  Whether successful.
 	 */
 	bool open();
 
 	/**
-	 * 显示关闭与 beanstalkd 的连接，当该类实例析构时会尝试调用关闭过程，
-	 * 调用本函数后，类对象内部的 tube_used_ 及 tubes_watched_ 会被释放
+	 * Explicitly close beanstalkd server connection. When object is destroyed, it
+	 * will attempt to call this close process,
+	 * and this function internally releases tube_used_ and tubes_watched_.
 	 */
 	void close();
 
 	/**
-	 * 显示通知 beanstalkd 服务器退出连接(服务器收到此命令后会立即关闭连接)
+	 * Notify beanstalkd server to exit (server will close connection after
+	 * receiving this command).
 	 */
 	void quit();
 
 	/**
-	 * 获取消息队列中指定的消息号的数据
-	 * @param buf {string&} 如果消息存在则存储该条消息，函数内部会先清空该缓冲区
-	 * @param id {unsigned long long} 指定的消息号
-	 * @return {unsigned long long} 返回取得的 ready 状态消息号，
-	 *  若返回值 > 0 则说明取得了一个消息，否则表示没有消息可用
+	 * Get message body for specified message number.
+	 * @param buf {string&} Message body buffer to store obtained message.
+	 * Internally first clears this buffer.
+	 * @param id {unsigned long long} Specified message number.
+	 * @return {unsigned long long} Returns obtained ready state message number,
+	 *  return value > 0 means got a message. Otherwise means no message available.
 	 */
 	unsigned long long peek(string& buf, unsigned long long id);
 
 	/**
-	 * 获得当前关注 (watch) 管道中的一条 ready 状态消息，
-	 * 如果消息不存在也立即返回
-	 * @param buf {string&} 如果消息存在则存储该条消息，函数内部会先清空该缓冲区
-	 * @return {unsigned long long} 返回取得的 ready 状态消息号，
-	 *  若返回值 > 0 则说明取得了一个消息，否则表示没有消息可用
+	 * Get a ready state message from currently watched (watch) tubes.
+	 * This message will not be deleted.
+	 * @param buf {string&} Message body buffer to store obtained message.
+	 * Internally first clears this buffer.
+	 * @return {unsigned long long} Returns obtained ready state message number,
+	 *  return value > 0 means got a message. Otherwise means no message available.
 	 */
 	unsigned long long peek_ready(string& buf);
 
 	/**
-	 * 获得当前关注 (watch) 管道中的一条 delayed 状态消息，
-	 * 如果消息不存在也立即返回
-	 * @param buf {string&} 如果消息存在则存储该条消息，函数内部会先清空该缓冲区
-	 * @return {unsigned long long} 返回取得的 delayed 状态消息号，
-	 *  若返回值 > 0 则说明取得了一个消息，否则表示没有消息可用
+	 * Get a delayed state message from currently watched (watch) tubes.
+	 * This message will not be deleted.
+	 * @param buf {string&} Message body buffer to store obtained message.
+	 * Internally first clears this buffer.
+	 * @return {unsigned long long} Returns obtained delayed state message number,
+	 *  return value > 0 means got a message. Otherwise means no message available.
 	 */
 	unsigned long long peek_delayed(string& buf);
 
 	/**
-	 * 获得当前关注 (watch) 管道中的一条 buried 状态消息，
-	 * 如果消息不存在也立即返回
-	 * @param buf {string&} 如果消息存在则存储该条消息，函数内部会先清空该缓冲区
-	 * @return {unsigned long long} 返回取得的 buried 状态消息号，
-	 *  若返回值 > 0 则说明取得了一个消息，否则表示没有消息可用
+	 * Get a buried state message from currently watched (watch) tubes.
+	 * This message will not be deleted.
+	 * @param buf {string&} Message body buffer to store obtained message.
+	 * Internally first clears this buffer.
+	 * @return {unsigned long long} Returns obtained buried state message number,
+	 *  return value > 0 means got a message. Otherwise means no message available.
 	 */
 	unsigned long long peek_buried(string& buf);
 
 	/**
-	 * 该命令只能针对当前正在使用的tube执行；它将 buried
-	 * 或者 delayed 状态的消息移动到 ready 队列
-	 * @param n {unsigned} 表示每次 kick 消息的上限，
-	 *  服务端将最多 kick 的消息数量
-	 * @return {int} 表示本次kick操作作用消息的数目，返回 -1 表示出错
+	 * Move messages in buried or delayed state to ready state, only for currently
+	 * used tube.
+	 * @param n {unsigned} Indicates maximum number of messages to kick each time,
+	 *  server will kick at most n messages.
+	 * @return {int} Indicates number of messages actually kicked. Returns -1 to
+	 * indicate error.
 	 */
 	int  kick(unsigned n);
 
 	/**
-	 * 获得客户当前正在使用的消息管道
-	 * @param buf {string&} 存储当前使用的消息管道，函数内部会先清空该缓冲区
-	 * @return {bool} 是否成功获得
+	 * Get currently used message tube for this client.
+	 * @param buf {string&} Buffer to store currently used message tube. Internally
+	 * first clears this buffer.
+	 * @return {bool} Whether successfully got.
 	 */
 	bool list_tube_used(string&buf);
 
 	/**
-	 * 获得已经存在的所有消息管道(tube)的列表集合
-	 * @param buf {string&} 存储结果，函数内部会先清空该缓冲区
-	 * @return {bool} 是否成功获得
+	 * Get list of all existing message tubes (tube).
+	 * @param buf {string&} Buffer to store result. Internally first clears this
+	 * buffer.
+	 * @return {bool} Whether successfully got.
 	 */
 	bool list_tubes(string& buf);
 
 	/**
-	 * 获得当前关注(watch)的消息管道的集合
-	 * @param buf {string&} 存储结果，函数内部会先清空该缓冲区
-	 * @return {bool} 是否成功获得
+	 * Get list of currently watched (watch) message tubes.
+	 * @param buf {string&} Buffer to store result. Internally first clears this
+	 * buffer.
+	 * @return {bool} Whether successfully got.
 	 */
 	bool list_tubes_watched(string& buf);
 
 	/**
-	 * 给定时间内暂停从指定消息管道(tube)中获取消息
-	 * @param tube {const char*} 消息管道名
-	 * @param delay {unsigned} 指定时间段
-	 * @return {bool} 是否成功
+	 * Temporarily pause getting messages from specified message tube (tube).
+	 * @param tube {const char*} Message tube name.
+	 * @param delay {unsigned} Specified time period.
+	 * @return {bool} Whether successful.
 	 */
 	bool pause_tube(const char* tube, unsigned delay);
 
 	/////////////////////////////////////////////////////////////////////
-	// 公共接口
-	const char* get_error() const
-	{
+	// Common interfaces
+	const char* get_error() const {
 		return errbuf_.c_str();
 	}
 
-	socket_stream& get_conn()
-	{
+	socket_stream& get_conn() {
 		return conn_;
 	}
 
 	/**
-	 * 返回构造函数中 beanstalkd 的服务器地址，格式：ip:port
-	 * @return {const char*} 永远返回非空的 beanstalkd 服务器地址
+	 * Get beanstalkd server address passed to constructor, format: ip:port
+	 * @return {const char*} Returns non-empty beanstalkd server address.
 	 */
-	const char* get_addr() const
-	{
+	const char* get_addr() const {
 		return addr_;
 	}
 
@@ -312,3 +353,4 @@ private:
 } // namespace acl
 
 #endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_BEANSTALK_DISABLE)
+

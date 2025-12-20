@@ -8,16 +8,16 @@ extern "C" {
 #include "acl_vstring.h"
 
 /**
- * 从文件全路径中提取文件名
- * @parm bp {ACL_VSTRING*} 存储结果的缓冲区，若为 NULL 则引用内部的线程局部存储
- * @return {char*} 永不为空
+ * Extract file name from full file path.
+ * @parm bp {ACL_VSTRING*} Storage buffer, if NULL, uses internal thread-local storage
+ * @return {char*} Must not be NULL
  */
 ACL_API char *acl_sane_basename(ACL_VSTRING *bp, const char *path);
 
 /**
- * 从文件全路径中提取文件所在目录
- * @parm bp {ACL_VSTRING*} 存储结果的缓冲区，若为 NULL 则引用内部的线程局部存储
- * @return {char*} 永不为空
+ * Extract file directory from full file path.
+ * @parm bp {ACL_VSTRING*} Storage buffer, if NULL, uses internal thread-local storage
+ * @return {char*} Must not be NULL
  */
 ACL_API char *acl_sane_dirname(ACL_VSTRING *bp, const char *path);
 

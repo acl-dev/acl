@@ -12,10 +12,10 @@ extern "C" {
 #include <unistd.h>
 
 /**
- * 设置程序的有效用户 ID 及有效组 ID
- * @param euid {uid_t} 有效用户 ID
- * @param egid {gid_t} 有效组 ID
- * @return {int} 0 表示设置成功，-1 表示设置失败
+ * Set process effective user ID and effective group ID.
+ * @param euid {uid_t} Effective user ID
+ * @param egid {gid_t} Effective group ID
+ * @return {int} 0 indicates setting successful, -1 indicates setting failed
  */
 int acl_set_eugid(uid_t euid, gid_t egid);
 
@@ -27,4 +27,3 @@ int acl_set_eugid(uid_t euid, gid_t egid);
 
 
 #endif
-

@@ -9,7 +9,7 @@ namespace acl {
 class socket_stream;
 
 /**
- * tcp ipc 通信发送类，内部自动组包
+ * TCP IPC communication sender class, internally automatically packages data
  */
 class ACL_CPP_API tcp_sender : public noncopyable {
 public:
@@ -17,15 +17,15 @@ public:
 	~tcp_sender();
 
 	/**
-	 * 发送方法
-	 * @param data {const void*} 要发送的数据包地址
-	 * @param len {unsigned int} 数据包长度
-	 * @return {bool} 发送是否成功
+	 * Send method
+	 * @param data {const void*} Address of the data packet to send
+	 * @param len {unsigned int} Data packet length
+	 * @return {bool} Whether the send was successful
 	 */
 	bool send(const void* data, unsigned int len);
 
 	/**
-	 * 获得连接流对象
+	 * Get the connection stream object
 	 * @return {acl::socket_stream&}
 	 */
 	acl::socket_stream& get_conn() const {
@@ -38,3 +38,4 @@ private:
 };
 
 } // namespace acl
+

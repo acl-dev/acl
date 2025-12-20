@@ -11,10 +11,14 @@ struct ACL_XML_NODE;
 struct ACL_XML_ATTR;
 
 /**
- * 对 ACL 库中 XML 解析库的封装，方便 C++ 用户使用，如果不太注重性能因素，
- * 可以直接使用该类，如果在服务端执行且非常注重性能，建议直接使用 ACL 库的
- * XML 解析器，因为该类也是调用了 ACL 库中的 XML 解析过程，并且有二次拷贝
- * 过程，可能会稍微影响一些性能，但对于一般的应用这点影响是微不足道的
+ * Wrapper for XML parsing library in ACL library, convenient for C++ users. If
+ * performance is not a major concern,
+ * can directly use this class. If executing on server side and performance is
+ * very important, it is recommended to directly use ACL library's
+ * XML parser, because this class also calls XML parsing process in ACL library,
+ * and has a secondary copy
+ * process, which may slightly affect performance, but for general applications
+ * this impact is negligible
  */
 
 namespace acl {
@@ -139,8 +143,9 @@ public:
 
 public:
 	/**
-	 * 取出对应于 ACL 库中的 XML 节点对象
-	 * @return {ACL_XML_NODE*} 返回节点对象，注：该节点用户不能单独释放
+	 * Get XML node object corresponding to ACL library
+	 * @return {ACL_XML_NODE*} Returns node object. Note: Users cannot separately
+	 * release this node
 	 */
 	ACL_XML_NODE* get_xml_node() const;
 
@@ -149,14 +154,14 @@ protected:
 	friend class dbuf_guard;
 
 	/**
-	 * xml 节点构造函数
-	 * @param xml_ptr {xml*} xml 树对象，非空
-	 * @param node {ACL_XML_NODE*} C 版中的 xml 节点指针
+	 * XML node constructor
+	 * @param xml_ptr {xml*} XML tree object, non-empty
+	 * @param node {ACL_XML_NODE*} XML node pointer in C version
 	 */
 	xml1_node(xml* xml_ptr, ACL_XML_NODE* node);
 
 	/**
-	 * 要求该对象必须是动态创建的
+	 * Requires that this object must be dynamically created
 	 */
 	~xml1_node();
 
@@ -174,14 +179,17 @@ class string;
 class ACL_CPP_API xml1 : public xml {
 public:
 	/**
-	 * 构造函数
-	 * @param data {const char*} xml 格式的字符串，可以是完整的
-	 *  xml 字符串，也可以是部分的 xml 字符串，也可以是空指针，
-	 *  无论如何，用户依然可以用部分或完整的 xml 字符串调用 update
-	 *  函数，在调用 update 过程中解析 xml；其实，当构造函数的
-	 *  的 data 参数非空时，它也会调用 update
-	 * @param dbuf_nblock {size_t} 内部所用 dbuf_guard 的初始化参数
-	 * @param dbuf_capacity {size_t} 内部所用 dbuf_guard 的初始化参数
+	 * Constructor
+	 * @param data {const char*} XML format string, can be complete
+	 *  XML string, can also be partial XML string, can also be NULL pointer.
+	 * In any case, users can still call update function with partial or complete
+	 * XML string
+	 *  to parse XML during update call; actually, when constructor's
+	 *  data parameter is not empty, it will also call update
+	 * @param dbuf_nblock {size_t} Initialization parameter for internally used
+	 * dbuf_guard
+	 * @param dbuf_capacity {size_t} Initialization parameter for internally used
+	 * dbuf_guard
 	 */
 	xml1(const char* data = NULL, size_t dbuf_nblock = 2,
 		size_t dbuf_capacity = 100);
@@ -323,9 +331,10 @@ public:
 
 public:
 	/**
-	 * 取得 acl 库中的 ACL_XML 对象
-	 * @return {ACL_XML*} 该值不可能为空，注意用户可以修改该对象的值，
-	 *  但不可以释放该对象
+	 * Get ACL_XML object in acl library
+	 * @return {ACL_XML*} This value cannot be NULL. Note: Users can modify the
+	 * value of this object,
+	 *  but cannot release this object
 	 */
 	ACL_XML* get_xml() const {
 		return xml_;
@@ -338,3 +347,4 @@ private:
 };
 
 } // namespace acl
+

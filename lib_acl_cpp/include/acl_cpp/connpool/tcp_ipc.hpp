@@ -8,8 +8,9 @@ class tcp_pool;
 class string;
 
 /**
- * 该类封装了 tcp_manager 管理类，可以动态添加目标服务端地址，同时动态创建与
- * 每一个服务端的连接池
+ * This class wraps tcp_manager management class, can dynamically add target
+ * server addresses, and dynamically create connection pools
+ * with each server
  */
 class ACL_CPP_API tcp_ipc : public noncopyable {
 public:
@@ -17,90 +18,97 @@ public:
 	~tcp_ipc();
 
 	/**
-	 * 设置与每个服务器所建连接池的最大连接限制
-	 * @param max {int} 每个连接池的最大连接限制，当 <= 0 时则不限制连接数
+	 * Set maximum connection limit for connection pool built with each server
+	 * @param max {int} Maximum connection limit for each connection pool. When <=
+	 * 0, there is no connection limit
 	 * @return {tcp_ipc&}
 	 */
 	tcp_ipc& set_limit(int max);
 
 	/**
-	 * 设置连接池中每个连接了空闲时间，当连接空闲时间超过设置值时将被关闭
-	 * @param ttl {int} 空闲连接的最大超时时间
+	 * Set idle time for each connection in connection pool. When connection idle
+	 * time exceeds set value, it will be closed
+	 * @param ttl {int} Maximum timeout for idle connections
 	 * @return {tcp_ipc&}
 	 */
 	tcp_ipc& set_idle(int ttl);
 
 	/**
-	 * 设置每个连接的网络连接超时时间
-	 * @param conn_timeout {int} 网络连接超时时间（秒）
+	 * Set network connection timeout for each connection
+	 * @param conn_timeout {int} Network connection timeout (seconds)
 	 * @return {tcp_ipc&}
 	 */
 	tcp_ipc& set_conn_timeout(int conn_timeout);
 
 	/**
-	 * 设置每个连接的网络读写超时时间
-	 * @param timeout {int} 读写超时时间（秒）
+	 * Set network read/write timeout for each connection
+	 * @param timeout {int} Read/write timeout (seconds)
 	 * @return {tcp_ipc&}
 	 */
 	tcp_ipc& set_rw_timeout(int timeout);
 
 	/**
-	 * 获得 TCP 管理器对象
+	 * Get TCP manager object
 	 * @return {tcp_manager&}
 	 */
 	tcp_manager& get_manager(void) const;
 
 	/**
-	 * 可以调用本方法显示添加一个服务器地址，只有当地址不存在时才会添加
-	 * @param addr {const char*} 服务器地址，格式：IP:PORT
+	 * Can call this method to explicitly add a server address. Only adds when
+	 * address does not exist
+	 * @param addr {const char*} Server address, format: IP:PORT
 	 * @return {tcp_ipc&}
 	 */
 	tcp_ipc& add_addr(const char* addr);
 
 	/**
-	 * 根据服务器地址删除指定的连接池对象，当连接池对象正在被引用时，该对象
-	 * 不会被删除，而是采用延迟删除方式，当最后一个连接被归还后该连接池对象
-	 * 才会被真正删除
-	 * @param addr {const char*} 服务器地址，格式：IP:PORT
+	 * Delete specified connection pool object based on server address. When
+	 * connection pool object is being referenced, this object will not be
+	 * deleted, but uses delayed deletion method. Only after the last connection
+	 * is returned will this connection pool object be truly deleted
+	 * @param addr {const char*} Server address, format: IP:PORT
 	 * @return {tcp_ipc&}
 	 */
 	tcp_ipc& del_addr(const char* addr);
 
 	/**
-	 * 检测指定的服务器地址是否成功
-	 * @param addr {const char*} 服务器地址，格式：IP:PORT
+	 * Check whether specified server address exists successfully
+	 * @param addr {const char*} Server address, format: IP:PORT
 	 * @return {bool}
 	 */
 	bool addr_exist(const char* addr);
 
 	/**
-	 * 获得当前所有的服务器地址集合
-	 * @param addrs {std::vector<string>&} 存储结果集
+	 * Get collection of all current server addresses
+	 * @param addrs {std::vector<string>&} Store result set
 	 */
 	void get_addrs(std::vector<string>& addrs);
 
 	/**
-	 * 向服务器发送指定长度的数据包
-	 * @param addr {const char*} 指定的目标服务器地址
-	 * @param data {const void*} 要发送的数据包地址
-	 * @param len {unsigned int} 数据长度
-	 * @param out {string*} 当该对象非 NULL 时表明需要从服务器读取响应数据，
-	 *  响应结果将被存放在该缓冲区中，如果该对象为 NULL，则表示无需读取
-	 *  服务器的响应数据
-	 * @return {bool} 发送是否成功
+	 * Send data packet of specified length to server
+	 * @param addr {const char*} Specified target server address
+	 * @param data {const void*} Address of data packet to be sent
+	 * @param len {unsigned int} Data length
+	 * @param out {string*} When this object is not NULL, it indicates that
+	 * response data needs to be read from server. Response result will be stored
+	 * in this buffer. If this object is NULL, it means no response data needs
+	 * to be read from server
+	 * @return {bool} Whether sending was successful
 	 */
 	bool send(const char* addr, const void* data, unsigned int len,
 		string* out = NULL);
 
 	/**
-	 * 向所有服务器发送数据包
-	 * @param data {const void*} 要发送的数据包地址
-	 * @param len {unsigned int} 数据长度
-	 * @param exclusive {bool} 发送广播包时，是否加线程锁以防止其它线程
-	 *  竞争内部连接池资源
-	 * @param check_result {bool} 是否读服务器响应以证明服务器收到了数据
-	 * @param nerr {unsigned *} 非 NULL 时存放失败的服务器的个数
-	 * @return {size_t} 返回发送到的服务器的数量
+	 * Send data packet to all servers
+	 * @param data {const void*} Address of data packet to be sent
+	 * @param len {unsigned int} Data length
+	 * @param exclusive {bool} When sending broadcast packet, whether to add
+	 * thread lock to prevent other threads from competing for internal
+	 * connection pool resources
+	 * @param check_result {bool} Whether to read server response to prove server
+	 * received data
+	 * @param nerr {unsigned *} When not NULL, stores number of failed servers
+	 * @return {size_t} Returns number of servers sent to
 	 */
 	size_t broadcast(const void* data, unsigned int len,
 		bool exclusive = true, bool check_result = false,
@@ -117,3 +125,4 @@ private:
 };
 
 } // namespace acl
+

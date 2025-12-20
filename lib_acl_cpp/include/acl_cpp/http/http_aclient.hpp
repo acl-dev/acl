@@ -27,41 +27,46 @@ class sslbase_io;
 class http_header;
 
 /**
- * HTTP 客户端异步通信类，不仅支持标准 HTTP 通信协议，而且支持 Websocket 通信，
- * 对于 HTTP 协议及 Websocket 通信均支持 SSL 加密传输；
- * 另外，对于 HTTP 协议，根据用户设置，可以自动解压 GZIP 响应数据，这样在回调
- * 方法 on_http_res_body() 中收到的便是解压后的明文数据。
+ * HTTP client asynchronous communication class, not only supports standard HTTP
+ * communication protocol, but also supports Websocket communication;
+ * Both HTTP protocol and Websocket communication support SSL encrypted
+ * transmission;
+ * Additionally, for HTTP protocol, when user sets it, it can automatically
+ * decompress GZIP response data. The data received in callback
+ * function on_http_res_body() is decompressed data.
  */
 class ACL_CPP_API http_aclient : public aio_open_callback {
 public:
 	/**
-	 * 构造函数
-	 * @param handle {aio_handle&} 异步通信事件引擎句柄
-	 * @param ssl_conf {sslbase_conf*} 非 NULL 时自动采用 SSL 通信方式
+	 * Constructor
+	 * @param handle {aio_handle&} Asynchronous communication event handle.
+	 * @param ssl_conf {sslbase_conf*} When NULL, automatically enables SSL
+	 * communication mode.
 	 */
 	explicit http_aclient(aio_handle& handle, sslbase_conf* ssl_conf = NULL);
 	virtual ~http_aclient();
 
 	/**
-	 * 当对象销毁时的回调方法，子类必须实现
+	 * Callback when object is destroyed. Subclasses must implement.
 	 */
 	virtual void destroy() = 0;
 
 	/**
-	 * 获得 HTTP 请求头，以便于应用添加 HTTP 请求头中的字段内容
+	 * Get HTTP request header so that applications can add fields to HTTP request
+	 * header.
 	 * @return {http_header&}
 	 */
 	http_header& request_header();
 
 	/**
-	 * 针对 HTTP 协议的响应数据是否自动进行解压
+	 * Set whether HTTP protocol automatically decompresses response.
 	 * @param on {bool}
 	 * @return {http_aclient&}
 	 */
 	http_aclient& unzip_body(bool on);
 
 	/**
-	 * 是否针对 GZIP 压缩数据自动进行解压
+	 * Whether GZIP compression is automatically decompressed.
 	 * @return {bool}
 	 */
 	bool is_unzip_body() const {
@@ -69,55 +74,60 @@ public:
 	}
 
 	/**
-	 * 除可以在构造函数中设置 SSL conf 外，还可以通过此方法设置，如果在
-	 * 构造函数中设置的 ssl_conf 为 NULL，则内部自动将 ssl_enable_ 置为
-	 * false，通过本方法设置了 ssl_conf 后还需调用下面的 enable_ssl()
-	 * 方法以启用 ssl 功能
-	 * @param ssl_conf {sslbase_conf*} 为 NULL 时将取消 SSL功能
+	 * In addition to SSL conf set in constructor, you can also call this method to
+	 * set it. Additionally,
+	 * when ssl_conf passed to constructor is NULL, internally automatically sets
+	 * ssl_enable_ to
+	 * false. You can call this method to set ssl_conf, or call enable_ssl()
+	 * method to enable ssl.
+	 * @param ssl_conf {sslbase_conf*} When NULL, disables SSL.
 	 * @return {http_aclient&}
 	 */
 	http_aclient& set_ssl_conf(sslbase_conf* ssl_conf);
 
 	/**
-	 * 获得设置的 SSL 配置
-	 * @return {sslbase_conf*} 为 NULL 表示未设置
+	 * Get configured SSL conf.
+	 * @return {sslbase_conf*} Returns NULL to indicate not set.
 	 */
 	sslbase_conf* get_ssl_conf() const {
 		return ssl_conf_;
 	}
 
 	/**
-	 * 设置 SSL 握手时的 SNI 字段
-	 * @param sni {const char*} 如果为 NULL，则自动将使用 HTTP 头中的 Host 字段
+	 * Set SNI field when SSL handshake.
+	 * @param sni {const char*} When NULL, automatically uses Host field in HTTP
+	 * header.
 	 * @return {http_request&}
 	 */
 	http_aclient& set_ssl_sni(const char* sni);
 
 	/**
-	 * 设置 SSL 握手时的 SNI 字段前缀
-	 * @param prefix {const char*} SNI 前缀
+	 * Set SNI field prefix when SSL handshake.
+	 * @param prefix {const char*} SNI prefix.
 	 * @return {http_request&}
 	 */
 	http_aclient& set_ssl_sni_prefix(const char* prefix);
 
 	/**
-	 * 设置 SSL 握手时的 SNI 字段后缀
-	 * @param suffix {const char*} SNI 后缀
+	 * Set SNI field suffix when SSL handshake.
+	 * @param suffix {const char*} SNI suffix.
 	 * @return {http_request&}
 	 */
 	http_aclient& set_ssl_sni_suffix(const char* prefix);
 
 	/**
-	 * 当构造函数中 ssl_conf 参数非空时，可以调用此方法来设置是否启用 SSL
-	 * 功能，如果 ssl_conf 非空，则内部 ssl_enable_ 缺省值为 true，可以通
-	 * 过本方法关闭或开启 ssl 功能
+	 * When ssl_conf in constructor is not empty, you can call this method to set
+	 * whether to enable SSL
+	 * encryption. When ssl_conf is not empty, internally ssl_enable_ default value
+	 * is true. You can
+	 * call this method to disable ssl.
 	 * @param yes {bool}
 	 * @return {http_aclient&}
 	 */
 	http_aclient& enable_ssl(bool yes);
 
 	/**
-	 * 判断内部是否启用了 ssl 功能
+	 * Determine whether SSL is enabled internally.
 	 * @return {bool}
 	 */
 	bool is_enable_ssl() const {
@@ -125,42 +135,50 @@ public:
 	}
 
 	/**
-	 * 开始异步连接远程 WEB 服务器
-	 * @param addr {const char*} 远程 WEB 服务器地址，格式为：
-	 *  domain:port 或 ip:port, 当地址为域名时，内部自动进行异步域名解析
-	 *  过程，但要求在程序开始时必须通过 aio_handle::set_dns() 设置过域名
-	 *  服务器地址，如果地址为 IP 则不需要先设置域名服务器地址
-	 * @param conn_timeout {int} 连接超时时间（秒）
-	 * @param rw_timeout {int} 网络 IO 读写超时时间（秒）
-	 * @param local {const char*} 本地网卡IP地址或网卡名，如果非空时，第一个字母
-	 *  为 @ 表示后面跟的是 IP 地址，如果为 # 表示后面跟的是网卡名，如：
+	 * Initialize asynchronous connection to remote WEB server.
+	 * @param addr {const char*} Remote WEB server address, format:
+	 * domain:port or ip:port. When address is domain name, internally
+	 * automatically starts asynchronous DNS resolution
+	 * process. You need to set DNS server address through aio_handle::set_dns() at
+	 * program initialization.
+	 *  When address is IP, no DNS resolution is needed.
+	 * @param conn_timeout {int} Connection timeout time (seconds)
+	 * @param rw_timeout {int} Network IO read/write timeout time (seconds)
+	 * @param local {const char*} Local binding IP address. When not empty, if
+	 * first character
+	 * is @, it means bind local IP address. If it is #, it means bind to specified
+	 * interface. Examples:
 	 *  @127.0.0.1, #eth1
-	 * @return {bool} 返回 false 表示连接失败，返回 true 表示进入异步连接中
+	 * @return {bool} Returns false to indicate connection failed. Returns true to
+	 * indicate asynchronous connection started.
 	 */
 	bool open(const char* addr, int conn_timeout, int rw_timeout,
 		const char *local = NULL);
 
 	/**
-	 * 异步关闭连接
+	 * Asynchronously close connection.
 	 */
 	void close();
 
 	/**
-	 * 获得本次连接（无论成功或失败）所使用的 DNS 服务地址
-	 * @param out {string&} 存储结果
-	 * @return {bool} 返回 false 表示没有可用的 DNS 地址
+	 * Get DNS address used for this connection, regardless of success or failure.
+	 * @param out {string&} Store result.
+	 * @return {bool} Returns false to indicate no available DNS address.
 	 */
 	bool get_ns_addr(string& out) const;
 
 	/**
-	 * 当连接成功、连接失败或连接超时时可调用此方法获得当前所连接用的应用服务器地址
-	 * @param out {string&} 存储结果
-	 * @return {bool} 返回 false 表示还没有设置所连接服务器的地址
+	 * After connection succeeds, fails, or times out, you can call this method to
+	 * get the application server address currently connected to.
+	 * @param out {string&} Store result.
+	 * @return {bool} Returns false to indicate no connection to application server
+	 * address.
 	 */
 	bool get_server_addr(string& out) const;
 
 	/**
-	 * 连接成功后可调用本方法获得异步连接对象
+	 * After connection succeeds, you can call this method to get asynchronous
+	 * connection object.
 	 * @return {aio_socket_stream*}
 	 */
 	aio_socket_stream* get_conn() const {
@@ -169,46 +187,55 @@ public:
 
 protected:
 	/**
-	 * 当连接成功后的回调方法，子类必须实现，子类应在该方法里构造 HTTP 请求
-	 * 并调用 send_request 方法向 WEB 服务器发送 HTTP 请求
-	 * @return {bool} 该方法如果返回 false 则内部会自动关闭连接
+	 * Callback when connection succeeds. Subclasses must implement. Applications
+	 * should construct HTTP request
+	 * in this method and call send_request method to send HTTP request to WEB
+	 * server.
+	 * @return {bool} When this method returns false, internally automatically
+	 * closes connection.
 	 */
 	virtual bool on_connect() = 0;
 
 	/**
-	 * 当域名解析失败时的回调方法，在调用本方法后，内部自动调用 this->destroy() 方法
+	 * Callback when DNS resolution fails. When calling this method, internally
+	 * automatically calls this->destroy().
 	 */
 	virtual void on_ns_failed() {}
 
 	/**
-	 * 当连接超时后的回调方法，在调用本方法后，内部自动调用 this->destroy() 方法
+	 * Callback when connection times out. When calling this method, internally
+	 * automatically calls this->destroy().
 	 */
 	virtual void on_connect_timeout() {}
 
 	/**
-	 * 当连接失败后的回调方法，在调用本方法后，内部自动调用 this->destroy() 方法
+	 * Callback after connection fails. When calling this method, internally
+	 * automatically calls this->destroy().
 	 */
 	virtual void on_connect_failed() {}
 
 	/**
-	 * 当网络读超时时的回调方法
-	 * @return {bool} 当读超时回调方法返回 true，则内部会继续读数据，如果
-	 *  返回 false，则该连接将会被关闭，接着回调 on_disconnect() 虚方法
+	 * Callback when read timeout.
+	 * @return {bool} When timeout callback returns true, internally continues
+	 * reading data. When
+	 * returns false, connection will be closed, and then on_disconnect() callback
+	 * method will be called.
 	 */
 	virtual bool on_read_timeout() {
 		return false;
 	}
 
 	/**
-	 * 对于连接成功后连接关闭后的回调方法，内部调用此方法后便立即回调
-	 * destroy() 方法
+	 * Callback when connection succeeds or connection closes. Internally calls
+	 * this method, and then calls
+	 * destroy() callback.
 	 */
 	virtual void on_disconnect() {};
 
 	/**
-	 * 当接收到 WEB 服务端的响应头时的回调方法
+	 * Callback when receiving WEB server response header.
 	 * @param header {const http_header&}
-	 * @return {bool} 返回 false 则将会关闭连接，否则继续读
+	 * @return {bool} Returns false to close connection, otherwise continues.
 	 */
 	virtual bool on_http_res_hdr(const http_header& header) {
 		(void) header;
@@ -216,11 +243,13 @@ protected:
 	}
 
 	/**
-	 * 当接收到 WEB 服务端的响应体时的回调方法，该方法可能会被多次回调
-	 * 直到响应数据读完或出错
-	 * @param data {char*} 读到的部分数据体内容
-	 * @param dlen {size_t} 本次读到的 data 数据的长度
-	 * @return {bool} 返回 false 则将会关闭连接，否则继续读
+	 * Callback when receiving WEB server response body. This method may be called
+	 * multiple times
+	 * until response data is completely read.
+	 * @param data {char*} Data read this time. Note: This data may be modified
+	 * internally.
+	 * @param dlen {size_t} Length of data read this time.
+	 * @return {bool} Returns false to close connection, otherwise continues.
 	 */
 	virtual bool on_http_res_body(char* data, size_t dlen) {
 		(void) data;
@@ -229,9 +258,9 @@ protected:
 	}
 
 	/**
-	 * 当读完 HTTP 响应体或出错后的回调方法
-	 * @param success {bool} 是否成功读完 HTTP 响应体数据
-	 * @return {bool} 如果成功读完数据体后返回 false 则会关闭连接
+	 * Callback when HTTP response is completely read.
+	 * @param success {bool} Whether successfully read HTTP response completely.
+	 * @return {bool} When successful, returns false to close connection.
 	 */
 	virtual bool on_http_res_finish(bool success) {
 		(void) success;
@@ -239,45 +268,49 @@ protected:
 	}
 
 	/**
-	 * 当 websocket 握手成功后的回调方法
-	 * @return {bool} 返回 false 表示需要关闭连接，否则继续
+	 * Callback when websocket handshake succeeds.
+	 * @return {bool} Returns false to indicate need to close connection, otherwise
+	 * continues.
 	 */
 	virtual bool on_ws_handshake() {
-		// 开始异步读 websocket 数据
+		// Initialize asynchronous websocket reading.
 		this->ws_read_wait(0);
 		return true;
 	}
 
 	/**
-	 * 当 websocket 握手失败后的回调方法
-	 * @param status {int} 服务器返回的 HTTP 响应状态码
+	 * Callback when websocket handshake fails.
+	 * @param status {int} HTTP response status returned by server.
 	 */
 	virtual void on_ws_handshake_failed(int status) {
 		(void) status;
 	}
 
 	/**
-	 * 当读到一个 text 类型的帧时的回调方法
-	 * @return {bool} 返回 true 表示继续读，否则则要求关闭连接
+	 * Callback when receiving a text type frame.
+	 * @return {bool} Returns true to indicate continue reading. Returns false to
+	 * indicate need to close connection.
 	 */
 	virtual bool on_ws_frame_text() { return true; }
 
 	/**
-	 * 当读到一个 binary 类型的帧时的回调方法
-	 * @return {bool} 返回 true 表示继续读，否则则要求关闭连接
+	 * Callback when receiving a binary type frame.
+	 * @return {bool} Returns true to indicate continue reading. Returns false to
+	 * indicate need to close connection.
 	 */
 	virtual bool on_ws_frame_binary() { return true; }
 
 	/**
-	 * 当读到一个关闭帧数据时的回调方法
+	 * Callback when receiving a close frame.
 	 */
 	virtual void on_ws_frame_closed() {}
 
 	/**
-	 * 在 websocket 通信方式，当读到数据体时的回调方法
-	 * @param data {char*} 读到的数据地址
-	 * @param dlen {size_t} 读到的数据长度
-	 * @return {bool} 返回 true 表示继续读，否则则要求关闭连接
+	 * Callback when receiving data in websocket communication mode.
+	 * @param data {char*} Address of received data.
+	 * @param dlen {size_t} Length of received data.
+	 * @return {bool} Returns true to indicate continue reading. Returns false to
+	 * indicate need to close connection.
 	 */
 	virtual bool on_ws_frame_data(char* data, size_t dlen) {
 		(void) data;
@@ -286,24 +319,26 @@ protected:
 	}
 
 	/**
-	 * 当读完一帧数据时的回调方法
-	 * @return {bool} 返回 true 表示继续读，否则则要求关闭连接
+	 * Callback when one frame is completely read.
+	 * @return {bool} Returns true to indicate continue reading. Returns false to
+	 * indicate need to close connection.
 	 */
 	virtual bool on_ws_frame_finish() { return true; }
 
 	/**
-	 * 当收到 ping 数据包时的回调方法，当该回调方法返回后，如果用户没有将
-	 * data 数据清理，则内部会自动给对端写入 pong 信息，如果用户将 data 缓
-	 * 冲区清理掉，则该方法返回后不会给对接发 pong 信息
-	 * @param data {string&} 读到的数据
+	 * Callback when receiving ping data packet. When this callback returns, if
+	 * data is not empty, internally automatically
+	 * writes pong message. If data is empty, after this method returns, it will
+	 * not send pong message to peer.
+	 * @param data {string&} Received data.
 	 */
 	virtual void on_ws_frame_ping(string& data) {
 		(void) data;
 	}
 
 	/**
-	 * 收到 pong 数据时的回调方法
-	 * @param data {string&} 读到的数据
+	 * Callback when receiving pong message.
+	 * @param data {string&} Received data.
 	 */
 	virtual void on_ws_frame_pong(string& data) {
 		(void) data;
@@ -311,69 +346,79 @@ protected:
 
 public:
 	/**
-	 * 向 WEB 服务器发送 HTTP 请求，内部在发送后会自动开始读 HTTP 响应过程
-	 * @param body {const void*} HTTP 请求的数据体，当为 NULL 时，内部会自
-	 *  动采用 HTTP GET 方法
-	 * @param len {size_t} body 非 NULL 时表示数据体的长度
+	 * Send HTTP request to WEB server. Internally automatically starts HTTP
+	 * response reading after sending.
+	 * @param body {const void*} HTTP request body. When NULL, internally
+	 * constructs
+	 *  HTTP GET request.
+	 * @param len {size_t} When body is NULL, indicates body length.
 	 */
 	void send_request(const void* body, size_t len);
 
 	/**
-	 * 与服务器进行 WEBSOCKET 握手
-	 * @param key {const void*} 设置的 key 值
-	 * @param len {size_t} key 值的长度
+	 * Send WEBSOCKET handshake request.
+	 * @param key {const void*} Key value to be sent.
+	 * @param len {size_t} Length of key value.
 	 */
 	void ws_handshake(const void* key, size_t len);
 	void ws_handshake(const char* key = "123456789xxx");
 
 	/**
-	 * 当调用 ws_handshake() 时，内部会填充与 websocket 相关的请求头信息，
-	 * 同时通过此回调告之调用者最终发给 websocket 服务器完整的请求头信息
+	 * When calling ws_handshake(), internally calls this callback to set websocket
+	 * request header information.
+	 * Applications can modify request header information through this callback
+	 * before sending websocket handshake request.
 	 */
 	virtual void ws_handshake_before(http_header& reqhdr) {
 		(void) reqhdr;
 	}
 
 	/**
-	 * 开始异步读 websocket 数据
-	 * @param timeout {int} 读超时时间，如果该值 <= 0，则不设读超时时间，
-	 *  否则当读超时时，超时回调方法便会被调用；
-	 *  注意：
-	 *  该值与 open() 中的 rw_timeout 有所不同，open() 方法中的读超时仅限
-	 *  定标准 HTTP IO 过程及 SSL 握手过程的读超时，而此处的读超时则用来
-	 *  限制与 websocket 相关的读超时，这主要是考虑到 websocket 应用很多
-	 *  都是长连接场景
+	 * Initialize asynchronous websocket reading.
+	 * @param timeout {int} Read timeout. When value <= 0, no read timeout is set,
+	 *  otherwise when read timeout expires, timeout callback will be called.
+	 *  Note:
+	 * This value is different from rw_timeout in open(). The timeout in open()
+	 * function is
+	 *  for standard HTTP IO process and SSL handshake process. The timeout here is
+	 * specifically for websocket reading timeout. This is mainly because websocket
+	 * applications are often
+	 *  long connections.
 	 */
 	void ws_read_wait(int timeout = 0);
 
 	/**
-	 * 异步发送一个 FRAME_TEXT 类型的数据帧
-	 * @param data {char*} 内部可能因添加掩码原因被改变内容
-	 * @param len {size_t} data 数据长度
+	 * Asynchronously send a FRAME_TEXT type data frame.
+	 * @param data {char*} Internally may modify this data, original data may be
+	 * changed.
+	 * @param len {size_t} Data length.
 	 * @return {bool}
 	 */
 	bool ws_send_text(char* data, size_t len);
 
 	/**
-	 * 异步发送一个 FRAME_BINARY 类型的数据帧
-	 * @param data {void*} 内部可能因添加掩码原因被改变内容
-	 * @param len {size_t} data 数据长度
+	 * Asynchronously send a FRAME_BINARY type data frame.
+	 * @param data {void*} Internally may modify this data, original data may be
+	 * changed.
+	 * @param len {size_t} Data length.
 	 * @return {bool}
 	 */
 	bool ws_send_binary(void* data, size_t len);
 
 	/**
-	 * 异步发送一个 FRAME_PING 类型的数据帧
-	 * @param data {void*} 内部可能因添加掩码原因被改变内容
-	 * @param len {size_t} data 数据长度
+	 * Asynchronously send a FRAME_PING type data frame.
+	 * @param data {void*} Internally may modify this data, original data may be
+	 * changed.
+	 * @param len {size_t} Data length.
 	 * @return {bool}
 	 */
 	bool ws_send_ping(void* data, size_t len);
 
 	/**
-	 * 异步发送一个 FRAME_PONG 类型的数据帧
-	 * @param data {void*} 内部可能因添加掩码原因被改变内容
-	 * @param len {size_t} data 数据长度
+	 * Asynchronously send a FRAME_PONG type data frame.
+	 * @param data {void*} Internally may modify this data, original data may be
+	 * changed.
+	 * @param len {size_t} Data length.
 	 * @return {bool}
 	 */
 	bool ws_send_pong(void* data, size_t len);
@@ -397,12 +442,12 @@ protected:
 protected:
 	unsigned           status_;
 	int                rw_timeout_;
-	int                gzip_header_left_;	// gzip 传输时压缩头部长度
+	int                gzip_header_left_;	// Remaining bytes when gzip decompression header.
 	bool               keep_alive_;
-	bool               unzip_;		// 是否自动解压响应体数据
+	bool               unzip_;		// Whether to automatically decompress response body.
 	aio_handle&        handle_;
-	sslbase_conf*      ssl_conf_;		// 非空时才允许启用 SSL 功能
-	bool               ssl_enable_;		// 是否启用 SSL 功能
+	sslbase_conf*      ssl_conf_;		// When not empty, enables SSL encryption.
+	bool               ssl_enable_;		// Whether SSL encryption is enabled.
 	std::string        sni_host_;
 	std::string        sni_prefix_;
 	std::string        sni_suffix_;
@@ -414,9 +459,9 @@ protected:
 	websocket*         ws_in_;
 	websocket*         ws_out_;
 	string*            buff_;
-	zlib_stream*       zstream_;		// 解压对象
-	struct sockaddr_storage ns_addr_;	// 所使用的 DNS 服务器地址
-	struct sockaddr_storage serv_addr_;	// 所连接的应用服务器地址
+	zlib_stream*       zstream_;		// Decompression stream.
+	struct sockaddr_storage ns_addr_;	// DNS server address used.
+	struct sockaddr_storage serv_addr_;	// Application server address connected to.
 
 	bool handle_connect(const ACL_ASTREAM_CTX* ctx);
 	bool handle_ssl_handshake();
@@ -444,3 +489,4 @@ private:
 };
 
 } // namespace acl
+

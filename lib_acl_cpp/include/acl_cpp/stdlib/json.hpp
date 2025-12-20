@@ -10,12 +10,17 @@ struct ACL_JSON;
 struct ACL_ITER;
 
 /**
- * 对 ACL 库中 json 解析库的封装，方便 C++ 用户使用，如果不太注重性能因素，
- * 可以直接使用该类，如果在服务端执行且非常注重性能，建议直接使用 ACL 库的
- * json 解析器，因为该类也是调用了 ACL 库中的 json 解析过程，并且有二次拷贝
- * 过程，可能会稍微影响一些性能，但对于一般的应用这点影响是微不足道的
- * 整个 json 对象及其附属 json 节点对象均是构建内部的 dbuf 对象上, 所以其内部
- * 创建的 json 节点对象均会在 json 对象析构时一起释放.
+ * This is a C++ wrapper for ACL library's json parsing library. If you don't
+ * care too much about performance,
+ * you can directly use this class. If you are very concerned about performance,
+ * you can directly use ACL library's
+ * json parsing library. Because this class is also a wrapper for ACL library's
+ * json parsing process, and there are multiple
+ * wrapper processes, which may slightly affect some performance. However, this
+ * impact is very small.
+ * Additionally, json object and attached json node objects are managed by
+ * internal dbuf pool, so when json object
+ * is destroyed, all json node objects will be automatically released.
  */
 
 namespace acl {
@@ -24,40 +29,43 @@ class string;
 class json;
 
 /**
- * json 节点，该类对象必须以 json.create_node() 方式创建
+ * json node, can only be created through json.create_node() method.
  */
 class ACL_CPP_API json_node : public dbuf_obj {
 public:
 	/**
-	 * 取得本 json 节点的标签名
-	 * @return {const char*} 返回 json 节点标签名，如果返回空，则说明
-	 *  调用者需要判断返回值
+	 * Get tag name of this json node.
+	 * @return {const char*} Json node tag name. Returns empty to indicate
+	 *  tag does not exist. You need to check return value.
 	 */
 	const char* tag_name() const;
 
 	/**
-	 * 返回该 json 节点的文本标签值，当该值为布尔型或数值型时调用者可
-	 * 自行进行转换
-	 * @return {const char*} 返回空说明没有文本标签值
+	 * Get text tag value of this json node. When value is numeric type or boolean
+	 * type, internally
+	 * automatically converts to string.
+	 * @return {const char*} Returns empty to indicate no text tag value.
 	 */
 	const char* get_text() const;
 
 	/**
-	 * 当该 json 节点存在子节点时，返回本 json 节点标签对应的 json 子节点
-	 * @return {const json_node*} 返回 NULL 说明不存在子节点
-	 *  注：get_text 与 get_obj 不会同时返回非 NULL
+	 * When json node has child nodes, returns json child node corresponding to
+	 * this json node's tag.
+	 * @return {const json_node*} Returns NULL to indicate no child nodes.
+	 *  Note: get_text and get_obj cannot both return NULL.
 	 */
 	json_node* get_obj() const;
 
 	/**
-	 * 当 json 节点为字符串类型时，该函数返回字符串内容
-	 * @return {const char*} 返回 NULL 表示该节点非字符串类型
+	 * When json node is string type, this function returns string value.
+	 * @return {const char*} Returns NULL to indicate this node is not string type.
 	 */
 	const char* get_string() const;
 
 	/**
-	 * 当 json 节点为长整型类型时，该函数返回长整型值的指针地址
-	 * @return {const long long int*} 当返回 NULL 时表示该对象非长整型类型
+	 * When json node is integer type, this function returns integer value pointer.
+	 * @return {const long long int*} Returns NULL when this object is not integer
+	 * type.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	const __int64* get_int64(void) const;
@@ -66,82 +74,90 @@ public:
 #endif
 
 	/**
-	 * 当 json 节点为浮点类型时，该函数返回长整型值的指针地址
-	 * @return {const double*} 当返回 NULL 时表示该对象非浮点类型
+	 * When json node is floating point type, this function returns floating point
+	 * value pointer.
+	 * @return {const double*} Returns NULL when this object is not floating point
+	 * type.
 	 */
 	const double *get_double() const;
 
 	/**
-	 * 当 json 节点为布尔类型时，该函数返回布尔值的指针地址
-	 * @return {bool*} 当返回 NULL 时表示该对象非布尔类型
+	 * When json node is boolean type, this function returns boolean value pointer.
+	 * @return {bool*} Returns NULL when this object is not boolean type.
 	 */
 	const bool* get_bool() const;
 
 	/**
-	 * 判断本节点数据是否为字符串类型
+	 * Determine whether this node's content is string type.
 	 * @return {bool}
 	 */
 	bool is_string() const;
 
 	/**
-	 * 判断本节点数据是否为数字类型
+	 * Determine whether this node's content is integer type.
 	 * @return {bool}
 	 */
 	bool is_number() const;
 
 	/**
-	 * 判断本节点数据是否为浮点类型
+	 * Determine whether this node's content is floating point type.
 	 * @return {bool}
 	 */
 	bool is_double() const;
 
 	/**
-	 * 判断本节点数据是否为布尔类型
+	 * Determine whether this node's content is boolean type.
 	 * @return {bool}
 	 */
 	bool is_bool() const;
 
 	/**
-	 * 判断本节点数据是否为 null 类型
+	 * Determine whether this node's content is null type.
 	 * @return {bool}
 	 */
 	bool is_null() const;
 
 	/**
-	 * 判断本节点是否为对象类型
+	 * Determine whether this node is object type.
 	 * @return {bool}
 	 */
 	bool is_object() const;
 
 	/**
-	 * 判断本节点是否为数组类型
+	 * Determine whether this node is array type.
 	 * @return {bool}
 	 */
 	bool is_array() const;
 
 	/**
-	 * 获得该节点类型的描述
+	 * Get string representation of this node's type.
 	 * @return {const char*}
 	 */
 	const char* get_type() const;
 
 	/**
-	 * 当该 json 节点有标签时，本函数用来新的标签值覆盖旧的标签名
-	 * @param name {const char*} 新的标签值，为非空字符串
-	 * @return {bool} 返回 false 表示该节点没有标签或输入空串，没有进行替换
+	 * When json node has tag, this function replaces old tag name with new tag
+	 * value.
+	 * @param name {const char*} New tag value, cannot be empty string.
+	 * @return {bool} Returns false to indicate this node has no tag, or empty
+	 * string was passed, or replacement failed.
 	 */
 	bool set_tag(const char* name);
 
 	/**
-	 * 当该 json 节点为叶节点时，本函数用来替换节点的文本值
-	 * @param text {const char*} 新的叶节点文本值，为非空字符串
-	 * @return {bool} 返回 false 表示该节点非叶节点或输入非法
+	 * When json node is leaf node, this function replaces node's text value.
+	 * @param text {const char*} New leaf node's text value, cannot be empty
+	 * string.
+	 * @return {bool} Returns false to indicate this node is not a leaf node or
+	 * error occurred.
 	 */
 	bool set_text(const char* text);
 
 	/**
-	 * 将当前 json 节点转换成 json 字符串(包含本 json 节点及其子节点)
-	 * @param out {string*} 非空时，则使用此缓冲区，否则使用内部缓冲区
+	 * Convert current json node to json string (including json node and its child
+	 * nodes).
+	 * @param out {string*} When not empty, uses this buffer. Otherwise uses
+	 * internal buffer.
 	 * @return {const char*}
 	 */
 	const string& to_string(string* out = NULL) const;
@@ -149,83 +165,101 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 给本 json 节点添加 json_node 子节点对象
-	 * @param child {json_node*} 子节点对象
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时返回子节点的引用，
-	 *  否则返回本 json 节点对象的引用
+	 * Add json_node child node object to json node.
+	 * @param child {json_node*} Child node object.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @return {json_node&} When return_child is true, returns child node
+	 * reference.
+	 *  Otherwise returns this json node reference.
 	 */
 	json_node& add_child(json_node* child, bool return_child = false);
 
 	/**
-	 * 给本 json 节点添加 json_node 子节点对象
-	 * @param child {json_node&} 子节点对象
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时返回子节点的引用，
-	 *  否则返回本 json 节点对象的引用
+	 * Add json_node child node object to json node.
+	 * @param child {json_node&} Child node object.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @return {json_node&} When return_child is true, returns child node
+	 * reference.
+	 *  Otherwise returns this json node reference.
 	 */
 	json_node& add_child(json_node& child, bool return_child = false);
 
 	/**
-	 * 创建一个 json 节点对象，并将之添加为本 json 节点的子节点
-	 * @param as_array {bool} 是否数组对象
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
+	 * Create a json node object, and add it as this json node's child node.
+	 * @param as_array {bool} Whether it is array.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @return {json_node&} When return_child is true, returns newly created node
+	 * reference.
+	 *  Otherwise returns this json node reference.
 	 */
 	json_node& add_child(bool as_array = false, bool return_child = false);
 	json_node& add_array(bool return_child = false);
 
 	/**
-	 * 创建一个 json 节点对象，并将之添加为本 json 节点的子节点
-	 * @param tag {const char*} 标签名
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
+	 * Create a json node object, and add it as this json node's child node.
+	 * @param tag {const char*} Tag name.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @return {json_node&} When return_child is true, returns newly created node
+	 * reference.
+	 *  Otherwise returns this json node reference.
 	 */
 	json_node& add_child(const char* tag, bool return_child = false);
 
 	/**
-	 * 创建一个 json 节点对象，并将之添加为本 json 节点的子节点
-	 * @param tag {const char*} 标签名
-	 * @param node {json_node*} 标签值指针
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
+	 * Create a json node object, and add it as this json node's child node.
+	 * @param tag {const char*} Tag name.
+	 * @param node {json_node*} Tag value pointer.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @return {json_node&} When return_child is true, returns newly created node
+	 * reference.
+	 *  Otherwise returns this json node reference.
 	 */
 	json_node& add_child(const char* tag, json_node* node,
 		bool return_child = false);
 
 	/**
-	 * 创建一个 json 节点对象，并将之添加为本 json 节点的子节点
-	 * @param tag {const char*} 标签名
-	 * @param node {json_node&} 标签值引用
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
+	 * Create a json node object, and add it as this json node's child node.
+	 * @param tag {const char*} Tag name.
+	 * @param node {json_node&} Tag value reference.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @return {json_node&} When return_child is true, returns newly created node
+	 * reference.
+	 *  Otherwise returns this json node reference.
 	 */
 	json_node& add_child(const char* tag, json_node& node,
 		bool return_child = false);
 
 	/**
-	 * 创建一个字符串类型的 json 节点对象，并将之添加为本 json 节点的子节点
-	 * @param tag {const char*} 标签名
-	 * @param value {const char*} 标签值
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
-	 * 注：此处的 add_text 和 add_child 是同样的功能
+	 * Create a string type json node object, and add it as this json node's child
+	 * node.
+	 * @param tag {const char*} Tag name.
+	 * @param value {const char*} Tag value.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @return {json_node&} When return_child is true, returns newly created node
+	 * reference.
+	 *  Otherwise returns this json node reference.
+	 * Note: Here add_text and add_child have the same function.
 	 */
 	json_node& add_text(const char* tag, const char* value,
 		bool return_child = false);
 
 	/**
-	 * 创建一个int64 类型的 json 节点对象，并将之添加为本 json 节点的子节点
-	 * @param tag {const char*} 标签名
-	 * @param value {int64} 标签值
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
+	 * Create an int64 type json node object, and add it as this json node's child
+	 * node.
+	 * @param tag {const char*} Tag name.
+	 * @param value {int64} Tag value.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @return {json_node&} When return_child is true, returns newly created node
+	 * reference.
+	 *  Otherwise returns this json node reference.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	json_node& add_number(const char* tag, __int64 value,
@@ -236,63 +270,80 @@ public:
 #endif
 
 	/**
-	 * 创建一个 double 类型的 json 节点对象，并将之添加为本 json 节点的子节点
-	 * @param tag {const char*} 标签名
-	 * @param value {double} 标签值
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
+	 * Create a double type json node object, and add it as this json node's child
+	 * node.
+	 * @param tag {const char*} Tag name.
+	 * @param value {double} Tag value.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @return {json_node&} When return_child is true, returns newly created node
+	 * reference.
+	 *  Otherwise returns this json node reference.
 	 */
 	json_node& add_double(const char* tag, double value,
 		bool return_child = false);
 
 	/**
-	 * 创建一个 double 类型的 json 节点对象，并将之添加为本 json 节点的子节点
-	 * @param tag {const char*} 标签名
-	 * @param value {double} 标签值
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @param precision {int} 小数点精度，大于 0 时有效，否则取缺省值为 4
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
+	 * Create a double type json node object, and add it as this json node's child
+	 * node.
+	 * @param tag {const char*} Tag name.
+	 * @param value {double} Tag value.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @param precision {int} Decimal precision. Effective when > 0. Default value
+	 * is 4.
+	 * @return {json_node&} When return_child is true, returns newly created node
+	 * reference.
+	 *  Otherwise returns this json node reference.
 	 */
 	json_node& add_double(const char* tag, double value, int precision,
 		bool return_child = false);
 
 	/**
-	 * 创建一个布尔类型的 json 节点对象，并将之添加为本 json 节点的子节点
-	 * @param tag {const char*} 标签名
-	 * @param value {bool} 标签值
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
+	 * Create a boolean type json node object, and add it as this json node's child
+	 * node.
+	 * @param tag {const char*} Tag name.
+	 * @param value {bool} Tag value.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @return {json_node&} When return_child is true, returns newly created node
+	 * reference.
+	 *  Otherwise returns this json node reference.
 	 */
 	json_node& add_bool(const char* tag, bool value,
 		bool return_child = false);
 
 	/**
-	 * 创建一个 null 类型的 json 节点对象，并将之添加为本 json 节点的子节点
-	 * @param tag {const char*} 标签名
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
+	 * Create a null type json node object, and add it as this json node's child
+	 * node.
+	 * @param tag {const char*} Tag name.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @return {json_node&} When return_child is true, returns newly created node
+	 * reference.
+	 *  Otherwise returns this json node reference.
 	 */
 	json_node& add_null(const char* tag, bool return_child = false);
 
 	/**
-	 * 创建一个 json 字符串对象，并将之添加为本 json 节点的子节点
-	 * @param text {const char*} 文本字符串
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
+	 * Create a json string object, and add it as this json node's child node.
+	 * @param text {const char*} Text string.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @return {json_node&} When return_child is true, returns newly created node
+	 * reference.
+	 *  Otherwise returns this json node reference.
 	 */
 	json_node& add_array_text(const char* text, bool return_child = false);
 
 	/**
-	 * 创建一个 json 数字对象，并将之添加为本 json 节点的子节点
-	 * @param value {acl_int64} 数字值
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
+	 * Create a json numeric object, and add it as this json node's child node.
+	 * @param value {acl_int64} Numeric value.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @return {json_node&} When return_child is true, returns newly created node
+	 * reference.
+	 *  Otherwise returns this json node reference.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	json_node& add_array_number(__int64 value,
@@ -302,116 +353,138 @@ public:
 #endif
 
 	/**
-	 * 创建一个 json double 对象，并将之添加为本 json 节点的子节点
-	 * @param value {double} 值
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
+	 * Create a json double object, and add it as this json node's child node.
+	 * @param value {double} Value.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @return {json_node&} When return_child is true, returns newly created node
+	 * reference.
+	 *  Otherwise returns this json node reference.
 	 */
 	json_node& add_array_double(double value, bool return_child = false);
 
 	/**
-	 * 创建一个 json 布尔对象，并将之添加为本 json 节点的子节点
-	 * @param value {bool} 布尔值
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
+	 * Create a json boolean object, and add it as this json node's child node.
+	 * @param value {bool} Boolean value.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @return {json_node&} When return_child is true, returns newly created node
+	 * reference.
+	 *  Otherwise returns this json node reference.
 	 */
 	json_node& add_array_bool(bool value, bool return_child = false);
 
 	/**
-	 * 创建一个 json null 对象，并将之添加为本 json 节点的子节点
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
+	 * Create a json null object, and add it as this json node's child node.
+	 * @param return_child {bool} Whether to return newly created child node
+	 * object.
+	 * @return {json_node&} When return_child is true, returns newly created node
+	 * reference.
+	 *  Otherwise returns this json node reference.
 	 */
 	json_node& add_array_null(bool return_child = false);
 
 	/**
-	 * @return {json_node&} 返回本节点的父节点引用，在采用级联方式创建 json
-	 *  对象时，本函数常被用于返回父节点
+	 * @return {json_node&} Returns parent node reference of this node. Internally
+	 * uses reference counting method. When json
+	 *  object is destroyed, reference counting automatically releases parent node.
 	 */
 	json_node& get_parent() const;
 
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 获得本节点的第一个子节点，需要遍历子节点时必须首先调用此函数
-	 * @return {json_node*} 返回空表示没有子节点，返回的非空对象不能
-	 *  在外部 delete，因为内部会自动释放
+	 * Get first child node of this node. When traversing child nodes, you need to
+	 * call this function first.
+	 * @return {json_node*} Returns empty to indicate no child nodes. Returned
+	 * non-empty object
+	 * should not be deleted externally, because it is automatically released
+	 * internally.
 	 */
 	json_node* first_child();
 
 	/**
-	 * 获得本节点的下一个子节点
-	 * @return {json_node*} 返回空表示遍历过程结束，返回的非空对象不能
-	 *  在外部 delete，因为内部会自动释放
+	 * Get next child node of this node.
+	 * @return {json_node*} Returns empty to indicate traversal finished. Returned
+	 * non-empty object
+	 * should not be deleted externally, because it is automatically released
+	 * internally.
 	 */
 	json_node* next_child();
 
 	/**
-	 * 在遍历子节点过程中删除释放指定的子节点，并返回下一个子节点
-	 * @param child {json_node*} 遍历过程中调用 first_child/next_child/remove_child
-	 *  时返回的当前 json 节点的子节点，该节点将被从 Json 对象中删除并释放
-	 * @return {json_node*} 返回当前节点的下一个子节点
+	 * In child node collection, remove and release specified child node, and
+	 * return next child node.
+	 * @param child {json_node*} Current json node's child node returned by
+	 * first_child/next_child/remove_child
+	 *  during traversal. This node will be removed from Json tree and released.
+	 * @return {json_node*} Next child node of current node.
 	 */
 	json_node* free_child(json_node* child);
 
 	/**
-	 * 从当前 json 节点的子节点中提取对应标签的 json 子节点
-	 * @param tag {const char*} json 子节点的标签名
-	 * @return {json_node*} 返回 NULL 表示不存在
+	 * Get json child node with corresponding tag name from current json node's
+	 * child node collection.
+	 * @param tag {const char*} Json child node's tag name.
+	 * @return {json_node*} Returns NULL to indicate not found.
 	 */
 	json_node* operator[] (const char* tag);
 
 	/**
-	 * 返回该 json 节点在整个 json 树中的深度
+	 * Get depth of this json node in json tree.
 	 * @return {int}
 	 */
 	int   depth() const;
 
 	/**
-	 * 返回该 json 节点的下一级子节点的个数
-	 * @return {int} 永远 >= 0
+	 * Get number of child nodes of this json node.
+	 * @return {int} Always >= 0.
 	 */
 	int   children_count() const;
 
 	/**
-	 * 将本节点及其子节点从 json 树中删除，其内存将由 json 对象统一释放
-	 * @return {int} 被释放的节点数量
+	 * Detach this node and its child nodes from json tree. Memory will be released
+	 * by json object uniformly.
+	 * @return {int} Number of detached nodes.
 	 */
 	int detach();
 
 	/**
-	 * 禁止当前 json 节点，在生成 json 字符串时被禁止的节点将被忽略，但该节点并未
-	 * 从 json 节点树中删除，这样在下次遍历时还可以再启用该节点
-	 * @param yes {bool} 是否禁止该 json 节点，false 表示启用，true 表示禁用
+	 * Disable current json node. When building json string, disabled nodes will be
+	 * ignored. This node is not
+	 * removed from json node tree, so when traversing next time, you can still use
+	 * this node.
+	 * @param yes {bool} Whether to disable json node. false means enable, true
+	 * means disable.
 	 */
 	void disable(bool yes);
 
 	/**
-	 * 判断当前 json 节点是否被禁止了
+	 * Determine whether current json node is disabled.
 	 * @return {bool}
 	 */
 	bool disabled() const;
 
 	/**
-	 * 当在遍历该 json 节点时，内部会动态产生一些临时 json_node 对象，调用
-	 * 此函数可以清空这些对象，一旦调用此函数进行了清除，则由 first_child,
-	 * next_child 返回的 json_node 节点对象将不再可用，否则会产生内存非法
-	 * 访问
+	 * When traversing json nodes, internally dynamically creates some temporary
+	 * json_node objects. When
+	 * traversal finishes, you need to call this function to clear these objects.
+	 * Otherwise,
+	 * json_node node objects returned by first_child,
+	 * next_child will no longer be available, which may cause memory leak.
 	 */
 	void clear();
 
 	/**
-	 * 获得 json 对象的引用
+	 * Get json object reference.
 	 * @return {json&}
 	 */
 	json& get_json() const;
 
 	/**
-	 * 取出对应于 ACL 库中的 json 节点对象
-	 * @return {ACL_JSON_NODE*} 返回节点对象，注：该节点用户不能单独释放
+	 * Get corresponding json node object in ACL library.
+	 * @return {ACL_JSON_NODE*} Returns node object. Note: This node object should
+	 * not be manually released by users.
 	 */
 	ACL_JSON_NODE* get_json_node() const;
 
@@ -420,18 +493,18 @@ private:
 	friend class dbuf_guard;
 
 	/**
-	 * 构造函数，要求该对象必须只能由 json 对象创建
-	 * @param node {ACL_JSON_NODE*} ACL 库中的 ACL_JSON_NODE 结构对象
+	 * Constructor. This object can only be created by json object.
+	 * @param node {ACL_JSON_NODE*} ACL_JSON_NODE structure object in ACL library.
 	 */
 	json_node(ACL_JSON_NODE* node, json* json_ptr);
 
 	/**
-	 * 要求该对象必须是动态创建的
+	 * This object needs to be dynamically allocated.
 	 */
 	~json_node();
 
 	/**
-	 * 设置 json 节点
+	 * Set json node.
 	 * @param node {ACL_JSON_NODE*}
 	 */
 	void set_json_node(ACL_JSON_NODE* node);
@@ -459,152 +532,170 @@ private:
 class ACL_CPP_API json : public pipe_stream, public dbuf_obj {
 public:
 	/**
-	 * 构造函数，可用于解析 json 字符串或生成 json 对象
-	 * @param data {const char*} json 格式的字符串，可以是完整的
-	 *  json 字符串，也可以是部分的 json 字符串，也可以是空指针，
-	 *  无论如何，用户依然可以用部分或完整的 json 字符串调用 update
-	 *  函数，在调用 update 过程中解析 json；其实，当构造函数的
-	 *  的 data 参数非空时，它也会调用 update
-	 * @param dbuf {dbuf_guard*} 非空时将做为内存池管理对象，否则内部
-	 *  会自动创建一个内存池管理对象
+	 * Constructor, used for parsing json string data into json object.
+	 * @param data {const char*} Json format string data. This parameter can be
+	 * complete json string, can also be partial json string, can also be empty
+	 * pointer.
+	 * Regardless of which case, users can still call update function to parse
+	 * partial or complete json string data. In fact, constructor
+	 *  also calls update internally when data is not empty.
+	 * @param dbuf {dbuf_guard*} When not empty, uses as memory pool object.
+	 * Otherwise, internally
+	 *  automatically creates a memory pool object.
 	 */
 	json(const char* data = NULL, dbuf_guard* dbuf = NULL);
 
 	/**
-	 * 根据一个 json 对象中的一个 json 节点构造一个新的 json 对象
-	 * @param node {const json_node&} 源 json 对象中的一个 json 节点
-	 * @param dbuf {dbuf_guard*} 非空时将做为内存池管理对象，否则内部
-	 *  会自动创建一个内存池管理对象
+	 * Construct a new json object from a json node in a json object.
+	 * @param node {const json_node&} A json node in source json object.
+	 * @param dbuf {dbuf_guard*} When not empty, uses as memory pool object.
+	 * Otherwise, internally
+	 * automatically creates a memory pool object.
 	 */
 	json(const json_node& node, dbuf_guard* dbuf = NULL);
 
 	~json();
 
 	/**
-	 * 设置是否在解析时自动处理半个汉字的情形
+	 * Set whether to automatically parse word boundaries when parsing.
 	 * @param on {bool}
 	 * @return {json&}
 	 */
 	json& part_word(bool on);
 
 	/**
-	 * 以流式方式循环调用本函数添加 json 数据，也可以一次性添加
-	 * 完整的 json 数据，如果是重复使用该 json 解析器解析多个 json
-	 * 对象，则应该在解析下一个 json 对象前调用 reset() 方法来清
-	 * 除上一次的解析结果
-	 * @param data {const char*} json 数据
-	 @return {const char*} 当解析结束后，该返回值表示剩余数据的指针地址
+	 * Streaming format: call this function in a loop to parse json data. You can
+	 * also parse
+	 * complete json data at once. When reusing this json object, you should call
+	 * reset() function before
+	 * parsing next json data to clear last parse result.
+	 * @param data {const char*} json data.
+	 @return {const char*} When parsing is not complete, return value indicates pointer to remaining data.
 	 */
 	const char* update(const char* data);
 
 	/**
-	 * 判断是否解析完毕
+	 * Determine whether parsing is complete.
 	 * @return {bool}
 	 */
 	bool finish();
 
 	/**
-	 * 重置 json 解析器状态，该 json 对象可以用来对多个 json 数据
-	 * 进行解析，在反复使用本 json 解析器前，需要调用本函数重置
-	 * 内部 json 解析器状态，清除上一次的解析结果
+	 * Reset json object state. Json object internally automatically manages json
+	 * tree
+	 * memory. Before reusing this json object, you need to call this function to
+	 * reset internal json object state and clear last parse result.
 	 */
 	void reset();
 
 	/**
-	 * 从 json 对象中取得某个标签名的第一个节点
-	 * @param tag {const char*} 标签名(不区分大小写)
-	 * @return {json_node*} 返回 json 节点对象，不存在则返回 NULL
-	 *  注：返回的 json_node 节点可以修改，但不能删除节点，内部有自动删除机制，
-	 *  当调用方法 clear/getElementsByTagName/getElementsByTags 后，节点
-	 *  不能再被引用，因为节点的内存被自动释放
+	 * Get first node with a certain tag name from json tree.
+	 * @param tag {const char*} Tag name (case-insensitive).
+	 * @return {json_node*} Returns json node object. Returns NULL when not found.
+	 * Note: Returned json_node node data can be modified, but do not delete node.
+	 * Internally automatically manages deletion.
+	 *  After calling clear/getElementsByTagName/getElementsByTags, node
+	 *  will no longer be available, because node memory is automatically released.
 	 */
 	json_node* getFirstElementByTagName(const char* tag) const;
 
 	/**
-	 * 重载运算符，直接获得对应标签名的第一个节点
-	 * @param tag {const char*} 标签名(不区分大小写)
-	 * @return {json_node*} 返回 json 节点对象，不存在则返回 NULL
-	 *  注：返回的 json_node 节点可以修改，但不能删除节点，内部有自动删除机制，
-	 *  当调用方法 clear/getElementsByTagName/getElementsByTags 后，节点
-	 *  不能再被引用，因为节点的内存被自动释放
+	 * Directly get first node with corresponding tag name from root node.
+	 * @param tag {const char*} Tag name (case-insensitive).
+	 * @return {json_node*} Returns json node object. Returns NULL when not found.
+	 * Note: Returned json_node node data can be modified, but do not delete node.
+	 * Internally automatically manages deletion.
+	 *  After calling clear/getElementsByTagName/getElementsByTags, node
+	 *  will no longer be available, because node memory is automatically released.
 	 */
 	json_node* operator[](const char* tag) const;
 
 	/**
-	 * 从 json 对象中取得某个标签名的所有节点集合
-	 * @param tag {const char*} 标签名(不区分大小写)
-	 * @return {const std::vector<json_node*>&} 返回结果集的对象引用，
-	 *  如果查询结果为空，则该集合为空，即：empty() == true
-	 *  注：返回的 json_node 节点可以修改，但不能删除节点，内部有自动删除机制，
-	 *  当调用方法 clear/getElementsByTagName/getElementsByTags 后，节点
-	 *  不能再被引用，因为节点的内存被自动释放
+	 * Get node collection of all nodes with a certain tag name from json tree.
+	 * @param tag {const char*} Tag name (case-insensitive).
+	 * @return {const std::vector<json_node*>&} Returns reference to result object.
+	 *  When query result is empty, collection is empty, i.e., empty() == true.
+	 * Note: Returned json_node node data can be modified, but do not delete node.
+	 * Internally automatically manages deletion.
+	 *  After calling clear/getElementsByTagName/getElementsByTags, node
+	 *  will no longer be available, because node memory is automatically released.
 	 */
 	const std::vector<json_node*>& getElementsByTagName(const char* tag) const;
 
 	/**
-	 * 从 json 对象中获得所有的与给定多级标签名相同的 json 节点的集合
-	 * @param tags {const char*} 多级标签名，由 '/' 分隔各级标签名，
-	 *  如针对 json 数据：
+	 * Get collection of all json nodes with same hierarchical tag name from json
+	 * tree.
+	 * @param tags {const char*} Hierarchical tag name, separated by '/'. For
+	 * example, for json data:
 	 *  { 'root': [
 	 *      'first': { 'second': { 'third': 'test1' } },
 	 *      'first': { 'second': { 'third': 'test2' } },
 	 *      'first': { 'second': { 'third': 'test3' } }
 	 *    ]
 	 *  }
-	 *  可以通过多级标签名：root/first/second/third 一次性查出所有符合
-	 *  条件的节点
-	 * @return {const std::vector<json_node*>&} 符合条件的 json 节点集合, 
-	 *  如果查询结果为空，则该集合为空，即：empty() == true
-	 *  注：返回的 json_node 节点可以修改，但不能删除节点，内部有自动删除机制，
-	 *  当调用方法 clear/getElementsByTagName/getElementsByTags 后，节点
-	 *  不能再被引用，因为节点的内存被自动释放
+	 * You can use hierarchical tag name root/first/second/third to query all
+	 * matching
+	 *  nodes at once.
+	 * @return {const std::vector<json_node*>&} Returns json node collection, 
+	 *  When query result is empty, collection is empty, i.e., empty() == true.
+	 * Note: Returned json_node node data can be modified, but do not delete node.
+	 * Internally automatically manages deletion.
+	 *  After calling clear/getElementsByTagName/getElementsByTags, node
+	 *  will no longer be available, because node memory is automatically released.
 	 */
 	const std::vector<json_node*>& getElementsByTags(const char* tags) const;
 
 	/**
-	 * 从 json 对象中获得所有的与给定多级标签名相同的 json 节点的集合
-	 * @param tags {const char*} 多级标签名，由 '/' 分隔各级标签名，
-	 *  如针对 json 数据：
+	 * Get collection of all json nodes with same hierarchical tag name from json
+	 * tree.
+	 * @param tags {const char*} Hierarchical tag name, separated by '/'. For
+	 * example, for json data:
 	 *  { 'root': [
 	 *      'first': { 'second': { 'third': 'test1' } },
 	 *      'first': { 'second': { 'third': 'test2' } },
 	 *      'first': { 'second': { 'third': 'test3' } }
 	 *    ]
 	 *  }
-	 *  可以通过多级标签名：root/first/second/third 一次性查出所有符合
-	 *  条件的节点
-	 * @return {json_node*} 返回 NULL 表示不存在
+	 * You can use hierarchical tag name root/first/second/third to query all
+	 * matching
+	 *  nodes at once.
+	 * @return {json_node*} Returns NULL to indicate not found.
 	 */
 	json_node* getFirstElementByTags(const char* tags) const;
 
 	/**
-	 * 取得 acl 库中的 ACL_JSON 对象
-	 * @return {ACL_JSON*} 该值不可能为空，注意用户可以修改该对象的值，
-	 *  但不可以释放该对象
+	 * Get ACL_JSON object in acl library.
+	 * @return {ACL_JSON*} Return value may be empty. Note: Users should not modify
+	 * this object's value or
+	 *  release this object.
 	 */
 	ACL_JSON* get_json() const;
 
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 创建一个 json_node 叶节点对象，该节点对象的格式为：
+	 * Create a json_node leaf node object. This node's format is:
 	 * "tag_name": "tag_value"
-	 * @param tag {const char*} 标签名
-	 * @param value {const char*} 标签值
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
-	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
-	 *  不用时调用 reset 来释放这些 json_node 节点对象
+	 * @param tag {const char*} Tag name.
+	 * @param value {const char*} Tag value.
+	 * @return {json_node&} Newly created json_node object. Users do not need to
+	 * manually release it,
+	 * because when json object is destroyed, these nodes will be automatically
+	 * released. However, users can also
+	 *  call reset to release these json_node node objects when not needed.
 	 */
 	json_node& create_node(const char* tag, const char* value);
 
 	/**
-	 * 创建一个 json_node 叶节点对象，该节点对象的格式为：
+	 * Create a json_node leaf node object. This node's format is:
 	 * "tag_name": tag_value
-	 * @param tag {const char*} 标签名
-	 * @param value {int64} 标签值
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
-	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
-	 *  不用时调用 reset 来释放这些 json_node 节点对象
+	 * @param tag {const char*} Tag name.
+	 * @param value {int64} Tag value.
+	 * @return {json_node&} Newly created json_node object. Users do not need to
+	 * manually release it,
+	 * because when json object is destroyed, these nodes will be automatically
+	 * released. However, users can also
+	 *  call reset to release these json_node node objects when not needed.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	json_node& create_node(const char* tag, __int64 value);
@@ -613,55 +704,66 @@ public:
 #endif
 
 	/**
-	 * 创建一个 json_node 叶节点对象，该节点对象的格式为：
+	 * Create a json_node leaf node object. This node's format is:
 	 * "tag_name": tag_value
-	 * @param tag {const char*} 标签名
-	 * @param value {double} 标签值
-	 * @param precision {int} 小数点后面的精度（> 0 时有效，否则设为 4）
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
-	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
-	 *  不用时调用 reset 来释放这些 json_node 节点对象
+	 * @param tag {const char*} Tag name.
+	 * @param value {double} Tag value.
+	 * @param precision {int} Precision of decimal point. Effective when > 0.
+	 * Default is 4.
+	 * @return {json_node&} Newly created json_node object. Users do not need to
+	 * manually release it,
+	 * because when json object is destroyed, these nodes will be automatically
+	 * released. However, users can also
+	 *  call reset to release these json_node node objects when not needed.
 	 */
 	json_node& create_double(const char* tag, double value, int precision = 4);
 
 	/**
-	 * 创建一个 json_node 叶节点对象，该节点对象的格式为：
+	 * Create a json_node leaf node object. This node's format is:
 	 * "tag_name": true|false
-	 * @param tag {const char*} 标签名
-	 * @param value {bool} 标签值
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
-	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
-	 *  不用时调用 reset 来释放这些 json_node 节点对象
+	 * @param tag {const char*} Tag name.
+	 * @param value {bool} Tag value.
+	 * @return {json_node&} Newly created json_node object. Users do not need to
+	 * manually release it,
+	 * because when json object is destroyed, these nodes will be automatically
+	 * released. However, users can also
+	 *  call reset to release these json_node node objects when not needed.
 	 */
 	json_node& create_node(const char* tag, bool value);
 
 	/**
-	 * 创建一个 json_node null 叶节点对象，该节点对象的格式为：
+	 * Create a json_node null leaf node object. This node's format is:
 	 * "tag_name": null
-	 * @param tag {const char*} 标签名
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
-	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
-	 *  不用时调用 reset 来释放这些 json_node 节点对象
+	 * @param tag {const char*} Tag name.
+	 * @return {json_node&} Newly created json_node object. Users do not need to
+	 * manually release it,
+	 * because when json object is destroyed, these nodes will be automatically
+	 * released. However, users can also
+	 *  call reset to release these json_node node objects when not needed.
 	 */
 	json_node& create_null(const char* tag);
 
 	/**
-	 * 创建一个 json_node 叶节点字符串对象，该节点对象的格式为："string"
-	 * 按 json 规范，该节点只能加入至数组对象中
-	 * @param text {const char*} 文本字符串
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
-	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
-	 *  不用时调用 reset 来释放这些 json_node 节点对象
+	 * Create a json_node leaf node string object. This node's format is: "string"
+	 * According to json specification, this node can only be added to array.
+	 * @param text {const char*} Text string.
+	 * @return {json_node&} Newly created json_node object. Users do not need to
+	 * manually release it,
+	 * because when json object is destroyed, these nodes will be automatically
+	 * released. However, users can also
+	 *  call reset to release these json_node node objects when not needed.
 	 */
 	json_node& create_array_text(const char* text);
 
 	/**
-	 * 创建一个 json_node 叶节点数值对象
-	 * 按 json 规范，该节点只能加入至数组对象中
-	 * @param value {acl_int64} 数值
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
-	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
-	 * 不用时调用 reset 来释放这些 json_node 节点对象
+	 * Create a json_node leaf node numeric object.
+	 * According to json specification, this node can only be added to array.
+	 * @param value {acl_int64} Numeric value.
+	 * @return {json_node&} Newly created json_node object. Users do not need to
+	 * manually release it,
+	 * because when json object is destroyed, these nodes will be automatically
+	 * released. However, users can also
+	 * call reset to release these json_node node objects when not needed.
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	json_node& create_array_number(__int64 value);
@@ -670,148 +772,169 @@ public:
 #endif
 
 	/**
-	 * 创建一个 json_node 叶节点数值对象
-	 * 按 json 规范，该节点只能加入至数组对象中
-	 * @param value {double} 值
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
-	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
-	 * 不用时调用 reset 来释放这些 json_node 节点对象
+	 * Create a json_node leaf node numeric object.
+	 * According to json specification, this node can only be added to array.
+	 * @param value {double} Value.
+	 * @return {json_node&} Newly created json_node object. Users do not need to
+	 * manually release it,
+	 * because when json object is destroyed, these nodes will be automatically
+	 * released. However, users can also
+	 * call reset to release these json_node node objects when not needed.
 	 */
 	json_node& create_array_double(double value);
 
 	/**
-	 * 创建一个 json_node 叶节点布尔对象
-	 * 按 json 规范，该节点只能加入至数组对象中
-	 * @param value {bool} 布尔值
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
-	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
-	 * 不用时调用 reset 来释放这些 json_node 节点对象
+	 * Create a json_node leaf node boolean object.
+	 * According to json specification, this node can only be added to array.
+	 * @param value {bool} Boolean value.
+	 * @return {json_node&} Newly created json_node object. Users do not need to
+	 * manually release it,
+	 * because when json object is destroyed, these nodes will be automatically
+	 * released. However, users can also
+	 * call reset to release these json_node node objects when not needed.
 	 */
 	json_node& create_array_bool(bool value);
 
 	/**
-	 * 创建一个 json_node 叶节点 null 对象
-	 * 按 json 规范，该节点只能加入至数组对象中
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
-	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
-	 * 不用时调用 reset 来释放这些 json_node 节点对象
+	 * Create a json_node leaf node null object.
+	 * According to json specification, this node can only be added to array.
+	 * @return {json_node&} Newly created json_node object. Users do not need to
+	 * manually release it,
+	 * because when json object is destroyed, these nodes will be automatically
+	 * released. However, users can also
+	 * call reset to release these json_node node objects when not needed.
 	 */
 	json_node& create_array_null();
 
 	/**
-	 * 创建一个 json_node 节点容器对象，该对象没有标签,
-	 * 该节点对象的格式为："{}" 或数组对象 "[]"
-	 * @param as_array {bool} 是否数组对象
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
-	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
-	 *  不用时调用 reset 来释放这些 json_node 节点对象
+	 * Create a json_node node object. This object has no tag,
+	 * this node's format is: "{}" (object) or "[]" (array)
+	 * @param as_array {bool} Whether it is array.
+	 * @return {json_node&} Newly created json_node object. Users do not need to
+	 * manually release it,
+	 * because when json object is destroyed, these nodes will be automatically
+	 * released. However, users can also
+	 *  call reset to release these json_node node objects when not needed.
 	 */
 	json_node& create_node(bool as_array = false);
 	json_node& create_array();
 
 	/**
-	 * 创建一个 json_node 节点对象，该节点对象的格式为：tag_name: {}
-	 * 或 tag_name: []
-	 * @param tag {const char*} 标签名
-	 * @param node {json_node*} json 节点对象作为标签值
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
-	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
-	 *  不用时调用 reset 来释放这些 json_node 节点对象
+	 * Create a json_node node object. This node's format is: tag_name: {}
+	 * or tag_name: []
+	 * @param tag {const char*} Tag name.
+	 * @param node {json_node*} Json node object as tag value.
+	 * @return {json_node&} Newly created json_node object. Users do not need to
+	 * manually release it,
+	 * because when json object is destroyed, these nodes will be automatically
+	 * released. However, users can also
+	 *  call reset to release these json_node node objects when not needed.
 	 */
 	json_node& create_node(const char* tag, json_node* node);
 
 	/**
-	 * 创建一个 json_node 节点对象，该节点对象的格式为：tag_name: {}
-	 * 或 tag_name: []
-	 * @param tag {const char*} 标签名
-	 * @param node {json_node&} json 节点对象作为标签值
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
-	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
-	 *  不用时调用 reset 来释放这些 json_node 节点对象
+	 * Create a json_node node object. This node's format is: tag_name: {}
+	 * or tag_name: []
+	 * @param tag {const char*} Tag name.
+	 * @param node {json_node&} Json node object as tag value.
+	 * @return {json_node&} Newly created json_node object. Users do not need to
+	 * manually release it,
+	 * because when json object is destroyed, these nodes will be automatically
+	 * released. However, users can also
+	 *  call reset to release these json_node node objects when not needed.
 	 */
 	json_node& create_node(const char* tag, json_node& node);
 
 	/**
-	 * 将指定的 json 节点从 json 对象中删除, 同时释放其内存资源, 调用本函数
-	 * 后应用将不得再使用该 json 节点对象.
-	 * @param node {json_node*} 该 json 节点及其包含的子节点将会从 json 对
-	 *  象中删除, 其所占用的内存资源将会在 json 对象析构时随 dbuf 销毁.
+	 * Remove specified json node from json tree, simultaneously release occupied
+	 * memory resources. Applications
+	 * should no longer use this json node object.
+	 * @param node {json_node*} This json node and all its child nodes will be
+	 * removed from json
+	 * tree, and occupied memory resources will be released when json object is
+	 * destroyed by dbuf pool.
 	 */
 	void remove(json_node* node);
 
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 将一个 json 对象中的一个 json 节点复制至任一 json 对象中的一个
-	 * 新 json 节点中并返回该新的 json 节点
-	 * @param node {json_node*} 源 json 对象的一个 json 节点
-	 * @return {json_node&} 当前目标 json 对象中新创建的 json 节点
+	 * Copy a json node from one json object to another json object's json node,
+	 * and insert copied new json node.
+	 * @param node {json_node*} A json node in source json object.
+	 * @return {json_node&} Newly created json node in current target json object.
 	 */
 	json_node& duplicate_node(const json_node* node);
 
 	/**
-	 * 将一个 json 对象中的一个 json 节点复制至任一 json 对象中的一个
-	 * 新 json 节点中并返回该新的 json 节点
-	 * @param node {json_node&} 源 json 对象的一个 json 节点
-	 * @return {json_node&} 当前目标 json 对象中新创建的 json 节点
+	 * Copy a json node from one json object to another json object's json node,
+	 * and insert copied new json node.
+	 * @param node {json_node&} A json node in source json object.
+	 * @return {json_node&} Newly created json node in current target json object.
 	 */
 	json_node& duplicate_node(const json_node& node);
 
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 获得根节点对象
+	 * Get root node object.
 	 * @return {json_node&}
 	 */
 	json_node& get_root();
 
 	/**
-	 * 开始遍历该 json 对象并获得第一个节点
-	 * @return {json_node*} 返回空表示该 json 对象为空节点
-	 *  注：返回的节点对象用户不能手工释放，因为该对象被
-	 *  内部库自动释放
+	 * Start traversing json object and get first node.
+	 * @return {json_node*} Returns empty to indicate json object is empty node.
+	 * Note: Returned node object does not need to be manually released, because
+	 * this object
+	 *  internally automatically releases it.
 	 */
 	json_node* first_node();
 
 	/**
-	 * 遍历该 json 对象的下一个 json 节点
-	 * @return {json_node*} 返回空表示遍历完毕
-	 *  注：返回的节点对象用户不能手工释放，因为该对象被
-	 *  内部库自动释放
+	 * Get next json node in json tree.
+	 * @return {json_node*} Returns empty to indicate traversal finished.
+	 * Note: Returned node object does not need to be manually released, because
+	 * this object
+	 *  internally automatically releases it.
 	 */
 	json_node* next_node();
 
 	/**
-	 * 在遍历过程通过本函数删除当前遍历到的 json 节点，并返回下一个 json 节点
-	 * @param curr {json_node*} 由 first_node/next_node/free_node 返回的节点
-	 * @return {json_node*} 返回下一个 json 节点
+	 * In traversal, remove and release current traversed json node, and return
+	 * next json node.
+	 * @param curr {json_node*} Node returned by first_node/next_node/free_node.
+	 * @return {json_node*} Next json node.
 	 */
 	json_node* free_node(json_node* curr);
 
 	/**
-	 * 将 json 对象树转成字符串
-	 * @param out {string&} 存储转换结果的缓冲区
-	 * @param add_space {bool} 创建 json 时是否自动在分隔符两边添加空格
+	 * Convert json tree to string.
+	 * @param out {string&} Buffer to store converted result.
+	 * @param add_space {bool} Whether to automatically add spaces between
+	 * separators when building json.
 	 */
 	void build_json(string& out, bool add_space = false) const;
 
 	/**
-	 * 将 json 对象树转换成 json 字符串
-	 * @param out {string*} 非空时，则使用此缓冲区，否则使用内部缓冲区
-	 * @param add_space {bool} 创建 json 时是否自动在分隔符两边添加空格
+	 * Convert json object to json string.
+	 * @param out {string*} When not empty, uses this buffer. Otherwise uses
+	 * internal buffer.
+	 * @param add_space {bool} Whether to automatically add spaces between
+	 * separators when building json.
 	 * @return {const string&}
 	 */
 	const string& to_string(string* out = NULL, bool add_space = false) const;
 
 	/**
-	 * 获得内存池对象指针
+	 * Get memory pool object pointer.
 	 * @return {dbuf_guard*}
 	 */
 	dbuf_guard* get_dbuf() const {
 		return dbuf_;
 	}
 
-	// pipe_stream 虚函数重载
+	// pipe_stream virtual function implementation.
 
 	virtual int push_pop(const char* in, size_t len,
 		string* out, size_t max = 0);
@@ -819,19 +942,20 @@ public:
 	virtual void clear();
 
 private:
-	// 内存池管理对象，适合管理大量小内存
+	// Memory pool object, suitable for managing small memory.
 	dbuf_guard* dbuf_;
 	dbuf_guard* dbuf_internal_;
 
-	// 对应于 acl 库中的 ACL_JSON 对象
+	// Corresponding ACL_JSON object in acl library.
 	ACL_JSON *json_;
-	// json 对象树中的根节点对象
+	// Root node object in json object tree.
 	json_node* root_;
-	// 临时的 json 节点查询结果集
+	// Temporary json node query result.
 	std::vector<json_node*> nodes_query_;
-	// 缓冲区
+	// Buffer.
 	string* buf_;
 	ACL_ITER* iter_;
 };
 
 } // namespace acl
+
