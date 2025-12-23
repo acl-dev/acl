@@ -305,6 +305,7 @@ public:
 	/**
 	 * If multiple fibers can share one epoll handle in the same thread.
 	 * @param yes {bool}
+	 * @deprecated
 	 */
 	static void share_epoll(bool yes);
 
