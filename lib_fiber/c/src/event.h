@@ -68,6 +68,7 @@ typedef struct POLL_EVENT   POLL_EVENT;
 #endif
 
 #ifdef HAS_EPOLL
+typedef struct EPOLL        EPOLL;
 typedef struct EPOLL_CTX    EPOLL_CTX;
 typedef struct EPOLL_EVENT  EPOLL_EVENT;
 #endif
@@ -372,12 +373,9 @@ struct POLL_EVENT {
 
 #ifdef	HAS_EPOLL
 
-typedef struct EPOLL EPOLL;
-
 struct EPOLL_EVENT {
 	RING        me;
 	ACL_FIBER  *fiber;
-	EPOLL      *epoll;
 
 	epoll_proc *proc;
 	long long   expire;
