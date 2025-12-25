@@ -1,5 +1,21 @@
 #include "stdafx.h"
 
+#if 0
+#define HAS_EPOLL
+#define EPOLLIN		1
+#define EPOLLOUT	2
+#define EPOLLERR	4
+#define EPOLL_CTL_ADD	1
+#define EPOLL_CTL_MOD	2
+#define EPOLL_CTL_DEL	3
+
+#define epoll_data_t	long long
+struct epoll_event {
+	int events;
+	epoll_data_t data;
+};
+#endif
+
 #if defined(HAS_EPOLL) && !defined(DISABLE_HOOK)
 
 #include "common.h"
@@ -21,6 +37,18 @@ struct EPOLL_CTX {
 	FILE_EVENT *fe;		// Refer to the FILE_EVENT with the socket fd.
 	EPOLL *ep;		// Refer to the EPOLL with the epfd.
 	epoll_data_t data;	// Same as the system epoll_data_t.
+};
+
+struct EPOLL_EVENT {
+	RING        me;
+	ACL_FIBER  *fiber;
+
+	epoll_proc *proc;
+	long long   expire;
+
+	struct epoll_event *events;
+	int maxevents;
+	int nready;
 };
 
 /**
@@ -117,6 +145,28 @@ static EPOLL_EVENT *epoll_event_alloc(void)
 	return ee;
 }
 
+static void fiber_on_exit(void *ctx)
+{
+	EPOLL_EVENT *ee = (EPOLL_EVENT*) ctx;
+	epoll_event_free(ee);
+}
+
+static __thread int __local_key;
+
+static EPOLL_EVENT *fiber_epoll_event()
+{
+	EPOLL_EVENT *ee = (EPOLL_EVENT*) acl_fiber_get_specific(__local_key);
+	if (ee) {
+		return ee;
+	}
+
+	ee = epoll_event_alloc();
+	acl_fiber_set_specific(&__local_key, ee, fiber_on_exit);
+	ring_init(&ee->me);
+	ee->fiber = acl_fiber_running();
+	return ee;
+}
+
 /****************************************************************************/
 
 static pthread_key_t  __once_key;
@@ -204,7 +254,8 @@ static EPOLL *epoll_alloc(int epfd)
 		ep->fds[i] = NULL;
 	}
 
-	ep->ee = epoll_event_alloc();
+	//ep->ee = epoll_event_alloc();
+	ep->ee = NULL;
 	return ep;
 }
 
@@ -219,7 +270,7 @@ static void epoll_free(EPOLL *ep)
 	}
 
 	mem_free(ep->fds);
-	epoll_event_free(ep->ee);
+	//epoll_event_free(ep->ee);
 	mem_free(ep);
 }
 
@@ -252,7 +303,7 @@ int epoll_close(int epfd)
 	ev = fiber_io_event();
 	assert(ev);
 
-	sys_epfd = event_handle(ev);
+	sys_epfd = (int) event_handle(ev);
 	assert(sys_epfd >= 0);
 
 	// We can't close the epfd same as the internal fiber event's fd.
@@ -318,7 +369,7 @@ int epoll_create(int size fiber_unused)
 	assert(ev);
 
 	// Get the current thread's epoll fd.
-	sys_epfd = event_handle(ev);
+	sys_epfd = (int) event_handle(ev);
 	if (sys_epfd < 0) {
 		msg_info("%s(%d), %s: no event_handle %d",
 			__FILE__, __LINE__, __FUNCTION__, sys_epfd);
@@ -370,8 +421,12 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 
 	ep = epx->ep;
 	assert(ep);
+
 	ee = ep->ee;
-	assert(ee);
+	if (ee == NULL) {
+		msg_error("%s(%d): ep->ee = NULL", __FUNCTION__, __LINE__);
+		return;
+	}
 
 	// If the ready count exceeds the maxevents been set which limits the
 	// buffer space to hold the ready fds, we just return to let the left
@@ -424,8 +479,12 @@ static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 
 	ep = epx->ep;
 	assert(ep);
+
 	ee = ep->ee;
-	assert(ee);
+	if (ee == NULL) {
+		msg_error("%s(%d): ep->ee = NULL", __FUNCTION__, __LINE__);
+		return;
+	}
 
 	if (ee->nready >= ee->maxevents) {
 		return;
@@ -620,9 +679,7 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 		return -1;
 	}
 
-	ee = ep->ee;
-	assert(ee);
-
+	ee = fiber_epoll_event();
 	ee->events    = events;
 	ee->maxevents = maxevents;
 	ee->fiber     = acl_fiber_running();
@@ -634,6 +691,11 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 	while (1) {
 		timer_cache_add(ev->epoll_timer, ee->expire, &ee->me);
 
+		if (ep->ee) {
+			ring_prepend(&ep->ee->me, &ee->me);
+		} else {
+			ep->ee = ee;
+		}
 		ee->fiber->wstatus |= FIBER_WAIT_EPOLL;
 
 		WAITER_INC(ev);
@@ -641,6 +703,8 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 		WAITER_DEC(ev);
 
 		ee->fiber->wstatus &= ~FIBER_WAIT_EPOLL;
+		ep->ee = ring_succ(&ee->me) ?
+			ring_to_appl(ring_succ(&ee->me), EPOLL_EVENT, me) : NULL;
 
 		if (ee->nready == 0) {
 			timer_cache_remove(ev->epoll_timer, ee->expire, &ee->me);

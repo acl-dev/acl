@@ -907,13 +907,11 @@ int acl_fiber_set_specific(int *key, void *ctx, void (*free_fn)(void *))
 		return -1;
 	}
 
-	if (__thread_fiber == NULL) {
+	if (__thread_fiber == NULL || __thread_fiber->running == NULL) {
 		return -1;
-	} else if (__thread_fiber->running == NULL) {
-		return -1;
-	} else {
-		curr = __thread_fiber->running;
 	}
+
+	curr = __thread_fiber->running;
 
 	if (*key <= 0) {
 		*key = ++__thread_fiber->nlocal;

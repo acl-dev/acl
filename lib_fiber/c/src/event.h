@@ -371,21 +371,6 @@ struct POLL_EVENT {
 };
 #endif
 
-#ifdef	HAS_EPOLL
-
-struct EPOLL_EVENT {
-	RING        me;
-	ACL_FIBER  *fiber;
-
-	epoll_proc *proc;
-	long long   expire;
-
-	struct epoll_event *events;
-	int maxevents;
-	int nready;
-};
-#endif
-
 struct EVENT {
 	RING events;
 	int  timeout;
