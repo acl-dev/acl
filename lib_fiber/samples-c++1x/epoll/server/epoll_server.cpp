@@ -58,21 +58,18 @@ static void epoll_read_again(int epfd, int fd, void *ptr) {
 	}
 }
 
-class epoll_server : public acl::fiber {
+class epoll_server {
 public:
-	epoll_server(acl::server_socket& ss) : ss_(ss) {}
+	epoll_server(int epfd, acl::server_socket& ss) : epfd_(epfd), ss_(ss) {}
 
-	~epoll_server(void) {}
+	~epoll_server() = default;
 
-	// @override
 	void run(void) {
-		printf("thread-%lu started\r\n", acl::thread::self());
-		epfd_ = epoll_create(1024);
-		assert(epfd_ >= 0);
+		printf("fiber-%d started\r\n", acl::fiber::self());
 
 		epoll_add_read(epfd_, ss_.sock_handle(), &ss_);
 
-#define MAX	100
+#define MAX	1000
 		struct epoll_event events[MAX];
 
 		while (true) {
@@ -82,6 +79,8 @@ public:
 				sleep(1);
 				continue;
 			}
+
+			//if (nfds >= 20) { printf("fiber-%d: ready=%d\n", acl::fiber::self(), nfds); }
 
 			for (int i = 0; i < nfds; i++) {
 				if (events[i].data.ptr == &ss_) {
@@ -105,8 +104,8 @@ private:
 			printf("accept error %s\r\n", acl::last_serror());
 			exit (1);
 		} else {
-			printf("thread-%lu: accept one fd %d\r\n",
-				acl::thread::self(), conn->sock_handle());
+			printf("fiber-%d: accept one fd %d\r\n",
+				acl::fiber::self(), conn->sock_handle());
 			conn->set_tcp_non_blocking(true);
 
 			epoll_add_read(epfd_, conn->sock_handle(), conn);
@@ -168,18 +167,18 @@ private:
 
 static void usage(const char* procname) {
 	printf("usage: %s -h [help] -s server_addr\r\n"
-		" -F [if using fiber mode, default: false]\r\n"
+		" -c the_fiber_count[default: 0]\r\n"
 		" -O [if using EPOLL_ONESHOT]\r\n"
 		" -E [if using EPOLL_ET]\r\n", procname);
 }
 
 int main(int argc, char* argv[]) {
 	acl::string addr("127.0.0.1:8887");
-	bool fiber_mode = false;
-	int  ch;
+	int  ch, cnt = 0;
 
 	signal(SIGPIPE, SIG_IGN);
-	while ((ch = getopt(argc, argv, "hs:FOE")) > 0) {
+
+	while ((ch = getopt(argc, argv, "hs:c:OE")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -187,8 +186,8 @@ int main(int argc, char* argv[]) {
 		case 's':
 			addr = optarg;
 			break;
-		case 'F':
-			fiber_mode = true;
+		case 'c':
+			cnt = atoi(optarg);
 			break;
 		case 'O':
 			__epoll_flag |= EPOLL_ONESHOT;
@@ -209,14 +208,24 @@ int main(int argc, char* argv[]) {
 
 	printf("listen %s ok\r\n", addr.c_str());
 
-	epoll_server server(ss);
-
-	if (fiber_mode) {
-		server.start();
-		acl::fiber::schedule();
-	} else {
+	if (cnt <= 0) {
+		int epfd = epoll_create(1024);
+		epoll_server server(epfd, ss);
 		server.run();
+		return 0;
 	}
 
+
+	go[&ss, cnt] {
+		int epfd = epoll_create(1024);
+		for (int i = 0; i < cnt; i++) {
+			go[epfd, &ss] {
+				epoll_server server(epfd, ss);
+				server.run();
+			};
+		}
+	};
+
+	acl::fiber::schedule();
 	return 0;
 }

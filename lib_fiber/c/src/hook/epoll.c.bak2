@@ -68,7 +68,7 @@ struct EPOLL {
 	int          epfd;	// Duplicate the current thread's epoll fd.
 	EPOLL_CTX  **fds;	// Hold EPOLL_CTX objects of the epfd.
 	size_t       nfds;	// The fds array's size.
-	RING         ees;	// Refer to epoll fd's EPOLL_EVENT.
+	EPOLL_EVENT *ee;	// Refer to epoll fd's EPOLL_EVENT.
 };
 
 // Hold the EPOLL objects of one thread; And the EPOLL object was created in
@@ -255,8 +255,7 @@ static EPOLL *epoll_alloc(int epfd)
 		ep->fds[i] = NULL;
 	}
 
-	//ep->ee = epoll_event_alloc();
-	ring_init(&ep->ees);
+	ep->ee = NULL;
 	return ep;
 }
 
@@ -415,7 +414,6 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	EPOLL_CTX   *epx = fe->epx;
 	EPOLL_EVENT *ee;
 	EPOLL *ep;
-	RING *r;
 
 	assert(epx);
 	assert(epx->fd == fe->fd);
@@ -424,13 +422,11 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	ep = epx->ep;
 	assert(ep);
 
-	r = ring_succ(&ep->ees);
-	if (r == &ep->ees) {
-		msg_error("%s(%d): ep->ees empty", __FUNCTION__, __LINE__);
+	ee = ep->ee;
+	if (ee == NULL) {
+		msg_error("%s(%d): ep->ee null", __FUNCTION__, __LINE__);
 		return;
 	}
-
-	ee = ring_to_appl(r, EPOLL_EVENT, me4ep);
 
 	// If the ready count exceeds the maxevents been set which limits the
 	// buffer space to hold the ready fds, we just return to let the left
@@ -476,7 +472,6 @@ static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 	EPOLL_CTX   *epx = fe->epx;
 	EPOLL_EVENT *ee;
 	EPOLL *ep;
-	RING  *r;
 
 	assert(epx);
 	assert(epx->fd == fe->fd);
@@ -485,13 +480,11 @@ static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 	ep = epx->ep;
 	assert(ep);
 
-	r = ring_succ(&ep->ees);
-	if (r == &ep->ees) {
+	ee = ep->ee;
+	if (ep->ee == NULL) {
 		msg_error("%s(%d): ep->ees empty", __FUNCTION__, __LINE__);
 		return;
 	}
-
-	ee = ring_to_appl(r, EPOLL_EVENT, me4ep);
 
 	if (ee->nready >= ee->maxevents) {
 		return;
@@ -658,6 +651,7 @@ static void event_epoll_set(EVENT *ev, EPOLL_EVENT *ee, int timeout)
 
 int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 {
+	RING *r;
 	EVENT *ev;
 	EPOLL *ep;
 	EPOLL_EVENT *ee;
@@ -698,7 +692,11 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 	while (1) {
 		timer_cache_add(ev->epoll_timer, ee->expire, &ee->me);
 
-		ring_prepend(&ep->ees, &ee->me4ep);
+		if (ep->ee == NULL) {
+			ep->ee = ee;
+		} else {
+			ring_prepend(&ep->ee->me4ep, &ee->me4ep);
+		}
 
 		ee->fiber->wstatus |= FIBER_WAIT_EPOLL;
 
@@ -707,6 +705,14 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 		WAITER_DEC(ev);
 
 		ee->fiber->wstatus &= ~FIBER_WAIT_EPOLL;
+		r = ring_succ(&ep->ee->me4ep);
+		if (r == &ee->me4ep) {
+			ep->ee = NULL;
+		} else {
+			ep->ee = ring_to_appl(r, EPOLL_EVENT, me4ep);
+			ep->ee->me4ep.len = ee->me4ep.len - 1;
+		}
+
 		ring_detach(&ee->me4ep);
 
 		if (ee->nready == 0) {
