@@ -451,7 +451,10 @@ unsigned short HttpServletRequest::getRemotePort(void) const
 		logger_warn("get_peer return empty string");
 		return 0;
 	}
-	char* port = (char*) strchr(ptr, ':');
+	char* port = (char*) strchr(ptr, '|');
+	if (port == NULL) {
+		port = (char*) strchr(ptr, ':');
+	}
 	if (port == NULL || *(++port) == 0) {
 		logger_warn("no port in addr: %s", ptr);
 		return 0;
