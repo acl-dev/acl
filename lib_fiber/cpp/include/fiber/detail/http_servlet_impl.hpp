@@ -39,7 +39,7 @@ public:
 		socket_stream* stream, session* session)
 	: HttpServlet(stream, session), handlers_(handlers) {}
 
-	virtual ~http_servlet_impl(void) {}
+	virtual ~http_servlet_impl() {}
 
 protected:
 	// override
