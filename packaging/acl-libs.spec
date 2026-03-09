@@ -2,7 +2,7 @@
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
-Version:        3.6.4
+Version:        3.6.6
 Release:        %{release_id}
 Group:          System/Libs
 License:        LGPL3.0,IBM
@@ -44,6 +44,12 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Mon Mar 09 2026 shuxin.zheng shuxin.zheng@qq.com 3.6.6-0-20260309.20 
+- Bugfix: Fixed bugs that the thread's local memory not freed after thread exit in fiber;
+- Feature: Add kqueue.c to hook kqueue API in fiber moduel for macOS/BSD;
+- Optimize: One epoll can be waited by multiple fibers;
+- Comments: Change to English from Chinese in header.
 
 * Sat Jul 26 2025 shuxin.zheng shuxin.zheng@qq.com 3.6.4-0-20250726.12
 - Bugfix: Fixed bugs in fiber mutex module;
