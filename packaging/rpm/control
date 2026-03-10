@@ -7,11 +7,11 @@ IFS=$'\n\t'
 function pack() {
     PKG_NAME=${1}
     PKG_VERSION=$(grep '^Version:' ${PKG_NAME}.spec | awk '{print $2}')
-    cd ..
+    cd ../..
     PROJECT_NAME="${PKG_NAME}-${PKG_VERSION}"
     git archive --format=tar --prefix=$PROJECT_NAME/ HEAD | (tar xpf -)
     tar zcpf ${PROJECT_NAME}.tar.gz ${PROJECT_NAME}
-    /bin/mv -f ${PROJECT_NAME}.tar.gz packaging/
+    /bin/mv -f ${PROJECT_NAME}.tar.gz packaging/rpm
     rm -rf ${PKG_NAME}-${PKG_VERSION}
     cd -
 }
