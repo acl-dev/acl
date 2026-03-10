@@ -1,0 +1,248 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TOP_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+function usage() {
+    echo "Usage: $0 pack <acl-libs|acl-master>"
+}
+
+function get_spec_field() {
+    local pkg_name="$1"
+    local field="$2"
+    local spec_file="${TOP_DIR}/packaging/rpm/${pkg_name}.spec"
+    if [ ! -f "${spec_file}" ]; then
+        echo "error: spec file not found: ${spec_file}" >&2
+        exit 1
+    fi
+    grep "^${field}:" "${spec_file}" | awk '{print $2}'
+}
+
+function get_release_id() {
+    local pkg_name="$1"
+    local spec_file="${TOP_DIR}/packaging/rpm/${pkg_name}.spec"
+    if [ ! -f "${spec_file}" ]; then
+        echo ""
+        return
+    fi
+    local release
+    release=$(grep -E '^%define[[:space:]]+release_id' "${spec_file}" | awk '{print $3}' || true)
+    echo "${release}"
+}
+
+function build_acl_libs() {
+    local root_dir="$1"
+
+    cd "${TOP_DIR}"
+    make -j 4 build_one
+    make -j 4 -C lib_fiber
+
+    # 只从当前工程产物拷贝到打包目录，不调用 packinstall、不写系统路径
+    local prefix="${root_dir}/usr/local"
+    local inc_acl="${prefix}/include/acl-lib"
+    local lib_acl="${prefix}/lib"
+
+    mkdir -p "${inc_acl}/acl" \
+             "${inc_acl}/acl_cpp" \
+             "${inc_acl}/protocol" \
+             "${inc_acl}/fiber" \
+             "${inc_acl}/fiber/detail" \
+             "${lib_acl}"
+
+    echo "copying headers and libraries into ${prefix} ..."
+
+    # 头文件
+    cp -Rf "${TOP_DIR}/lib_acl/include/"*          "${inc_acl}/acl/"
+    cp -Rf "${TOP_DIR}/lib_acl_cpp/include/acl_cpp/"* "${inc_acl}/acl_cpp/"
+    cp -Rf "${TOP_DIR}/lib_protocol/include/"*     "${inc_acl}/protocol/"
+
+    # fiber 头文件
+    cp -f  "${TOP_DIR}/lib_fiber/c/include/fiber/"*.h           "${inc_acl}/fiber/" || true
+    cp -f  "${TOP_DIR}/lib_fiber/cpp/include/fiber/"*.hpp       "${inc_acl}/fiber/" || true
+    cp -f  "${TOP_DIR}/lib_fiber/cpp/include/fiber/detail/"*.hpp "${inc_acl}/fiber/detail/" || true
+
+    # 静态库
+    cp -f "${TOP_DIR}/libacl_all.a"                 "${lib_acl}/libacl_all.a"
+    cp -f "${TOP_DIR}/lib_fiber/lib/libfiber.a"     "${lib_acl}/libfiber.a"
+    cp -f "${TOP_DIR}/lib_fiber/lib/libfiber_cpp.a" "${lib_acl}/libfiber_cpp.a"
+}
+
+function build_acl_master() {
+    local root_dir="$1"
+
+    cd "${TOP_DIR}"
+    make -j 4
+
+    # 只把 dist/master 下的文件拷贝进打包目录，避免触碰 /etc、systemd 等受保护路径
+    local install_path="${root_dir}/opt/soft/acl-master"
+    local real_install_path="/opt/soft/acl-master"
+    local bin_path="${install_path}/bin"
+    local sbin_path="${install_path}/sbin"
+    local conf_path="${install_path}/conf"
+    local service_path="${conf_path}/service"
+    local libexec_path="${install_path}/libexec"
+    local sh_path="${install_path}/sh"
+    local var_path="${install_path}/var"
+
+    mkdir -p "${bin_path}" \
+             "${sbin_path}" \
+             "${conf_path}" \
+             "${service_path}" \
+             "${libexec_path}" \
+             "${sh_path}" \
+             "${var_path}/log" \
+             "${var_path}/pid" \
+             "${var_path}/private" \
+             "${var_path}/public"
+
+    chmod 700  "${var_path}/private"
+    chmod 1777 "${var_path}/log"
+
+    local dist_dir="${TOP_DIR}/dist/master"
+
+    echo "copying acl-master files into ${install_path} ..."
+
+    # bin / libexec
+    if [ -d "${dist_dir}/bin/macos" ]; then
+        cp -f "${dist_dir}/bin/macos/"* "${bin_path}/" || true
+    fi
+    if [ -d "${dist_dir}/sbin/macos" ]; then
+        cp -f "${dist_dir}/sbin/macos/"* "${sbin_path}/" || true
+    fi
+    if [ -d "${dist_dir}/libexec/macos" ]; then
+        cp -f "${dist_dir}/libexec/macos/"* "${libexec_path}/" || true
+    fi
+
+    # 脚本与配置：需要将 {install_path} 渲染为实际安装路径 /opt/soft/acl-master
+    if [ -d "${dist_dir}/sh" ]; then
+        find "${dist_dir}/sh" -type f | while read -r src; do
+            rel="${src#${dist_dir}/sh/}"
+            dst_dir="$(dirname "${sh_path}/${rel}")"
+            mkdir -p "${dst_dir}"
+            dst="${sh_path}/${rel}"
+            sed "s;{install_path};${real_install_path};g" "${src}" > "${dst}"
+            chmod 755 "${dst}" || true
+        done
+    fi
+
+    if [ -d "${dist_dir}/conf" ]; then
+        find "${dist_dir}/conf" -type f | while read -r src; do
+            rel="${src#${dist_dir}/conf/}"
+            dst_dir="$(dirname "${conf_path}/${rel}")"
+            mkdir -p "${dst_dir}"
+            dst="${conf_path}/${rel}"
+            sed "s;{install_path};${real_install_path};g" "${src}" > "${dst}"
+            chmod 644 "${dst}" || true
+        done
+    fi
+
+    if [ -d "${dist_dir}/conf/service" ]; then
+        find "${dist_dir}/conf/service" -type f | while read -r src; do
+            rel="${src#${dist_dir}/conf/service/}"
+            dst_dir="$(dirname "${service_path}/${rel}")"
+            mkdir -p "${dst_dir}"
+            dst="${service_path}/${rel}"
+            sed "s;{install_path};${real_install_path};g" "${src}" > "${dst}"
+            chmod 644 "${dst}" || true
+        done
+    fi
+}
+
+function pack() {
+    local pkg_name="$1"
+
+    if ! command -v pkgbuild >/dev/null 2>&1; then
+        echo "error: pkgbuild not found. Please install Xcode Command Line Tools." >&2
+        echo "You can run: xcode-select --install" >&2
+        exit 1
+    fi
+
+    local pkg_version
+    pkg_version="$(get_spec_field "${pkg_name}" "Version")"
+    if [ -z "${pkg_version}" ]; then
+        echo "error: failed to get Version from spec for ${pkg_name}" >&2
+        exit 1
+    fi
+
+    local release_id
+    release_id="$(get_release_id "${pkg_name}")"
+    if [ -z "${release_id}" ]; then
+        release_id="1"
+    fi
+
+    local identifier_base="cn.acl"
+    case "${pkg_name}" in
+        acl-libs)
+            identifier="${identifier_base}.libs"
+            ;;
+        acl-master)
+            identifier="${identifier_base}.master"
+            ;;
+        *)
+            echo "error: unsupported package name: ${pkg_name}" >&2
+            exit 1
+            ;;
+    esac
+
+    local version_tag="${pkg_version}-${release_id}"
+    local pkg_tag="${pkg_name}-${version_tag}-macos"
+    local build_dir="${SCRIPT_DIR}/build"
+    local root_dir="${build_dir}/${pkg_tag}"
+
+    rm -rf "${root_dir}"
+    mkdir -p "${root_dir}"
+
+    case "${pkg_name}" in
+        acl-libs)
+            build_acl_libs "${root_dir}"
+            ;;
+        acl-master)
+            build_acl_master "${root_dir}"
+            ;;
+        *)
+            echo "error: unsupported package name: ${pkg_name}" >&2
+            exit 1
+            ;;
+    esac
+
+    mkdir -p "${build_dir}"
+    local output_pkg="${SCRIPT_DIR}/${pkg_tag}.pkg"
+
+    pkgbuild \
+        --root "${root_dir}" \
+        --identifier "${identifier}" \
+        --version "${version_tag}" \
+        "${output_pkg}"
+
+    echo "macOS pkg created: ${output_pkg}"
+    echo "You can install it by double-clicking in Finder,"
+    echo "or via CLI:"
+    echo "  sudo installer -pkg ${output_pkg} -target /"
+}
+
+if [ "${#}" -lt 1 ]; then
+    usage
+    exit 1
+fi
+
+cmd="${1}"
+shift || true
+
+case "${cmd}" in
+    pack)
+        if [ "${#}" -lt 1 ]; then
+            echo "error: missing package name" >&2
+            usage
+            exit 1
+        fi
+        pack "$1"
+        ;;
+    *)
+        usage
+        exit 1
+        ;;
+esac
+

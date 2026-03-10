@@ -1,0 +1,181 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TOP_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+function usage() {
+    echo "Usage: $0 pack <acl-libs|acl-master>"
+}
+
+function ensure_tools() {
+    if ! command -v dpkg-deb >/dev/null 2>&1; then
+        echo "error: dpkg-deb not found, please install dpkg-dev or dpkg." >&2
+        exit 1
+    fi
+}
+
+function get_spec_field() {
+    local pkg_name="$1"
+    local field="$2"
+    local spec_file="${TOP_DIR}/packaging/rpm/${pkg_name}.spec"
+    if [ ! -f "${spec_file}" ]; then
+        echo "error: spec file not found: ${spec_file}" >&2
+        exit 1
+    fi
+    grep "^${field}:" "${spec_file}" | awk '{print $2}'
+}
+
+function get_release_id() {
+    local pkg_name="$1"
+    local spec_file="${TOP_DIR}/packaging/rpm/${pkg_name}.spec"
+    if [ ! -f "${spec_file}" ]; then
+        echo ""
+        return
+    fi
+    local release
+    release=$(grep -E '^%define[[:space:]]+release_id' "${spec_file}" | awk '{print $3}' || true)
+    echo "${release}"
+}
+
+function create_control() {
+    local pkg_name="$1"
+    local deb_version="$2"
+    local arch="$3"
+    local root_dir="$4"
+
+    local control_dir="${root_dir}/DEBIAN"
+    local control_file="${control_dir}/control"
+
+    mkdir -p "${control_dir}"
+
+    case "${pkg_name}" in
+        acl-libs)
+            cat > "${control_file}" <<EOF
+Package: acl-libs
+Version: ${deb_version}
+Section: libs
+Priority: optional
+Architecture: ${arch}
+Maintainer: Zhang Qiang <155281969@qq.com>, Wang Haibin <634648088@qq.com>
+Description: The powerful C/C++ library
+ One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IOS.
+EOF
+            ;;
+        acl-master)
+            cat > "${control_file}" <<EOF
+Package: acl-master
+Version: ${deb_version}
+Section: admin
+Priority: optional
+Architecture: ${arch}
+Maintainer: Zhang Qiang <155281969@qq.com>, Wang Haibin <634648088@qq.com>
+Depends: acl-libs
+Description: acl master framework
+ acl master framework.
+EOF
+            ;;
+        *)
+            echo "error: unsupported package name: ${pkg_name}" >&2
+            exit 1
+            ;;
+    esac
+}
+
+function build_acl_libs() {
+    local root_dir="$1"
+
+    cd "${TOP_DIR}"
+    make -j 4 build_one
+    make -j 4 -C lib_fiber
+    make packinstall DESTDIR="${root_dir}"
+}
+
+function build_acl_master() {
+    local root_dir="$1"
+
+    cd "${TOP_DIR}"
+    make -j 4
+    make install_master DESTDIR="${root_dir}"
+}
+
+function pack() {
+    local pkg_name="$1"
+
+    ensure_tools
+
+    local pkg_version
+    pkg_version="$(get_spec_field "${pkg_name}" "Version")"
+    if [ -z "${pkg_version}" ]; then
+        echo "error: failed to get Version from spec for ${pkg_name}" >&2
+        exit 1
+    fi
+
+    local release_id
+    release_id="$(get_release_id "${pkg_name}")"
+    if [ -z "${release_id}" ]; then
+        release_id="1"
+    fi
+
+    local deb_version="${pkg_version}-${release_id}"
+    local arch
+    arch="$(dpkg --print-architecture 2>/dev/null || echo amd64)"
+
+    local build_dir="${SCRIPT_DIR}/build"
+    local root_dir="${build_dir}/${pkg_name}_${deb_version}_${arch}"
+
+    rm -rf "${root_dir}"
+    mkdir -p "${root_dir}"
+
+    case "${pkg_name}" in
+        acl-libs)
+            build_acl_libs "${root_dir}"
+            ;;
+        acl-master)
+            build_acl_master "${root_dir}"
+            ;;
+        *)
+            echo "error: unsupported package name: ${pkg_name}" >&2
+            exit 1
+            ;;
+    esac
+
+    create_control "${pkg_name}" "${deb_version}" "${arch}" "${root_dir}"
+
+    local output_deb="${SCRIPT_DIR}/${pkg_name}_${deb_version}_${arch}.deb"
+
+    if command -v fakeroot >/dev/null 2>&1; then
+        (cd "${build_dir}" && fakeroot dpkg-deb --build "$(basename "${root_dir}")" "${output_deb}")
+    else
+        echo "warning: fakeroot not found, building deb without fakeroot" >&2
+        (cd "${build_dir}" && dpkg-deb --build "$(basename "${root_dir}")" "${output_deb}")
+    fi
+
+    echo "deb package created: ${output_deb}"
+}
+
+if [ "${#}" -lt 1 ]; then
+    usage
+    exit 1
+fi
+
+cmd="${1}"
+shift || true
+
+case "${cmd}" in
+    pack)
+        if [ "${#}" -lt 1 ]; then
+            echo "error: missing package name" >&2
+            usage
+            exit 1
+        fi
+        pack "$1"
+        ;;
+    *)
+        usage
+        exit 1
+        ;;
+esac
+
