@@ -154,7 +154,7 @@ static void hash_key(pthread_key_t key, char *buf, size_t n)
 	buf[n - 1] = '\0';
 }
 
-static void thread_exit(void *ctx)
+static void NTAPI thread_exit(void *ctx)
 {
 	FLS_KEY *fkey = (FLS_KEY *) ctx;
 	assert(fkey && fkey->locals);
