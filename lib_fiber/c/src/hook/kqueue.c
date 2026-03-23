@@ -150,7 +150,7 @@ static void fiber_on_exit(void *ctx)
 static __thread int __local_key;
 
 // Get or create the current fiber's kqueue wait context.
-static KQUEUE_EVENT *fiber_kqueue_event()
+static KQUEUE_EVENT *fiber_kqueue_event(void)
 {
 	KQUEUE_EVENT *ke = (KQUEUE_EVENT*) acl_fiber_get_specific(__local_key);
 	if (ke) {
