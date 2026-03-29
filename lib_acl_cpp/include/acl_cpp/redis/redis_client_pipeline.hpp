@@ -300,7 +300,7 @@ private:
 	void stop_channel(const char* addr) const;
 
 	// Delete the channel when one channel closed message got.
-	void channel_closed(redis_pipeline_channel* channel) const;
+	void channel_closed(redis_pipeline_channel* channel);
 };
 
 /**
