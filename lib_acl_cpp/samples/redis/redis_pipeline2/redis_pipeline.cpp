@@ -12,7 +12,8 @@ public:
 	, msg_(cmd_.get_pipeline_message())
 	{
 		cmd_.set_pipeline(&pipeline);
-		msg_.set_option(cmd_.get_dbuf(), 1, NULL);
+		msg_->set_option(1, NULL);
+		msg_->set(cmd_.get_dbuf());
 
 		long long id = __count.fetch_add(1);
 		acl::string key;
@@ -43,7 +44,7 @@ public:
 
 	~redis_command(void) {}
 
-	acl::redis_pipeline_message& get_message(void) {
+	acl::redis_pipeline_message* get_message(void) {
 		return msg_;
 	}
 
@@ -55,7 +56,7 @@ public:
 
 private:
 	acl::redis  cmd_;
-	acl::redis_pipeline_message& msg_;
+	acl::redis_pipeline_message* msg_;
 	size_t argc_;
 	const char* argv_[4];
 	size_t lens_[4];
@@ -111,15 +112,15 @@ private:
 		// send all request commands
 		for (std::vector<redis_command*>::iterator it = commands.begin();
 			it != commands.end(); ++it) {
-			acl::redis_pipeline_message& msg = (*it)->get_message();
-			pipeline_.push(&msg);
+			acl::redis_pipeline_message* msg = (*it)->get_message();
+			pipeline_.push(msg);
 		}
 
 		// wait for all results
 		for (std::vector<redis_command*>::iterator it = commands.begin();
 			it != commands.end(); ++it) {
-			acl::redis_pipeline_message& msg = (*it)->get_message();
-			const acl::redis_result* result = msg.wait();
+			acl::redis_pipeline_message* msg = (*it)->get_message();
+			const acl::redis_result* result = msg->wait();
 			if (result == NULL) {
 				printf("wait result error\r\n");
 				break;

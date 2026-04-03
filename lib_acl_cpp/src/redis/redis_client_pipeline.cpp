@@ -257,7 +257,7 @@ bool redis_pipeline_channel::handle_result(redis_pipeline_message* msg,
 			msg->set_type(redis_pipeline_t_redirect);
 
 			// Transfer the msg back to the pipeline thread again.
-			pipeline_.push(msg);
+			pipeline_.notify(msg);
 		}
 		return true;
 	}
@@ -272,7 +272,7 @@ bool redis_pipeline_channel::handle_result(redis_pipeline_message* msg,
 				redis_pipeline_t_clusterdonw, NULL);
 		m->set_addr(this->get_addr());
 		// Transfer the cluster down msg to the pipeline thread.
-		pipeline_.push(m);
+		pipeline_.notify(m);
 		return false; // Return false to break the loop process.
 	}
 
@@ -419,7 +419,7 @@ void* redis_pipeline_channel::run()
 
 	msg = NEW redis_pipeline_message(redis_pipeline_t_channel_closed, NULL);
 	msg->set_channel(this);
-	pipeline_.push(msg);
+	pipeline_.notify(msg);
 
 	while (true) {
 		msg = box_->pop(0, &success);
@@ -523,12 +523,18 @@ void redis_client_pipeline::stop_thread()
 	box<redis_pipeline_message>* box = NEW mbox<redis_pipeline_message>;
 	redis_pipeline_message *msg =
 		NEW redis_pipeline_message(redis_pipeline_t_stop, box);
-	push(msg);
+	notify(msg);
 	this->wait();  // Wait for the thread to exit
 	msg->unrefer();
 }
 
 const redis_result* redis_client_pipeline::exec(redis_pipeline_message* msg) const
+{
+	push(msg);
+	return msg->wait();
+}
+
+void redis_client_pipeline::push(redis_pipeline_message *msg) const
 {
 	// The box in msg is not safety in the tail return after push back,
 	// because the consumer may free the box in msg at once after getting
@@ -538,14 +544,13 @@ const redis_result* redis_client_pipeline::exec(redis_pipeline_message* msg) con
 	// here to make sure the box in msg is not freed before the producer
 	// returns the result. And the msg's reference will be decreased
 	// in redis_pipeline_channel::wait_results() after the result is pushed
-	// to the channel's message queue.
-
+	// to the channel's message queue; In redis_pipeline_message::push, the
+	// msg's reference will be decreased.
 	msg->refer();
 	box_->push(msg, false);
-	return msg->wait();
 }
 
-void redis_client_pipeline::push(redis_pipeline_message *msg) const
+void redis_client_pipeline::notify(redis_pipeline_message *msg) const
 {
 	box_->push(msg, false);
 }

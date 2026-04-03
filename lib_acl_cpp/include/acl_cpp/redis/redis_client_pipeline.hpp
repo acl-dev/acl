@@ -216,7 +216,7 @@ public:
 	// Called by redis_command in pipeline mode
 	const redis_result* exec(redis_pipeline_message* msg) const;
 
-	// Called by redis_pipeline_channel
+	// Called by exec and application
 	void push(redis_pipeline_message* msg) const;
 
 	// Called by redis_command::get_pipeline_message, and can be overrided
@@ -250,6 +250,11 @@ public:
 protected:
 	// @override from acl::thread
 	void* run();
+
+	friend class redis_pipeline_channel;
+
+	// Called by redis_pipeline_channel
+	void notify(redis_pipeline_message* msg) const;
 
 private:
 	string addr_;		// The default redis address

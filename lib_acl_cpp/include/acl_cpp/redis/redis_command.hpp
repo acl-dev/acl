@@ -18,8 +18,8 @@ class redis_pipeline_message;
 
 /**
  * Base virtual class for redis client command classes;
- * the redis command classes's base virtual class, which includes the basic
- * functions for all sub-classes
+ * the redis command class's base virtual class, which includes the basic
+ * functions for all subclass
  */
 class ACL_CPP_API redis_command : public noncopyable {
 public:
@@ -77,7 +77,7 @@ public:
 	 * When reusing a redis_command subclass object to operate redis, you need to
 	 * call this method first before the next call to release resources from the
 	 * last operation;
-	 * when reusing a redis command sub-class, the reset method should be
+	 * when reusing a redis command subclass, the reset method should be
 	 * called first to rlease some resources in last command operation
 	 * @param save_slot {bool} When using cluster mode, this parameter indicates
 	 * whether to save
@@ -301,7 +301,7 @@ public:
 	 * when the reply from redis-serveer are strings array, this
 	 * function can be used to get the string specified by a subscript
 	 * @param i {size_t} Subscript (starting from 0).
-	 *  the subscript of strings array
+	 *  the subscript of string array.
 	 * @param len {size_t*} If the pointer is not empty, it stores the length of
 	 * the returned result. This parameter
 	 *  is only valid when the caller passes a non-empty pointer.
@@ -520,7 +520,7 @@ public:
 	void set_client_addr(const char* addr);
 	void set_client_addr(redis_client& conn);
 
-public:
+//public:
 	redis_request* get_request_obj() const {
 		return request_obj_;
 	}
@@ -533,7 +533,6 @@ public:
 		return slice_req_;
 	}
 
-private:
 	// get pipeline message bound with the current command
 	redis_pipeline_message* get_pipeline_message();
 
