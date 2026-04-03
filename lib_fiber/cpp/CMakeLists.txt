@@ -1,7 +1,8 @@
 if(DEFINED ENV{CMAKE_MIN_VER})
 	cmake_minimum_required(VERSION $ENV{CMAKE_MIN_VER})
 else()
-	cmake_minimum_required(VERSION 2.8.0)
+	cmake_minimum_required(VERSION 3.10)
+#	cmake_minimum_required(VERSION 2.8.0)
 endif()
 
 project(fiber_cpp)
