@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+using namespace acl;
+
 static void fiber1(void)
 {
 	printf("in fiber: %d\r\n", acl::fiber::self());
@@ -12,9 +14,9 @@ static void fiber2(int n, const char* s)
 	printf("in fiber: %d, n: %d, s: %s\r\n", acl::fiber::self(), n, s);
 }
 
-static void fiber3(acl::string& buf)
+static void fiber3(int id, acl::string& buf)
 {
-	printf("in fiber: %d, buf: %s\r\n", acl::fiber::self(), buf.c_str());
+	printf("in fiber: %d, buf: %s, id=%d\r\n", acl::fiber::self(), buf.c_str(), id);
 	buf = "world";
 }
 
@@ -57,9 +59,10 @@ int main(int argc, char *argv[])
 	};
 
 	acl::string buf("hello");
+	int id = 0;
 
 	go[&] {
-		fiber3(buf);
+		fiber3(id++, buf);
 	};
 
 	go[&] {
@@ -69,6 +72,46 @@ int main(int argc, char *argv[])
 	go[=] {
 		fiber4(buf);
 	};
+
+	//////////////////////////////////////////////////////////////////////
+
+	acl::gofiber([&] {
+		buf = "gofiber";
+		fiber3(id++, buf);
+	});
+
+	acl::gofiber_stack([&] {
+		buf = "gofiber_stack";
+		fiber3(id++, buf);
+	});
+
+	acl::gofiber_stack([&] {
+		buf = "gofiber_stack";
+		fiber3(id++, buf);
+	}, 64000);
+
+	acl::gofiber_share([&] {
+		buf = "gofiber_share";
+		fiber3(id++, buf);
+	});
+
+	acl::gofiber_share([&] {
+		buf = "gofiber_share";
+		fiber3(id++, buf);
+	}, 16000);
+
+	go[&] {
+		buf = "gofiber_wait_fiber";
+		acl::gofiber_wait_fiber([&] {
+			fiber3(id++, buf);
+		});
+	};
+
+	acl::gofiber_wait_thread([&] {
+		buf = "gofiber_wait_thread";
+		printf("The thread: %ld, id=%d\n", acl::thread::self(), id);
+		fiber3(id++, buf);
+	});
 
 	acl::fiber::schedule();
 	return 0;

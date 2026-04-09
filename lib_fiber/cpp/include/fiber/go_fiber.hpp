@@ -42,6 +42,8 @@ public:
 	std::function<void()> fn_;  // The function to be executed
 };
 
+#ifndef GO_MACRO_OFF
+
 // Macro: go - Start a fiber with default stack size (320000 bytes)
 // Usage: go [&] { /* your code */ };
 #define	go                  acl::go_fiber()>
@@ -64,6 +66,8 @@ public:
 
 // Macro: go_wait - Alias for go_wait_thread
 #define	go_wait             go_wait_thread
+
+#endif
 
 /**
  * go_fiber - A Go-style fiber launcher for C++
@@ -113,6 +117,7 @@ public:
 	 * 
 	 * @param fn The function to execute in the fiber
 	 */
+#if 0
 	void operator < (std::function<void()> fn) {
 		fiber_tbox<int> box;
 
@@ -122,6 +127,17 @@ public:
 		};
 		(void) box.pop();
 	}
+#else
+	void operator < (std::function<void()> fn) {
+		fiber_tbox<int> box;
+
+		auto fb = go_fiber() > std::function<void()>([&] {
+			fn();
+			box.push(nullptr);
+		});
+		(void) box.pop();
+	}
+#endif
 
 	/**
 	 * operator<< - Launch a thread and wait for completion
@@ -164,6 +180,31 @@ private:
 		fn();
 	}
 };
+
+template<typename Callable>
+std::shared_ptr<fiber> gofiber(Callable&& fn) {
+	return go_fiber() > std::function<void()>(std::forward<Callable>(fn));
+}
+
+template<typename Callable>
+std::shared_ptr<fiber> gofiber_stack(Callable&& fn, size_t stack_size = 128000) {
+	return go_fiber(stack_size, false) > std::function<void()>(std::forward<Callable>(fn));
+}
+
+template<typename Callable>
+std::shared_ptr<fiber> gofiber_share(Callable&& fn, size_t stack_size = 8000) {
+	return go_fiber(stack_size, true) > std::function<void()>(std::forward<Callable>(fn));
+}
+
+template<typename Callable>
+void gofiber_wait_fiber(Callable&& fn) {
+	go_fiber() < std::function<void()>(std::forward<Callable>(fn));
+}
+
+template<typename Callable>
+void gofiber_wait_thread(Callable&& fn) {
+	go_fiber() << std::function<void()>(std::forward<Callable>(fn));
+}
 
 } // namespace acl
 
