@@ -88,10 +88,9 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 		return ACL_SOCKET_INVALID;
 	}
 
-	/*
+	/* Set the buff for readwrite to improve the IO performance. 2026.4.9 */
 	acl_tcp_set_rcvbuf(sock, ACL_SOCKET_RBUF_SIZE);
 	acl_tcp_set_sndbuf(sock, ACL_SOCKET_WBUF_SIZE);
-	*/
 
 	on = 1;
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char*) &on, sizeof(on)) < 0) {
