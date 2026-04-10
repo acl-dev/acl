@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 #set -x
 # acl_master          Start/Stop the acl_master daemon.
@@ -32,102 +32,100 @@ lockfile=/var/lock/subsys/acl_master
 # use systemd 
 # SYSTEMCTL_SKIP_REDIRECT=1
 if [ -f /lib/lsb/init-functions ]; then
-    . /lib/lsb/init-functions
+	. /lib/lsb/init-functions
 elif [ -f /etc/init.d/functions ]; then
-    . /etc/init.d/functions
+	. /etc/init.d/functions
 elif [ -f /etc/rc.d/init.d/functions ]; then
-    . /etc/rc.d/init.d/functions
+	. /etc/rc.d/init.d/functions
 fi
 
 # Fallback helpers for distros where RHEL init helpers are unavailable.
 if ! command -v success >/dev/null 2>&1; then
-    success() { return 0; }
+	success() { return 0; }
 fi
 
 if ! command -v failure >/dev/null 2>&1; then
-    failure() {
-        echo "FAILED"
-        return 1
-    }
+	failure() {
+		echo "FAILED"
+		return 1
+	}
 fi
 
 if ! command -v __pids_var_run >/dev/null 2>&1; then
-    __pids_var_run() {
-        local _pid_file="$2"
-        if [ -n "$_pid_file" ] && [ -f "$_pid_file" ]; then
-            pid=$(cat "$_pid_file" 2>/dev/null)
-        else
-            pid=""
-        fi
-    }
+	__pids_var_run() {
+		local _pid_file="$2"
+		if [ -n "$_pid_file" ] && [ -f "$_pid_file" ]; then
+			pid=$(cat "$_pid_file" 2>/dev/null)
+		else
+			pid=""
+		fi
+	}
 fi
 
-if ! command -v killproc >/dev/null 2>&1; then
-    killproc() {
-        local _pid_file=""
-        local _sig="TERM"
-        local _exe=""
+kill_proc() {
+	local _pid_file=""
+	local _sig="TERM"
+	local _exe=""
 
-        while [ "$#" -gt 0 ]; do
-            case "$1" in
-                -p)
-                    _pid_file="$2"
-                    shift 2
-                    ;;
-                -d)
-                    shift 2
-                    ;;
-                -HUP)
-                    _sig="HUP"
-                    shift
-                    ;;
-                *)
-                    _exe="$1"
-                    shift
-                    ;;
-            esac
-        done
+	while [ "$#" -gt 0 ]; do
+		case "$1" in
+		-p)
+			_pid_file="$2"
+			shift 2
+			;;
+		-d)
+			shift 2
+			;;
+		-HUP)
+			_sig="HUP"
+			shift
+			;;
+		*)
+			_exe="$1"
+			shift
+			;;
+		esac
+	done
 
-        if [ -n "$_pid_file" ] && [ -f "$_pid_file" ]; then
-            _pid=$(cat "$_pid_file" 2>/dev/null)
-        elif [ -n "$_exe" ]; then
-            _pid=$(pidof "$_exe" 2>/dev/null | awk '{print $1}')
-        else
-            _pid=""
-        fi
+	if [ -n "$_pid_file" ] && [ -f "$_pid_file" ]; then
+		_pid=$(cat "$_pid_file" 2>/dev/null)
+	elif [ -n "$_exe" ]; then
+		_pid=$(pidof "$_exe" 2>/dev/null | awk '{print $1}')
+	else
+		_pid=""
+	fi
 
-        [ -n "$_pid" ] || return 1
-        kill -s "$_sig" "$_pid" >/dev/null 2>&1
-    }
-fi
+	[ -n "$_pid" ] || return 1
+	kill -s "$_sig" "$_pid" >/dev/null 2>&1
+}
 
 if ! command -v status >/dev/null 2>&1; then
-    status() {
-        local _pid_file=""
-        local _prog=""
-        if [ "$1" = "-p" ]; then
-            _pid_file="$2"
-            _prog="$3"
-        else
-            _prog="$1"
-        fi
+	status() {
+		local _pid_file=""
+		local _prog=""
+		if [ "$1" = "-p" ]; then
+			_pid_file="$2"
+			_prog="$3"
+		else
+			_prog="$1"
+		fi
 
-        if [ -n "$_pid_file" ] && [ -f "$_pid_file" ]; then
-            _pid=$(cat "$_pid_file" 2>/dev/null)
-            if [ -n "$_pid" ] && kill -0 "$_pid" >/dev/null 2>&1; then
-                echo "${_prog} (pid ${_pid}) is running"
-                return 0
-            fi
-        fi
+		if [ -n "$_pid_file" ] && [ -f "$_pid_file" ]; then
+			_pid=$(cat "$_pid_file" 2>/dev/null)
+			if [ -n "$_pid" ] && kill -0 "$_pid" >/dev/null 2>&1; then
+				echo "${_prog} (pid ${_pid}) is running"
+				return 0
+			fi
+		fi
 
-        if [ -n "$_prog" ] && pidof "$_prog" >/dev/null 2>&1; then
-            echo "${_prog} is running"
-            return 0
-        fi
+		if [ -n "$_prog" ] && pidof "$_prog" >/dev/null 2>&1; then
+			echo "${_prog} is running"
+			return 0
+		fi
 
-        echo "${_prog} is stopped"
-        return 3
-    }
+		echo "${_prog} is stopped"
+		return 3
+	}
 fi
 
 # A function to find the pid of a program. Looks *only* at the pidfile
@@ -146,53 +144,64 @@ findpidfileofproc() {
 }
 
 start() {
-    if [ $UID -ne 0 ] ; then
-        echo "User has insufficient privilege."
-        exit 4
-    fi
-    [ -x $exec ] || exit 5
-    echo -n $"Starting $prog: "
-    ulimit -c 0
-    ulimit -n 500000
-    trap '' 1
-    #daemon --pidfile=${PID_FILE} 
-    $exec -k -c $CONF_PATH -l $LOG_PATH &
-    sleep 1
-    rh_status_q && success
-    echo
-    retval=$?
-    [ $retval -eq 0 ] && touch $lockfile
-    return $retval
+	if [ $UID -ne 0 ] ; then
+		echo "User has insufficient privilege."
+		exit 4
+	fi
+			[ -x $exec ] || exit 5
+	echo -n $"Starting $prog: "
+	ulimit -c 0
+	ulimit -n 500000
+	trap '' 1
+	#daemon --pidfile=${PID_FILE} 
+	$exec -k -c $CONF_PATH -l $LOG_PATH &
+	sleep 1
+	rh_status_q && success
+
+	retval=$?
+	if [ $retval -eq 0 ]; then
+		echo "ok."
+	else
+		echo "error($retval)."
+	fi
+
+	[ $retval -eq 0 ] && touch $lockfile
+	return $retval
 }
 
 stop() {
-    if [ $UID -ne 0 ] ; then
-        echo "User has insufficient privilege."
-        exit 4
-    fi
-    echo -n $"Stopping $prog: "
-    if [ -n "`findpidfileofproc $exec $PID_FILE`" ]; then
-        killproc -p $PID_FILE -d 3 $exec
-        retval=$?
-	else
-        failure $"Stopping $prog"
-        retval=$?
+	if [ $UID -ne 0 ] ; then
+		echo "User has insufficient privilege."
+		exit 4
 	fi
-    echo
-    [ $retval -eq 0 ] && rm -f $lockfile
-    return $retval
+	echo $"Stopping $prog: "
+	if [ -n "`findpidfileofproc $exec $PID_FILE`" ]; then
+		kill_proc -p $PID_FILE # -d 3 $exec
+		retval=$?
+		if [ $retval -eq 0 ]; then
+			echo "Stop $prog ok."
+		else
+			echo "Stop $prog failed($retval)."
+		fi
+	else
+		failure $"Stopping $prog"
+		retval=$?
+	fi
+
+	[ $retval -eq 0 ] && rm -f $lockfile
+	return $retval
 }
 
 restart() {
-    stop
-    sleep 1
-    start
+	stop
+	sleep 1
+	start
 }
 
 reload() {
 	echo -n $"Reloading $prog: "
 	if [ -n "`findpidfileofproc $exec $PID_FILE`" ]; then
-		killproc $exec -HUP
+		kill_proc $exec -HUP
 	else
 		failure $"Reloading $prog"
 	fi
@@ -202,48 +211,49 @@ reload() {
 
 force_reload() {
 	# new configuration takes effect after restart
-    restart
+	restart
 }
 
 rh_status() {
-    # run checks to determine if the service is running or use generic status
-    status -p $PID_FILE $prog
+	# run checks to determine if the service is running or use generic status
+	status -p $PID_FILE $prog
 }
 
 rh_status_q() {
-    rh_status >/dev/null 2>&1
+	rh_status >/dev/null 2>&1
 }
 
 
 case "$1" in
-    start)
-        rh_status_q && exit 0
-        $1
-        ;;
-    stop)
-        rh_status_q || exit 0
-        $1
-        ;;
-    restart)
-        $1
-        ;;
-    reload)
-        rh_status_q || exit 7
-        $1
-        ;;
-    force-reload)
-        force_reload
-        ;;
-    status)
-        rh_status || exit 0
-        ;;
-    masterrestart|try-restart)
-        rh_status_q || exit 0
-        restart
-        ;;
-    *)
-        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
-        exit 2
+start)
+	rh_status_q && exit 0
+	$1
+	;;
+stop)
+	rh_status_q || exit 0
+	$1
+	;;
+restart)
+	$1
+	;;
+reload)
+	rh_status_q || exit 7
+	$1
+	;;
+force-reload)
+	force_reload
+	;;
+status)
+	rh_status || exit 0
+	;;
+masterrestart|try-restart)
+	rh_status_q || exit 0
+	restart
+	;;
+*)
+	echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
+	exit 2
 esac
+
 exit $?
 

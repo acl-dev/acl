@@ -6,11 +6,11 @@ tempdir="/tmp"
 
 umask 022       
 
-function censored_ls() {
+censored_ls() {
     ls "$@" | egrep -v '^\.|/\.|CVS|RCS|SCCS|linux\.d|solaris\.d|hp_ux\.d|example'
 }               
         
-function compare_or_replace() {
+compare_or_replace() {
     (cmp $2 $3 >/dev/null 2>&1 && echo Skipping $3...) || { 
         echo Updating $3...
         rm -f $tempdir/junk || exit 1
@@ -22,7 +22,7 @@ function compare_or_replace() {
 }    
 ###############################################################################
 RPATH=
-function guess_os() {
+guess_os() {
 	os_name=`uname -s`
 	os_type=`uname -m`
 	case $os_name in
@@ -67,14 +67,14 @@ function guess_os() {
 	esac
 }
 
-function create_path() {
+create_path() {
 	test -d $1 || mkdir -p $1 || {
 		echo "can't mkdir $1"
 		exit 1
 	}
 }
 
-function copy_file() {
+copy_file() {
 	test -f $2 && {
 		compare_or_replace $1 $2 $3 || {
 			echo "copy file: $2 error"
@@ -83,7 +83,7 @@ function copy_file() {
 	}
 }
 
-function install_file() {
+install_file() {
 	rm -f $tempdir/junk2 || {
 		echo "can't remove file: $tempdir/junk2"
 		exit 1
@@ -142,7 +142,7 @@ SERVICE_BIN=$SBIN_PATH/$SERVICE_NAME
 SERVICE_CONF=$CONF_PATH/$SERVICE_NAME.cf
 ###############################################################################
 
-function create_all_path() {
+create_all_path() {
 	create_path $INSTALL_PATH
 	create_path $BIN_PATH
 	create_path $SBIN_PATH
@@ -154,7 +154,7 @@ function create_all_path() {
 	chmod 1777 $VAR_PATH/log
 }
 
-function copy_all_file() {
+copy_all_file() {
 	copy_file a+x,go+rx $SERVICE_NAME $SERVICE_BIN
 	install_file a+x,go-wrx $SERVICE_NAME.cf $SERVICE_CONF
 }
@@ -164,7 +164,7 @@ MASTER_CONF=$MASTER_PATH/conf
 MASTER_SERVICES=$MASTER_CONF/services.cf
 MASTER_CTL=$MASTER_PATH/bin/master_ctl
 
-function add_master_service() {
+add_master_service() {
 	echo ""
 
 	if [ ! -d $MASTER_CONF ]; then
