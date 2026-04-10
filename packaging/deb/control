@@ -72,7 +72,6 @@ Section: admin
 Priority: optional
 Architecture: ${arch}
 Maintainer: Zhang Qiang <155281969@qq.com>, Wang Haibin <634648088@qq.com>
-Depends: acl-libs
 Description: acl master framework
  acl master framework.
 EOF

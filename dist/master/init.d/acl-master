@@ -172,12 +172,12 @@ stop() {
     fi
     echo -n $"Stopping $prog: "
     if [ -n "`findpidfileofproc $exec $PID_FILE`" ]; then
-		killproc -p $PID_FILE -d 3 $exec
-		RETVAL=3
+        killproc -p $PID_FILE -d 3 $exec
+        retval=$?
 	else
-		failure $"Stopping $prog"
+        failure $"Stopping $prog"
+        retval=$?
 	fi
-    retval=$?
     echo
     [ $retval -eq 0 ] && rm -f $lockfile
     return $retval
