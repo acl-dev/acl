@@ -31,7 +31,104 @@ lockfile=/var/lock/subsys/acl_master
 # Source function library.
 # use systemd 
 # SYSTEMCTL_SKIP_REDIRECT=1
-. /etc/rc.d/init.d/functions
+if [ -f /lib/lsb/init-functions ]; then
+    . /lib/lsb/init-functions
+elif [ -f /etc/init.d/functions ]; then
+    . /etc/init.d/functions
+elif [ -f /etc/rc.d/init.d/functions ]; then
+    . /etc/rc.d/init.d/functions
+fi
+
+# Fallback helpers for distros where RHEL init helpers are unavailable.
+if ! command -v success >/dev/null 2>&1; then
+    success() { return 0; }
+fi
+
+if ! command -v failure >/dev/null 2>&1; then
+    failure() {
+        echo "FAILED"
+        return 1
+    }
+fi
+
+if ! command -v __pids_var_run >/dev/null 2>&1; then
+    __pids_var_run() {
+        local _pid_file="$2"
+        if [ -n "$_pid_file" ] && [ -f "$_pid_file" ]; then
+            pid=$(cat "$_pid_file" 2>/dev/null)
+        else
+            pid=""
+        fi
+    }
+fi
+
+if ! command -v killproc >/dev/null 2>&1; then
+    killproc() {
+        local _pid_file=""
+        local _sig="TERM"
+        local _exe=""
+
+        while [ "$#" -gt 0 ]; do
+            case "$1" in
+                -p)
+                    _pid_file="$2"
+                    shift 2
+                    ;;
+                -d)
+                    shift 2
+                    ;;
+                -HUP)
+                    _sig="HUP"
+                    shift
+                    ;;
+                *)
+                    _exe="$1"
+                    shift
+                    ;;
+            esac
+        done
+
+        if [ -n "$_pid_file" ] && [ -f "$_pid_file" ]; then
+            _pid=$(cat "$_pid_file" 2>/dev/null)
+        elif [ -n "$_exe" ]; then
+            _pid=$(pidof "$_exe" 2>/dev/null | awk '{print $1}')
+        else
+            _pid=""
+        fi
+
+        [ -n "$_pid" ] || return 1
+        kill -s "$_sig" "$_pid" >/dev/null 2>&1
+    }
+fi
+
+if ! command -v status >/dev/null 2>&1; then
+    status() {
+        local _pid_file=""
+        local _prog=""
+        if [ "$1" = "-p" ]; then
+            _pid_file="$2"
+            _prog="$3"
+        else
+            _prog="$1"
+        fi
+
+        if [ -n "$_pid_file" ] && [ -f "$_pid_file" ]; then
+            _pid=$(cat "$_pid_file" 2>/dev/null)
+            if [ -n "$_pid" ] && kill -0 "$_pid" >/dev/null 2>&1; then
+                echo "${_prog} (pid ${_pid}) is running"
+                return 0
+            fi
+        fi
+
+        if [ -n "$_prog" ] && pidof "$_prog" >/dev/null 2>&1; then
+            echo "${_prog} is running"
+            return 0
+        fi
+
+        echo "${_prog} is stopped"
+        return 3
+    }
+fi
 
 # A function to find the pid of a program. Looks *only* at the pidfile
 findpidfileofproc() {
