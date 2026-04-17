@@ -9,11 +9,13 @@
 # define my_bool bool
 # include "mysql/8.4.7/mysql.h"
 # include "mysql/8.4.7/errmsg.h"
+# include "mysql/8.4.7/mysqld_error.h"
 #elif MYSQL_VERSION_ID==90500
 # include <stdbool.h>
 # define my_bool bool
 # include "mysql/9.5.0/mysql.h"
 # include "mysql/9.5.0/errmsg.h"
+# include "mysql/9.5.0/mysqld_error.h"
 #endif
 
 #ifndef ACL_PREPARE_COMPILE
@@ -880,7 +882,14 @@ bool db_mysql::sane_mysql_query(const char* sql)
 	}
 
 	int errnum = __mysql_errno((MYSQL*) conn_);
-	if (errnum != CR_SERVER_LOST && errnum != CR_SERVER_GONE_ERROR) {
+	if (errnum != CR_SERVER_LOST
+		&& errnum != CR_SERVER_GONE_ERROR
+		&& errnum != CR_SERVER_LOST_EXTENDED
+#ifdef ER_CLIENT_INTERACTION_TIMEOUT
+		&& errnum != ER_CLIENT_INTERACTION_TIMEOUT
+#endif
+	) {
+
 		logger_error("db(%s): sql(%s) error(%s)",
 			dbname_.c_str(), sql, __mysql_error((MYSQL*) conn_));
 		return false;
