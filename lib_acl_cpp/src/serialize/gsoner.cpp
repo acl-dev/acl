@@ -1263,6 +1263,10 @@ bool gsoner::read_file(const char *filepath)
 std::string gsoner::get_filename(const char *filepath)
 {
 	std::string  filename;
+#if 1
+	const char *ptr = acl_safe_basename(filepath);
+	filename = ptr;
+#else
 	int i = (int) strlen(filepath) - 1;
 
 	while (i >= 0 && (filepath[i] != '\\' || filepath[i] != '/')) {
@@ -1271,6 +1275,7 @@ std::string gsoner::get_filename(const char *filepath)
 	}
 
 	std::reverse(filename.begin(), filename.end());
+#endif
 
 	return filename;
 }
