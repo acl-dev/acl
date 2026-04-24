@@ -950,15 +950,14 @@ string::operator const void *() const
 	return (void*) STR(vbf_);
 }
 
-string::operator const std::string () const
+string::operator std::string () const
 {
 	if (!this->empty()) {
 		std::string temp(this->c_str());
 		return temp;
-	} else {
-		std::string temp;
-		return temp;
 	}
+	std::string temp;
+	return temp;
 }
 
 size_t string::hash() const

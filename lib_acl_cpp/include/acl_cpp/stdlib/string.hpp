@@ -789,7 +789,7 @@ public:
 	 * Convert acl::string to std::string
 	 * @return {const std::string}
 	 */
-	operator const std::string() const;
+	operator std::string() const;
 
 	/**
 	 * Add a signed character to the end of current string buffer.
@@ -810,7 +810,7 @@ public:
 	/**
 	 * Remove last character.
 	 * @return {bool} When string is not empty, after removing last character,
-	 * returns true. Otherwise returns false.
+	 * returns true. Otherwise, returns false.
 	 */
 	bool pop_back();
 
@@ -1051,13 +1051,13 @@ public:
 	char* buf_end();
 
 	/**
-	 * Get start address of current buffer buffer.
+	 * Get start address of current buffer.
 	 * @return {void*} Returned address is always non-empty.
 	 */
 	void* buf() const;
 
 	/**
-	 * Get start address of current buffer buffer in string format.
+	 * Get start address of current buffer in string format.
 	 * @return {char*} Returned address is always non-empty.
 	 */
 	char* c_str() const;
@@ -1075,13 +1075,13 @@ public:
 	size_t size() const;
 
 	/**
-	 * Get space length of current buffer buffer. This value >= stored data length.
+	 * Get space length of current buffer. This value >= stored data length.
 	 * @return {size_t} Return value > 0.
 	 */
 	size_t capacity() const;
 
 	/**
-	 * Determine whether current buffer buffer's data length is 0.
+	 * Determine whether current buffer's data length is 0.
 	 * @return {bool} Returns true to indicate buffer is empty.
 	 */
 	bool empty() const;
@@ -1094,7 +1094,7 @@ public:
 	ACL_VSTRING* vstring() const;
 
 	/**
-	 * Set current buffer buffer's subscript position to specified position.
+	 * Set current buffer's subscript position to specified position.
 	 * @param n {size_t} Target subscript position. When this value >= capacity,
 	 * internally
 	 *  will reallocate some memory.
@@ -1181,14 +1181,14 @@ public:
 	std::pair<string, string>& split_at_right(char delimiter);
 
 	/**
-	 * Copy string data to current buffer buffer.
+	 * Copy string data to current buffer.
 	 * @param ptr {const char*} Source string address. Must end with '\0'.
 	 * @return {string&} Current object reference.
 	 */
 	string& copy(const char* ptr);
 
 	/**
-	 * Copy source data's binary data to current buffer buffer.
+	 * Copy source data's binary data to current buffer.
 	 * @param ptr {const void*} Source data address.
 	 * @param len {size_t} Data length of ptr source data.
 	 * @return {string&} Current object reference.
@@ -1196,18 +1196,18 @@ public:
 	string& copy(const void* ptr, size_t len);
 
 	/**
-	 * Move source string data to current buffer buffer. Internally automatically
+	 * Move source string data to current buffer. Internally automatically
 	 * determines whether source data
-	 * address is within current buffer buffer.
+	 * address is within current buffer.
 	 * @param src {const char*} Source data address.
 	 * @return {string&} Current object reference.
 	 */
 	string& memmove(const char* src);
 
 	/**
-	 * Move source string data to current buffer buffer. Internally automatically
+	 * Move source string data to current buffer. Internally automatically
 	 * determines whether source data
-	 * address is within current buffer buffer.
+	 * address is within current buffer.
 	 * @param src {const char*} Source data address.
 	 * @param len {size_t} Length of moved data.
 	 * @return {string&} Current object reference.
@@ -1261,8 +1261,8 @@ public:
 
 	/**
 	 * Insert memory data at specified subscript position starting from current
-	 * buffer buffer.
-	 * @param start {size_t} Start subscript value of current buffer buffer.
+	 * buffer.
+	 * @param start {size_t} Start subscript value of current buffer.
 	 * @param ptr {const void*} Memory data address.
 	 * @param len {size_t} Length of memory data.
 	 * @return {string&} Current object reference.
@@ -1320,14 +1320,14 @@ public:
 	string& truncate(size_t n);
 
 	/**
-	 * In current buffer buffer, remove specified character string data. Memory
+	 * In current buffer, remove specified character string data. Memory
 	 * data in buffer will
 	 * move forward.
 	 * @param needle {const char*} Specified character string to remove.
 	 * @param each {bool} When true, for each character that appears in needle
 	 * string,
-	 * remove it from current buffer buffer. Otherwise, remove needle string from
-	 * current buffer buffer.
+	 * remove it from current buffer. Otherwise, remove needle string from
+	 * current buffer.
 	 * @return {string&} Current object reference.
 	 *  Example: acl::string s("hello world!");
 	 *  Call s.strip("hel", true), result is: s == "o word!"
@@ -1336,37 +1336,37 @@ public:
 	string& strip(const char* needle, bool each = false);
 
 	/**
-	 * Remove whitespace (spaces TAB) on left side of current buffer buffer.
+	 * Remove whitespace (spaces TAB) on left side of current buffer.
 	 * @return {string&} Current object reference.
 	 */
 	string& trim_left_space();
 
 	/**
-	 * Remove whitespace (spaces TAB) on right side of current buffer buffer.
+	 * Remove whitespace (spaces TAB) on right side of current buffer.
 	 * @return {string&} Current object reference.
 	 */
 	string& trim_right_space();
 
 	/**
-	 * Remove all whitespace (spaces TAB) in current buffer buffer.
+	 * Remove all whitespace (spaces TAB) in current buffer.
 	 * @return {string&} Current object reference.
 	 */
 	string& trim_space();
 
 	/**
-	 * Remove carriage return and line feed on left side of current buffer buffer.
+	 * Remove carriage return and line feed on left side of current buffer.
 	 * @return {string&} Current object reference.
 	 */
 	string& trim_left_line();
 
 	/**
-	 * Remove carriage return and line feed on right side of current buffer buffer.
+	 * Remove carriage return and line feed on right side of current buffer.
 	 * @return {string&} Current object reference.
 	 */
 	string& trim_right_line();
 
 	/**
-	 * Remove all carriage return and line feed in current buffer buffer.
+	 * Remove all carriage return and line feed in current buffer.
 	 * @return {string&} Current object reference.
 	 */
 	string& trim_line();
@@ -1413,7 +1413,7 @@ public:
 	string& base64_encode();
 
 	/**
-	 * Encode source data with base64 encoding and append to current buffer buffer.
+	 * Encode source data with base64 encoding and append to current buffer.
 	 * @param ptr {const void*} Source data address.
 	 * @param len {size_t} Source data length.
 	 * @return {string&} Current object reference.
@@ -1421,7 +1421,7 @@ public:
 	string& base64_encode(const void* ptr, size_t len);
 
 	/**
-	 * When current buffer buffer's data is base64 encoded, this function decodes
+	 * When current buffer's data is base64 encoded, this function decodes
 	 * these
 	 * data.
 	 * @return {string&} Current object reference. When decoding fails, internal
@@ -1431,7 +1431,7 @@ public:
 	string& base64_decode();
 
 	/**
-	 * Decode base64 encoded source data and append to current buffer buffer.
+	 * Decode base64 encoded source data and append to current buffer.
 	 * @param s {const char*} Base64 encoded source data.
 	 * @return {string&} Current object reference. When decoding fails, internal
 	 * buffer will be automatically cleared,
@@ -1440,7 +1440,7 @@ public:
 	string& base64_decode(const char* s);
 
 	/**
-	 * Decode base64 encoded source data and append to current buffer buffer.
+	 * Decode base64 encoded source data and append to current buffer.
 	 * @param ptr {const void*} Base64 encoded source data.
 	 * @param len {size_t} Data length of ptr.
 	 * @return {string&} Current object reference. When decoding fails, internal
@@ -1450,7 +1450,7 @@ public:
 	string& base64_decode(const void* ptr, size_t len);
 
 	/**
-	 * Encode source data with url encoding and append to current buffer buffer.
+	 * Encode source data with url encoding and append to current buffer.
 	 * @param s {const char*} Source data.
 	 * @param dbuf {dbuf_pool*} Memory pool object. When not empty, internal
 	 * dynamic memory will
@@ -1462,7 +1462,7 @@ public:
 	string& url_encode(const char* s, dbuf_pool* dbuf = NULL);
 
 	/**
-	 * Decode url encoded source data and append to current buffer buffer.
+	 * Decode url encoded source data and append to current buffer.
 	 * @param s {const char*} Url encoded source data.
 	 * @param dbuf {dbuf_pool*} Memory pool object. When not empty, internal
 	 * dynamic memory will
@@ -1473,7 +1473,7 @@ public:
 	string& url_decode(const char* s, dbuf_pool* dbuf = NULL);
 
 	/**
-	 * Encode source data with H2B encoding and append to current buffer buffer.
+	 * Encode source data with H2B encoding and append to current buffer.
 	 * @param s {const void*} Source data address.
 	 * @param len {size_t} Source data length.
 	 * @return {string&} Current object reference.
@@ -1481,7 +1481,7 @@ public:
 	string& hex_encode(const void* s, size_t len);
 
 	/**
-	 * Decode source data with H2B encoding and append to current buffer buffer.
+	 * Decode source data with H2B encoding and append to current buffer.
 	 * @param s {const char*} Source data address.
 	 * @param len {size_t} Source data length.
 	 * @return {string&} Current object reference.
@@ -1639,18 +1639,13 @@ size_t split(const char* str, const char* sep, std::list<std::string>& out);
 
 #if __cplusplus >= 201103L      // Support c++11 ?
 
-namespace std {
-
 // Hash function, only for use with std::unordered_xxx containers in C++11.
-
 template <>
-struct hash<acl::string> {
-	size_t operator()(const acl::string& key) const {
+struct std::hash<acl::string> {
+	size_t operator()(const acl::string& key) const noexcept {
 		return key.hash();
 	}
 };
-
-} // namespace std
 
 #endif	// __cplusplus >= 201103L
 

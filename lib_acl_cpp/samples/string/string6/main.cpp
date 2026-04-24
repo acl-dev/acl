@@ -29,7 +29,7 @@ int main()
 #if 1
 	std::string s2 = s;
 #else
-	// This'll be failed.
+	// This'll be failed because it's ambiguous with 'operator const char*() const' in acl::string.
 	std::string s2;
 	s2 = s;
 #endif
