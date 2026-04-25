@@ -56,5 +56,21 @@ int main()
 		std::cout << "back char: " << ch << std::endl;
 	}
 
+	s = "www.google.com:80";
+	std::cout << "s: " << s << "; len: " << s.length() << std::endl;
+
+	int p = s.find(':');
+	if (p > 0) {
+		s.truncate(p);
+	}
+	std::cout << "s: " << s << "; len: " << s.length() << std::endl;
+
+	s = "www.google.com:80";
+	p = s.find(':');
+	if (p > 0) {
+		s.set_offset(p);
+	}
+	std::cout << "s: " << s << "; len: " << s.length() << std::endl;
+
 	return 0;
 }
