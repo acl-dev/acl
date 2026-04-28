@@ -22,7 +22,8 @@ public:
 	 * Read data from input stream.
 	 * @param buf {void*} User buffer.
 	 * @param size {size_t} User buffer size.
-	 * @param loop {bool} Whether to read until size bytes are read.
+	 * @param loop {bool} Whether to read until size bytes are read in TCP mode;
+	 *  It'll be ignored for UDP mode and will read once from UDP socket.
 	 * @return {int} Number of bytes read, -1 indicates closed or error, > 0
 	 * indicates success.
 	 */
@@ -112,7 +113,8 @@ public:
 	 * Read string data from input stream.
 	 * @param s {string*} String buffer. Internally automatically expands buffer.
 	 * @param max {size_t} Maximum length of data to be read.
-	 * @param loop {bool} Whether to read until max bytes are read.
+	 * @param loop {bool} Whether to read until max bytes are read for TCP,
+	 *  and it'll be ignored for UDP that only read once for each read.
 	 * @return {bool} Whether reading was successful.
 	 */
 	bool read(string& s, size_t max, bool loop = true);

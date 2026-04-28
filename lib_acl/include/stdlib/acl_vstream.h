@@ -73,15 +73,16 @@ struct ACL_VSTREAM {
 	int   is_nonblock;              /**< just for WINDOWS, because
 					 *   the ioctlsocket is too weak */
 	int   type;                     /**< defined as: ACL_VSTREAM_TYPE_XXX */
-#define	ACL_VSTREAM_TYPE_SOCK           (1 << 0)
-#define	ACL_VSTREAM_TYPE_FILE           (1 << 1)
-#define	ACL_VSTREAM_TYPE_LISTEN		(1 << 2)
-#define	ACL_VSTREAM_TYPE_LISTEN_INET    (1 << 3)
-#define	ACL_VSTREAM_TYPE_LISTEN_UNIX    (1 << 4)
+#define ACL_VSTREAM_TYPE_SOCK           (1 << 0)
+#define ACL_VSTREAM_TYPE_FILE           (1 << 1)
+#define ACL_VSTREAM_TYPE_LISTEN         (1 << 2)
+#define ACL_VSTREAM_TYPE_LISTEN_INET    (1 << 3)
+#define ACL_VSTREAM_TYPE_LISTEN_UNIX    (1 << 4)
 #define ACL_VSTREAM_TYPE_LISTEN_IOCP    (1 << 5)
-#define ACL_VSTREAM_TYPE_INET4		(1 << 6)
-#define ACL_VSTREAM_TYPE_INET6		(1 << 7)
-#define ACL_VSTREAM_TYPE_UNIX		(1 << 8)
+#define ACL_VSTREAM_TYPE_INET4          (1 << 6)
+#define ACL_VSTREAM_TYPE_INET6          (1 << 7)
+#define ACL_VSTREAM_TYPE_UNIX           (1 << 8)
+#define ACL_VSTREAM_TYPE_DGRAM          (1 << 9)
 
 	acl_off_t offset;               /**< cached seek info */
 	acl_off_t sys_offset;           /**< cached seek info */

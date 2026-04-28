@@ -96,7 +96,7 @@ public:
 	 * @param ttl {int} Value range is 1--255.
 	 * @return {bool} Whether setting was successful.
 	 */
-	bool multicast_set_ttl(int ttl);
+	bool multicast_set_ttl(int ttl) const;
 
 	/**
 	 * After bind_multicast succeeds, you can call this method to set multicast
@@ -104,7 +104,7 @@ public:
 	 * @param iface {const char*}
 	 * @return {bool} Whether setting was successful.
 	 */
-	bool multicast_set_if(const char* iface);
+	bool multicast_set_if(const char* iface) const;
 
 	/**
 	 * After bind_multicast succeeds, you can call this method to leave multicast.
@@ -112,25 +112,25 @@ public:
 	 * @param iface {const char*} Local IP.
 	 * @return {bool} Whether successful.
 	 */
-	bool multicast_drop(const char *addr, const char *iface);
+	bool multicast_drop(const char *addr, const char *iface) const;
 
 	/**
 	 * Close socket read end.
 	 * @return {bool}
 	 */
-	bool shutdown_read();
+	bool shutdown_read() const;
 
 	/**
 	 * Close socket write end.
 	 * @return {bool}
 	 */
-	bool shutdown_write();
+	bool shutdown_write() const;
 
 	/**
 	 * Close socket read and write ends.
 	 * @return {bool}
 	 */
-	bool shutdown_readwrite();
+	bool shutdown_readwrite() const;
 
 	/**
 	 * Get underlying socket connection handle.
@@ -195,7 +195,7 @@ public:
 	 * @param addr {const char*} Remote connection object address, format: ip:port
 	 * @return {bool} Returns false when connection is not opened.
 	 */
-	bool set_peer(const char* addr);
+	bool set_peer(const char* addr) const;
 
 	/**
 	 * Get local address of connection.
@@ -221,7 +221,7 @@ public:
 	 * @param addr {const char*} Address, format: ip:port
 	 * @return {bool} Returns false when connection is not opened.
 	 */
-	bool set_local(const char* addr);
+	bool set_local(const char* addr) const;
 
 	/**
 	 * Detect socket connection status (internally uses ping-like method for
@@ -314,7 +314,8 @@ public:
 
 private:
 	std::string ipbuf_;
-	const char* get_ip(const char* addr, std::string& out);
+
+	static const char* get_ip(const char* addr, std::string& out);
 };
 
 } // namespace acl

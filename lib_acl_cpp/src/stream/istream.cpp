@@ -25,7 +25,11 @@ namespace acl {
 int istream::read(void* buf, size_t size, bool loop /* = true */)
 {
 	int   ret;
-	if (loop && size > 1) {
+	if (buf == NULL || size == 0) {
+		return -1;
+	}
+
+	if (loop && size > 1 && !(stream_->type & ACL_VSTREAM_TYPE_DGRAM)) {
 		ret = acl_vstream_readn(stream_, buf, size);
 	} else {
 		ret = acl_vstream_read(stream_, buf, size);
@@ -33,9 +37,8 @@ int istream::read(void* buf, size_t size, bool loop /* = true */)
 	if (ret == ACL_VSTREAM_EOF) {
 		CHECK_ERROR(errno);
 		return -1;
-	} else {
-		return ret;
 	}
+	return ret;
 }
 
 bool istream::readtags(void *buf, size_t* size, const char *tag, size_t taglen)
@@ -97,6 +100,9 @@ bool istream::read(string* s, bool loop /* = true */)
 bool istream::read(string& s, size_t max, bool loop /* = true */)
 {
 	s.clear();
+	if (max == 0) {
+		max = s.capacity();
+	}
 	s.space(max);
 	int ret = read(s.buf(), max, loop);
 	if (ret == -1) {
@@ -124,13 +130,13 @@ bool istream::gets(void* buf, size_t* size, bool nonl /* = true */)
 		CHECK_ERROR(errno);
 		*size = 0;
 		return false;
-	} else {
-		*size = ret;
-		if ((stream_->flag & ACL_VSTREAM_FLAG_TAGYES)) {
-			return true;
-		}
-		return false;
 	}
+
+	*size = ret;
+	if ((stream_->flag & ACL_VSTREAM_FLAG_TAGYES)) {
+		return true;
+	}
+	return false;
 }
 
 bool istream::gets(string& s, bool nonl /* = true */, size_t max /* = 0 */)
@@ -268,7 +274,7 @@ bool istream::gets_peek(string& buf, bool nonl /* = true */,
 	}
 
 	int ready, ret;
-	ACL_VSTRING *vbf = (ACL_VSTRING*) buf.vstring();
+	ACL_VSTRING *vbf = buf.vstring();
 	if (nonl) {
 		ret = acl_vstream_gets_nonl_peek(stream_, vbf, &ready);
 	} else {
@@ -312,11 +318,11 @@ bool istream::read_peek(string& buf, bool clear /* = false */)
 			eof_ = true;
 		}
 		return false;
-	} else if (n == 0) {
-		return false;
-	} else {
-		return true;
 	}
+	if (n == 0) {
+		return false;
+	}
+	return true;
 }
 
 bool istream::read_peek(string* buf, bool clear /* = false */)
@@ -345,11 +351,11 @@ int istream::read_peek(void* buf, size_t size)
 			return -1;
 		}
 		return 0;
-	} else if (n == 0) {
-		return 0;
-	} else {
-		return n;
 	}
+	if (n == 0) {
+		return 0;
+	}
+	return n;
 }
 
 bool istream::readn_peek(string& buf, size_t cnt, bool clear /* = false */)

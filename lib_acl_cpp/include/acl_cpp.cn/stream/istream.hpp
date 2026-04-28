@@ -21,7 +21,8 @@ public:
 	 * 从输入流中读数据
 	 * @param buf {void*} 用户缓冲区
 	 * @param size {size_t} 用户缓冲区长度
-	 * @param loop {bool} 是否读满 size 后才返回
+	 * @param loop {bool} 是否读满 size 后才返回，该标志位仅对TCP模式有效，针对UDP方式，
+	 *  内部仅读一次
 	 * @return {int} 读操作结果, -1 表示关闭或出错, > 0 表示成功
 	 */
 	int read(void* buf, size_t size, bool loop = true);

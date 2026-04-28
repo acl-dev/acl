@@ -353,7 +353,8 @@ ACL_VSTREAM *acl_vstream_bind(const char *addr, int rw_timeout, unsigned flag)
 		return NULL;
 	}
 
-	stream = acl_vstream_fdopen(sock, O_RDWR, 4096, -1, ACL_VSTREAM_TYPE_SOCK);
+	stream = acl_vstream_fdopen(sock, O_RDWR, 4096, -1,
+		ACL_VSTREAM_TYPE_SOCK | ACL_VSTREAM_TYPE_DGRAM);
 	stream->rw_timeout = rw_timeout;
 
 	/* 设置本地绑定地址 */
