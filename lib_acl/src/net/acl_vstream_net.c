@@ -463,7 +463,8 @@ ACL_VSTREAM *acl_vstream_bind_multicast(const char *addr, const char *iface,
 		return NULL;
 	}
 
-	stream = acl_vstream_fdopen(sock, O_RDWR, 4096, -1, ACL_VSTREAM_TYPE_SOCK);
+	stream = acl_vstream_fdopen(sock, O_RDWR, 4096, -1,
+		ACL_VSTREAM_TYPE_SOCK | ACL_VSTREAM_TYPE_DGRAM);
 	stream->rw_timeout = timeout;
 
 	/* 设置本地绑定地址，该地址同时用做外发地址 */
