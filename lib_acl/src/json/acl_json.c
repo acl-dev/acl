@@ -102,6 +102,10 @@ ACL_JSON_NODE *acl_json_node_alloc(ACL_JSON *json)
 	node->quote     = 0;
 	node->left_ch   = 0;
 	node->right_ch  = 0;
+	node->unicode_state  = 0; // Same as ACL_JSON_U_NONE defined in acl_json_parse.c
+	node->unicode_digits = 0;
+	node->unicode_value  = 0;
+	node->unicode_high   = 0;
 	node->backslash = 0;
 	node->part_word = 0;
 	node->disabled  = 0;

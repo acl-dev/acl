@@ -50,6 +50,10 @@ struct ACL_JSON_NODE {
 	unsigned char quote;        /**< 非 0 表示 ' 或 " */
 	unsigned char left_ch;      /**< 本节点的第一个字符: { or [ */
 	unsigned char right_ch;     /**< 本节点的最后一个字符: } or ] */
+	unsigned char unicode_state;/**< 流式 Unicode 转义解析状态 */
+	unsigned char unicode_digits;/**< Unicode 十六进制位数 */
+	unsigned int unicode_value; /**< 当前解析中的 Unicode 码元 */
+	unsigned int unicode_high;  /**< 待配对的高代理项 */
 	unsigned backslash:1;       /**< 转义字符 \ */
 	unsigned part_word:1;       /**< 半个汉字的情况处理标志位 */
 	unsigned disabled:1;        /**< 该节点是否被禁止 */

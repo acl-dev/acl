@@ -31,7 +31,7 @@ int main(void)
 	  .add_bool("status", true)	// 添加 root 节点的子节点 status
 	  .add_number("length", 100);	// 添加 root 节点的子节点 length
 
-	printf("%s\r\n", json.to_string().c_str());
+	printf("json1: %s\r\n", json.to_string().c_str());
 	acl::string buf1;
 	json.build_json(buf1);
 
@@ -47,7 +47,6 @@ int main(void)
 
 	// 在重新使用前需要重置 json 生成器状态
 	json.reset();
-
 	root = json.get_root();
 
 	root.add_text("cmd", "add")
@@ -60,7 +59,7 @@ int main(void)
 		.add_bool("status", true)
 		.add_number("length", 100);
 
-	printf("%s\r\n", json.to_string().c_str());
+	printf("json2: %s\r\n", json.to_string().c_str());
 	acl::string buf2;
 	json.build_json(buf2);
 
@@ -69,6 +68,7 @@ int main(void)
 
 	// 在重新使用前需要重置 json 生成器状态
 	json.reset();
+	root = json.get_root();
 
 	acl::json_node& cmd = json.create_node("cmd", "add");
 	root.add_child(cmd);
@@ -94,17 +94,30 @@ int main(void)
 	acl::json_node& length = json.create_node("length", (long long int) 100);
 	root.add_child(length);
 
-	printf("%s\r\n", json.to_string().c_str());
+	printf("json3: %s\r\n", json.to_string().c_str());
 	acl::string buf3;
 	json.build_json(buf3);
 
 	//////////////////////////////////////////////////////////////////////
 	// 比较三种方法的结果是否相等
 
-	if (buf2 == buf1 && buf3 == buf2) {
-		printf("OK\r\n");
+	if (buf2 == buf1) {
+		printf("OK, buf2 == buf1\r\n");
 	} else {
-		printf("ERROR\r\n");
+		printf("ERROR buf2 != buf1\r\n");
+		printf("buf2(%zd)=%s\r\nbuf1(%zd)=%s\r\n",
+			buf2.size(), buf2.c_str(), buf1.size(), buf1.c_str());
+		exit (0);
 	}
+
+	if (buf3 == buf2) {
+		printf("OK, buf3 == buf2\r\n");
+	} else {
+		printf("ERROR buf3 != buf2\r\n");
+		printf("buf3(%zd)=%s\r\nbuf2(%zd)=%s\r\n",
+			buf3.size(), buf3.c_str(), buf2.size(), buf2.c_str());
+		exit (0);
+	}
+
 	return 0;
 }

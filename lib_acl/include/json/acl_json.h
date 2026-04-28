@@ -53,6 +53,10 @@ struct ACL_JSON_NODE {
 	unsigned char quote;        /**< If 0 indicates ' or " */
 	unsigned char left_ch;      /**< First character of the node: { or [ */
 	unsigned char right_ch;     /**< Last character of the node: } or ] */
+	unsigned char unicode_state;/**< unicode parsing state for streaming */
+	unsigned char unicode_digits;/**< unicode hex digits count */
+	unsigned int unicode_value; /**< unicode code unit under parsing */
+	unsigned int unicode_high;  /**< pending high surrogate */
 	unsigned backslash:1;       /**< escape character \ */
 	unsigned part_word:1;       /**< Whether the tag value contains a word flag */
 	unsigned disabled:1;        /**< Whether this node is disabled */

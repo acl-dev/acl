@@ -17,6 +17,157 @@
 #define SKIP_WHILE(cond, ptr) { while(*(ptr) && (cond)) (ptr)++; }
 #define SKIP_SPACE(ptr) { while(IS_SPACE(*(ptr))) (ptr)++; }
 
+enum {
+	ACL_JSON_U_NONE,
+	ACL_JSON_U_HEX,
+	ACL_JSON_U_LOW_BS,
+	ACL_JSON_U_LOW_U,
+	ACL_JSON_U_LOW_HEX
+};
+
+static void json_reset_unicode(ACL_JSON_NODE *node)
+{
+	node->unicode_state  = ACL_JSON_U_NONE;
+	node->unicode_digits = 0;
+	node->unicode_value  = 0;
+	node->unicode_high   = 0;
+}
+
+static int json_hex_value(int ch)
+{
+	if (ch >= '0' && ch <= '9')
+		return ch - '0';
+	if (ch >= 'a' && ch <= 'f')
+		return ch - 'a' + 10;
+	if (ch >= 'A' && ch <= 'F')
+		return ch - 'A' + 10;
+	return -1;
+}
+
+static void json_add_utf8(ACL_VSTRING *buf, unsigned int codepoint)
+{
+	if (codepoint > 0x10FFFF ||
+		(codepoint >= 0xD800 && codepoint <= 0xDFFF)) {
+		codepoint = 0xFFFD;
+	}
+
+	if (codepoint <= 0x7F) {
+		ADDCH(buf, (char) codepoint);
+	} else if (codepoint <= 0x7FF) {
+		ADDCH(buf, (char) (0xC0 | (codepoint >> 6)));
+		ADDCH(buf, (char) (0x80 | (codepoint & 0x3F)));
+	} else if (codepoint <= 0xFFFF) {
+		ADDCH(buf, (char) (0xE0 | (codepoint >> 12)));
+		ADDCH(buf, (char) (0x80 | ((codepoint >> 6) & 0x3F)));
+		ADDCH(buf, (char) (0x80 | (codepoint & 0x3F)));
+	} else {
+		ADDCH(buf, (char) (0xF0 | (codepoint >> 18)));
+		ADDCH(buf, (char) (0x80 | ((codepoint >> 12) & 0x3F)));
+		ADDCH(buf, (char) (0x80 | ((codepoint >> 6) & 0x3F)));
+		ADDCH(buf, (char) (0x80 | (codepoint & 0x3F)));
+	}
+}
+
+static int json_handle_unicode(ACL_JSON_NODE *node, ACL_VSTRING *buf, int ch)
+{
+	int hex;
+	unsigned int value;
+
+	switch (node->unicode_state) {
+	case ACL_JSON_U_NONE:
+		return 0;
+	case ACL_JSON_U_HEX:
+	case ACL_JSON_U_LOW_HEX:
+		hex = json_hex_value(ch);
+		if (hex < 0) {
+			if (node->unicode_high != 0)
+				json_add_utf8(buf, node->unicode_high);
+			else
+				json_add_utf8(buf, 0xFFFD);
+			json_reset_unicode(node);
+			return 0;
+		}
+		node->unicode_value = (node->unicode_value << 4) | (unsigned int) hex;
+		node->unicode_digits++;
+		if (node->unicode_digits < 4)
+			return 1;
+
+		value = node->unicode_value;
+		node->unicode_digits = 0;
+		node->unicode_value = 0;
+
+		if (node->unicode_state == ACL_JSON_U_HEX) {
+			if (value >= 0xD800 && value <= 0xDBFF) {
+				node->unicode_high = value;
+				node->unicode_state = ACL_JSON_U_LOW_BS;
+			} else {
+				json_add_utf8(buf, value);
+				json_reset_unicode(node);
+			}
+		} else {
+			if (value >= 0xDC00 && value <= 0xDFFF &&
+				node->unicode_high >= 0xD800 &&
+				node->unicode_high <= 0xDBFF) {
+				unsigned int codepoint =
+					0x10000 + ((node->unicode_high - 0xD800) << 10)
+					+ (value - 0xDC00);
+				json_add_utf8(buf, codepoint);
+			} else {
+				json_add_utf8(buf, node->unicode_high);
+				json_add_utf8(buf, value);
+			}
+			json_reset_unicode(node);
+		}
+		return 1;
+	case ACL_JSON_U_LOW_BS:
+		if (ch == '\\') {
+			node->unicode_state = ACL_JSON_U_LOW_U;
+			return 1;
+		}
+		json_add_utf8(buf, node->unicode_high);
+		json_reset_unicode(node);
+		return 0;
+	case ACL_JSON_U_LOW_U:
+		if (ch == 'u') {
+			node->unicode_state = ACL_JSON_U_LOW_HEX;
+			return 1;
+		}
+		json_add_utf8(buf, node->unicode_high);
+		json_reset_unicode(node);
+		return 0;
+	default:
+		json_reset_unicode(node);
+		return 0;
+	}
+}
+
+static int json_handle_escape(ACL_JSON_NODE *node, ACL_VSTRING *buf, int ch)
+{
+	if (!node->backslash)
+		return 0;
+
+	node->backslash = 0;
+
+	if (ch == 'b')
+		ADDCH(buf, '\b');
+	else if (ch == 'f')
+		ADDCH(buf, '\f');
+	else if (ch == 'n')
+		ADDCH(buf, '\n');
+	else if (ch == 'r')
+		ADDCH(buf, '\r');
+	else if (ch == 't')
+		ADDCH(buf, '\t');
+	else if (ch == 'u') {
+		node->unicode_state = ACL_JSON_U_HEX;
+		node->unicode_digits = 0;
+		node->unicode_value = 0;
+	} else
+		ADDCH(buf, ch);
+
+	return 1;
+}
+
 static const char *json_root(ACL_JSON *json, const char *data)
 {
 	SKIP_WHILE(*data != '{' && *data != '[', data);
@@ -154,22 +305,16 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 	int ch;
 
 	while ((ch = *data) != 0) {
+		if (json_handle_unicode(node, node->ltag, ch)) {
+			data++;
+			continue;
+		}
+
 		/* 如果前面有引号，则需要找到结尾引号 */
 		if (node->quote) {
-			if (node->backslash) {
-				if (ch == 'b')
-					ADDCH(node->ltag, '\b');
-				else if (ch == 'f')
-					ADDCH(node->ltag, '\f');
-				else if (ch == 'n')
-					ADDCH(node->ltag, '\n');
-				else if (ch == 'r')
-					ADDCH(node->ltag, '\r');
-				else if (ch == 't')
-					ADDCH(node->ltag, '\t');
-				else
-					ADDCH(node->ltag, ch);
-				node->backslash = 0;
+			if (json_handle_escape(node, node->ltag, ch)) {
+				data++;
+				continue;
 			}
 
 			/* 当为双字节汉字时，第一个字节为的高位为 1，
@@ -414,22 +559,16 @@ static const char *json_string(ACL_JSON *json, const char *data)
 	/* 说明本节点是叶节点 */
 
 	while ((ch = *data) != 0) {
+		if (json_handle_unicode(node, node->text, ch)) {
+			data++;
+			continue;
+		}
+
 		/* 如果开始有引号，则需要以该引号作为结尾符 */
 		if (node->quote) {
-			if (node->backslash) {
-				if (ch == 'b')
-					ADDCH(node->text, '\b');
-				else if (ch == 'f')
-					ADDCH(node->text, '\f');
-				else if (ch == 'n')
-					ADDCH(node->text, '\n');
-				else if (ch == 'r')
-					ADDCH(node->text, '\r');
-				else if (ch == 't')
-					ADDCH(node->text, '\t');
-				else
-					ADDCH(node->text, ch);
-				node->backslash = 0;
+			if (json_handle_escape(node, node->text, ch)) {
+				data++;
+				continue;
 			}
 
 			/* 当为双字节汉字时，第一个字节为的高位为 1，
