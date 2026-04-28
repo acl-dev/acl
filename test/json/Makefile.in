@@ -144,27 +144,29 @@ LDFLAGS = -L$(ACL_LIB) -Wl,-rpath,$(ACL_LIB) -lacl $(EXTLIBS) $(SYSLIB)
 OUT_PATH = .
 OBJ_PATH = $(OUT_PATH)
 
-#Project's objs
+#Project's objs and programs
 SRC = $(wildcard *.c)
-OBJ = $(patsubst %.c, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
+# 从源文件列表生成要编译的程序（排除临时测试文件 te*.c）
+PROGRAMS ?= $(patsubst %.c, %, $(filter-out te%.c, $(SRC)))
 ###########################################################
 
 .PHONY = all clean
-PROG =
-
 COMPILE = $(CC) $(CFLAGS)
 
-#-Wl,-rpath,$(ACL_LIB) -Wl,-rpath,$(PROTO_LIB) -o $(OBJ_PATH)/$(PROG)
-all: RM $(OBJ)
-	$(CC) $(OBJ) $(LDFLAGS) -o $(OBJ_PATH)/$(PROG)
+# 默认目标：编译所有程序
+all: $(PROGRAMS)
 	@echo ""
-	@echo "All ok! Output:$(PROG)"
+	@echo "All ok! Output: $(PROGRAMS)"
 	@echo ""
-$(OBJ_PATH)/%.o: %.c
-	$(COMPILE) $< -o $@
+
+# 编译链接规则：从 .c 文件直接生成可执行文件
+# 注意：去掉 -c 标志，使用 LDFLAGS 来进行链接
+%: %.c
+	$(CC) $(filter-out -c, $(CFLAGS)) $< $(LDFLAGS) -o $(OBJ_PATH)/$@
+
 RM:
-	rm -f $(PROG)
+	rm -f $(PROGRAMS) $(patsubst %, $(OBJ_PATH)/%, $(PROGRAMS))
+
 clean:
-	rm -f $(PROG)
-	rm -f $(OBJ)
+	rm -f $(PROGRAMS) $(patsubst %, $(OBJ_PATH)/%, $(PROGRAMS))
 ###########################################################

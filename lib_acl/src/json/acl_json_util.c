@@ -269,6 +269,7 @@ void acl_json_node_append_child(ACL_JSON_NODE *parent, ACL_JSON_NODE *child)
 static void json_escape_append(ACL_VSTRING *buf, const char *src)
 {
 	const unsigned char *ptr = (const unsigned char*) src;
+	char tmp[8];
 
 	ACL_VSTRING_ADDCH(buf, '"');
 
@@ -291,6 +292,19 @@ static void json_escape_append(ACL_VSTRING *buf, const char *src)
 		} else if (*ptr == '\t') {
 			ACL_VSTRING_ADDCH(buf, '\\');
 			ACL_VSTRING_ADDCH(buf, 't');
+		} else if (*ptr < 0x20) {
+			/* 其余 C0 控制字符（0x00–0x1F）输出 \uXXXX */
+			snprintf(tmp, sizeof(tmp), "\\u%04X", (unsigned)*ptr);
+			acl_vstring_strcat(buf, tmp);
+		} else if (*ptr == 0xE2
+			&& *(ptr + 1) == 0x80
+			&& (*(ptr + 2) == 0xA8 || *(ptr + 2) == 0xA9)) {
+			/* UTF-8 编码的 U+2028 行分隔符和 U+2029 段分隔符，
+			 * 在 JSON 字符串中需要转义以确保嵌入 JavaScript 时安全 */
+			snprintf(tmp, sizeof(tmp), "\\u20%s",
+				*(ptr + 2) == 0xA8 ? "28" : "29");
+			acl_vstring_strcat(buf, tmp);
+			ptr += 2; /* 跳过剩余两个字节，ptr++ 在最后执行 */
 		} else
 			ACL_VSTRING_ADDCH(buf, *ptr);
 		ptr++;
