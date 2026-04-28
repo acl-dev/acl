@@ -47,15 +47,18 @@ void master_service::on_read(acl::socket_stream* stream)
 	char  buf[1024];
 	int   ret;
 
-	if ((ret = stream->read(buf, sizeof(buf), false)) == -1)
+	if ((ret = stream->read(buf, sizeof(buf) - 1, false)) == -1) {
 		logger_error("read from %s error %s",
 			stream->get_peer(true), acl::last_serror());
-	else if (stream->write(buf, ret) == -1)
+	} else if (stream->write(buf, ret) == -1) {
 		logger_error("write to %s error %s",
 			stream->get_peer(true), acl::last_serror());
-	if (0)
-		logger(">>Peer: %s, Local: %s", stream->get_peer(true),
-			stream->get_local(true));
+	}
+	if (0) {
+		buf[ret] = 0;
+		logger(">>Peer: %s, Local: %s, data=%s", stream->get_peer(true),
+			stream->get_local(true), buf);
+	}
 }
 
 void master_service::proc_on_init()
