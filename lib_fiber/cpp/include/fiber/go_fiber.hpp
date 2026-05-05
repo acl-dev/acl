@@ -181,26 +181,72 @@ private:
 	}
 };
 
+/**
+ * gofiber - Launch a fiber asynchronously (template helper)
+ *
+ * Equivalent to: go [capture] { ... };
+ * Uses default fiber configuration (stack size 320000, non-shared stack).
+ *
+ * @tparam Callable Any callable type invocable as void()
+ * @param fn Callable object (lambda, function, functor)
+ * @return Shared pointer to the created fiber object
+ */
 template<typename Callable>
 std::shared_ptr<fiber> gofiber(Callable&& fn) {
 	return go_fiber() > std::function<void()>(std::forward<Callable>(fn));
 }
 
+/**
+ * gofiber_stack - Launch a fiber asynchronously with private stack
+ *
+ * Uses a custom stack size and non-shared stack mode.
+ *
+ * @tparam Callable Any callable type invocable as void()
+ * @param fn Callable object (lambda, function, functor)
+ * @param stack_size Fiber stack size in bytes, default is 128000
+ * @return Shared pointer to the created fiber object
+ */
 template<typename Callable>
 std::shared_ptr<fiber> gofiber_stack(Callable&& fn, size_t stack_size = 128000) {
 	return go_fiber(stack_size, false) > std::function<void()>(std::forward<Callable>(fn));
 }
 
+/**
+ * gofiber_share - Launch a fiber asynchronously with shared stack
+ *
+ * Uses a custom stack size and shared stack mode.
+ *
+ * @tparam Callable Any callable type invocable as void()
+ * @param fn Callable object (lambda, function, functor)
+ * @param stack_size Fiber stack size in bytes, default is 8000
+ * @return Shared pointer to the created fiber object
+ */
 template<typename Callable>
 std::shared_ptr<fiber> gofiber_share(Callable&& fn, size_t stack_size = 8000) {
 	return go_fiber(stack_size, true) > std::function<void()>(std::forward<Callable>(fn));
 }
 
+/**
+ * gofiber_wait_fiber - Launch a fiber and wait until it finishes
+ *
+ * Equivalent to: go_wait_fiber [capture] { ... };
+ *
+ * @tparam Callable Any callable type invocable as void()
+ * @param fn Callable object (lambda, function, functor)
+ */
 template<typename Callable>
 void gofiber_wait_fiber(Callable&& fn) {
 	go_fiber() < std::function<void()>(std::forward<Callable>(fn));
 }
 
+/**
+ * gofiber_wait_thread - Launch a thread and wait until it finishes
+ *
+ * Equivalent to: go_wait_thread [capture] { ... };
+ *
+ * @tparam Callable Any callable type invocable as void()
+ * @param fn Callable object (lambda, function, functor)
+ */
 template<typename Callable>
 void gofiber_wait_thread(Callable&& fn) {
 	go_fiber() << std::function<void()>(std::forward<Callable>(fn));
@@ -282,6 +328,43 @@ void gofiber_wait_thread(Callable&& fn) {
  * 	};
  * }
  *
+ * Example 7: Template helper APIs (gofiber*)
+ * -------------------------------------------
+ * static void helper_demo() {
+ * 	int n = 0;
+ *
+ * 	// 1) Async fiber, default stack settings
+ * 	auto fb1 = acl::gofiber([&] {
+ * 		n += 1;
+ * 	});
+ *
+ * 	// 2) Async fiber with custom private stack
+ * 	auto fb2 = acl::gofiber_stack([&] {
+ * 		n += 2;
+ * 	}, 256000);
+ *
+ * 	// 3) Async fiber with shared stack
+ * 	auto fb3 = acl::gofiber_share([&] {
+ * 		n += 3;
+ * 	}, 16000);
+ *
+ * 	// 4) Run in fiber and wait for completion
+ * 	acl::gofiber_wait_fiber([&] {
+ * 		n += 4;
+ * 	});
+ *
+ * 	// 5) Run in thread and wait for completion
+ * 	acl::gofiber_wait_thread([&] {
+ * 		n += 5;
+ * 	});
+ *
+ * 	// NOTE: fb1/fb2/fb3 are handles of async fibers.
+ * 	// If execution order is required, use wait variants.
+ * 	(void) fb1;
+ * 	(void) fb2;
+ * 	(void) fb3;
+ * }
+ *
  * ============================================================================
  * KEY CONCEPTS
  * ============================================================================
@@ -293,4 +376,9 @@ void gofiber_wait_thread(Callable&& fn) {
  * 5. [=] - Capture variables by value (creates copies)
  * 6. go_stack(size) - Launch fiber with custom stack size
  * 7. go_share(size) - Launch fiber with shared stack
+ * 8. gofiber(...) - Template helper for async fiber launch
+ * 9. gofiber_stack(..., size) - Template helper with private stack
+ * 10. gofiber_share(..., size) - Template helper with shared stack
+ * 11. gofiber_wait_fiber(...) - Template helper to run fiber and wait
+ * 12. gofiber_wait_thread(...) - Template helper to run thread and wait
  */
