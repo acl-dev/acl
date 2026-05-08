@@ -2,7 +2,7 @@
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
-Version:        3.6.6
+Version:        3.6.7
 Release:        %{release_id}
 Group:          System/Libs
 License:        LGPL3.0,IBM
@@ -44,6 +44,18 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Fri May 08 2026 shuxin.zheng shuxin.zheng@qq.com 3.6.7-0-20260508.12 
+- Optimize: Optimize stream::read() API for reading from UDP socket;
+- Optimize: Add more mysql's error number in mysql module;
+- Optmize: Set the connect socket's readwrite buffer to improve network IO performance;
+- Feature: Add more fiber template and add conditional compiling for fiber go macro;
+- Optimize: redis_client_pipeline::push() API can be used by user to get the highest performance;
+- Feature: Support parsing unicode string in json parser;
+- Feature: Add CMAKE_MIN_VER envrionment setting in userspace;
+- Feature: Add pkg building for Ubuntu and macOS.
+- Bugfix: Fixed bug in gsoner::get_filename() when getting the file name from full file path;
+- Bugfix: Fixed compiling error in fiber module on windows platform;
 
 * Mon Mar 09 2026 shuxin.zheng shuxin.zheng@qq.com 3.6.6-0-20260309.20 
 - Bugfix: Fixed bugs that the thread's local memory not freed after thread exit in fiber;
