@@ -289,7 +289,7 @@ void gofiber_wait_thread(Callable&& fn) {
  * Example 5: Waiting for fiber/thread completion
  * -----------------------------------------------
  * static void waiter() {
- *	int n = 100;
+ *	static int n = 100;
  *
  *	// Run in a separate thread and wait for result
  *	go_wait_thread[&] { incr(n); };
@@ -308,7 +308,7 @@ void gofiber_wait_thread(Callable&& fn) {
  * 	// Launch a fiber without lambda (direct function call)
  * 	go fiber1;
  * 	
- * 	acl::string buf("hello");
+ * 	static acl::string buf("hello");
  *
  * 	// Launch a fiber with lambda (capture by reference)
  * 	// The fiber can modify 'buf'
@@ -332,31 +332,44 @@ void gofiber_wait_thread(Callable&& fn) {
  * -------------------------------------------
  * static void helper_demo() {
  * 	int n = 0;
+ * 	acl::wait_group wg;
  *
  * 	// 1) Async fiber, default stack settings
+ *  wg.add(1);
  * 	auto fb1 = acl::gofiber([&] {
  * 		n += 1;
+ * 		wg.done();
  * 	});
  *
  * 	// 2) Async fiber with custom private stack
+ *  wg.add(1);
  * 	auto fb2 = acl::gofiber_stack([&] {
  * 		n += 2;
+ * 		wg.done();
  * 	}, 256000);
  *
  * 	// 3) Async fiber with shared stack
+ *  wg.add(1);
  * 	auto fb3 = acl::gofiber_share([&] {
  * 		n += 3;
+ * 		wg.done();
  * 	}, 16000);
  *
  * 	// 4) Run in fiber and wait for completion
+ *  wg.add(1);
  * 	acl::gofiber_wait_fiber([&] {
+ * 		wg.done();
  * 		n += 4;
  * 	});
  *
  * 	// 5) Run in thread and wait for completion
+ *  wg.add(1);
  * 	acl::gofiber_wait_thread([&] {
  * 		n += 5;
+ * 		wg.done();
  * 	});
+ *
+ *  wg.wait();
  *
  * 	// NOTE: fb1/fb2/fb3 are handles of async fibers.
  * 	// If execution order is required, use wait variants.
