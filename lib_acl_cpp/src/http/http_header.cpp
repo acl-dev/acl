@@ -446,6 +446,9 @@ void http_header::build_common(string& buf) const
 		}
 		++it;
 		for (; it != entries_.end(); ++it) {
+			if ((*it)->off) {
+				continue;
+			}
 			buf << (*it)->name << ": " << (*it)->value << "\r\n";
 		}
 	}
