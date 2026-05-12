@@ -123,7 +123,6 @@ public:
 	const http_mime_node* get_node(const char* name) const;
 
 private:
-	string boundary_;
 	string save_path_;
 	off_t off_;
 	MIME_STATE* mime_state_;

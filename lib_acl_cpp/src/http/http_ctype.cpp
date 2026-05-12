@@ -7,8 +7,7 @@
 
 #if !defined(ACL_MIME_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 http_ctype::http_ctype()
 {
@@ -107,9 +106,7 @@ bool http_ctype::parse(const char* cp)
 				if (bound_ == NULL) {
 					bound_ = NEW string(64);
 				}
-				/* 需要添加 "--" 做为分隔符的前导符 */
-				*bound_ = "--";
-				*bound_ += token[2].u.value;
+				*bound_ = token[2].u.value;
 				break;
 			}
 		}
@@ -190,6 +187,81 @@ const char* http_ctype::get_name() const
 const char* http_ctype::get_charset() const
 {
 	return charset_;
+}
+
+http_ctype& http_ctype::set_ctype(const char* ctype) {
+	if (ctype == NULL || *ctype == 0) {
+		return *this;
+	}
+	if (ctype_) {
+		acl_myfree(ctype_);
+	}
+	ctype_ = acl_mystrdup(ctype);
+	return *this;
+}
+
+http_ctype& http_ctype::set_stype(const char* stype) {
+	if (stype == NULL || *stype == 0) {
+		return *this;
+	}
+	if (stype_) {
+		acl_myfree(stype_);
+	}
+	stype_ = acl_mystrdup(stype);
+	return *this;
+}
+
+http_ctype& http_ctype::set_bound(const char* boundary) {
+	if (boundary == NULL || *boundary == 0) {
+		return *this;
+	}
+	if (bound_ == NULL) {
+		bound_ = NEW string(64);
+	}
+	bound_->copy(boundary);
+	return *this;
+}
+
+http_ctype& http_ctype::set_charset(const char* charset) {
+	if (charset == NULL || *charset == 0) {
+		return *this;
+	}
+	if (charset_) {
+		acl_myfree(charset_);
+	}
+	charset_ = acl_mystrdup(charset);
+	return *this;
+}
+
+http_ctype& http_ctype::set_name(const char* name) {
+	if (name == NULL || *name == 0) {
+		return *this;
+	}
+	if (name_) {
+		acl_myfree(name_);
+	}
+	name_ = acl_mystrdup(name);
+	return *this;
+}
+
+bool http_ctype::to_string(string& buf) const {
+	if (ctype_ == NULL || *ctype_ == 0) {
+		return false;
+	}
+	if (stype_ == NULL || *stype_ == 0) {
+		return false;
+	}
+	buf.format("%s/%s", ctype_, stype_);
+	if (charset_ && *charset_) {
+		buf.format_append("; charset=%s", charset_);
+	}
+	if (name_ && *name_) {
+		buf.format_append("; name=%s", name_);
+	}
+	if (bound_ && bound_->size() > 2) {
+		buf.format_append("; boundary=%s", bound_->c_str());
+	}
+	return true;
 }
 
 } // namespace acl

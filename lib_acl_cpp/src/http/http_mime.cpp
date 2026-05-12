@@ -142,18 +142,6 @@ http_mime::http_mime(const char* boundary,
 		mime_state_ = NULL;
 		return;
 	}
-	// HTTP 的 MIME 格式与 邮件的 MIME 的分隔符有所不同，
-	// HTTP 的分隔符要比邮件分隔符多两个 '-'，而目前 HTTP
-	// 的 MIME 解析器用的是邮件的 MIME 解析器，目前邮件的
-	// MIME 解析器会自动加上两个 '-' 前缀，所以需要去掉
-	// 开头的两个 '-'
-	if (*boundary == '-') {
-		boundary++;
-	}
-	if (*boundary == '-') {
-		boundary++;
-	}
-	boundary_ = boundary;
 
 	if (local_charset && *local_charset) {
 		safe_snprintf(local_charset_, sizeof(local_charset_),

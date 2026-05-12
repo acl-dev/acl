@@ -72,6 +72,13 @@ public:
 	 */
 	const char* get_charset() const;
 
+	http_ctype& set_ctype(const char* ctype);
+	http_ctype& set_stype(const char* stype);
+	http_ctype& set_bound(const char* boundary);
+	http_ctype& set_charset(const char* charset);
+	http_ctype& set_name(const char* name);
+	bool to_string(string& buf) const;
+
 private:
 	char* ctype_;
 	char* stype_;
