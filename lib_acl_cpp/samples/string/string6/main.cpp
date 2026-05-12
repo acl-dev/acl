@@ -61,6 +61,10 @@ int main()
 
 	int p = s.find(':');
 	if (p > 0) {
+		acl::string port;
+		s.substr(port, p, s.length());
+		printf("port: |%s|, len=%zd\n", port.c_str(), port.size());
+
 		s.truncate(p);
 	}
 	std::cout << "s: " << s << "; len: " << s.length() << std::endl;
