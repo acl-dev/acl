@@ -167,8 +167,32 @@ public:
 	 */
 	bool request(const void* data, size_t len);
 
+	/**
+	 * Upload one file to the HTTP server, the content-type should be set first
+	 * @param filepath The filepath must exist and no empty
+	 * @return {bool} If upload file successfully
+	 */
 	bool upload(const char* filepath);
-	bool upload(http_mime& mime, const char* filepath);
+
+	/**
+	 * Upload one http_mime object to the HTTP server
+	 * @param mime The mime holding many parameters and files
+	 * @param filepath  The temp file to save mime data, which shouldn't exist
+	 *  with the same name with filepath, or the file will be rewritten with
+	 *  the mime's data; If filepath is NULL, the memory will be used to hold
+	 *  all the mime's data
+	 * @param savefile {bool} If left the temp file after sending.
+	 * @return {bool} If upload file successfully
+	 */
+	bool upload(http_mime& mime, const char* filepath, bool savefile = false);
+
+	/**
+     * Upload one http_mime object to the HTTP server
+     * @param mime The mime holding many parameters and files
+     * @param buff {string*} If no null, it'll store the data to send.
+     * @return {bool} If upload file successfully
+     */
+	bool upload(http_mime& mime, string *buff = NULL);
 
 	/////////////////////////////////////////////////////////////////////
 

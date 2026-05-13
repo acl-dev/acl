@@ -577,11 +577,11 @@ bool http_request::send_file(const char *filepath) const {
 	return true;
 }
 
-bool http_request::upload(http_mime &mime, const char *filepath) {
+bool http_request::upload(http_mime &mime, const char *filepath, bool savefile) {
 	if (filepath == NULL || filepath[0] == '\0') {
-		logger_error("filepath is NULL");
-		return false;
+		return upload(mime);
 	}
+
 	if (!mime.save_to(filepath)) {
 		logger_error("save to file error");
 		return false;
@@ -592,11 +592,33 @@ bool http_request::upload(http_mime &mime, const char *filepath) {
 	ctype.append("; boundary=").append(boundary);
 	header_.set_content_type(ctype.c_str());
 
-	return upload(filepath);
+	const bool ret = upload(filepath);
+	if (!savefile) {
+		unlink(filepath);
+	}
+	return ret;
 }
 
-int http_request::http_status() const
-{
+bool http_request::upload(http_mime &mime, string *buff) {
+	string buf;
+	if (!mime.save_to(buf)) {
+		logger_error("save to buffer error");
+		return false;
+	}
+
+	if (buff) {
+		buff->copy(buf.c_str(), buf.length());
+	}
+
+	const char* boundary = mime.get_boundary();
+	std::string ctype("multipart/form-data");
+	ctype.append("; boundary=").append(boundary);
+	header_.set_content_type(ctype.c_str());
+
+	return request(buf.c_str(), buf.size());
+}
+
+int http_request::http_status() const {
 	return client_ ? client_->response_status() : -1;
 }
 

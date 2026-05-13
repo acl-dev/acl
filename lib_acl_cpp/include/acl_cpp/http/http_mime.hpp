@@ -140,6 +140,8 @@ public:
 	bool save_to(const char* file_path);
 	bool save_to(ostream& out);
 
+	bool save_to(string& out);
+
 private:
 	std::string boundary_;
 	string save_path_;
@@ -159,6 +161,12 @@ private:
 		const std::pair<std::string, std::string>& param);
 	static bool save_file(ostream& out, const std::string& bound,
 		const std::pair<std::string, pair_value>& file);
+
+	static void save_param(string& out, const std::string& bound,
+		const std::pair<std::string, std::string>& param);
+	static bool save_file(string& out, const std::string& bound,
+		const std::pair<std::string, pair_value>& file);
+
 	static void get_ctype(const char* filename, std::string& ctype);
 };
 

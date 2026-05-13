@@ -1,6 +1,5 @@
 #include "acl_stdafx.hpp"
 #include "../mime/internal/mime_state.hpp"
-#include "../mime/internal/header_opts.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
@@ -95,7 +94,7 @@ void http_mime_node::load_param(const char* path) {
 
 	const char* fromCharset = get_charset();
 	const char* toCharset   = get_toCharset();
-	if (fromCharset && *fromCharset && toCharset && *toCharset
+	if (*fromCharset && toCharset && *toCharset
 		  && strcasecmp(fromCharset, toCharset) != 0) {
 
 		charset_conv conv;
@@ -200,7 +199,7 @@ const std::list<http_mime_node*>& http_mime::get_nodes() const {
 }
 
 const http_mime_node* http_mime::get_node(const char* name) const {
-	get_nodes();
+	(void) get_nodes();
 
 	for (std::list<http_mime_node*>::const_iterator cit = mime_nodes_.begin();
 		  cit != mime_nodes_.end(); ++cit) {
@@ -355,6 +354,96 @@ bool http_mime::save_file(ostream &out, const std::string& bound,
 	}
 	return true;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+bool http_mime::save_to(string &out) {
+	std::string bound("--");
+	bound += boundary_;
+
+	for (std::map<std::string, pair_value>::const_iterator it = files_.begin();
+		  it != files_.end(); ++it) {
+		if (!save_file(out, bound, *it)) {
+			return false;
+		}
+	}
+
+	for (std::map<std::string, std::string>::const_iterator it = params_.begin();
+		  it != params_.end(); ++it) {
+		save_param(out, bound, *it);
+	}
+
+	bound += "--\r\n";
+	out.append(bound.c_str(), bound.size());
+	return true;
+}
+
+void http_mime::save_param(string &out, const std::string& bound,
+	  const std::pair<std::string, std::string>& param) {
+	out.append(bound.c_str(), bound.size());
+	out.append("\r\n");
+
+	const char disposition[] = "Content-Disposition: form-data; name=\"";
+	out.append(disposition, sizeof(disposition) - 1);
+	if (!param.first.empty()) {
+		out.append(param.first.c_str(), param.first.size());
+	}
+	out.append("\"\r\n\r\n");
+
+	if (!param.second.empty()) {
+		out.append(param.second.c_str(), param.second.size());
+	}
+	out.append("\r\n");
+}
+
+bool http_mime::save_file(string &out, const std::string& bound,
+		const std::pair<std::string, pair_value>& file) {
+	out.append(bound.c_str(), bound.size());
+	out.append("\r\n");
+
+	const char disposition[] = "Content-Disposition: form-data; name=\"";
+	out.append(disposition, sizeof(disposition) - 1);
+	if (!file.first.empty()) {
+		out.append(file.first.c_str(), file.first.size());
+	}
+	out.append("\"; filename=\"");
+	if (!file.second.first.empty()) {
+		out.append(file.second.first.c_str(), file.second.first.size());
+	}
+	out.append("\"\r\n");
+
+	out.append("Content-Type: ");
+	std::string ctype;
+	get_ctype(file.second.first.c_str(), ctype);
+	out.append(ctype.c_str(), ctype.size());
+	out.append("\r\n\r\n");
+
+	if (file.second.second.empty()) {
+		out.append("\r\n");
+		return true;
+	}
+
+	const char* filepath = file.second.second.c_str();
+	ifstream in;
+	if (!in.open_read(filepath)) {
+		logger_error("open %s failed(%s)", filepath, last_serror());
+		return false;
+	}
+
+	char buffer[8192];
+	while (!in.eof()) {
+		const int ret = in.read(buffer, sizeof(buffer), false);
+		if (ret == -1) {
+			break;
+		}
+		out.append(buffer, ret);
+	}
+
+	out.append("\r\n");
+	return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 void http_mime::get_ctype(const char *filename, std::string& ctype) {
 	ctype = "application/octet-stream";

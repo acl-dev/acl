@@ -1,6 +1,5 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
-#include <stdlib.h>
 #include <map>
 #include "../stdlib/noncopyable.hpp"
 #include "../stdlib/string.hpp"
@@ -102,9 +101,8 @@ public:
 	const char* get_toCharset() const {
 		if (m_toCharset[0]) {
 			return m_toCharset;
-		} else {
-			return NULL;
 		}
+		return NULL;
 	}
 
 	/**
