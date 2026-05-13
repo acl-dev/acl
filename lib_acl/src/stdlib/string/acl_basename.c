@@ -27,7 +27,7 @@ const char *acl_safe_basename(const char *path)
 		result = (const char *) path;
 	} else
 		result += 1;
-	return (result);
+	return result;
 }
 
 

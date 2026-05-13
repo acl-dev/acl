@@ -13,8 +13,7 @@ class ostream;
  * When composing emails, this class is used to create functionality related to
  * email attachments
  */
-class ACL_CPP_API mail_attach
-{
+class ACL_CPP_API mail_attach {
 public:
 	/**
 	 * Constructor when packaging a regular file into email
@@ -53,8 +52,7 @@ public:
 	 * Get attachment file path passed in constructor
 	 * @return {const char*}
 	 */
-	const char* get_filepath() const
-	{
+	const char* get_filepath() const {
 		return filepath_.c_str();
 	}
 
@@ -62,8 +60,7 @@ public:
 	 * Get filename part of attachment after rfc2047 encoding
 	 * @return {const char*}
 	 */
-	const char* get_filename() const
-	{
+	const char* get_filename() const {
 		return filename_.c_str();
 	}
 
@@ -71,8 +68,7 @@ public:
 	 * Get file type passed in constructor
 	 * @return {const char*}
 	 */
-	const char* get_content_type() const
-	{
+	const char* get_content_type() const {
 		return ctype_.c_str();
 	}
 
@@ -80,8 +76,7 @@ public:
 	 * Get cid identifier of this attachment set by set_content_id
 	 * @return {const char*}
 	 */
-	const char* get_content_id() const
-	{
+	const char* get_content_id() const {
 		return cid_.c_str();
 	}
 

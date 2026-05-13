@@ -56,12 +56,12 @@ public:
 
 private:
 	http_mime_t mime_type_;
-	char* param_value_;
+	std::string param_value_;
 
 	void load_param(const char* path);
 };
 
-//////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * HTTP mime parser. This parser is a streaming parser. Users can input only
@@ -77,7 +77,7 @@ public:
 	 * automatically converts
 	 *  parameter content to local character set
 	 */
-	http_mime(const char* boundary, const char* local_charset  = "gb2312");
+	http_mime(const char* boundary, const char* local_charset  = "utf8");
 	~http_mime();
 
 	/**
@@ -92,9 +92,11 @@ public:
 	 */
 	void set_saved_path(const char* path);
 
+	////////////////////////////////////////////////////////////////////////////
+
 	/**
 	 * Call this function to parse body content in streaming mode
-	 * @param data {const char*} Body data (may be data header or body data,
+	 * @param data {const char*} Body data (maybe be data header or body data,
 	 *  and does not need to be complete data line)
 	 * @param len {size_t} data data length
 	 * @return {bool} For multipart data, returns true indicates parsing is
@@ -122,14 +124,34 @@ public:
 	 */
 	const http_mime_node* get_node(const char* name) const;
 
+	////////////////////////////////////////////////////////////////////////////
+
+	http_mime& add_param(const char* name, const char* value);
+	http_mime& add_file(const char* name, const char* filepath);
+
+	bool save_to(const char* file_path);
+	bool save_to(ostream& out);
+
 private:
+	std::string boundary_;
 	string save_path_;
 	off_t off_;
 	MIME_STATE* mime_state_;
-	std::list<http_mime_node*> mime_nodes_;
+	std::list<http_mime_node*> mime_nodes_; // For parsing
 	char  local_charset_[32];
 	bool  decode_on_;
 	bool  parsed_;
+
+private:
+	typedef std::pair<std::string, std::string> pair_value;
+	std::map<std::string, std::string> params_;
+	std::map<std::string, pair_value>  files_;
+
+	static bool save_param(ostream& out, const std::string& bound,
+		const std::pair<std::string, std::string>& param);
+	static bool save_file(ostream& out, const std::string& bound,
+		const std::pair<std::string, pair_value>& file);
+	static void get_ctype(const char* filename, std::string& ctype);
 };
 
 } // namespace acl

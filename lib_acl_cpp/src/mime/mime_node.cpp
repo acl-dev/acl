@@ -255,8 +255,7 @@ mime_node* mime_node::get_parent() const
 	if (node == NULL) {
 		return NULL;
 	}
-	const_cast<mime_node*>(this)->m_pParent =
-		NEW mime_node(m_emailFile.c_str(),
+	const_cast<mime_node*>(this)->m_pParent = NEW mime_node(m_emailFile.c_str(),
 			node, m_enableDecode, m_toCharset);
 	return m_pParent;
 }

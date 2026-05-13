@@ -71,8 +71,9 @@ typedef enum {
 } http_request_error_t;
 
 typedef enum {
-	HTTP_MIME_PARAM,        // http mime node is parameter type
-	HTTP_MIME_FILE          // http mime node is file type
+	HTTP_MIME_NULL,		// unknown type
+	HTTP_MIME_PARAM,	// http mime node is parameter type
+	HTTP_MIME_FILE,		// http mime node is file type
 } http_mime_t;
 
 } // namespace acl end

@@ -29,13 +29,9 @@ mail_attach::mail_attach(const char* filepath, const char* content_type,
 	}
 }
 
-mail_attach::~mail_attach(void)
-{
-}
+mail_attach::~mail_attach() {}
 
-bool mail_attach::rfc2047_encode(const char* name, const char* charset,
-	string& out)
-{
+bool mail_attach::rfc2047_encode(const char* name, const char* charset, string& out) {
 	if (charset == NULL || *charset == 0) {
 		return false;
 	}
@@ -50,24 +46,21 @@ bool mail_attach::rfc2047_encode(const char* name, const char* charset,
 }
 
 mail_attach& mail_attach::set_filename(const char* name,
-	const char* charset /* = NULL */)
-{
+	  const char* charset /* = NULL */) {
 	if (!rfc2047_encode(name, charset, filename_)) {
 		filename_ = name;
 	}
 	return *this;
 }
 
-mail_attach& mail_attach::set_content_id(const char* id)
-{
+mail_attach& mail_attach::set_content_id(const char* id) {
 	if (id && *id) {
 		cid_.format("%s", id);
 	}
 	return *this;
 }
 
-bool mail_attach::save_to(mime_code* coder, string& out)
-{
+bool mail_attach::save_to(mime_code* coder, string& out) {
 	if (coder) {
 		build_header(coder->get_encoding_type(), out);
 	} else {
@@ -92,8 +85,7 @@ bool mail_attach::save_to(mime_code* coder, string& out)
 	return true;
 }
 
-bool mail_attach::save_to(mime_code* coder, ostream& out)
-{
+bool mail_attach::save_to(mime_code* coder, ostream& out) {
 	string header;
 
 	if (coder) {
@@ -115,20 +107,16 @@ bool mail_attach::save_to(mime_code* coder, ostream& out)
 	}
 
 	char  buf[8192];
-	int   ret;
 	string body(8192);
 
 	while (!in.eof()) {
-		ret = in.read(buf, sizeof(buf), false);
+		int ret = in.read(buf, sizeof(buf), false);
 		if (ret == -1) {
 			break;
 		}
-		if (coder == NULL) {
-			if (out.write(buf, ret) == -1) {
-				logger_error("write body error %s",
-					last_serror());
-				return false;
-			}
+		if (coder == NULL && out.write(buf, ret) == -1) {
+			logger_error("write body error %s", last_serror());
+			return false;
 		}
 
 		coder->encode_update(buf, ret, &body);
@@ -158,8 +146,7 @@ bool mail_attach::save_to(mime_code* coder, ostream& out)
 	return true;
 }
 
-void mail_attach::build_header(const char* transfer_encoding, string& out)
-{
+void mail_attach::build_header(const char* transfer_encoding, string& out) {
 	out.format_append("Content-Type: %s;\r\n", ctype_.c_str());
 	out.format_append("\tname=\"%s\"\r\n", filename_.c_str());
 
