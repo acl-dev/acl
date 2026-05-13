@@ -2,6 +2,7 @@
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include <list>
+#include <string>
 #include "../stdlib/dbuf_pool.hpp"
 #include "../stdlib/string.hpp"
 #include "../mime/mime_attach.hpp"
@@ -79,6 +80,13 @@ public:
 	 */
 	http_mime(const char* boundary, const char* local_charset  = "utf8");
 	~http_mime();
+
+	const char* get_boundary() const {
+		return boundary_.c_str();
+	}
+	const char* get_local_charset() const {
+		return local_charset_;
+	}
 
 	/**
 	 * Set storage path for MIME data. After analyzing MIME data, if want to

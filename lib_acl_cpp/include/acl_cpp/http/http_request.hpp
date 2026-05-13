@@ -2,6 +2,7 @@
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include <string>
+#include "../stdlib/string.hpp"
 #include "../connpool/connect_client.hpp"
 #include "http_header.hpp"
 
@@ -9,6 +10,7 @@ namespace acl {
 
 class http_client;
 class http_pipe;
+class http_mime;
 class socket_stream;
 class charset_conv;
 class sslbase_conf;
@@ -164,6 +166,9 @@ public:
 	 * was successful.
 	 */
 	bool request(const void* data, size_t len);
+
+	bool upload(const char* filepath);
+	bool upload(http_mime& mime, const char* filepath);
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -448,6 +453,7 @@ private:
 	bool need_retry_;
 
 	bool send_request(const void* data, size_t len);
+	bool send_file(const char* filepath) const;
 	bool try_open(bool* reuse_conn);
 	void close();
 	void create_cookies();

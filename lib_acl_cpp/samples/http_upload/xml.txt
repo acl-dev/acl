@@ -1,0 +1,6 @@
+<root>
+  <users>
+    <user name="张三" pass="xsz1" />
+    <user name="李四" pass="xsz2" />
+</users>
+</root>

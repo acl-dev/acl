@@ -428,9 +428,8 @@ bool http_client::write_body(const void* data, size_t len)
 		// 如果数据输出完毕，则还需输出 gzip 尾部字段
 		if (data == NULL || len == 0) {
 			return write_gzip_trailer(out);
-		} else {
-			return true;
 		}
+		return true;
 	}
 
 	// 非压缩方式传输数据
@@ -439,23 +438,21 @@ bool http_client::write_body(const void* data, size_t len)
 	if (data == NULL || len == 0) {
 		if (chunked_transfer_) {
 			return write_chunk_trailer(out);
-		} else {
-			return true;
 		}
+		return true;
 	}
 
 	// 块方式写入数据体
-	else if (chunked_transfer_) {
+	if (chunked_transfer_) {
 		return write_chunk(out, data, len);
 	}
 
 	// 普通流式写入数据体
-	else if (out.write(data, len, true, true) == -1 || !out.fflush()) {
+	if (out.write(data, len, true, true) == -1 || !out.fflush()) {
 		disconnected_ = true;
 		return false;
-	} else {
-		return true;
 	}
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////

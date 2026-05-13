@@ -16,6 +16,7 @@
 #include "acl_cpp/http/http_ctype.hpp"
 #include "acl_cpp/http/http_pipe.hpp"
 #include "acl_cpp/http/http_utils.hpp"
+#include "acl_cpp/http/http_mime.hpp"
 #include "acl_cpp/http/http_request.hpp"
 #endif
 
@@ -405,8 +406,7 @@ bool http_request::post(const char *data, size_t len)
 	return request(data, len);
 }
 
-bool http_request::request(const void* data, size_t len)
-{
+bool http_request::request(const void* data, size_t len) {
 	bool  have_retried = false;
 	bool  reuse_conn;
 	http_method_t method = header_.get_method();
@@ -427,13 +427,13 @@ bool http_request::request(const void* data, size_t len)
 
 	while (true) {
 		// 尝试打开远程连接
-		if (! try_open(&reuse_conn)) {
+		if (!try_open(&reuse_conn)) {
 			logger_error("connect server error");
 			return false;
 		}
 
 		// 发送 HTTP 请求至服务器
-		if (! send_request(data, len)) {
+		if (!send_request(data, len)) {
 			if (have_retried || !reuse_conn) {
 				logger_error("send request error");
 				return false;
@@ -447,11 +447,11 @@ bool http_request::request(const void* data, size_t len)
 			continue;
 		}
 
-		client_->reset();  // 重置状态
-
-		// 读 HTTP 响应头
-		if (client_->read_head()) {
-			break;
+		if (client_) {
+			client_->reset();  // 重置状态
+			if (client_->read_head()) { // 读 HTTP 响应头
+				break;
+			}
 		}
 
 		if (last_error() == ECANCELED) {
@@ -464,8 +464,7 @@ bool http_request::request(const void* data, size_t len)
 			return false;
 		}
 
-		// 先关闭之前的连接流
-		close();
+		close(); // 先关闭之前的连接流
 
 		// 对于长连接，如果是第一次IO失败，则可以再重试一次
 		have_retried = true;
@@ -478,6 +477,122 @@ bool http_request::request(const void* data, size_t len)
 	check_range();
 
 	return true;
+}
+
+bool http_request::upload(const char *filepath) {
+	if (filepath == NULL || filepath[0] == '\0') {
+		logger_error("filepath is NULL");
+		return false;
+	}
+
+	const long long fsize = fstream::fsize(filepath);
+	if (fsize <= 0) {
+		logger_error("fsize(%lld) is invalid", fsize);
+		return false;
+	}
+
+	header_.set_content_length(fsize);
+	header_.set_method(HTTP_METHOD_POST);
+
+	bool  have_retried = false;
+	bool  reuse_conn;
+
+	while (true) {
+		if (!try_open(&reuse_conn)) {
+			logger_error("connect server error");
+			return false;
+		}
+
+		if (!send_file(filepath)) {
+			if (have_retried || !reuse_conn) {
+				logger_error("send file error");
+				return false;
+			}
+			close();
+			have_retried = true;
+			continue;
+		}
+
+		if (client_) {
+			client_->reset();
+			if (client_->read_head()) { // 读 HTTP 响应头
+				break;
+			}
+		}
+
+		if (last_error() == ECANCELED) {
+			return false;
+		}
+
+		if (have_retried || !reuse_conn) {
+			logger_error("read response header error");
+			return false;
+		}
+
+		close(); // 先关闭之前的连接流
+
+		// 对于长连接，如果是第一次IO失败，则可以再重试一次
+		have_retried = true;
+	}
+
+	// 设置字符集转换器
+	set_charset_conv();
+
+	// 检查返回头中是否有 Content-Range 字段
+	check_range();
+
+	return true;
+}
+
+bool http_request::send_file(const char *filepath) const {
+	// 必须保证该连接已经打开
+	if (client_ == NULL) {
+		logger_error("connection not opened yet!");
+		return false;
+	}
+
+	client_->reset();  // 重置状态
+
+	// 写 HTTP 请求头
+	if (!client_->write_head(header_)) {
+		return false;
+	}
+
+	ifstream in;
+	if (!in.open_read(filepath)) {
+		logger_error("open %s error: %s", filepath, last_serror());
+		return false;
+	}
+
+	char buf[8192];
+	while (!in.eof()) {
+		const int ret = in.read(buf, sizeof(buf), false);
+		if (ret <= 0) {
+			break;
+		}
+		if (!client_->write_body(buf, ret)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool http_request::upload(http_mime &mime, const char *filepath) {
+	if (filepath == NULL || filepath[0] == '\0') {
+		logger_error("filepath is NULL");
+		return false;
+	}
+	if (!mime.save_to(filepath)) {
+		logger_error("save to file error");
+		return false;
+	}
+
+	const char* boundary = mime.get_boundary();
+	std::string ctype("multipart/form-data");
+	ctype.append("; boundary=").append(boundary);
+	header_.set_content_type(ctype.c_str());
+
+	return upload(filepath);
 }
 
 int http_request::http_status() const
