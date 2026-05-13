@@ -24,7 +24,7 @@
 #include "event/event_io_uring.h"
 #endif
 
-#include "event.h"
+#include "./event.h"
 
 static __thread int __event_mode = FIBER_EVENT_KERNEL;
 

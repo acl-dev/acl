@@ -4,7 +4,7 @@
 #ifdef HAS_POLL
 
 #include "hook/hook.h"
-#include "event.h"
+#include "../event.h"
 #include "event_poll.h"
 
 typedef struct EVENT_POLL {

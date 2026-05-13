@@ -3,7 +3,7 @@
 #ifdef	HAS_IO_URING
 
 #include "common.h"
-#include "event.h"
+#include "../event.h"
 #include "fiber.h"
 #include "hook.h"
 #include "io.h"

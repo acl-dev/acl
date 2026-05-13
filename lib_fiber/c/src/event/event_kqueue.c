@@ -5,7 +5,7 @@
 
 #include <dlfcn.h>
 #include <sys/event.h>
-#include "event.h"
+#include "../event.h"
 #include "event_kqueue.h"
 
 typedef int (*kqueue_fn)(void);

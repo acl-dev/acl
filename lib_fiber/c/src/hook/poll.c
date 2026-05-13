@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "common.h"
 
-#include "event.h"
+#include "../event.h"
 #include "fiber.h"
 #include "hook.h"
 

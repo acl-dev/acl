@@ -4,7 +4,7 @@
 #ifdef HAS_WMSG
 
 #include <winuser.h>
-#include "event.h"
+#include "../event.h"
 #include "event_wmsg.h"
 
 #define WM_SOCKET_NOTIFY	(WM_USER + 8192)

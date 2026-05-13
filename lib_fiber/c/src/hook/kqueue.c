@@ -4,7 +4,7 @@
 
 #include "common.h"
 #include "fiber/libfiber.h"
-#include "event.h"
+#include "../event.h"
 #include "fiber.h"
 #include "hook.h"
 #include <errno.h>

@@ -5,7 +5,7 @@
 
 #include <dlfcn.h>
 #include <liburing.h>
-#include "event.h"
+#include "../event.h"
 #include "event_io_uring.h"
 
 typedef struct EVENT_URING {

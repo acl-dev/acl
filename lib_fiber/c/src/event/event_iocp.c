@@ -8,7 +8,7 @@
 #pragma comment(lib, "Mswsock.lib")
 
 #include "../hook/hook.h"
-#include "event.h"
+#include "../event.h"
 #include "event_iocp.h"
 
 typedef BOOL (PASCAL FAR* LPFN_CONNECTEX) (

@@ -15,7 +15,7 @@
 # include <sys/epoll.h>
 #endif
 
-#include "event.h"
+#include "../event.h"
 #include "event_epoll.h"
 
 typedef int (*epoll_create_fn)(int);
