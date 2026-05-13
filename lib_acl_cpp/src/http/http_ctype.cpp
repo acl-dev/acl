@@ -9,65 +9,28 @@
 
 namespace acl {
 
-http_ctype::http_ctype()
-{
-	ctype_ = NULL;
-	stype_ = NULL;
-	name_ = NULL;
-	charset_ = NULL;
-	bound_ = NULL;
-}
+http_ctype::http_ctype() {}
 
-http_ctype::~http_ctype()
-{
-	reset();
-}
+http_ctype::~http_ctype() {}
 
-http_ctype& http_ctype::operator = (const http_ctype& ctype)
-{
+http_ctype& http_ctype::operator = (const http_ctype& ctype) {
 	reset();
 
-	if (ctype.ctype_ && *ctype.ctype_) {
-		ctype_ = acl_mystrdup(ctype.ctype_);
-	}
-	if (ctype.stype_ && *ctype.stype_) {
-		stype_ = acl_mystrdup(ctype.stype_);
-	}
-	if (ctype.charset_ && *ctype.charset_) {
-		charset_ = acl_mystrdup(ctype.charset_);
-	}
-	if (ctype.name_ && *ctype.name_) {
-		name_ = acl_mystrdup(ctype.name_);
-	}
-	if (ctype.bound_ && !ctype.bound_->empty()) {
-		bound_ = NEW string(*ctype.bound_);
-	}
+	ctype_   = ctype.ctype_;
+	stype_   = ctype.stype_;
+	charset_ = ctype.charset_;
+	name_    = ctype.name_;
+	bound_   = ctype.bound_;
 
 	return *this;
 }
 
-void http_ctype::reset()
-{
-	if (ctype_) {
-		acl_myfree(ctype_);
-		ctype_ = NULL;
-	}
-	if (stype_) {
-		acl_myfree(stype_);
-		stype_ = NULL;
-	}
-	if (charset_) {
-		acl_myfree(charset_);
-		charset_ = NULL;
-	}
-	if (name_) {
-		acl_myfree(name_);
-		name_ = NULL;
-	}
-	if (bound_) {
-		delete bound_;
-		bound_ = NULL;
-	}
+void http_ctype::reset() {
+	ctype_.clear();
+	stype_.clear();
+	charset_.clear();
+	name_.clear();
+	bound_.clear();
 }
 
 #define RFC2045_TSPECIALS	"()<>@,;:\\\"/[]?="
@@ -75,191 +38,132 @@ void http_ctype::reset()
 #define TOKEN_MATCH(tok, text) \
 	((tok).type == HEADER_TOK_TOKEN && EQUAL((tok).u.value, (text)))
 
-bool http_ctype::parse(const char* cp)
-{
+#define PARSE_CONTENT_TYPE(t, ptr) \
+	header_token(t, MIME_MAX_TOKEN, buffer, ptr, RFC2045_TSPECIALS, ';')
+
+static void parse_token(const char* cp, ACL_VSTRING* buffer, HEADER_TOKEN* token,
+	  ssize_t tok_count, const char* tag, std::string& stype, std::string& value) {
+	if (tok_count >= 3 && token[1].type == '/') {
+		stype = token[2].u.value;
+	}
+	while ((tok_count = PARSE_CONTENT_TYPE(token, &cp)) >= 0) {
+		if (tok_count < 3 || token[1].type != '=') {
+			continue;
+		}
+		if (TOKEN_MATCH(token[0], tag)) {
+			value = token[2].u.value;
+			break;
+		}
+	}
+}
+
+bool http_ctype::parse(const char* cp) {
 	reset();
 
-#define PARSE_CONTENT_TYPE(t, ptr) \
-	header_token(t, MIME_MAX_TOKEN, \
-		buffer, ptr, RFC2045_TSPECIALS, ';')
-
 	HEADER_TOKEN token[MIME_MAX_TOKEN];
-	ssize_t tok_count;
 	ACL_VSTRING* buffer = acl_vstring_alloc(64);
-
-	tok_count = PARSE_CONTENT_TYPE(token, &cp);
+	ssize_t tok_count = PARSE_CONTENT_TYPE(token, &cp);
 	if (tok_count < 0) {
 		acl_vstring_free(buffer);
 		return false;
 	}
 
-	ctype_ = acl_mystrdup(token[0].u.value);
+	ctype_ = token[0].u.value;
 
 	if (TOKEN_MATCH(token[0], "multipart")) {
-		if (tok_count >= 3 && token[1].type == '/')
-			stype_ = acl_mystrdup(token[2].u.value);
-		while ((tok_count = PARSE_CONTENT_TYPE(token, &cp)) >= 0) {
-			if (tok_count < 3 || token[1].type != '=') {
-				continue;
-			}
-			if (TOKEN_MATCH(token[0], "boundary")) {
-				if (bound_ == NULL) {
-					bound_ = NEW string(64);
-				}
-				*bound_ = token[2].u.value;
-				break;
-			}
-		}
+		parse_token(cp, buffer, token, tok_count, "boundary", stype_, bound_);
 	} else if (TOKEN_MATCH(token[0], "text")) {
-		if (tok_count >= 3 && token[1].type == '/') {
-			stype_ = acl_mystrdup(token[2].u.value);
-		}
-
-		while ((tok_count = PARSE_CONTENT_TYPE(token, &cp)) >= 0) {
-			if (tok_count < 3 || token[1].type != '=') {
-				continue;
-			}
-			if (TOKEN_MATCH(token[0], "charset")) {
-				charset_ = acl_mystrdup(token[2].u.value);
-				break;
-			}
-		}
-	} else if (TOKEN_MATCH(token[0], "image")) {
-		if (tok_count >= 3 && token[1].type == '/') {
-			stype_ = acl_mystrdup(token[2].u.value);
-		}
-
-		while ((tok_count = PARSE_CONTENT_TYPE(token, &cp)) >= 0) {
-			if (tok_count < 3 || token[1].type != '=') {
-				continue;
-			}
-			if (TOKEN_MATCH(token[0], "name")) {
-				name_ = acl_mystrdup(token[2].u.value);
-				break;
-			}
-		}
-	} else if (TOKEN_MATCH(token[0], "application")) {
-		if (tok_count >= 3 && token[1].type == '/') {
-			stype_ = acl_mystrdup(token[2].u.value);
-		}
-
-		while ((tok_count = PARSE_CONTENT_TYPE(token, &cp)) >= 0) {
-			if (tok_count < 3 || token[1].type != '=') {
-				continue;
-			}
-
-			if (TOKEN_MATCH(token[0], "name")) {
-				name_ = acl_mystrdup(token[2].u.value);
-				break;
-			}
-		}
+		parse_token(cp, buffer, token, tok_count, "charset", stype_, charset_);
+	} else if (TOKEN_MATCH(token[0], "image")
+		 || TOKEN_MATCH(token[0], "application")) {
+		parse_token(cp, buffer, token, tok_count, "name", stype_, name_);
 	} else if (tok_count >= 3 && token[1].type == '/') {
-		stype_ = acl_mystrdup(token[2].u.value);
+		stype_ = token[2].u.value;
 	}
 
 	acl_vstring_free(buffer);
 	return true;
 }
 
-const char* http_ctype::get_ctype() const
-{
-	return ctype_;
+const char* http_ctype::get_ctype() const {
+	return ctype_.empty() ? NULL : ctype_.c_str();
 }
 
-const char* http_ctype::get_stype() const
-{
-	return stype_;
+const char* http_ctype::get_stype() const {
+	return stype_.empty() ? NULL : stype_.c_str();
 }
 
-const char* http_ctype::get_bound() const
-{
-	if (bound_ == NULL || bound_->empty()) {
-		return NULL;
-	}
-	return bound_->c_str();
+const char* http_ctype::get_bound() const {
+	return bound_.empty() ? NULL : bound_.c_str();
 }
 
-const char* http_ctype::get_name() const
-{
-	return name_;
+const char* http_ctype::get_name() const {
+	return name_.empty() ? NULL : name_.c_str();
 }
 
-const char* http_ctype::get_charset() const
-{
-	return charset_;
+const char* http_ctype::get_charset() const {
+	return charset_.empty() ? NULL : charset_.c_str();
 }
 
 http_ctype& http_ctype::set_ctype(const char* ctype) {
-	if (ctype == NULL || *ctype == 0) {
+	if (ctype == NULL) {
 		return *this;
 	}
-	if (ctype_) {
-		acl_myfree(ctype_);
-	}
-	ctype_ = acl_mystrdup(ctype);
+	ctype_ = ctype;
 	return *this;
 }
 
 http_ctype& http_ctype::set_stype(const char* stype) {
-	if (stype == NULL || *stype == 0) {
+	if (stype == NULL) {
 		return *this;
 	}
-	if (stype_) {
-		acl_myfree(stype_);
-	}
-	stype_ = acl_mystrdup(stype);
+	stype_ = stype;
 	return *this;
 }
 
 http_ctype& http_ctype::set_bound(const char* boundary) {
-	if (boundary == NULL || *boundary == 0) {
+	if (boundary == NULL) {
 		return *this;
 	}
-	if (bound_ == NULL) {
-		bound_ = NEW string(64);
-	}
-	bound_->copy(boundary);
+	bound_ = boundary;
 	return *this;
 }
 
 http_ctype& http_ctype::set_charset(const char* charset) {
-	if (charset == NULL || *charset == 0) {
+	if (charset == NULL) {
 		return *this;
 	}
-	if (charset_) {
-		acl_myfree(charset_);
-	}
-	charset_ = acl_mystrdup(charset);
+	charset_ = charset;
 	return *this;
 }
 
 http_ctype& http_ctype::set_name(const char* name) {
-	if (name == NULL || *name == 0) {
+	if (name == NULL) {
 		return *this;
 	}
-	if (name_) {
-		acl_myfree(name_);
-	}
-	name_ = acl_mystrdup(name);
+	name_ = name;
 	return *this;
 }
 
-bool http_ctype::to_string(string& buf) const {
-	if (ctype_ == NULL || *ctype_ == 0) {
+bool http_ctype::to_string(std::string& buf) const {
+	if (ctype_.empty() || stype_.empty()) {
 		return false;
 	}
-	if (stype_ == NULL || *stype_ == 0) {
-		return false;
+
+	buf = ctype_;
+	buf += "/";
+	buf += stype_;
+	if (!charset_.empty()) {
+		buf += "; charset=\"%s\"";
+		buf += charset_;
 	}
-	buf.format("%s/%s", ctype_, stype_);
-	if (charset_ && *charset_) {
-		buf.format_append("; charset=%s", charset_);
+	if (!name_.empty()) {
+		buf += "; name=%s";
+		buf += name_;
 	}
-	if (name_ && *name_) {
-		buf.format_append("; name=%s", name_);
-	}
-	if (bound_ && bound_->size() > 2) {
-		buf.format_append("; boundary=%s", bound_->c_str());
+	if (!bound_.empty()) {
+		buf += "; boundary=%s";
+		buf += bound_;
 	}
 	return true;
 }

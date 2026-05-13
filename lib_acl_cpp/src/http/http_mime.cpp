@@ -83,9 +83,7 @@ void http_mime_node::load_param(const char* path)
 	buf[len] = 0;
 	char* ptr = buf + len - 1;
 	while (ptr >= buf) {
-		if (*ptr == '\r' || *ptr == '\n'
-			|| *ptr == ' ' || *ptr == '\t') {
-
+		if (*ptr == '\r' || *ptr == '\n' || *ptr == ' ' || *ptr == '\t') {
 			*ptr-- = 0;
 			continue;
 		}

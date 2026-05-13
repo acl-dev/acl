@@ -1,6 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
-#include "../stdlib/string.hpp"
+#include <string>
 #include "../stdlib/noncopyable.hpp"
 
 #if !defined(ACL_MIME_DISABLE)
@@ -77,14 +77,14 @@ public:
 	http_ctype& set_bound(const char* boundary);
 	http_ctype& set_charset(const char* charset);
 	http_ctype& set_name(const char* name);
-	bool to_string(string& buf) const;
+	bool to_string(std::string& buf) const;
 
 private:
-	char* ctype_;
-	char* stype_;
-	char* name_;
-	char* charset_;
-	string* bound_;
+	std::string ctype_;
+	std::string stype_;
+	std::string name_;
+	std::string charset_;
+	std::string bound_;
 
 	void reset();
 };
