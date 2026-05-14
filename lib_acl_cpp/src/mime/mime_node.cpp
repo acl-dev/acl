@@ -41,8 +41,7 @@ mime_node::mime_node(const char* emailFile, const MIME_NODE* node,
 	if (node->header_name) {
 		if (toCharset) {
 			rfc2047 rfc;
-			rfc.decode_update(node->header_name,
-				(int) strlen(node->header_name));
+			rfc.decode_update(node->header_name, (int) strlen(node->header_name));
 			rfc.decode_finish(toCharset, &m_name);
 		} else {
 			m_name = node->header_name;
@@ -61,24 +60,20 @@ mime_node::mime_node(const char* emailFile, const MIME_NODE* node,
 	m_bodyEnd = node->body_data_end + off;
 }
 
-mime_node::~mime_node()
-{
+mime_node::~mime_node() {
 	delete m_headers_;
 	delete m_pParent;
 }
 
-const char* mime_node::get_ctype_s() const
-{
+const char* mime_node::get_ctype_s() const {
 	return m_pMimeNode->ctype_s ? m_pMimeNode->ctype_s : "";
 }
 
-const char* mime_node::get_stype_s() const
-{
+const char* mime_node::get_stype_s() const {
 	return m_pMimeNode->stype_s ? m_pMimeNode->stype_s : "";
 }
 
-const char* mime_node::header_value(const char* name) const
-{
+const char* mime_node::header_value(const char* name) const {
 	ACL_ITER iter;
 
 	acl_foreach(iter, m_pMimeNode->header_list) {
@@ -91,14 +86,12 @@ const char* mime_node::header_value(const char* name) const
 	return NULL;
 }
 
-const std::map<string, string>& mime_node::get_headers() const
-{
+const std::map<string, string>& mime_node::get_headers() const {
 	if (m_headers_ != NULL) {
 		return *m_headers_;
 	}
 
-	const_cast<mime_node*> (this)->m_headers_ =
-		NEW std::map<string, string>;
+	const_cast<mime_node*> (this)->m_headers_ = NEW std::map<string, string>;
 
 	ACL_ITER iter;
 
@@ -114,8 +107,7 @@ const std::map<string, string>& mime_node::get_headers() const
 	return *m_headers_;
 }
 
-bool mime_node::save(pipe_manager& out) const
-{
+bool mime_node::save(pipe_manager& out) const {
 	if (m_emailFile.empty()) {
 		logger_error("m_emailFile empty!");
 		return false;
@@ -150,15 +142,12 @@ bool mime_node::save(pipe_manager& out) const
 		mime_decoder = NULL;
 	}
 
-	char   buf[8192];
-	size_t size;
-	int    len = (int) (m_bodyEnd - m_bodyBegin);
+	char    buf[8192];
+	ssize_t len = (m_bodyEnd - m_bodyBegin);
 
-	int   ret;
 	while (len > 0) {
-		size = sizeof(buf) > (size_t) len
-			? (size_t) len : sizeof(buf);
-		ret = in.read(buf, size, true);
+		size_t size = sizeof(buf) > (size_t) len ? (size_t) len : sizeof(buf);
+		int ret = in.read(buf, size, true);
 		if (ret < 0) {
 			logger_error("read error(%s), ret: %d",
 				last_serror(), ret);
@@ -179,8 +168,7 @@ bool mime_node::save(pipe_manager& out) const
 	return result;
 }
 
-bool mime_node::save(pipe_manager& out, const char* src, int len) const
-{
+bool mime_node::save(pipe_manager& out, const char* src, int len) const {
 	if (src == NULL || len <= 0) {
 		return save(out);
 	}
@@ -217,16 +205,14 @@ bool mime_node::save(pipe_manager& out, const char* src, int len) const
 }
 
 bool mime_node::save(ostream& out, const char* src /* = NULL */,
-	int len /* = 0 */) const
-{
+	  int len /* = 0 */) const {
 	pipe_manager manager;
 	manager.push_front(&out);
 	return save(manager, src, len);
 }
 
 bool mime_node::save(const char* outFile, const char* src /* = NULL */,
-	int len /* = 0 */) const
-{
+	  int len /* = 0 */) const {
 	ofstream out;
 
 	if (!out.open_trunc(outFile)) {
@@ -237,16 +223,14 @@ bool mime_node::save(const char* outFile, const char* src /* = NULL */,
 }
 
 bool mime_node::save(string& out, const char* src /* = NULL */,
-	int len /* = 0 */) const
-{
+	  int len /* = 0 */) const {
 	pipe_manager manager;
 	pipe_string ps(out);
 	manager.push_front(&ps);
 	return save(manager, src, len);
 }
 
-mime_node* mime_node::get_parent() const
-{
+mime_node* mime_node::get_parent() const {
 	if (m_pParent) {
 		return m_pParent;
 	}
@@ -260,29 +244,25 @@ mime_node* mime_node::get_parent() const
 	return m_pParent;
 }
 
-bool mime_node::has_parent() const
-{
-	return m_pMimeNode->parent == NULL ? false : true;
+bool mime_node::has_parent() const {
+	return m_pMimeNode->parent != NULL;
 }
 
-int mime_node::parent_ctype() const
-{
+int mime_node::parent_ctype() const {
 	if (m_pMimeNode->parent == NULL) {
 		return MIME_CTYPE_OTHER;
 	}
 	return m_pMimeNode->parent->ctype;
 }
 
-int mime_node::parent_stype() const
-{
+int mime_node::parent_stype() const {
 	if (m_pMimeNode->parent == NULL) {
 		return MIME_STYPE_OTHER;
 	}
 	return m_pMimeNode->parent->stype;
 }
 
-const char* mime_node::parent_ctype_s() const
-{
+const char* mime_node::parent_ctype_s() const {
 	if (m_pMimeNode->parent == NULL) {
 		return "";
 	}
@@ -290,8 +270,7 @@ const char* mime_node::parent_ctype_s() const
 	return ptr ? ptr : "";
 }
 
-const char* mime_node::parent_stype_s() const
-{
+const char* mime_node::parent_stype_s() const {
 	if (m_pMimeNode->parent == NULL) {
 		return "";
 	}
@@ -299,40 +278,35 @@ const char* mime_node::parent_stype_s() const
 	return ptr ? ptr : "";
 }
 
-int mime_node::parent_encoding() const
-{
+int mime_node::parent_encoding() const {
 	if (m_pMimeNode->parent == NULL) {
 		return MIME_ENC_OTHER;
 	}
 	return m_pMimeNode->parent->encoding;
 }
 
-char* mime_node::parent_charset() const
-{
+char* mime_node::parent_charset() const {
 	if (m_pMimeNode->parent == NULL) {
 		return NULL;
 	}
 	return m_pMimeNode->parent->charset;
 }
 
-off_t mime_node::parent_bodyBegin(void) const
-{
+off_t mime_node::parent_bodyBegin() const {
 	if (m_pMimeNode->parent == NULL) {
 		return -1;
 	}
 	return m_pMimeNode->parent->body_begin;
 }
 
-off_t mime_node::parent_bodyEnd(void) const
-{
+off_t mime_node::parent_bodyEnd() const {
 	if (m_pMimeNode->parent == NULL) {
 		return -1;
 	}
 	return m_pMimeNode->parent->body_end;
 }
 
-const char* mime_node::parent_header_value(const char* name) const
-{
+const char* mime_node::parent_header_value(const char* name) const {
 	if (m_pMimeNode->parent == NULL) {
 		return NULL;
 	}
