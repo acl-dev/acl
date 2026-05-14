@@ -1,7 +1,7 @@
 #ifndef EVENT_WMSG_INCLUDE_H
 #define EVENT_WMSG_INCLUDE_H
 
-#include "event.h"
+#include "../event.h"
 
 #ifdef HAS_WMSG
 

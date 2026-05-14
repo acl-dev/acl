@@ -1,7 +1,7 @@
 #ifndef EVENT_SELECT_INCLUDE_H
 #define EVENT_SELECT_INCLUDE_H
 
-#include "event.h"
+#include "../event.h"
 
 #ifdef HAS_SELECT
 
