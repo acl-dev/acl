@@ -24,8 +24,7 @@
 
 namespace acl {
 
-mime::mime()
-{
+mime::mime() {
 	m_pMimeState         = mime_state_alloc();
 	m_bPrimaryHeadFinish = false;
 	m_pFilePath          = NULL;
@@ -35,8 +34,7 @@ mime::mime()
 	m_pImages            = NULL;
 }
 
-mime::~mime()
-{
+mime::~mime() {
 	reset();
 	mime_state_free(m_pMimeState);
 	delete m_pNodes;
@@ -44,8 +42,7 @@ mime::~mime()
 	delete m_pImages;
 }
 
-mime& mime::reset()
-{
+mime& mime::reset() {
 	m_primaryHeader.reset();
 	mime_state_reset(m_pMimeState);
 	m_bPrimaryHeadFinish = false;
@@ -59,24 +56,24 @@ mime& mime::reset()
 	m_pBody = NULL;
 
 	if (m_pNodes) {
-		std::list<mime_node*>::iterator it = m_pNodes->begin();
-		for (; it != m_pNodes->end(); ++it) {
+		for (std::list<mime_node*>::iterator it = m_pNodes->begin();
+			  it != m_pNodes->end(); ++it) {
 			delete (*it);
 		}
 		m_pNodes->clear();
 	}
 
 	if (m_pAttaches) {
-		std::list<mime_attach*>::iterator it = m_pAttaches->begin();
-		for (; it != m_pAttaches->end(); ++it) {
+		for (std::list<mime_attach*>::iterator it = m_pAttaches->begin();
+			  it != m_pAttaches->end(); ++it) {
 			delete (*it);
 		}
 		m_pAttaches->clear();
 	}
 
 	if (m_pImages) {
-		std::list<mime_image*>::iterator it = m_pImages->begin();
-		for (; it != m_pImages->end(); ++it) {
+		for (std::list<mime_image*>::iterator it = m_pImages->begin();
+			  it != m_pImages->end(); ++it) {
 			delete (*it);
 		}
 		m_pImages->clear();
@@ -85,8 +82,7 @@ mime& mime::reset()
 	return *this;
 }
 
-bool mime::primary_head_ok() const
-{
+bool mime::primary_head_ok() const {
 	if (mime_state_head_finish(m_pMimeState)) {
 		return true;
 	} else {
@@ -94,8 +90,7 @@ bool mime::primary_head_ok() const
 	}
 }
 
-void mime::update_begin(const char* path)
-{
+void mime::update_begin(const char* path) {
 	reset();
 	if (m_pFilePath) {
 		acl_myfree(m_pFilePath);
@@ -105,19 +100,15 @@ void mime::update_begin(const char* path)
 	}
 }
 
-bool mime::update(const char* data, size_t len)
-{
-	return mime_state_update(m_pMimeState, data, (int) len) == 1
-			? true : false;
+bool mime::update(const char* data, size_t len) const {
+	return mime_state_update(m_pMimeState, data, (int) len) == 1;
 }
 
-void mime::update_end()
-{
+void mime::update_end() {
 	primary_head_finish();
 }
 
-void mime::primary_head_finish()
-{
+void mime::primary_head_finish() {
 	if (m_bPrimaryHeadFinish) {
 		return;
 	}
@@ -173,12 +164,11 @@ void mime::primary_head_finish()
 	m_bPrimaryHeadFinish = true;
 }
 
-bool mime::parse(const char* path)
-{
-	acl::ifstream fp;
+bool mime::parse(const char* file_path) {
+	ifstream fp;
 
-	if (!fp.open_read(path)) {
-		logger_error("open %s error %s", path, last_serror());
+	if (!fp.open_read(file_path)) {
+		logger_error("open %s error %s", file_path, last_serror());
 		return false;
 	}
 
@@ -219,12 +209,11 @@ bool mime::parse(const char* path)
 	if (m_pFilePath) {
 		acl_myfree(m_pFilePath);
 	}
-	m_pFilePath = acl_mystrdup(path);
+	m_pFilePath = acl_mystrdup(file_path);
 	return true;
 }
 
-static bool save_as(ifstream& in, ostream& out, off_t pos, ssize_t len)
-{
+static bool save_as(ifstream& in, ostream& out, off_t pos, ssize_t len) {
 	if (pos < 0 || len <= 0) {
 		return true;
 	}
@@ -236,12 +225,9 @@ static bool save_as(ifstream& in, ostream& out, off_t pos, ssize_t len)
 		return false;
 	}
 
-	size_t size;
-	int    ret;
-
 	while (len > 0) {
-		size = sizeof(buf) > (size_t) len ? (size_t) len : sizeof(buf);
-		ret = in.read(buf, size);
+		size_t size = sizeof(buf) > (size_t) len ? (size_t) len : sizeof(buf);
+		int ret = in.read(buf, size);
 		if (ret < 0) {
 			logger_error("read error(%s)", last_serror());
 			return false;
@@ -256,8 +242,7 @@ static bool save_as(ifstream& in, ostream& out, off_t pos, ssize_t len)
 	return true;
 }
 
-static bool save_to(ifstream& in, ostream& out, MIME_NODE* node)
-{
+static bool save_to(ifstream& in, ostream& out, const MIME_NODE* node) {
 	if (node->header_begin < 0 || node->header_end <= node->header_begin) {
 		logger_warn("node invalid, header_begin(%ld), "
 			"header_end(%ld), body_begin(%ld), body_end(%ld)",
@@ -293,8 +278,7 @@ static bool save_to(ifstream& in, ostream& out, MIME_NODE* node)
 	return save_as(in, out, node->body_begin, len);
 }
 
-bool mime::save_as(ostream& out)
-{
+bool mime::save_as(ostream& out) const {
 	if (m_pFilePath == NULL) {
 		logger_error("no input filePath");
 		return false;
@@ -340,8 +324,7 @@ bool mime::save_as(ostream& out)
 	return true;
 }
 
-bool mime::save_as(const char* file_path)
-{
+bool mime::save_as(const char* file_path) const {
 	if (m_pFilePath == NULL) {
 		logger_error("no input filePath");
 		return false;
@@ -365,9 +348,8 @@ bool mime::save_as(const char* file_path)
 }
 
 bool mime::save_mail(const char* path, const char* filename,
-	bool enableDecode /* = true */, const char* toCharset /* = "gb2312" */,
-	off_t off /* = 0 */)
-{
+	  bool enableDecode /* = true */, const char* toCharset /* = "gb2312" */,
+	  off_t off /* = 0 */) {
 	mime_body* pBody = get_body_node(true, true, NULL);
 	if (pBody == NULL) {
 		return false;
@@ -402,15 +384,15 @@ bool mime::save_mail(const char* path, const char* filename,
 	acl_make_dirs(subPath.c_str(), 0700);
 
 	const char* name;
-	std::list<mime_image*>::const_iterator cit = images.begin();
-	for (; cit != images.end(); ++cit) {
+	for (std::list<mime_image*>::const_iterator cit = images.begin();
+		  cit != images.end(); ++cit) {
 		name = (*cit)->get_name();
 		if (name == NULL) {
 			continue;
 		}
 		filepath.clear();
 		filepath << subPath.c_str() << "/" << name;
-		(*cit)->save(filepath.c_str());
+		(void) (*cit)->save(filepath.c_str());
 	}
 
 	filepath.clear();
@@ -495,8 +477,7 @@ bool mime::save_mail(const char* path, const char* filename,
 	return true;
 }
 
-static MIME_NODE *get_alternative(MIME_STATE *pMime)
-{
+static MIME_NODE *get_alternative(MIME_STATE *pMime) {
 	// 从根结点开始遍历整个 multipart 邮件中所有的子结点，
 	// 直至找到第一个不包含子结点的结点，因为遍历过程本身
 	// 保证了遍历是自上而下遍历的，即先遍历根结点的子结点，
@@ -522,8 +503,7 @@ static MIME_NODE *get_alternative(MIME_STATE *pMime)
 	return pAlterNative;
 }
 
-static MIME_NODE *get_text_html(MIME_NODE *pAlterNative, bool *is_html = NULL)
-{
+static MIME_NODE *get_text_html(MIME_NODE *pAlterNative, bool *is_html = NULL) {
 	ACL_ITER iter;
 	MIME_NODE* pHtml = NULL, *pText = NULL;
 
@@ -536,7 +516,9 @@ static MIME_NODE *get_text_html(MIME_NODE *pAlterNative, bool *is_html = NULL)
 		if (pNode->stype == MIME_STYPE_HTML) {
 			pHtml = pNode;
 			break;
-		} else if (pNode->stype == MIME_STYPE_PLAIN) {
+		}
+
+		if (pNode->stype == MIME_STYPE_PLAIN) {
 			// 仅保留第一个纯文本的结点
 			if (pText == NULL) {
 				pText = pNode;
@@ -555,8 +537,7 @@ static MIME_NODE *get_text_html(MIME_NODE *pAlterNative, bool *is_html = NULL)
 	return pHtml != NULL ? pHtml : pText;
 }
 
-static MIME_NODE *get_text_plain(MIME_NODE *pAlterNative, bool *is_html = NULL)
-{
+static MIME_NODE *get_text_plain(MIME_NODE *pAlterNative, bool *is_html = NULL) {
 	ACL_ITER iter;
 	MIME_NODE* pHtml = NULL, *pText = NULL;
 
@@ -569,7 +550,9 @@ static MIME_NODE *get_text_plain(MIME_NODE *pAlterNative, bool *is_html = NULL)
 		if (pNode->stype == MIME_STYPE_PLAIN) {
 			pText = pNode;
 			break;
-		} else if (pNode->stype == MIME_STYPE_HTML) {
+		}
+
+		if (pNode->stype == MIME_STYPE_HTML) {
 			// 仅保留第一个HTML结点
 			if (pHtml == NULL) {
 				pHtml = pNode;
@@ -590,8 +573,7 @@ static MIME_NODE *get_text_plain(MIME_NODE *pAlterNative, bool *is_html = NULL)
 
 // 找到邮件正文结点
 static MIME_NODE* body_node(MIME_STATE* pMime, bool htmlFirst,
-	bool *is_html = NULL)
-{
+	  bool *is_html = NULL) {
 	if (pMime->root->ctype == MIME_CTYPE_TEXT) {
 		if (is_html) {
 			*is_html = pMime->root->stype == MIME_STYPE_HTML;
@@ -601,7 +583,9 @@ static MIME_NODE* body_node(MIME_STATE* pMime, bool htmlFirst,
 
 	if (pMime->root->ctype != MIME_CTYPE_MULTIPART) {
 		return NULL;
-	} else if (pMime->root->boundary == NULL) {
+	}
+
+	if (pMime->root->boundary == NULL) {
 		logger_warn("no boundary for multipart");
 		return NULL;
 	}
@@ -617,16 +601,14 @@ static MIME_NODE* body_node(MIME_STATE* pMime, bool htmlFirst,
 	if (pAlterNative != NULL) {
 		if (htmlFirst) {
 			return get_text_html(pAlterNative, is_html);
-		} else {
-			return get_text_plain(pAlterNative, is_html);
 		}
+		return get_text_plain(pAlterNative, is_html);
 	}
 
 	if (htmlFirst) {
 		return get_text_html(pMime->root, is_html);
-	} else {
-		return get_text_plain(pMime->root, is_html);
 	}
+	return get_text_plain(pMime->root, is_html);
 }
 
 #if 0
@@ -634,11 +616,8 @@ static MIME_NODE* body_node(MIME_STATE* pMime, bool htmlFirst,
 	|| ((x) != NULL && (y) != NULL && !strcasecmp((x), (y))))
 #endif
 
-mime_body* mime::get_body_node(bool htmlFirst,
-	bool enableDecode /* = true */,
-	const char* toCharset /* = "gb2312" */,
-	off_t off /* = 0 */)
-{
+mime_body* mime::get_body_node(bool htmlFirst, bool enableDecode /* = true */,
+	  const char* toCharset /* = "gb2312" */, off_t off /* = 0 */) {
 	if (m_pBody != NULL) {
 		//const char* ptr = m_pBody->get_toCharset();
 		//if (EQ2(toCharset, ptr))
@@ -657,8 +636,7 @@ mime_body* mime::get_body_node(bool htmlFirst,
 }
 
 mime_body* mime::get_html_body(bool enableDecode /* = true */,
-	const char* toCharset /* = "gb2312" */, off_t off /* = 0 */)
-{
+	  const char* toCharset /* = "gb2312" */, off_t off /* = 0 */) {
 	if (m_pBody != NULL) {
 		delete m_pBody;
 	}
@@ -675,8 +653,7 @@ mime_body* mime::get_html_body(bool enableDecode /* = true */,
 }
 
 mime_body* mime::get_plain_body(bool enableDecode /* = true */,
-	const char* toCharset /* = "gb2312" */, off_t off /* = 0 */)
-{
+	  const char* toCharset /* = "gb2312" */, off_t off /* = 0 */) {
 	if (m_pBody != NULL) {
 		delete m_pBody;
 	}
@@ -693,8 +670,7 @@ mime_body* mime::get_plain_body(bool enableDecode /* = true */,
 }
 
 const std::list<mime_node*>& mime::get_mime_nodes(bool enableDecode /* = true */,
-	const char* toCharset /* = "gb2312" */, off_t off /* = 0 */)
-{
+	  const char* toCharset /* = "gb2312" */, off_t off /* = 0 */) {
 	if (m_pNodes == NULL) {
 		m_pNodes = NEW std::list<mime_node*>;
 	} else if (!m_pNodes->empty()) {
@@ -715,15 +691,12 @@ const std::list<mime_node*>& mime::get_mime_nodes(bool enableDecode /* = true */
 	return *m_pNodes;
 }
 
-static bool has_content_id(MIME_NODE* node)
-{
-	return mime_head_value(node, "Content-ID") == NULL ? false : true;
+static bool has_content_id(MIME_NODE* node) {
+	return mime_head_value(node, "Content-ID") != NULL;
 }
 
 const std::list<mime_attach*>& mime::get_attachments(bool enableDecode /* = true */,
-	const char* toCharset /* = "gb2312" */, off_t off /* = 0 */,
-	bool all /* = true */)
-{
+	  const char* toCharset /* = "gb2312" */, off_t off /* = 0 */, bool all /* = true */) {
 	if (m_pAttaches == NULL) {
 		m_pAttaches = NEW std::list<mime_attach*>;
 	} else if (!m_pAttaches->empty()) {
@@ -739,9 +712,8 @@ const std::list<mime_attach*>& mime::get_attachments(bool enableDecode /* = true
 
 	ACL_ITER iter;
 	mime_attach* attach;
-	MIME_NODE* node;
 	acl_foreach(iter, m_pMimeState) {
-		node = (MIME_NODE*) iter.data;
+		MIME_NODE* node = (MIME_NODE*) iter.data;
 		if (node->header_filename != NULL || has_content_id(node)) {
 			attach = NEW mime_attach(m_pFilePath, node,
 					enableDecode, toCharset, off);
@@ -757,8 +729,7 @@ const std::list<mime_attach*>& mime::get_attachments(bool enableDecode /* = true
 }
 
 const std::list<mime_image*>& mime::get_images(bool enableDecode /* = true */,
-	const char* toCharset /* = "gb2312" */, off_t off /* = 0 */)
-{
+	  const char* toCharset /* = "gb2312" */, off_t off /* = 0 */) {
 	if (m_pImages == NULL) {
 		m_pImages = NEW std::list<mime_image*>;
 	} else if (!m_pImages->empty()) {
@@ -770,9 +741,8 @@ const std::list<mime_image*>& mime::get_images(bool enableDecode /* = true */,
 	}
 
 	ACL_ITER iter;
-	MIME_NODE* node;
 	acl_foreach(iter, m_pMimeState) {
-		node = (MIME_NODE*) iter.data;
+		MIME_NODE *node = (MIME_NODE *) iter.data;
 		if (node->ctype != MIME_CTYPE_IMAGE) {
 			continue;
 		}
@@ -783,14 +753,12 @@ const std::list<mime_image*>& mime::get_images(bool enableDecode /* = true */,
 }
 
 mime_image* mime::get_image(const char* cid, bool enableDecode /* = true */,
-	const char* toCharset /* = "gb2312" */, off_t off /* = 0 */)
-{
-	const char* ptr;
+	  const char* toCharset /* = "gb2312" */, off_t off /* = 0 */) {
 	const std::list<mime_image*>& images =
 		get_images(enableDecode, toCharset, off);
-	std::list<mime_image*>::const_iterator cit = images.begin();
-	for (; cit != images.end(); ++cit) {
-		ptr = (*cit)->header_value("Content-ID");
+	for (std::list<mime_image*>::const_iterator cit = images.begin();
+		  cit != images.end(); ++cit) {
+		const char *ptr = (*cit)->header_value("Content-ID");
 		if (ptr != NULL && strcmp(ptr, cid) == 0) {
 			return *cit;
 		}
@@ -800,17 +768,12 @@ mime_image* mime::get_image(const char* cid, bool enableDecode /* = true */,
 }
 
 static void mime_node_dump(const char* from_path, const char* dump_path,
-	MIME_NODE *node, bool decode)
-{
+	  MIME_NODE *node, bool decode) {
 	ifstream in;
 	fstream out;
 	string path;
 	char *pbuf;
 	static int i = 0;
-
-	if (dump_path == NULL) {
-		return;
-	}
 
 	if (!in.open_read(from_path)) {
 		return;
@@ -827,9 +790,9 @@ static void mime_node_dump(const char* from_path, const char* dump_path,
 	out.puts(">---------header begin--------<");
 	off_t pos = (off_t) in.fseek(node->header_begin, SEEK_SET);
 	pbuf = (char*) acl_mymalloc(dlen);
-	printf(">>>%s: header begin: %ld, end: %ld, len: %ld\n",
+	printf(">>>%s: header begin: %ld, end: %ld, len: %ld, pos=%ld\n",
 		__FUNCTION__, (long int) node->header_begin,
-		(long int) node->header_end, (long int) dlen);
+		(long int) node->header_end, (long int) dlen, (long) pos);
 
 	int ret;
 	if ((ret = in.read(pbuf, dlen, true)) < 0) {
@@ -866,7 +829,7 @@ static void mime_node_dump(const char* from_path, const char* dump_path,
 	}
 
 	pbuf = (char*) acl_mymalloc(dlen);
-	if ((ret = in.read(pbuf, dlen, true)) == -1) {
+	if (in.read(pbuf, dlen, true) == -1) {
 		acl_myfree(pbuf);
 		return;
 	}
@@ -883,10 +846,9 @@ static void mime_node_dump(const char* from_path, const char* dump_path,
 	} else {
 		string result(8192);
 		const char* ptr = pbuf;
-		ssize_t n;
 
 		while (dlen > 0) {
-			n = dlen > 8192 ? 8192 : dlen;
+			ssize_t n = dlen > 8192 ? 8192 : dlen;
 			//n = dlen;
 			decoder->decode_update(ptr, (int) n, &result);
 			if (result.length() > 0) {
@@ -910,8 +872,7 @@ static void mime_node_dump(const char* from_path, const char* dump_path,
 	in.close();
 }
 
-void mime::mime_debug(const char* save_path, bool decode /* = true */)
-{
+void mime::mime_debug(const char* save_path, bool decode /* = true */) {
 	MIME_STATE* state = m_pMimeState;
 	// 如果 multipart 格式, 则分析各个部分数据
 	MIME_STATE state_dummy;

@@ -83,7 +83,7 @@ public:
 	 * Note: After calling this function, you must call update_end to notify
 	 * parsing completion.
 	 */
-	bool update(const char* data, size_t len);
+	bool update(const char* data, size_t len) const;
 
 	/**
 	 * Call this function when streaming parsing is complete.
@@ -102,14 +102,14 @@ public:
 	 * @param out {ostream&} Target output stream.
 	 * @return {bool} Whether successful.
 	 */
-	bool save_as(ostream& out);
+	bool save_as(ostream& out) const;
 
 	/**
 	 * Save mail content to a file.
 	 * @param file_path {const char*} Target file path.
 	 * @return {bool} Whether successful.
 	 */
-	bool save_as(const char* file_path);
+	bool save_as(const char* file_path) const;
 
 	/**
 	 * After mail parsing is complete, save in client display format to HTML file
