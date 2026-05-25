@@ -18,7 +18,7 @@ namespace acl {
 
 http_mime_node::http_mime_node(const char* path, const MIME_NODE* node,
 	bool decodeIt /* = true */, const char* toCharset /* =  */,
-	off_t off /* = 0 */)
+	long long off /* = 0 */)
 : mime_attach(path, node, decodeIt, toCharset, off)
 {
 	if (get_filename() == NULL) {
@@ -44,8 +44,8 @@ void http_mime_node::load_param(const char* path) {
 		logger_error("open file %s error(%s)", path, last_serror());
 		return;
 	}
-	off_t begin = get_bodyBegin();
-	off_t end = get_bodyEnd();
+	long long begin = get_bodyBegin();
+	long long end = get_bodyEnd();
 	if (begin < 0 || end < 0) {
 		logger_error("invalid file offset, begin: %d, end: %d",
 			(int) begin, (int) end);
@@ -145,7 +145,7 @@ http_mime::http_mime(const char* boundary,
 
 	// 因为该头作为解析器的主头是额外加进去的，所以会造成实际的偏移量，
 	// 通过 off_ 来进行偏移量补偿
-	off_ = 0 - ((off_t) sizeof(ctype_pre) - 1 + (off_t) len + 4);
+	off_ = 0 - ((long long) sizeof(ctype_pre) - 1 + (long long) len + 4);
 
 	parsed_ = false;
 }

@@ -213,7 +213,7 @@ bool mime::parse(const char* file_path) {
 	return true;
 }
 
-static bool save_as(ifstream& in, ostream& out, off_t pos, ssize_t len) {
+static bool save_as(ifstream& in, ostream& out, long long pos, ssize_t len) {
 	if (pos < 0 || len <= 0) {
 		return true;
 	}
@@ -349,7 +349,7 @@ bool mime::save_as(const char* file_path) const {
 
 bool mime::save_mail(const char* path, const char* filename,
 	  bool enableDecode /* = true */, const char* toCharset /* = "gb2312" */,
-	  off_t off /* = 0 */) {
+	  long long off /* = 0 */) {
 	mime_body* pBody = get_body_node(true, true, NULL);
 	if (pBody == NULL) {
 		return false;
@@ -617,7 +617,7 @@ static MIME_NODE* body_node(MIME_STATE* pMime, bool htmlFirst,
 #endif
 
 mime_body* mime::get_body_node(bool htmlFirst, bool enableDecode /* = true */,
-	  const char* toCharset /* = "gb2312" */, off_t off /* = 0 */) {
+	  const char* toCharset /* = "gb2312" */, long long off /* = 0 */) {
 	if (m_pBody != NULL) {
 		//const char* ptr = m_pBody->get_toCharset();
 		//if (EQ2(toCharset, ptr))
@@ -636,7 +636,7 @@ mime_body* mime::get_body_node(bool htmlFirst, bool enableDecode /* = true */,
 }
 
 mime_body* mime::get_html_body(bool enableDecode /* = true */,
-	  const char* toCharset /* = "gb2312" */, off_t off /* = 0 */) {
+	  const char* toCharset /* = "gb2312" */, long long off /* = 0 */) {
 	if (m_pBody != NULL) {
 		delete m_pBody;
 	}
@@ -653,7 +653,7 @@ mime_body* mime::get_html_body(bool enableDecode /* = true */,
 }
 
 mime_body* mime::get_plain_body(bool enableDecode /* = true */,
-	  const char* toCharset /* = "gb2312" */, off_t off /* = 0 */) {
+	  const char* toCharset /* = "gb2312" */, long long off /* = 0 */) {
 	if (m_pBody != NULL) {
 		delete m_pBody;
 	}
@@ -670,7 +670,7 @@ mime_body* mime::get_plain_body(bool enableDecode /* = true */,
 }
 
 const std::list<mime_node*>& mime::get_mime_nodes(bool enableDecode /* = true */,
-	  const char* toCharset /* = "gb2312" */, off_t off /* = 0 */) {
+	  const char* toCharset /* = "gb2312" */, long long off /* = 0 */) {
 	if (m_pNodes == NULL) {
 		m_pNodes = NEW std::list<mime_node*>;
 	} else if (!m_pNodes->empty()) {
@@ -696,7 +696,7 @@ static bool has_content_id(MIME_NODE* node) {
 }
 
 const std::list<mime_attach*>& mime::get_attachments(bool enableDecode /* = true */,
-	  const char* toCharset /* = "gb2312" */, off_t off /* = 0 */, bool all /* = true */) {
+	  const char* toCharset /* = "gb2312" */, long long off /* = 0 */, bool all /* = true */) {
 	if (m_pAttaches == NULL) {
 		m_pAttaches = NEW std::list<mime_attach*>;
 	} else if (!m_pAttaches->empty()) {
@@ -729,7 +729,7 @@ const std::list<mime_attach*>& mime::get_attachments(bool enableDecode /* = true
 }
 
 const std::list<mime_image*>& mime::get_images(bool enableDecode /* = true */,
-	  const char* toCharset /* = "gb2312" */, off_t off /* = 0 */) {
+	  const char* toCharset /* = "gb2312" */, long long off /* = 0 */) {
 	if (m_pImages == NULL) {
 		m_pImages = NEW std::list<mime_image*>;
 	} else if (!m_pImages->empty()) {
@@ -753,7 +753,7 @@ const std::list<mime_image*>& mime::get_images(bool enableDecode /* = true */,
 }
 
 mime_image* mime::get_image(const char* cid, bool enableDecode /* = true */,
-	  const char* toCharset /* = "gb2312" */, off_t off /* = 0 */) {
+	  const char* toCharset /* = "gb2312" */, long long off /* = 0 */) {
 	const std::list<mime_image*>& images =
 		get_images(enableDecode, toCharset, off);
 	for (std::list<mime_image*>::const_iterator cit = images.begin();
@@ -788,7 +788,7 @@ static void mime_node_dump(const char* from_path, const char* dump_path,
 	ssize_t dlen = (ssize_t) node->header_end - (ssize_t) node->header_begin;
 
 	out.puts(">---------header begin--------<");
-	off_t pos = (off_t) in.fseek(node->header_begin, SEEK_SET);
+	long long pos = (long long) in.fseek(node->header_begin, SEEK_SET);
 	pbuf = (char*) acl_mymalloc(dlen);
 	printf(">>>%s: header begin: %ld, end: %ld, len: %ld, pos=%ld\n",
 		__FUNCTION__, (long int) node->header_begin,
@@ -821,7 +821,7 @@ static void mime_node_dump(const char* from_path, const char* dump_path,
 		in.close();
 		return;
 	}
-	pos = (off_t) in.fseek(node->body_begin, SEEK_SET);
+	pos = (long long) in.fseek(node->body_begin, SEEK_SET);
 	if (pos == -1) {
 		printf(">>>%s: fseek error(%s)\r\n", __FUNCTION__,
 			last_serror());

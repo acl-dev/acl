@@ -594,7 +594,11 @@ bool http_request::upload(http_mime &mime, const char *filepath, bool savefile) 
 
 	const bool ret = upload(filepath);
 	if (!savefile) {
+#ifdef _WIN32
+		_unlink(filepath);
+#else
 		unlink(filepath);
+#endif
 	}
 	return ret;
 }

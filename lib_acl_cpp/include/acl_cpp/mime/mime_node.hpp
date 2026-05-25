@@ -27,14 +27,14 @@ public:
 	 * @param toCharset {const char*} Default target character set. If target
 	 * character set is different from source character set, character set
 	 * conversion will be performed.
-	 * @param off {off_t} Starting position offset in the email body data stream,
+	 * @param off {long long} Starting position offset in the email body data stream,
 	 * with additional
 	 * offset added, so that users can add their own private data before the email
 	 * body.
 	 */
 	mime_node(const char* emailFile, const MIME_NODE* node,
 		bool enableDecode = true, const char* toCharset = "gb2312",
-		off_t off = 0);
+		long long off = 0);
 	virtual ~mime_node();
 
 	/**
@@ -107,17 +107,17 @@ public:
 
 	/**
 	 * Get the starting offset of this node in the email.
-	 * @return {off_t}
+	 * @return {long long}
 	 */
-	off_t get_bodyBegin() const {
+	long long get_bodyBegin() const {
 		return m_bodyBegin;
 	}
 
 	/**
 	 * Get the ending offset of this node in the email.
-	 * @return {off_t}
+	 * @return {long long}
 	 */
-	off_t get_bodyEnd() const {
+	long long get_bodyEnd() const {
 		return m_bodyEnd;
 	}
 
@@ -241,15 +241,15 @@ public:
 
 	/**
 	 * Get parent node's body starting offset.
-	 * @return {off_t} Return value of -1 means this node does not exist.
+	 * @return {long long} Return value of -1 means this node does not exist.
 	 */
-	off_t parent_bodyBegin() const;
+	long long parent_bodyBegin() const;
 
 	/**
 	 * Get parent node's body ending offset.
-	 * @return {off_t} Return value of -1 means this node does not exist.
+	 * @return {long long} Return value of -1 means this node does not exist.
 	 */
-	off_t parent_bodyEnd() const;
+	long long parent_bodyEnd() const;
 
 	/**
 	 * Get the value corresponding to a certain header field name in parent node,
@@ -269,8 +269,8 @@ protected:
 	int   m_encoding;	// mime_define.hpp
 	char  m_charset[32];
 	char  m_toCharset[32];
-	off_t m_bodyBegin;
-	off_t m_bodyEnd;
+	long long m_bodyBegin;
+	long long m_bodyEnd;
 	std::map<string, string>* m_headers_;
 	const MIME_NODE* m_pMimeNode;
 	mime_node* m_pParent;

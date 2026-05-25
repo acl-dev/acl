@@ -120,13 +120,13 @@ public:
 	 * @param enableDecode {bool} Whether to automatically decode during
 	 * conversion.
 	 * @param toCharset {const char*} Target character set.
-	 * @param off {off_t} When parsing attachments, offset from start to attachment
+	 * @param off {long long} When parsing attachments, offset from start to attachment
 	 * data.
 	 * @return {bool} Whether successful.
 	 */
 	bool save_mail(const char* path, const char* filename,
 		bool enableDecode = true, const char* toCharset = "gb2312",
-		off_t off = 0);
+		long long off = 0);
 
 	/**
 	 * Get mail body node.
@@ -135,77 +135,77 @@ public:
 	 * @param enableDecode {bool} Whether to decode original encoding during
 	 * conversion.
 	 * @param toCharset {const char*} Target character set.
-	 * @param off {off_t} When parsing attachments, offset from start to attachment
+	 * @param off {long long} When parsing attachments, offset from start to attachment
 	 * data.
 	 * @return {mime_body*} Returns NULL if not found or error.
 	 */
 	mime_body* get_body_node(bool htmlFirst, bool enableDecode = true,
-                const char* toCharset = "gb2312", off_t off = 0);
+                const char* toCharset = "gb2312", long long off = 0);
 
 	/**
 	 * Get text/plain format body node.
 	 * @param enableDecode {bool} Whether to decode original encoding during
 	 * conversion.
 	 * @param toCharset {const char*} Target character set.
-	 * @param off {off_t} When parsing attachments, offset from start to attachment
+	 * @param off {long long} When parsing attachments, offset from start to attachment
 	 * data.
 	 * @return {mime_body*} Returns NULL if plain format body is not found or
 	 * error.
 	 */
 	mime_body* get_plain_body(bool enableDecode = true,
-		const char* toCharset = "gb2312", off_t off = 0);
+		const char* toCharset = "gb2312", long long off = 0);
 
 	/**
 	 * Get text/html format body node.
 	 * @param enableDecode {bool} Whether to decode original encoding during
 	 * conversion.
 	 * @param toCharset {const char*} Target character set.
-	 * @param off {off_t} When parsing attachments, offset from start to attachment
+	 * @param off {long long} When parsing attachments, offset from start to attachment
 	 * data.
 	 * @return {mime_body*} Returns NULL if html format body is not found or error.
 	 */
 	mime_body* get_html_body(bool enableDecode = true,
-		const char* toCharset = "gb2312", off_t off = 0);
+		const char* toCharset = "gb2312", long long off = 0);
 
 	/**
 	 * Get all mime node list.
 	 * @param enableDecode {bool} Whether to automatically decode during
 	 * conversion.
 	 * @param toCharset {const char*} Target character set.
-	 * @param off {off_t} When parsing attachments, offset from start to attachment
+	 * @param off {long long} When parsing attachments, offset from start to attachment
 	 * data.
 	 * @return {const std::list<mime_node*>&}
 	 */
 	const std::list<mime_node*>& get_mime_nodes(bool enableDecode = true,
-		const char* toCharset = "gb2312", off_t off = 0);
+		const char* toCharset = "gb2312", long long off = 0);
 
 	/**
 	 * Get attachment list.
 	 * @param enableDecode {bool} Whether to automatically decode during
 	 * conversion.
 	 * @param toCharset {const char*} Target character set.
-	 * @param off {off_t} When parsing attachments, offset from start to attachment
+	 * @param off {long long} When parsing attachments, offset from start to attachment
 	 * data.
 	 * @param all {bool} Get all nodes including message/application/image type
 	 * nodes.
 	 * @return {const std::list<mime_attach*>&}
 	 */
 	const std::list<mime_attach*>& get_attachments(bool enableDecode = true,
-		const char* toCharset = "gb2312", off_t off = 0, bool all = true);
+		const char* toCharset = "gb2312", long long off = 0, bool all = true);
 
 	/**
 	 * Get image list.
 	 * @param enableDecode {bool} Whether to automatically decode during
 	 * conversion.
 	 * @param toCharset {const char*} Target character set.
-	 * @param off {off_t} When parsing attachments, offset from start to attachment
+	 * @param off {long long} When parsing attachments, offset from start to attachment
 	 * data.
 	 * @return {const std::list<mime_image*>&}
 	 */
 	const std::list<mime_image*>& get_images(bool enableDecode = true,
-		const char* toCharset = "gb2312", off_t off = 0);
+		const char* toCharset = "gb2312", long long off = 0);
 	mime_image* get_image(const char* cld, bool enableDecode = true,
-		const char* toCharset = "gb2312", off_t off = 0);
+		const char* toCharset = "gb2312", long long off = 0);
 
 	/**
 	 * Debug MIME object.

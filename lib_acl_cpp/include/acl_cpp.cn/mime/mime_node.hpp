@@ -26,12 +26,12 @@ public:
 	 *  时是否需要自动进行解码
 	 * @param toCharset {const char*} 缺省的目标字符集，如果目标
 	 *  字符集与源字符集不同，则进行字符集转换
-	 * @param off {off_t} 邮件内容在整个数据中的起始位置中附加的
+	 * @param off {long long} 邮件内容在整个数据中的起始位置中附加的
 	 *  相对偏移量，以便于用户可以在邮件内容前面加自己的私有数据
 	 */
 	mime_node(const char* emailFile, const MIME_NODE* node,
 		bool enableDecode = true, const char* toCharset = "gb2312",
-		off_t off = 0);
+		long long off = 0);
 	virtual ~mime_node();
 
 	/**
@@ -105,17 +105,17 @@ public:
 
 	/**
 	 * 获得本结点在邮件中的起始偏移量
-	 * @return {off_t}
+	 * @return {long long}
 	 */
-	off_t get_bodyBegin() const {
+	long long get_bodyBegin() const {
 		return m_bodyBegin;
 	}
 
 	/**
 	 * 获得本结点在邮件中的结束偏移量
-	 * @return {off_t}
+	 * @return {long long}
 	 */
-	off_t get_bodyEnd() const {
+	long long get_bodyEnd() const {
 		return m_bodyEnd;
 	}
 
@@ -229,15 +229,15 @@ public:
 
 	/**
 	 * 获得父结点的数据体起始偏移量
-	 * @return {off_t} 返回值为 -1 表示父结点不存在
+	 * @return {long long} 返回值为 -1 表示父结点不存在
 	 */
-	off_t parent_bodyBegin() const;
+	long long parent_bodyBegin() const;
 
 	/**
 	 * 获得父结点的数据体结束偏移量
-	 * @return {off_t} 返回值为 -1 表示父结点不存在
+	 * @return {long long} 返回值为 -1 表示父结点不存在
 	 */
-	off_t parent_bodyEnd() const;
+	long long parent_bodyEnd() const;
 
 	/**
 	 * 获得父结点头部中某个字段名对应的字段值, 如: Content-Type
@@ -256,8 +256,8 @@ protected:
 	int   m_encoding;	// mime_define.hpp
 	char  m_charset[32];
 	char  m_toCharset[32];
-	off_t m_bodyBegin;
-	off_t m_bodyEnd;
+	long long m_bodyBegin;
+	long long m_bodyEnd;
 	std::map<string, string>* m_headers_;
 	const MIME_NODE* m_pMimeNode;
 	mime_node* m_pParent;

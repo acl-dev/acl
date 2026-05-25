@@ -25,12 +25,12 @@ public:
 	 *  时是否需要自动进行解码
 	 * @param toCharset {const char*} 缺省的目标字符集，如果目标
 	 *  字符集与源字符集不同，则进行字符集转换
-	 * @param off {off_t} 邮件内容在整个数据中的起始位置中附加的
+	 * @param off {long long} 邮件内容在整个数据中的起始位置中附加的
 	 *  相对偏移量，以便于用户可以在邮件内容前面加自己的私有数据
 	 */
 	mime_body(const char* emailFile, const MIME_NODE* node,
 		bool htmlFirst = true, bool enableDecode = true,
-		const char* toCharset = "gb2312", off_t off = 0)
+		const char* toCharset = "gb2312", long long off = 0)
 		: mime_node(emailFile, node, enableDecode, toCharset, off)
 		, m_htmlFirst(htmlFirst)
 	{

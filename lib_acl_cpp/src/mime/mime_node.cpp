@@ -22,7 +22,7 @@ namespace acl {
 mime_node::mime_node(const char* emailFile, const MIME_NODE* node,
 	bool enableDecode /* = true */,
 	const char* toCharset /* = "gb2312" */,
-	off_t off /* = 0 */)
+	long long off /* = 0 */)
 : m_name(128)
 , m_headers_(NULL)
 , m_pMimeNode(node)
@@ -292,14 +292,14 @@ char* mime_node::parent_charset() const {
 	return m_pMimeNode->parent->charset;
 }
 
-off_t mime_node::parent_bodyBegin() const {
+long long mime_node::parent_bodyBegin() const {
 	if (m_pMimeNode->parent == NULL) {
 		return -1;
 	}
 	return m_pMimeNode->parent->body_begin;
 }
 
-off_t mime_node::parent_bodyEnd() const {
+long long mime_node::parent_bodyEnd() const {
 	if (m_pMimeNode->parent == NULL) {
 		return -1;
 	}

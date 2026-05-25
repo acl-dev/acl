@@ -29,13 +29,13 @@ public:
 	 * @param toCharset {const char*} Default target character set. If target
 	 * character set is different from source character set, performs character set
 	 * conversion
-	 * @param off {off_t} Relative offset added to starting position of email
+	 * @param off {long long} Relative offset added to starting position of email
 	 * content in entire data,
 	 *  so that users can add their own private data before email content
 	 */
 	mime_body(const char* emailFile, const MIME_NODE* node,
 		bool htmlFirst = true, bool enableDecode = true,
-		const char* toCharset = "gb2312", off_t off = 0)
+		const char* toCharset = "gb2312", long long off = 0)
 		: mime_node(emailFile, node, enableDecode, toCharset, off)
 		, m_htmlFirst(htmlFirst)
 	{

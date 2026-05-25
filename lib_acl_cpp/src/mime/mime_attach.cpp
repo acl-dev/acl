@@ -12,7 +12,7 @@ namespace acl {
 mime_attach::mime_attach(const char* emailFile, const MIME_NODE* node,
 	bool enableDecode /* = true */,
 	const char* toCharset /* = "gdb2312" */,
-	off_t off /* = 0 */)
+	long long off /* = 0 */)
 : mime_node(emailFile, node, enableDecode, toCharset, off)
 , m_filename(128)
 {

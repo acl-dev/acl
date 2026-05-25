@@ -11,7 +11,7 @@ class ACL_CPP_API mime_attach : public mime_node {
 public:
 	mime_attach(const char* emailFile, const MIME_NODE* node,
 		bool enableDecode = true, const char* toCharset = "gb2312",
-		off_t off = 0);
+		long long off = 0);
 
 	virtual ~mime_attach();
 

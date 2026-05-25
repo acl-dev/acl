@@ -33,11 +33,11 @@ public:
 	 * @param decodeIt {bool} 是否对 MIME 结点的头部数据
 	 *  或数据体数据进行解码
 	 * @param toCharset {const char*} 本机的字符集
-	 * @param off {off_t} 偏移数据位置
+	 * @param off {long long} 偏移数据位置
 	 */
 	http_mime_node(const char* path, const MIME_NODE* node,
 		bool decodeIt = true, const char* toCharset = "gb2312",
-		off_t off = 0);
+		long long off = 0);
 	~http_mime_node();
 
 	/**
@@ -117,7 +117,7 @@ public:
 private:
 	string boundary_;
 	string save_path_;
-	off_t off_;
+	long long off_;
 	MIME_STATE* mime_state_;
 	std::list<http_mime_node*> mime_nodes_;
 	char  local_charset_[32];

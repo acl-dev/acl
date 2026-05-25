@@ -34,11 +34,11 @@ public:
 	 * @param decodeIt {bool} Whether to decode MIME node's header data
 	 *  or body data
 	 * @param toCharset {const char*} Local character set
-	 * @param off {off_t} Offset data position
+	 * @param off {long long} Offset data position
 	 */
 	http_mime_node(const char* path, const MIME_NODE* node,
 		bool decodeIt = true, const char* toCharset = "gb2312",
-		off_t off = 0);
+		long long off = 0);
 	~http_mime_node();
 
 	/**
@@ -145,7 +145,7 @@ public:
 private:
 	std::string boundary_;
 	string save_path_;
-	off_t off_;
+	long long off_;
 	MIME_STATE* mime_state_;
 	std::list<http_mime_node*> mime_nodes_; // For parsing
 	char  local_charset_[32];

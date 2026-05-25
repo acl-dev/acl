@@ -102,12 +102,12 @@ public:
 	 * @param filename {const char*} 目标文件名
 	 * @param enableDecode {bool} 转储时是否自动进行解码
 	 * @param toCharset {const char*} 目标字符集
-	 * @param off {off_t} 调用者希望给邮件结点附加的相对偏移量
+	 * @param off {long long} 调用者希望给邮件结点附加的相对偏移量
 	 * @return {bool} 是否成功
 	 */
 	bool save_mail(const char* path, const char* filename,
 		bool enableDecode = true, const char* toCharset = "gb2312",
-		off_t off = 0);
+		long long off = 0);
 
 	/**
 	 * 获得邮件正文节点
@@ -115,64 +115,64 @@ public:
 	 *  纯文本，且如果只有HTML文本则转换为纯文本
 	 * @param enableDecode {bool} 转储时是否对原文进行解码
 	 * @param toCharset {const char*} 目标字符集
-	 * @param off {off_t} 调用者希望给邮件体结点附加的相对偏移量
+	 * @param off {long long} 调用者希望给邮件体结点附加的相对偏移量
 	 * @return {mime_body*} 若未找到正文内容则返回 NULL
 	 */
 	mime_body* get_body_node(bool htmlFirst, bool enableDecode = true,
-                const char* toCharset = "gb2312", off_t off = 0);
+                const char* toCharset = "gb2312", long long off = 0);
 
 	/**
 	 * 获得 text/plain 格式的正文节点
 	 * @param enableDecode {bool} 转储时是否对原文进行解码
 	 * @param toCharset {const char*} 目标字符集
-	 * @param off {off_t} 调用者希望给邮件体结点附加的相对偏移量
+	 * @param off {long long} 调用者希望给邮件体结点附加的相对偏移量
 	 * @return {mime_body*} 若未找到 plain 格式的正文内容则返回 NULL
 	 */
 	mime_body* get_plain_body(bool enableDecode = true,
-		const char* toCharset = "gb2312", off_t off = 0);
+		const char* toCharset = "gb2312", long long off = 0);
 
 	/**
 	 * 获得 text/html 格式的正文节点
 	 * @param enableDecode {bool} 转储时是否对原文进行解码
 	 * @param toCharset {const char*} 目标字符集
-	 * @param off {off_t} 调用者希望给邮件体结点附加的相对偏移量
+	 * @param off {long long} 调用者希望给邮件体结点附加的相对偏移量
 	 * @return {mime_body*} 若未找到 html 格式的正文内容则返回 NULL
 	 */
 	mime_body* get_html_body(bool enableDecode = true,
-		const char* toCharset = "gb2312", off_t off = 0);
+		const char* toCharset = "gb2312", long long off = 0);
 
 	/**
 	 * 获得所有的 mime 节点列表
 	 * @param enableDecode {bool} 转储时是否自动进行解码
 	 * @param toCharset {const char*} 目标字符集
-	 * @param off {off_t} 调用者希望给邮件结点附加的相对偏移量
+	 * @param off {long long} 调用者希望给邮件结点附加的相对偏移量
 	 * @return {const std::list<mime_node*>&}
 	 */
 	const std::list<mime_node*>& get_mime_nodes(bool enableDecode = true,
-		const char* toCharset = "gb2312", off_t off = 0);
+		const char* toCharset = "gb2312", long long off = 0);
 
 	/**
 	 * 获得附件列表
 	 * @param enableDecode {bool} 转储时是否自动进行解码
 	 * @param toCharset {const char*} 目标字符集
-	 * @param off {off_t} 调用者希望给邮件结点附加的相对偏移量
+	 * @param off {long long} 调用者希望给邮件结点附加的相对偏移量
 	 * @param all {bool} 提取所有包括 message/application/image 在内的所有节点
 	 * @return {const std::list<mime_attach*>&}
 	 */
 	const std::list<mime_attach*>& get_attachments(bool enableDecode = true,
-		const char* toCharset = "gb2312", off_t off = 0, bool all = true);
+		const char* toCharset = "gb2312", long long off = 0, bool all = true);
 
 	/**
 	 * 获得图片列表
 	 * @param enableDecode {bool} 转储时是否自动进行解码
 	 * @param toCharset {const char*} 目标字符集
-	 * @param off {off_t} 调用者希望给邮件结点附加的相对偏移量
+	 * @param off {long long} 调用者希望给邮件结点附加的相对偏移量
 	 * @return {const std::list<mime_image*>&}
 	 */
 	const std::list<mime_image*>& get_images(bool enableDecode = true,
-		const char* toCharset = "gb2312", off_t off = 0);
+		const char* toCharset = "gb2312", long long off = 0);
 	mime_image* get_image(const char* cld, bool enableDecode = true,
-		const char* toCharset = "gb2312", off_t off = 0);
+		const char* toCharset = "gb2312", long long off = 0);
 
 	/**
 	 * 调试MIME解析结果
