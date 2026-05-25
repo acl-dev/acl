@@ -51,8 +51,8 @@ struct MIME_NODE
 	int   valid_line;
 	char  last_ch;                          /**< 分析过程中记录的前一个字节 */
 	char  last_lf;                          /**< 分析头部每行数据时前一个 \n */
-	off_t last_cr_pos;                      /**< 上一个 \r 的偏移位置 */
-	off_t last_lf_pos;                      /**< 上一个 \n 的偏移位置 */
+	long long last_cr_pos;                      /**< 上一个 \r 的偏移位置 */
+	long long last_lf_pos;                      /**< 上一个 \n 的偏移位置 */
 	ACL_VSTRING *boundary;                  /**< 当是 multipart 邮件时存储分隔符 */
 
 	/**< 当是 multipart 邮件时记录分隔符的下一个匹配位置，
@@ -63,12 +63,12 @@ struct MIME_NODE
 	ACL_VSTRING *buffer;                    /**< headers, quoted-printable body */
 	ACL_RING node;                          /**< 当前结点 */
 
-	off_t header_begin;			/**< 结点头开始位置 */
-	off_t header_end;			/**< 结点头结束位置 */
-	off_t body_begin;			/**< 结点体开始位置 */
-	off_t body_end;				/**< 结点体结束位置 */
-	off_t body_data_end;			/**< 结点数据体结束位置 */
-	off_t bound_end;			/**< 分隔体结束位置 */
+	long long header_begin;			/**< 结点头开始位置 */
+	long long header_end;			/**< 结点头结束位置 */
+	long long body_begin;			/**< 结点体开始位置 */
+	long long body_end;			/**< 结点体结束位置 */
+	long long body_data_end;		/**< 结点数据体结束位置 */
+	long long bound_end;			/**< 分隔体结束位置 */
 
 	/* for acl_iterator, 通过 acl_foreach 列出该结点的一级子结点 */
 
@@ -95,7 +95,7 @@ struct MIME_STATE
 
 	MIME_NODE *curr_node;           /**< 当前正在处理的 MIME_NODE 结点 */
 	const char *curr_bound;         /**< 针对 multipart 邮件, 当前的分隔符 */
-	off_t curr_off;                 /**< 针对邮件的当前偏移, 它总是会指向下一个位置 */
+	long long curr_off;             /**< 针对邮件的当前偏移, 它总是会指向下一个位置 */
 	int   curr_status;              /**< 状态机当前解析状态 */
 #define MIME_S_HEAD                     0
 #define MIME_S_BODY                     1

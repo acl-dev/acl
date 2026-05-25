@@ -616,9 +616,9 @@ static int mime_bound_body(MIME_STATE *state, const char * const boundary,
 	const unsigned char *cp  = (const unsigned char*) s;
 	const unsigned char *end = (const unsigned char*) s + n;
 	size_t bound_len         = strlen(boundary);
-	off_t curr_off           = state->curr_off;
-	off_t last_cr_pos        = node->last_cr_pos;
-	off_t last_lf_pos        = node->last_lf_pos;
+	long long curr_off       = state->curr_off;
+	long long last_cr_pos    = node->last_cr_pos;
+	long long last_lf_pos    = node->last_lf_pos;
 	const char *bound_ptr    = node->bound_ptr;
 
 	for (; cp < end; cp++) {
@@ -645,13 +645,13 @@ static int mime_bound_body(MIME_STATE *state, const char * const boundary,
 			/* 说明完全匹配 */
 			*finish = 1;
 
-			node->body_end = (off_t) (curr_off - bound_len);
+			node->body_end = (long long) (curr_off - bound_len);
 			node->body_data_end = node->body_end;
 
 			// body_end 记录的是某个结点最后的位置，根据协议,
 			// 其中会包含附加的 \r\n，所以真实数据的结束位置
 			// body_data_end 是去掉这些数据后的位置
-			if (last_lf_pos + (off_t) bound_len == curr_off - 1)
+			if (last_lf_pos + (long long) bound_len == curr_off - 1)
 			{
 				node->body_data_end--;
 				if (last_cr_pos + 1 == last_lf_pos)
