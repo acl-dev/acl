@@ -686,7 +686,7 @@ ACL_VSTREAM *private_vstream_connect_ex(const char *addr, int block_mode,
 {
 	ACL_VSTREAM *stream;
 	ACL_SOCKET fd;
-	char *ptr;
+	const char *ptr;
 
 	acl_assert(addr && *addr);
 	ptr = strchr(addr, ':');

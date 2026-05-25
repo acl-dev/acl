@@ -70,6 +70,9 @@ public:
 	 */
 	http_method_t getMethod(string* method_s = NULL) const;
 
+	// Same as getMethod.
+	http_method_t getRequestMethod(string* method_s = NULL) const;
+
 	/**
 	 * Convert HTTP request method type to corresponding string.
 	 * @param type {http_method_t}

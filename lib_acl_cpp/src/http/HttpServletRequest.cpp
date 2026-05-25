@@ -95,6 +95,11 @@ http_method_t HttpServletRequest::getMethod(string* method_s /* = NULL */) const
 	return method_;
 }
 
+http_method_t HttpServletRequest::getRequestMethod(string* method_s) const
+{
+	return getMethod(method_s);
+}
+
 void HttpServletRequest::setParseBody(bool yes)
 {
 	parse_body_ = yes;

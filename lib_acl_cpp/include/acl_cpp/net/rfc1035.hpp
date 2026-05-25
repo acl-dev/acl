@@ -1,7 +1,3 @@
-//
-// Created by shuxin ¡¡¡¡zheng on 2020/11/14.
-//
-
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
