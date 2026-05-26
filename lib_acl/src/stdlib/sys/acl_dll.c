@@ -4,6 +4,7 @@
 #include "stdlib/acl_define.h"
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_dll.h"
+#include "stdlib/acl_mymalloc.h"
 
 #ifdef ACL_UNIX
 #include <dlfcn.h>
@@ -29,7 +30,23 @@ ACL_DLL_HANDLE acl_dlopen(const char *dlname)
 	if (handle != NULL)
 		dlerror();  /* clear any existing error */
 #elif defined(ACL_WINDOWS)
-	handle = LoadLibrary(dlname);
+	{
+		int n = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS,
+			dlname, -1, NULL, 0);
+		if (n > 0) {
+			wchar_t *wname = (wchar_t *) acl_mymalloc(sizeof(wchar_t) * n);
+			if (MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS,
+				dlname, -1, wname, n) > 0)
+			{
+				handle = LoadLibraryW(wname);
+			} else {
+				handle = NULL;
+			}
+			acl_myfree(wname);
+		} else {
+			handle = LoadLibrary(dlname);
+		}
+	}
 #endif
 	if (handle == NULL)
 		acl_msg_error("%s(%d): open(%s) error(%s)",
