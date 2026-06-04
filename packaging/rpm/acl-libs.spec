@@ -2,7 +2,7 @@
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
-Version:        3.6.7
+Version:        3.6.8
 Release:        %{release_id}
 Group:          System/Libs
 License:        LGPL3.0,IBM
@@ -44,6 +44,16 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Thu Jun 04 2026 shuxin.zheng shuxin.zheng@qq.com 3.6.8-0-20260664.16
+- Bugfix: Fixed one bug in mime parsing for http & email;
+- Bugfix: Fixed one bug that the mime parser can't parse big file which's size is larger than 2GB;
+- Feature: Add builder module for http mime;
+- Feature: Add upload mime data in http_request module;
+- Workaround: Not be collision with libevent when compiling fiber module;
+- Optimize: Optimize acl_dll.c for windows platform;
+- Bugfix: Fixed one bug in xml parsing for one memory safety issue;
+- Building: Fixed some building warning.
 
 * Fri May 08 2026 shuxin.zheng shuxin.zheng@qq.com 3.6.7-0-20260508.12 
 - Optimize: Optimize stream::read() API for reading from UDP socket;
