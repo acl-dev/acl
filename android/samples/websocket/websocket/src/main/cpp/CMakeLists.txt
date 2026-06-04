@@ -56,7 +56,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Android")
 
     # xxx: don't set any CMAKE_SHARED_LINKER_FLAGS on NDK with gnustl_shared
     if (NOT ANDROID_STL MATCHES "gnustl_shared")
-        set(CMAKE_SHARED_LINKER_FLAGS "-fvisibility=hidden")
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fvisibility=hidden")
     endif()
     add_definitions("-fvisibility=hidden")
     add_definitions("-fvisibility-inlines-hidden")
@@ -101,7 +101,7 @@ endforeach()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Android")
     if (NOT ANDROID_STL MATCHES "gnustl_shared")
-        set(CMAKE_SHARED_LINKER_FLAGS "-shared -O3 -flto")
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -shared -O3 -flto")
     endif()
 endif()
 

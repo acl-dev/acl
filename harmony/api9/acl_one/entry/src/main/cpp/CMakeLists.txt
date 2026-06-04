@@ -51,7 +51,7 @@ set(libacl_cpp ${lib_acl_path}/libacl_cpp.a)
 set(libprotocol ${lib_acl_path}/libprotocol.a)
 
 set(lib_all ${libacl_cpp} ${libprotocol} ${libacl} -lz)
-set(CMAKE_SHARED_LINKER_FLAGS "-shared -O3 -flto")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -shared -O3 -flto")
 
 find_library(
     hilog-lib
