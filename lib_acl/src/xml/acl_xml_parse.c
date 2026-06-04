@@ -244,7 +244,6 @@ static const char *xml_meta_attr_name(ACL_XML_ATTR *attr, const char *data)
 	while ((ch = *data) != 0) {
 		if (ch == '=') {
 			data++;
-			ACL_VSTRING_TERMINATE(attr->name);
 			break;
 		}
 		if (!IS_SPACE(ch))
@@ -252,6 +251,7 @@ static const char *xml_meta_attr_name(ACL_XML_ATTR *attr, const char *data)
 		data++;
 	}
 
+	ACL_VSTRING_TERMINATE(attr->name);
 	return data;
 }
 
