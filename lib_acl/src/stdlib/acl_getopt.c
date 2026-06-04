@@ -26,8 +26,8 @@ void acl_getopt_init(void)
 
 int acl_getopt(int argc, char * argv[], const char *optstring)
 {
-	register char c;
-	register char *place;
+	char c;
+	const char *place;
 
 	acl_optarg = NULL;
 

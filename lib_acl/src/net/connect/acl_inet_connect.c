@@ -314,7 +314,7 @@ static struct addrinfo *resolve_addr(const char *name, const char *service)
 static int parse_addr(const char *addr, struct addr_res *res)
 {
 	char *ptr, *local;
-	const char *peer;
+	char *peer;
 
 	res->peer_family = PF_UNSPEC;
 

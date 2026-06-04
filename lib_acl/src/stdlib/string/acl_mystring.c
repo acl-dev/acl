@@ -222,7 +222,8 @@ int acl_strstrip(const char *haystack, const char *needle,
 	char *buf, int bsize)
 {
 	const char *src;
-	char *des, *ptr;
+	char *des;
+	const char *ptr;
 	int len, n, ncpy = 0;
 
 	if (haystack == NULL || *haystack == 0 || needle == NULL
