@@ -52,7 +52,7 @@ rm -rf %{buildroot}
 - Feature: Add upload mime data in http_request module;
 - Workaround: Not be collision with libevent when compiling fiber module;
 - Optimize: Optimize acl_dll.c for windows platform;
-- Bugfix: Fixed one bug in xml parsing for one memory safety issue;
+- Bugfix: Fixed one bug in xml parsing for one memory safety issue, by damseleng in github;
 - Building: Fixed some building warning.
 
 * Fri May 08 2026 shuxin.zheng shuxin.zheng@qq.com 3.6.7-0-20260508.12 
