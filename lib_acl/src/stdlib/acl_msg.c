@@ -36,9 +36,23 @@ static int __trace_enable = 0;
 static ACL_MSG_OPEN_FN __open_fn = NULL;
 static ACL_MSG_CLOSE_FN __close_fn = NULL;
 static ACL_MSG_WRITE_FN __write_fn = NULL;
+static ACL_MSG_WRITE_FN_EX __write_fn_ex = NULL;
 static ACL_MSG_PRE_WRITE_FN __pre_write_fn = NULL;
 static void *__pre_write_ctx = NULL;
 static void *__msg_ctx = NULL;
+
+static void acl_msg_write_internal(const char *level, const char *fmt, va_list ap)
+{
+	if (__log_open_flag) {
+		if (__write_fn_ex != NULL) {
+			__write_fn_ex(__msg_ctx, level, fmt, ap);
+		} else if (__write_fn != NULL) {
+			__write_fn(__msg_ctx, fmt, ap);
+		} else {
+			acl_write_to_log2(level, fmt, ap);
+		}
+	}
+}
 
 void acl_msg_register(ACL_MSG_OPEN_FN open_fn, ACL_MSG_CLOSE_FN close_fn,
 	ACL_MSG_WRITE_FN write_fn, void *ctx)
@@ -49,6 +63,20 @@ void acl_msg_register(ACL_MSG_OPEN_FN open_fn, ACL_MSG_CLOSE_FN close_fn,
 	__open_fn = open_fn;
     __close_fn = close_fn;
 	__write_fn = write_fn;
+	__write_fn_ex = NULL;
+	__msg_ctx = ctx;
+}
+
+void acl_msg_register_ex(ACL_MSG_OPEN_FN open_fn, ACL_MSG_CLOSE_FN close_fn,
+	ACL_MSG_WRITE_FN_EX write_fn, void *ctx)
+{
+	if (open_fn == NULL || write_fn == NULL)
+		return;
+
+	__open_fn = open_fn;
+    __close_fn = close_fn;
+	__write_fn = NULL;
+	__write_fn_ex = write_fn;
 	__msg_ctx = ctx;
 }
 
@@ -57,6 +85,7 @@ void acl_msg_unregister(void)
 	__open_fn = NULL;
 	__close_fn = NULL;
 	__write_fn = NULL;
+	__write_fn_ex = NULL;
 	__msg_ctx = NULL;
 }
 
@@ -88,6 +117,7 @@ void acl_msg_open2(ACL_VSTREAM *fp, const char *info_pre)
 			__open_fn = NULL;
 			__close_fn = NULL;
 			__write_fn = NULL;
+			__write_fn_ex = NULL;
 			__msg_ctx = NULL;
 			acl_log_fp_set(fp, info_pre);
 		}
@@ -115,6 +145,7 @@ void acl_msg_open(const char *log_file, const char *info_pre)
 			__open_fn = NULL;
 			__close_fn = NULL;
 			__write_fn = NULL;
+			__write_fn_ex = NULL;
 			__msg_ctx = NULL;
 			ret = acl_open_log(log_file, info_pre);
 		}
@@ -127,6 +158,7 @@ void acl_msg_open(const char *log_file, const char *info_pre)
 		__log_open_flag = 0;
 		__open_fn = NULL;
 		__write_fn = NULL;
+		__write_fn_ex = NULL;
 		__msg_ctx = NULL;
 		return;
 	}
@@ -170,13 +202,7 @@ void acl_msg_info(const char *fmt,...)
 		__pre_write_fn(__pre_write_ctx, fmt, ap);
 	}
 
-	if (__log_open_flag) {
-		if (__write_fn != NULL) {
-			__write_fn(__msg_ctx, fmt, ap);
-		} else {
-			acl_write_to_log2("info", fmt, ap);
-		}
-	}
+	acl_msg_write_internal("info", fmt, ap);
 
 	va_end (ap);
 }
@@ -204,13 +230,7 @@ void acl_msg_info2(const char *fmt, va_list ap)
 		__pre_write_fn(__pre_write_ctx, fmt, ap);
 	}
 
-	if (__log_open_flag) {
-		if (__write_fn != NULL) {
-			__write_fn(__msg_ctx, fmt, ap);
-		} else {
-			acl_write_to_log2("info", fmt, ap);
-		}
-	}
+	acl_msg_write_internal("info", fmt, ap);
 }
 
 void acl_msg_warn(const char *fmt,...)
@@ -242,13 +262,7 @@ void acl_msg_warn(const char *fmt,...)
 		__pre_write_fn(__pre_write_ctx, fmt, ap);
 	}
 
-	if (__log_open_flag) {
-		if (__write_fn != NULL) {
-			__write_fn(__msg_ctx, fmt, ap);
-		} else {
-			acl_write_to_log2("warn", fmt, ap);
-		}
-	}
+	acl_msg_write_internal("warn", fmt, ap);
 
 	va_end (ap);
 
@@ -280,13 +294,7 @@ void acl_msg_warn2(const char *fmt, va_list ap)
 		__pre_write_fn(__pre_write_ctx, fmt, ap);
 	}
 
-	if (__log_open_flag) {
-		if (__write_fn != NULL) {
-			__write_fn(__msg_ctx, fmt, ap);
-		} else {
-			acl_write_to_log2("warn", fmt, ap);
-		}
-	}
+	acl_msg_write_internal("warn", fmt, ap);
 
 	if (__trace_enable) {
 		acl_trace_info();
@@ -320,13 +328,7 @@ void acl_msg_error(const char *fmt,...)
 		__pre_write_fn(__pre_write_ctx, fmt, ap);
 	}
 
-	if (__log_open_flag) {
-		if (__write_fn != NULL) {
-			__write_fn(__msg_ctx, fmt, ap);
-		} else {
-			acl_write_to_log2("error", fmt, ap);
-		}
-	}
+	acl_msg_write_internal("error", fmt, ap);
 
 	va_end (ap);
 
@@ -358,13 +360,7 @@ void acl_msg_error2(const char *fmt, va_list ap)
 		__pre_write_fn(__pre_write_ctx, fmt, ap);
 	}
 
-	if (__log_open_flag) {
-		if (__write_fn != NULL) {
-			__write_fn(__msg_ctx, fmt, ap);
-		} else {
-			acl_write_to_log2("error", fmt, ap);
-		}
-	}
+	acl_msg_write_internal("error", fmt, ap);
 
 	if (__trace_enable) {
 		acl_trace_info();
@@ -400,13 +396,7 @@ void acl_msg_fatal(const char *fmt,...)
 		__pre_write_fn(__pre_write_ctx, fmt, ap);
 	}
 
-	if (__log_open_flag) {
-		if (__write_fn != NULL) {
-			__write_fn(__msg_ctx, fmt, ap);
-		} else {
-			acl_write_to_log2("fatal", fmt, ap);
-		}
-	}
+	acl_msg_write_internal("fatal", fmt, ap);
 
 	va_end (ap);
 	acl_trace_info();
@@ -437,13 +427,7 @@ void acl_msg_fatal2(const char *fmt, va_list ap)
 		__pre_write_fn(__pre_write_ctx, fmt, ap);
 	}
 
-	if (__log_open_flag) {
-		if (__write_fn != NULL) {
-			__write_fn(__msg_ctx, fmt, ap);
-		} else {
-			acl_write_to_log2("fatal", fmt, ap);
-		}
-	}
+	acl_msg_write_internal("fatal", fmt, ap);
 
 	acl_trace_info();
 	acl_close_log();
@@ -475,13 +459,7 @@ void acl_msg_fatal_status(int status, const char *fmt,...)
 #endif
 	}
 
-	if (__log_open_flag) {
-		if (__write_fn != NULL) {
-			__write_fn(__msg_ctx, fmt, ap);
-		} else {
-			acl_write_to_log2("fatal", fmt, ap);
-		}
-	}
+	acl_msg_write_internal("fatal", fmt, ap);
 
 	va_end (ap);
 	acl_trace_info();
@@ -510,13 +488,7 @@ void acl_msg_fatal_status2(int status, const char *fmt, va_list ap)
 #endif
 	}
 
-	if (__log_open_flag) {
-		if (__write_fn != NULL) {
-			__write_fn(__msg_ctx, fmt, ap);
-		} else {
-			acl_write_to_log2("fatal", fmt, ap);
-		}
-	}
+	acl_msg_write_internal("fatal", fmt, ap);
 
 	acl_trace_info();
 	acl_close_log();
@@ -550,13 +522,7 @@ void acl_msg_panic(const char *fmt,...)
 		__pre_write_fn(__pre_write_ctx, fmt, ap);
 	}
 
-	if (__log_open_flag) {
-		if (__write_fn != NULL) {
-			__write_fn(__msg_ctx, fmt, ap);
-		} else {
-			acl_write_to_log2("panic", fmt, ap);
-		}
-	}
+	acl_msg_write_internal("panic", fmt, ap);
 
 	va_end (ap);
 	acl_trace_info();
@@ -587,13 +553,7 @@ void acl_msg_panic2(const char *fmt, va_list ap)
 		__pre_write_fn(__pre_write_ctx, fmt, ap);
 	}
 
-	if (__log_open_flag) {
-		if (__write_fn != NULL) {
-			__write_fn(__msg_ctx, fmt, ap);
-		} else {
-			acl_write_to_log2("panic", fmt, ap);
-		}
-	}
+	acl_msg_write_internal("panic", fmt, ap);
 
 	acl_trace_info();
 	acl_close_log();

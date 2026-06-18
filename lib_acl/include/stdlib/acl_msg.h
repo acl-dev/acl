@@ -54,6 +54,17 @@ typedef void (*ACL_MSG_CLOSE_FN) (void *ctx);
 typedef void (*ACL_MSG_WRITE_FN) (void *ctx, const char *fmt, va_list ap);
 
 /**
+ * Applications can customize log write functions through this callback type,
+ * and get the log level when logs are written.
+ * @param ctx {void*} Parameter passed by the application
+ * @param level {const char*} Log level string
+ * @param fmt {const char*} Format string
+ * @param ap {va_list} Parameter list
+ */
+typedef void (*ACL_MSG_WRITE_FN_EX) (void *ctx, const char *level,
+	const char *fmt, va_list ap);
+
+/**
  * Call this function before logging to register the application's own log open function,
  * log close function, and log write function.
  * @param open_fn {ACL_MSG_OPEN_FN} Custom log open function
@@ -63,6 +74,18 @@ typedef void (*ACL_MSG_WRITE_FN) (void *ctx, const char *fmt, va_list ap);
  */
 ACL_API void acl_msg_register(ACL_MSG_OPEN_FN open_fn, ACL_MSG_CLOSE_FN close_fn,
         ACL_MSG_WRITE_FN write_fn, void *ctx);
+
+/**
+ * Call this function before logging to register the application's own log open function,
+ * log close function, and log write function with log level. This registration and
+ * acl_msg_register are mutually exclusive; the later registration replaces the former.
+ * @param open_fn {ACL_MSG_OPEN_FN} Custom log open function
+ * @param close_fn {ACL_MSG_CLOSE_FN} Custom log close function
+ * @param write_fn {ACL_MSG_WRITE_FN_EX} Custom log write function with log level
+ * @param ctx {void*} Custom context
+ */
+ACL_API void acl_msg_register_ex(ACL_MSG_OPEN_FN open_fn,
+	ACL_MSG_CLOSE_FN close_fn, ACL_MSG_WRITE_FN_EX write_fn, void *ctx);
 
 /**
  * Unregister custom functions registered via acl_msg_register and restore default log handlers.
