@@ -1314,13 +1314,9 @@ http_header& http_header::set_transfer_gzip(bool on)
 		is_request_ = false;
 
 		// 必须尝试加载 zlib 库，如果失败，则设为非 gzip 方式
-		if (zlib_stream::zlib_load_once()) {
-			transfer_gzip_ = on;
-		} else {
-			transfer_gzip_ = on;
-		}
+		transfer_gzip_ = on && zlib_stream::zlib_load_once();
 	} else {
-		transfer_gzip_ = on;
+		transfer_gzip_ = false;
 	}
 	return *this;
 }

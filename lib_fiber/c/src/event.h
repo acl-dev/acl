@@ -48,9 +48,15 @@
     } \
 } while (0)
 #else
+# ifdef SYS_WIN
+#  define SYS_GETTIME acl_fiber_gettimeofday
+# else
+#  define SYS_GETTIME gettimeofday
+# endif
+
 # define SET_TIME(x) do { \
     struct timeval _tv; \
-    if (gettimeofday(&_tv, NULL) == 0) { \
+    if (SYS_GETTIME(&_tv, NULL) == 0) { \
         (x) = ((long long) _tv.tv_sec) * 1000 + ((long long) _tv.tv_usec)/ 1000; \
     } else { \
         abort(); \

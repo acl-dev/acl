@@ -77,7 +77,7 @@ typedef struct {
 	int tzflag;
 } TIME_CTX_T;
 
-int gettimeofday(struct timeval *tv, struct timezone *tz)
+int acl_fiber_gettimeofday(struct timeval *tv, struct timezone *tz)
 {
 	FILETIME        ft;
 	LARGE_INTEGER   li;

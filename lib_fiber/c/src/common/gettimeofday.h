@@ -4,7 +4,7 @@
 #include "define.h"
 
 #ifdef SYS_WIN
-int gettimeofday(struct timeval *tv, struct timezone *tz);
+int acl_fiber_gettimeofday(struct timeval *tv, struct timezone *tz);
 #endif
 
 #if defined(USE_FAST_TIME)
