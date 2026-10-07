@@ -32,6 +32,11 @@ void fbase_event_open(FIBER_BASE* fbase)
 
 void fbase_event_open2(FIBER_BASE *fbase, int thread_only)
 {
+	if (fbase->event_in != INVALID_SOCKET) {
+		assert(fbase->event_out != INVALID_SOCKET);
+		return;
+	}
+
 #if defined(HAS_EVENTFD)
 	int flags = 0;
 # if !defined(ALPINE)
@@ -45,11 +50,6 @@ void fbase_event_open2(FIBER_BASE *fbase, int thread_only)
 	}
 #else
 	socket_t fds[2];
-
-	if (fbase->event_in != INVALID_SOCKET) {
-		assert(fbase->event_out != INVALID_SOCKET);
-		return;
-	}
 
 	if (sane_socketpair(AF_UNIX, SOCK_STREAM, 0, fds) < 0) {
 		msg_fatal("%s(%d), %s: acl_duplex_pipe error %s",
@@ -117,6 +117,7 @@ void fbase_event_close(FIBER_BASE *fbase)
 	fbase->event_out = INVALID_SOCKET;
 	fbase->in  = NULL;
 	fbase->out = NULL;
+	fbase->flag &= ~FBASE_F_OWNER;
 
 	/*
 	 * Directly allocated objects are not owned by the fiber IO registry.

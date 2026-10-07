@@ -21,6 +21,7 @@ typedef struct {
 	HTABLE      *events;
 #else
 	FILE_EVENT **events;
+	int          events_capacity;
 #endif
 	ARRAY       *cache;
 	int          cache_max;
@@ -75,8 +76,15 @@ static void thread_free(FIBER_TLS *tf)
 	timer_cache_free(tf->ev_timer);
 
 #ifdef SYS_WIN
-	htable_free(tf->events, NULL);
+	htable_free(tf->events, free_file);
 #else
+	for (int fd = 0; fd < tf->events_capacity; ++fd) {
+		FILE_EVENT *fe = tf->events[fd];
+		tf->events[fd] = NULL;
+		if (fe != NULL) {
+			file_event_unrefer(fe);
+		}
+	}
 	mem_free(tf->events);
 #endif
 
@@ -116,7 +124,8 @@ static void thread_init(void)
 #ifdef SYS_WIN
 	local->events    = htable_create(var_maxfd);
 #else
-	local->events    = (FILE_EVENT **) mem_calloc(var_maxfd, sizeof(FILE_EVENT*));
+	local->events_capacity = var_maxfd;
+	local->events = (FILE_EVENT **) mem_calloc(local->events_capacity, sizeof(FILE_EVENT*));
 #endif
 
 	local->cache     = array_create(100, ARRAY_F_UNORDER);
