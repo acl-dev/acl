@@ -66,9 +66,12 @@ void fbase_event_open2(FIBER_BASE *fbase, int thread_only)
 
 	if (thread_only) {
 		fbase->in = file_event_alloc(fbase->event_in);
+		fbase->flag |= FBASE_F_OWNER;
 	} else {
 		fbase->in = fiber_file_open(fbase->event_in);
+		fbase->flag &= ~FBASE_F_OWNER;
 	}
+
 	if (fbase->event_in == fbase->event_out) {
 		fbase->out = fbase->in;
 	} else if (thread_only) {
@@ -96,6 +99,9 @@ void fbase_event_open2(FIBER_BASE *fbase, int thread_only)
 
 void fbase_event_close(FIBER_BASE *fbase)
 {
+	FILE_EVENT *in = fbase->in, *out = fbase->out;
+	unsigned owned = fbase->flag & FBASE_F_OWNER;
+
 	if (fbase->event_in != INVALID_SOCKET) {
 		CLOSE_SOCKET(fbase->event_in);
 	}
@@ -111,6 +117,20 @@ void fbase_event_close(FIBER_BASE *fbase)
 	fbase->event_out = INVALID_SOCKET;
 	fbase->in  = NULL;
 	fbase->out = NULL;
+
+	/*
+	 * Directly allocated objects are not owned by the fiber IO registry.
+	 * Objects obtained through fiber_file_open() retain their existing
+	 * registry-managed lifetime.
+	 */
+	if (owned) {
+		if (out != NULL && out != in) {
+			file_event_unrefer(out);
+		}
+		if (in != NULL) {
+			file_event_unrefer(in);
+		}
+	}
 }
 
 int fbase_event_wait(FIBER_BASE *fbase)

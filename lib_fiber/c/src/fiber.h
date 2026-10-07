@@ -19,8 +19,9 @@ typedef struct {
 } FIBER_LOCAL;
 
 typedef struct FIBER_BASE {
-#define	FBASE_F_BASE	(1 << 0)
-#define FBASE_F_FIBER	(1 << 1)
+#define	FBASE_F_BASE		(1 << 0)
+#define FBASE_F_FIBER		(1 << 1)
+#define	FBASE_F_OWNER		(1 << 2)
 	unsigned flag;
 
 	socket_t event_in;
