@@ -48,11 +48,18 @@ typedef struct THREAD {
 static ATOMIC   *__idgen_atomic = NULL;
 static long long __idgen_value  = 0;
 static pthread_key_t __fiber_key;
+static pthread_once_t __fiber_key_once = PTHREAD_ONCE_INIT;
+static void thread_key_check(void);
 
 #define THREAD_LOCAL_DYNAMIC
 
 #ifdef THREAD_LOCAL_DYNAMIC
-# define __thread_local ((THREAD*) pthread_getspecific(__fiber_key))
+static THREAD *thread_local_get(void)
+{
+	thread_key_check();
+	return (THREAD *) pthread_getspecific(__fiber_key);
+}
+# define __thread_local thread_local_get()
 #else
 static __thread THREAD *__thread_local = NULL;
 #endif
@@ -139,12 +146,28 @@ static void thread_exit(void *ctx)
 	}
 }
 
-static void thread_once(void)
+static void thread_key_create(void)
 {
 	if (pthread_key_create(&__fiber_key, thread_exit) != 0) {
 		msg_fatal("%s(%d), %s: pthread_key_create error %s",
 			__FILE__, __LINE__, __FUNCTION__, last_serror());
 	}
+}
+
+/* Queries may run before fiber_check(), including from allocator hooks.
+ * Initialize only the key here, not the scheduler or its allocating state.
+ * Key zero may already belong to another library (for example jemalloc).
+ */
+static void thread_key_check(void)
+{
+	if (pthread_once(&__fiber_key_once, thread_key_create) != 0) {
+		abort();
+	}
+}
+
+static void thread_once(void)
+{
+	thread_key_check();
 
 #if defined(_WIN32) || defined(_WIN64)
 	lib_init();
